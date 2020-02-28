@@ -290,7 +290,7 @@ class Sensor:
 
     def disable(self):
         """Disable the sensor by cancelling its listeners."""
-        for name, listener in self.listeners:
+        for name, listener in self.listeners.items():
             if listener is not None:
                 self.monitor.controller.cancel_listen_state(listener)
                 self.listeners[name] = None
