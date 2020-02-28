@@ -1,0 +1,4 @@
+Media:
+  module: media
+  class: Media
+  steady_state_delay: 5 # delay in seconds before firing a tv state change

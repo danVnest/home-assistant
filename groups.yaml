@@ -1,0 +1,18 @@
+tv_lights:
+  name: TV Lights
+  entities:
+  - light.tv_left
+  - light.tv_middle
+  - light.tv_right
+  
+main_lights:
+  name: Main Lights
+  entities:
+  - group.tv_lights
+  - light.hall
+  
+#dining_lights:
+#  name: Dining Lights
+#  entities:
+#  - group.dining_close
+#  - light.dining_far

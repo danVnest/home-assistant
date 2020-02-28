@@ -1,0 +1,26 @@
+!.gitignore
+
+# Sensative information
+ip_bans.yaml
+known_devices.yaml
+secrets.yaml
+
+# Custom components (don't need details, except manifest.json)
+custom_components/*/*
+!custom_components/*/manifest.json
+
+# Logs
+logs
+*.log
+OZW_Log.txt
+
+# System files
+.storage
+.homekit.state
+states.yaml
+*.db
+options.xml
+zwscene.xml
+zwcfg_*
+pyozw.sqlite
+__pycache__

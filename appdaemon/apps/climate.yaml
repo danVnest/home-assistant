@@ -1,0 +1,11 @@
+Climate:
+  module: climate
+  class: Climate
+  max_target_temperature: 25 # maximum target temperature for aircon to achieve
+  min_target_temperature: 20 # minimum target temperature for aircon to achieve
+  max_day_temperature_trigger: 29 # threshold during daytime until climate control is triggered
+  max_night_temperature_trigger: 27 # threshold during nighttime until climate control is triggered
+  min_temperature_trigger: 15 # threshold until climate control is triggered
+  inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
+  target_trigger_buffer: 0.5 # difference between inside and target temperatures which triggers aircon off
+  aircon_trigger_delay: 2 # delay by this many minutes when climate control thresholds trigger aircon activation and user notification
