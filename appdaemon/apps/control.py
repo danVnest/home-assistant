@@ -78,8 +78,9 @@ class Control(hass.Hass):
             self.notify("House security on", title="Away")
             return "away_day" if time < self.evening_time() else "away_night"
         if self.scene == "sleep" and time < (
-            self.sunrise()
-            + datetime.timedelta(minutes=self.args["sunrise_offset"]).time()
+            (
+                self.sunrise() + datetime.timedelta(minutes=self.args["sunrise_offset"])
+            ).time()
         ):
             return "sleep"
         if time < self.evening_time():
