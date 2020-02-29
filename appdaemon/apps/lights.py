@@ -173,6 +173,7 @@ class Light:
     @brightness.setter
     def brightness(self, value):
         """Set and validate light's brightness."""
+        value = round(value)
         if self.brightness != value:
             if value < 0 or value > 255:
                 self.controller.log(
@@ -195,23 +196,25 @@ class Light:
         """Get the colour warmth value of the light from Home Assistant."""
         kelvin = self.get_attribute("color_temp")
         return (
-            self.kelvin_before_off if kelvin is None else round(1000000 / kelvin, 10,)
-        )  # convert from mireds to kelvin
+            round(1e6 / kelvin, 20) if kelvin is not None else self.kelvin_before_off
+        )  # Home Assistant uses mireds, so convert from kelvin and round to mired step
 
     @kelvin.setter
     def kelvin(self, value):
         """Set and validate light's warmth of colour."""
-        if self.kelvin != value and value is not None:
-            if value < 2000 or value > 4500:
+        if value is not None:
+            value = round(value, 20)  # 20 is the biggest mired step (1e6/222 - 1e6/223)
+            if self.kelvin != value:
+                if value < 2000 or value > 4500:
+                    self.controller.log(
+                        f"Kelvin ({value}) out of bounds for'{self.light_id}'",
+                        level="WARNING",
+                    )
                 self.controller.log(
-                    f"Kelvin ({value}) out of bounds for'{self.light_id}'",
-                    level="WARNING",
+                    f"Setting {self.light_id}'s kelvin from {self.kelvin} to {value}",
+                    level="DEBUG",
                 )
-            self.controller.log(
-                f"Setting {self.light_id}'s Kelvin from {self.kelvin} to {value}",
-                level="DEBUG",
-            )
-            self.controller.turn_on(self.light_id, kelvin=value)
+                self.controller.turn_on(self.light_id, kelvin=value)
 
     def adjust(self, brightness: int, kelvin: int):
         """Intelligently adjusts light brightness and kelvin in the nicest order."""
@@ -391,12 +394,13 @@ class MotionLight(Light):
                 self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
                 - self.scene_state_attributes[self.scene]["motion"]["kelvin"]
             )
-            steps = (
-                brightness_change
-                if brightness_change
-                >= kelvin_change / 10  # division by 10 normalises the two changes
-                else kelvin_change
-            )
+            mired_change = (
+                1e6 / self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
+                - 1e6 / self.scene_state_attributes[self.scene]["motion"]["kelvin"]
+            )  # lights change in 1 mired increments, not kelvin
+            steps = max(
+                abs(brightness_change), 255 / (400 - 222) * abs(mired_change)
+            )  # normalises to help account for non-proportional change between units
             if (
                 steps
                 > self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
