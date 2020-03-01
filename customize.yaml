@@ -1,0 +1,15 @@
+light.hall:
+  max_mireds: 500
+  min_mireds: 222
+light.kitchen:
+  max_mireds: 500
+  min_mireds: 222
+light.tv_left:
+  max_mireds: 500
+  min_mireds: 222
+light.tv_middle:
+  max_mireds: 500
+  min_mireds: 222
+light.tv_right:
+  max_mireds: 500
+  min_mireds: 222

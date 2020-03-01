@@ -196,14 +196,18 @@ class Light:
         """Get the colour warmth value of the light from Home Assistant."""
         kelvin = self.get_attribute("color_temp")
         return (
-            round(1e6 / kelvin, 20) if kelvin is not None else self.kelvin_before_off
+            20 * round(1e6 / 20 / kelvin)
+            if kelvin is not None
+            else self.kelvin_before_off
         )  # Home Assistant uses mireds, so convert from kelvin and round to mired step
 
     @kelvin.setter
     def kelvin(self, value):
         """Set and validate light's warmth of colour."""
         if value is not None:
-            value = round(value, 20)  # 20 is the biggest mired step (1e6/222 - 1e6/223)
+            value = 20 * round(
+                value / 20
+            )  # 20 is the biggest mired step (1e6/222 - 1e6/223)
             if self.kelvin != value:
                 if value < 2000 or value > 4500:
                     self.controller.log(
