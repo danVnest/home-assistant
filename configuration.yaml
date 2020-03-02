@@ -4,6 +4,9 @@ default_config:
 # discovery: # included in default
 # ios:  # included in default
 
+homeassistant:
+  customize: !include customize.yaml
+
 http:
   base_url: !secret http_url
   server_port: !secret http_port
