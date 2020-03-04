@@ -6,7 +6,7 @@ Also includes localised adjustments based on motion detection.
 User defined variables are configued in lights.yaml
 """
 import datetime
-from typing import Union
+from typing import Tuple
 
 import appdaemon.plugins.hass.hassapi as hass
 
@@ -45,43 +45,38 @@ class Lights(hass.Hass):
         if self.circadian_timer is not None:
             self.cancel_timer(self.circadian_timer)
             self.circadian_timer = None
+        self.lights["kitchen"].scene = data["scene"]
         if data["scene"] == "day":
-            self.lights["kitchen"].turn_off_and_disable()
             self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
         elif data["scene"] == "night":
+            self.circadian_progression(None)
             self.circadian_timer = self.run_every(
                 self.circadian_progression,
-                self.datetime() + datetime.timedelta(seconds=1),
+                self.datetime() + datetime.timedelta(seconds=60),
                 60,
             )  # (end_time - start_time) / 255) ≈ 60 seconds
-            self.circadian_progression(None)
         elif data["scene"] == "bright":
             bright = 255
             white = 4500
-            self.lights["kitchen"].set_scene("bright")
             self.lights["tv"].adjust(bright, white)
             self.lights["hall"].adjust(bright, white)
             self.lights["bedroom"].adjust(bright, white)
         elif data["scene"] == "tv":
-            self.lights["kitchen"].set_scene("tv")
             self.lights["tv"].adjust(self.args["tv_brightness"], self.args["tv_kelvin"])
             self.lights["hall"].adjust(
                 self.args["tv_brightness"], self.args["tv_kelvin"]
             )
         elif data["scene"] == "sleep":
-            self.lights["kitchen"].set_scene("sleep")
             self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
         elif data["scene"] == "away_day":
-            self.lights["kitchen"].turn_off_and_disable()
             self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
         elif data["scene"] == "away_night":
-            self.lights["kitchen"].set_scene("away_night")
             self.lights["tv"].brightness = 0
             self.lights["hall"].adjust(255, kelvin=4500)
             self.lights["bedroom"].brightness = 0
@@ -260,7 +255,6 @@ class MotionLight(Light):
         self.state = "no_motion"
         self.detectors = dict.fromkeys(["no_motion", "motion"])
         self.long_motion_transitioner = None
-        self.scene = "day"
         self.scene_state_attributes = {
             "day": {
                 "no_motion": {"brightness": 0, "kelvin": None, "delay": "off"},
@@ -268,30 +262,66 @@ class MotionLight(Light):
                 "long_motion": {"brightness": 0, "kelvin": None, "delay": "off"},
             }
         }
+        self._scene = "day"
+
+    @property
+    def scene(self) -> str:
+        """Return what scene is currently set."""
+        return self._scene
+
+    @scene.setter
+    def scene(self, new_scene: str):
+        """Adjust to lighting for the new scene and reconfigure motion capture."""
+        old_scene = self._scene
+        if new_scene not in self.scene_state_attributes:
+            self.configure_scene_with_user_args(new_scene)
+        if (
+            self.scene_state_attributes[old_scene]["no_motion"]["delay"]
+            != self.scene_state_attributes[new_scene]["no_motion"]["delay"]
+        ):
+            self.configure_motion_monitoring(
+                self.scene_state_attributes[new_scene]["no_motion"]["delay"],
+                self.scene_state_attributes[old_scene]["no_motion"]["delay"],
+            )
+        self._scene = new_scene
+        if self.state != "motion" or self.is_long_motion_transition_valid() is False:
+            self.adjust_with_scene_state_attributes()
+
+    def configure_motion_monitoring(self, new_delay, old_delay):
+        """Start, stop, or reconfigure motion monitoring based on new and old delays."""
+        monitor_motion = new_delay != "off"
+        reconfigure = monitor_motion is True and old_delay != "off"
+        if monitor_motion is False or reconfigure is True:
+            self.controller.cancel_listen_state(self.detectors["no_motion"])
+            self.detectors["no_motion"] = None
+        if monitor_motion is False:
+            self.state = "no_motion"
+            self.controller.cancel_listen_state(self.detectors["motion"])
+            self.detectors["motion"] = None
+            if self.long_motion_transitioner is not None:
+                self.controller.cancel_timer(self.long_motion_transitioner)
+                self.long_motion_transitioner = None
+        else:
+            self.detectors["no_motion"] = self.controller.listen_state(
+                self.no_motion,
+                self.sensor_id,
+                new="0",
+                duration=new_delay,
+                immediate=True,
+            )
+            if reconfigure is False:
+                self.detectors["motion"] = self.controller.listen_state(
+                    self.motion, self.sensor_id, old="0"
+                )
+        self.controller.log(
+            f"Motion monitoring for {self.light_id} is"
+            f" {'on' if monitor_motion is True else 'off'}"
+            f"{' and reconfigured' if reconfigure is True else ''}"
+        )
 
     def turn_off_and_disable(self):
         """Turn the light off and disable future changes based on motion (aka day)."""
-        self.set_scene("day")
-
-    def set_scene(self, scene: str):
-        """Adjust to appropriate lighting for scene and reconfigure motion capture."""
-        old_scene = self.scene
-        self.scene = scene
-        if scene not in self.scene_state_attributes:
-            self.configure_scene_with_user_args(scene)
-        if (
-            self.scene_state_attributes[old_scene]["no_motion"]["delay"]
-            != self.scene_state_attributes[scene]["no_motion"]["delay"]
-        ):
-            if self.scene_state_attributes[old_scene]["no_motion"]["delay"] == "off":
-                self.monitor_motion(True)
-            elif self.scene_state_attributes[scene]["no_motion"]["delay"] == "off":
-                self.monitor_motion(False)
-            else:
-                self.monitor_motion("reconfigure")
-        self.adjust_with_scene_state_attributes()
-        if self.state == "motion":
-            self.start_transition_to_long_motion()
+        self.scene = "day"
 
     def configure_scene_with_user_args(self, scene: str):
         """Configure and store scene attributes with user specified values."""
@@ -321,8 +351,6 @@ class MotionLight(Light):
 
     def adjust_circadian(self, brightness: int, kelvin: int):
         """Adjust lighting with new circadian values. Configures long_motion if dim."""
-        if self.scene != "night":
-            self.set_scene("night")
         self.scene_state_attributes[self.scene]["long_motion"]["delay"] = (
             "off"
             if brightness > self.controller.args["motion_brightness_threshold"]
@@ -335,33 +363,6 @@ class MotionLight(Light):
             self.scene_state_attributes[self.scene]["motion"]["kelvin"] = kelvin
         if self.state == "no_motion":
             self.adjust_with_scene_state_attributes()
-
-    def monitor_motion(self, monitor_motion: Union[bool, str]):
-        """Configure light to monitor motion or not, or reconfigure."""
-        if (monitor_motion is not True) and self.detectors["no_motion"] is not None:
-            self.controller.cancel_listen_state(self.detectors["no_motion"])
-            self.controller.cancel_listen_state(self.detectors["motion"])
-            self.detectors["no_motion"] = None
-            self.detectors["motion"] = None
-            if self.long_motion_transitioner is not None:
-                self.controller.cancel_timer(self.long_motion_transitioner)
-                self.long_motion_transitioner = None
-            if monitor_motion is False:
-                self.state = "no_motion"
-        if (monitor_motion is not False) and self.detectors["no_motion"] is None:
-            self.detectors["no_motion"] = self.controller.listen_state(
-                self.no_motion,
-                self.sensor_id,
-                new="0",
-                duration=self.scene_state_attributes[self.scene]["no_motion"]["delay"],
-                immediate=True,
-            )
-            self.detectors["motion"] = self.controller.listen_state(
-                self.motion, self.sensor_id, old="0"
-            )
-        self.controller.log(
-            f"Motion monitoring for {self.light_id} is set to: {monitor_motion}"
-        )
 
     def no_motion(
         self, entity: str, attribute: str, old: int, new: int, kwargs: dict
@@ -380,69 +381,117 @@ class MotionLight(Light):
     ):  # pylint: disable=too-many-arguments
         """Set state to 'motion' and adjust lighting when motion is detected."""
         del entity, attribute, old, new, kwargs
-        self.state = "motion"
-        self.controller.log(f"Motion detected on {self.sensor_id}")
-        self.adjust_with_scene_state_attributes()
-        self.start_transition_to_long_motion()
+        if self.state == "no_motion":
+            self.state = "motion"
+            self.controller.log(f"Motion detected on {self.sensor_id}")
+            self.adjust_with_scene_state_attributes()
+            self.start_transition_to_long_motion()
 
     def start_transition_to_long_motion(self):
         """Calculate the light change required and start the transition."""
-        if self.long_motion_transitioner is not None:
-            self.controller.cancel_timer(self.long_motion_transitioner)
         if self.scene_state_attributes[self.scene]["long_motion"]["delay"] != "off":
-            brightness_change = (
-                self.scene_state_attributes[self.scene]["long_motion"]["brightness"]
-                - self.scene_state_attributes[self.scene]["motion"]["brightness"]
-            )
-            kelvin_change = (
-                self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
-                - self.scene_state_attributes[self.scene]["motion"]["kelvin"]
-            )
-            mired_change = (
-                1e6 / self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
-                - 1e6 / self.scene_state_attributes[self.scene]["motion"]["kelvin"]
-            )  # lights change in 1 mired increments, not kelvin
-            steps = max(
-                abs(brightness_change), 255 / (400 - 222) * abs(mired_change)
-            )  # normalises to help account for non-proportional change between units
-            if (
-                steps
-                > self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
-            ):  # can handle up to 2 steps per second
-                steps = (
-                    self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
-                )
-            brightness_step = brightness_change / steps if brightness_change != 0 else 0
-            kelvin_step = kelvin_change / steps if kelvin_change != 0 else 0
+            (
+                brightness_step,
+                kelvin_step,
+                steps,
+                step_time,
+            ) = self.calculate_long_motion_step()
             self.long_motion_transitioner = self.controller.run_in(
                 self.transition_towards_long_motion,
-                1,
+                step_time,
                 brightness_step=brightness_step,
                 kelvin_step=kelvin_step,
                 steps_remaining=steps,
+                step_time=step_time,
+                scene=self.scene,
             )
+
+    def calculate_long_motion_step(self) -> Tuple[int, int, int, float]:
+        """Calculate the light change required for each transition step."""
+        brightness_change = (
+            self.scene_state_attributes[self.scene]["long_motion"]["brightness"]
+            - self.brightness
+        )
+        kelvin_change = (
+            self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
+            - self.kelvin
+        )
+        if brightness_change == 0 and kelvin_change == 0:
+            return (0, 0, 0, 0)
+        mired_change = (
+            1e6 / self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
+            - 1e6 / self.kelvin
+        )  # lights change in 1 mired increments, not kelvin
+        steps = max(
+            abs(brightness_change), int(255 / (400 - 222) * abs(mired_change))
+        )  # normalises to help account for non-proportional change between units
+        if (
+            steps > self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
+        ):  # can handle up to 2 steps per second
+            steps = self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
+        return (
+            brightness_change / steps if brightness_change != 0 else 0,
+            kelvin_change / steps if kelvin_change != 0 else 0,
+            steps,
+            self.scene_state_attributes[self.scene]["long_motion"]["delay"] / steps,
+        )
+
+    def is_long_motion_transition_valid(self) -> bool:
+        """Check if lighting values are between initial and long motion values."""
+        brightness = sorted(
+            [
+                self.scene_state_attributes[self.scene]["motion"]["brightness"],
+                self.scene_state_attributes[self.scene]["long_motion"]["brightness"],
+            ]
+        )
+        if not brightness[0] < self.brightness < brightness[1]:
+            return False
+        kelvin = sorted(
+            [
+                self.scene_state_attributes[self.scene]["motion"]["kelvin"],
+                self.scene_state_attributes[self.scene]["long_motion"]["kelvin"],
+            ]
+        )
+        if not kelvin[0] < self.brightness < kelvin[1]:
+            return False
+        return True
 
     def transition_towards_long_motion(self, kwargs: dict):
         """Step towards lighting settings for after a long period of motion."""
-        if kwargs["steps_remaining"] == 1:
-            self.controller.log(f"Long motion transition complete for {self.light_id}")
-            self.long_motion_transitioner = None
-            self.state = "long_motion"
-            self.adjust_with_scene_state_attributes()
-        else:
-            self.adjust(
-                self.brightness + kwargs["brightness_step"],
-                self.kelvin + kwargs["kelvin_step"],
+        if self.state == "motion":
+            if kwargs["scene"] != self.scene:
+                (
+                    kwargs["brightness_step"],
+                    kwargs["kelvin_step"],
+                    kwargs["steps_remaining"],
+                    kwargs["step_time"],
+                ) = self.calculate_long_motion_step()
+            steps_remaining = kwargs["steps_remaining"] - 1
+            if steps_remaining <= 0:
+                self.controller.log(
+                    f"Long motion transition complete for {self.light_id}"
+                )
+                self.long_motion_transitioner = None
+                self.state = "long_motion"
+                self.adjust_with_scene_state_attributes()
+            else:
+                self.adjust(
+                    self.scene_state_attributes[self.scene]["long_motion"]["brightness"]
+                    - kwargs["brightness_step"] * steps_remaining,
+                    self.scene_state_attributes[self.scene]["long_motion"]["kelvin"]
+                    - kwargs["kelvin_step"] * steps_remaining,
+                )
+                self.long_motion_transitioner = self.controller.run_in(
+                    self.transition_towards_long_motion,
+                    kwargs["step_time"],
+                    brightness_step=kwargs["brightness_step"],
+                    kelvin_step=kwargs["kelvin_step"],
+                    step_time=kwargs["step_time"],
+                    steps_remaining=steps_remaining,
+                    scene=self.scene,
+                )
+            self.controller.log(
+                f"Brightness: {self.brightness}"
+                f" Kelvin: {self.kelvin}"
+                f" Step: {kwargs['steps_remaining']}"
             )
-            self.long_motion_transitioner = self.controller.run_in(
-                self.transition_towards_long_motion,
-                1,
-                brightness_step=kwargs["brightness_step"],
-                kelvin_step=kwargs["kelvin_step"],
-                steps_remaining=kwargs["steps_remaining"] - 1,
-            )
-        self.controller.log(
-            f"Brightness: {self.brightness}"
-            f" Kelvin: {self.kelvin}"
-            f" Step: {kwargs['steps_remaining']}"
-        )
