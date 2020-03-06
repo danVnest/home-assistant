@@ -132,12 +132,12 @@ class Climate(hass.Hass):
             if self.temperature_monitor.is_maximum_forecast():
                 self.suggest(
                     "It's forecast to reach"
-                    f" {self.temperature_monitor.forecast['maximum']}"
-                    "º, consider enabling climate control."
+                    f" {self.temperature_monitor.forecast['maximum']}º,"
+                    " consider enabling climate control."
                 )
             if self.temperature_monitor.is_minimum_forecast():
                 self.suggest(
-                    "It's forecast to reach"
+                    "It's forecast to fall to"
                     f" {self.temperature_monitor.forecast['minimum']}º,"
                     " consider enabling climate control."
                 )
@@ -554,31 +554,20 @@ class TemperatureMonitor:
     def is_minimum_forecast(self) -> bool:
         """Check if the minimum temperature forecast is below the minimum trigger."""
         forecast = self.controller.get_state("sensor.bom_forecast_min_temp_c_0")
-        if forecast != "n/a" and forecast is not None:
-            self.forecast["minimum"] = float(forecast)
-            if (
-                self.forecast["minimum"]
-                > self.controller.args["min_temperature_trigger"]
-            ):
-                return True
-        else:
-            self.controller.log(
-                "Minimum temperature forecast is 'n/a' or None", level="WARNING"
-            )
-        return False
+        if forecast == "n/a":
+            forecast = self.controller.get_state("sensor.bom_forecast_min_temp_c_1")
+        self.forecast["minimum"] = float(forecast)
+        return (
+            self.forecast["minimum"] <= self.controller.args["min_temperature_trigger"]
+        )
 
     def is_maximum_forecast(self) -> bool:
         """Check if the maximum temperature forecast is above the maximum trigger."""
         forecast = self.controller.get_state("sensor.bom_forecast_max_temp_c_0")
-        if forecast != "n/a" and forecast is not None:
-            self.forecast["maximum"] = float(forecast)
-            if self.forecast["maximum"] < self.current_max_temperature_trigger:
-                return True
-        else:
-            self.controller.log(
-                "Maximum temperature forecast is 'n/a' or None", level="WARNING"
-            )
-        return False
+        if forecast == "n/a":
+            forecast = self.controller.get_state("sensor.bom_forecast_max_temp_c_1")
+        self.forecast["maximum"] = float(forecast)
+        return self.forecast["maximum"] >= self.current_max_temperature_trigger
 
 
 class Aircon:
