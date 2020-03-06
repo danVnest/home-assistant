@@ -156,13 +156,20 @@ class Light:
         self.controller = controller
         self.brightness_before_off = 0
         self.kelvin_before_off = 4500
+        self.dimmable = (
+            self.controller.get_state(self.light_id, attribute="supported_features")
+            == "0"
+        )
 
     @property
     def brightness(self) -> int:
         """Get the brightness of the light from Home Assistant."""
-        brightness = self.get_attribute("brightness")
-        if brightness is None:
-            brightness = 0
+        if self.dimmable is True:
+            brightness = self.get_attribute("brightness")
+            if brightness is None:
+                brightness = 0
+        else:
+            brightness = 255 if self.controller.get_state(self.light_id) == "on" else 0
         return brightness
 
     @brightness.setter
@@ -199,7 +206,7 @@ class Light:
     @kelvin.setter
     def kelvin(self, value):
         """Set and validate light's warmth of colour."""
-        if value is not None:
+        if value is not None and self.dimmable is True:
             value = 20 * round(
                 value / 20
             )  # 20 is the biggest mired step (1e6/222 - 1e6/223)
@@ -262,6 +269,7 @@ class MotionLight(Light):
                 "long_motion": {"brightness": 0, "kelvin": None, "delay": "off"},
             }
         }
+        self.scene_state_attributes["day_away"] = self.scene_state_attributes["day"]
         self._scene = "day"
 
     @property
