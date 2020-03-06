@@ -294,6 +294,12 @@ class MotionLight(Light):
         self._scene = new_scene
         if self.state != "motion" or self.is_long_motion_transition_valid() is False:
             self.adjust_with_scene_state_attributes()
+        else:
+            self.controller.log(
+                f"Light values of {self.light_id} are within new motion and"
+                "long motion settings - continuing transition",
+                level="DEBUG",
+            )
 
     def configure_motion_monitoring(self, new_delay, old_delay):
         """Start, stop, or reconfigure motion monitoring based on new and old delays."""
@@ -324,12 +330,9 @@ class MotionLight(Light):
         self.controller.log(
             f"Motion monitoring for {self.light_id} is"
             f" {'on' if monitor_motion is True else 'off'}"
-            f"{' and reconfigured' if reconfigure is True else ''}"
+            f"{' and reconfigured' if reconfigure is True else ''}",
+            level="DEBUG",
         )
-
-    def turn_off_and_disable(self):
-        """Turn the light off and disable future changes based on motion (aka day)."""
-        self.scene = "day"
 
     def configure_scene_with_user_args(self, scene: str):
         """Configure and store scene attributes with user specified values."""
@@ -431,18 +434,24 @@ class MotionLight(Light):
             - 1e6 / self.kelvin
         )  # lights change in 1 mired increments, not kelvin
         steps = max(
-            abs(brightness_change), int(255 / (400 - 222) * abs(mired_change))
+            abs(brightness_change), int(255 / (400 - 222) * abs(mired_change)), 1
         )  # normalises to help account for non-proportional change between units
         if (
             steps > self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
         ):  # can handle up to 2 steps per second
             steps = self.scene_state_attributes[self.scene]["long_motion"]["delay"] * 2
-        return (
-            brightness_change / steps if brightness_change != 0 else 0,
-            kelvin_change / steps if kelvin_change != 0 else 0,
-            steps,
-            self.scene_state_attributes[self.scene]["long_motion"]["delay"] / steps,
+        brightness_step = brightness_change / steps
+        kelvin_step = kelvin_change / steps
+        step_time = (
+            self.scene_state_attributes[self.scene]["long_motion"]["delay"] / steps
         )
+        self.controller.log(
+            f"Transitioning to long motion state with: steps = {steps}, step_time ="
+            f" {step_time}, brightness_step = {brightness_step}, kelvin_step ="
+            f" {kelvin_step}",
+            level="DEBUG",
+        )
+        return brightness_step, kelvin_step, steps, step_time
 
     def is_long_motion_transition_valid(self) -> bool:
         """Check if lighting values are between initial and long motion values."""
@@ -477,7 +486,8 @@ class MotionLight(Light):
             steps_remaining = kwargs["steps_remaining"] - 1
             if steps_remaining <= 0:
                 self.controller.log(
-                    f"Long motion transition complete for {self.light_id}"
+                    f"Long motion transition complete for {self.light_id}",
+                    level="DEBUG",
                 )
                 self.long_motion_transitioner = None
                 self.state = "long_motion"
@@ -498,8 +508,3 @@ class MotionLight(Light):
                     steps_remaining=steps_remaining,
                     scene=self.scene,
                 )
-            self.controller.log(
-                f"Brightness: {self.brightness}"
-                f" Kelvin: {self.kelvin}"
-                f" Step: {kwargs['steps_remaining']}"
-            )
