@@ -40,6 +40,7 @@ class Control(hass.Hass):
         self.listen_event(self.button, "zwave.scene_activated")
         self.listen_event(self.apple_tv, "TV")
         self.listen_event(self.everything_initialized, "appd_started")
+        self.listen_state(self.handle_presence_change, "person")
 
     def everything_initialized(self, event_name: str, data: dict, kwargs: dict):
         """Configure all other apps with the current scene and other states.
@@ -72,18 +73,17 @@ class Control(hass.Hass):
     def detect_scene(self) -> str:
         """Detect and return scene based on who's home, time, stored scene, etc."""
         self.log("Detecting scene")
-        time = self.time()
-
-        if self.noone_home():
-            self.notify("House security on", title="Away")
-            return "away_day" if time < self.evening_time() else "away_night"
-        if self.scene == "sleep" and time < (
-            (
+        if "home" not in self.get_state("person").values():
+            return "away_day" if self.time() < self.evening_time() else "away_night"
+        if (
+            self.scene == "sleep"
+            and self.time()
+            < (
                 self.sunrise() + datetime.timedelta(minutes=self.args["sunrise_offset"])
             ).time()
         ):
             return "sleep"
-        if time < self.evening_time():
+        if self.time() < self.evening_time():
             return "day"
         if self.get_state("media_player.living_room") == "playing":
             return "tv"
@@ -103,10 +103,9 @@ class Control(hass.Hass):
         """Change scene to day (callback for run_at_sunrise with offset)."""
         del kwargs
         self.log("Morning triggered")
-        if self.anyone_home():
-            self.set_scene("day")
-        else:
-            self.set_scene("day_away")
+        self.set_scene(
+            "day" if "home" in self.get_state("person").values() else "day_away"
+        )
 
     def evening(self, kwargs: dict):
         """Detect new scene and set it (callback for run_at_sunset with offset)."""
@@ -173,6 +172,39 @@ class Control(hass.Hass):
         elif self.scene == "tv":
             self.set_scene("night")
 
+    def handle_presence_change(
+        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Change scene if everyone has left home or if someone has come back."""
+        del attribute, old, kwargs
+        self.log(f"{entity} is {new}")
+        self.log(
+            self.get_state(f"person.{'rachel' if entity.endswith('dan') else 'dan'}")
+            != "home"
+        )
+        if new == "home":
+            if self.scene.startswith("away"):
+                self.notify(
+                    f"{self.get_state(entity, attribute='friendly_name')} is home."
+                    " Security is now disabled.",
+                    title="Home Security",
+                )
+                self.set_scene(self.detect_scene())
+        elif (
+            self.scene.startswith("away") is False
+            and self.get_state(
+                f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
+            )
+            != "home"
+        ):
+            self.notify(
+                "Everyone has left the house. Security is now enabled.",
+                title="Home Security",
+            )
+            self.set_scene(
+                "away_day" if self.time() < self.evening_time() else "away_night"
+            )
+
     def handle_log(
         self,
         app_name: str,
@@ -202,6 +234,11 @@ class Control(hass.Hass):
                 and self.error_notifier_timer is None
             ):
                 self.error_notifier_timer = self.run_in(self.notify_error, 5)
+
+    def notify(self, message: str, **kwargs):
+        """Send a notification to users and log the message."""
+        super().notify(message, **kwargs)
+        self.log(f"NOTIFICATION: {message}")
 
     def notify_error(self, kwargs: dict):
         """Notify users of errors in a structured and paced way."""

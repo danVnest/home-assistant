@@ -105,7 +105,8 @@ sensor:
 device_tracker:
   platform: netgear
   password: !secret orbi_password
-  #accesspoints: # TODO: if delays, look into this to solve
+  consider_home: 0:05
+  accesspoints: true # forces use of Orbi API v2, which is much faster
 
 tts:
   platform: google_translate

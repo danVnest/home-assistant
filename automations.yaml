@@ -13,16 +13,3 @@
       message: 'Home Assistant ready'
   - delay: 00:01 # TODO: remove?
   - service: homekit.start
-- id: '4901248580234'
-  alias: Notify when someone leaves home
-  trigger:
-    platform: zone
-    event: leave
-    zone: zone.home
-    entity_id:
-    - device_tracker.iphone
-    - device_tracker.rachel_s_phone # TODO: update with Google Maps integration
-  action:
-    service: notify.notify
-    data:
-      message: 'Someone left the house'
