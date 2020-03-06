@@ -494,9 +494,9 @@ class TemperatureMonitor:
             > self.outside_temperature + self.controller.args["inside_outside_trigger"]
         )
         too_hot_or_cold_outside = (
-            self.outside_temperature > self.current_max_temperature_trigger
-            or self.outside_temperature
-            < self.controller.args["min_temperature_trigger"]
+            not self.controller.args["min_temperature_trigger"]
+            <= self.outside_temperature
+            <= self.current_max_temperature_trigger
         )
         vs_str = f"({self.outside_temperature} vs {self.inside_temperature} degrees)"
         if any(

@@ -177,7 +177,7 @@ class Light:
         """Set and validate light's brightness."""
         value = round(value)
         if self.brightness != value:
-            if value < 0 or value > 255:
+            if not 0 <= value <= 255:
                 self.controller.log(
                     f"Brightness ({value}) out of bounds for'{self.light_id}'",
                     level="WARNING",
@@ -211,7 +211,7 @@ class Light:
                 value / 20
             )  # 20 is the biggest mired step (1e6/222 - 1e6/223)
             if self.kelvin != value:
-                if value < 2000 or value > 4500:
+                if not 2000 <= value <= 4500:
                     self.controller.log(
                         f"Kelvin ({value}) out of bounds for'{self.light_id}'",
                         level="WARNING",
@@ -292,14 +292,10 @@ class MotionLight(Light):
                 self.scene_state_attributes[old_scene]["no_motion"]["delay"],
             )
         self._scene = new_scene
-        if self.state != "motion" or self.is_long_motion_transition_valid() is False:
+        if self.state != "motion":
             self.adjust_with_scene_state_attributes()
         else:
-            self.controller.log(
-                f"Light values of {self.light_id} are within new motion and"
-                "long motion settings - continuing transition",
-                level="DEBUG",
-            )
+            self.validate_long_motion_transition()
 
     def configure_motion_monitoring(self, new_delay, old_delay):
         """Start, stop, or reconfigure motion monitoring based on new and old delays."""
@@ -453,25 +449,28 @@ class MotionLight(Light):
         )
         return brightness_step, kelvin_step, steps, step_time
 
-    def is_long_motion_transition_valid(self) -> bool:
-        """Check if lighting values are between initial and long motion values."""
-        brightness = sorted(
+    def validate_long_motion_transition(self):
+        """Ensure lighting values are between initial and long motion values."""
+        brightness_limits = sorted(
             [
                 self.scene_state_attributes[self.scene]["motion"]["brightness"],
                 self.scene_state_attributes[self.scene]["long_motion"]["brightness"],
             ]
         )
-        if not brightness[0] < self.brightness < brightness[1]:
-            return False
-        kelvin = sorted(
+        kelvin_limits = sorted(
             [
                 self.scene_state_attributes[self.scene]["motion"]["kelvin"],
                 self.scene_state_attributes[self.scene]["long_motion"]["kelvin"],
             ]
         )
-        if not kelvin[0] < self.brightness < kelvin[1]:
-            return False
-        return True
+        if self.brightness < brightness_limits[0]:
+            self.brightness = brightness_limits[0]
+        elif self.brightness > brightness_limits[1]:
+            self.brightness = brightness_limits[1]
+        if self.kelvin < kelvin_limits[0]:
+            self.kelvin = kelvin_limits[0]
+        elif self.kelvin > kelvin_limits[1]:
+            self.kelvin = kelvin_limits[1]
 
     def transition_towards_long_motion(self, kwargs: dict):
         """Step towards lighting settings for after a long period of motion."""
