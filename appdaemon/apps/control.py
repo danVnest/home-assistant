@@ -22,6 +22,7 @@ class Control(hass.Hass):
         self.next_notify_error_datetime = None
         self.states = None
         self.scene = None
+        self.last_device_date = None
         super().__init__(*args, **kwargs)
 
     def initialize(self):
@@ -33,6 +34,7 @@ class Control(hass.Hass):
         self.listen_log(self.handle_log)
         self.states = self.get_saved_states()
         self.scene = self.states["scene"]
+        self.last_device_date = self.date()
         self.run_at_sunrise(self.morning, offset=self.args["sunrise_offset"] * 60)
         self.run_at_sunset(self.evening, offset=-self.args["sunset_offset"] * 60)
         self.listen_event(self.voice, "SIRI")
@@ -40,6 +42,7 @@ class Control(hass.Hass):
         self.listen_event(self.button, "zwave.scene_activated")
         self.listen_event(self.apple_tv, "TV")
         self.listen_event(self.everything_initialized, "appd_started")
+        self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
 
     def everything_initialized(self, event_name: str, data: dict, kwargs: dict):
@@ -172,6 +175,15 @@ class Control(hass.Hass):
         elif self.scene == "tv":
             self.set_scene("night")
 
+    def handle_new_device(self, event_name: str, data: dict, kwargs: dict):
+        """If not home and someone adds a device, notify."""
+        del event_name
+        self.log(f"New device added: {data}, {kwargs}")
+        if self.scene.startswith("away"):
+            if self.last_device_date < self.date() - datetime.timedelta(hours=3):
+                self.notify(f'A guest has added a device: "{data["host_name"]}"')
+                self.last_device_date = self.date()
+
     def handle_presence_change(
         self, entity: str, attribute: str, old: int, new: int, kwargs: dict
     ):  # pylint: disable=too-many-arguments
@@ -180,11 +192,6 @@ class Control(hass.Hass):
         self.log(f"{entity} is {new}", level="DEBUG")
         if new == "home":
             if self.scene.startswith("away"):
-                self.notify(
-                    f"{self.get_state(entity, attribute='friendly_name')} is home."
-                    " Security is now disabled.",
-                    title="Home Security",
-                )
                 self.set_scene(self.detect_scene())
         elif (
             self.scene.startswith("away") is False
@@ -193,10 +200,6 @@ class Control(hass.Hass):
             )
             != "home"
         ):
-            self.notify(
-                "Everyone has left the house. Security is now enabled.",
-                title="Home Security",
-            )
             self.set_scene(
                 "away_day" if self.time() < self.evening_time() else "away_night"
             )
@@ -244,7 +247,6 @@ class Control(hass.Hass):
             f"There have been {self.error_count} errors and {self.warning_count}"
             " warnings logged since the previous issue notification"
         )
-        self.notify(message, title=title)
         self.call_service(
             "persistent_notification/create", title=title, message=message
         )
