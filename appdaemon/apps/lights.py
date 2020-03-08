@@ -269,7 +269,7 @@ class MotionLight(Light):
                 "long_motion": {"brightness": 0, "kelvin": None, "delay": "off"},
             }
         }
-        self.scene_state_attributes["day_away"] = self.scene_state_attributes["day"]
+        self.scene_state_attributes["away_day"] = self.scene_state_attributes["day"]
         self._scene = "day"
 
     @property
