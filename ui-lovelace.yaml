@@ -1,0 +1,58 @@
+title: Nest
+views:
+  - badges:
+      - entity: binary_sensor.updater
+      - entity: sensor.hacs
+    cards:
+      - entities:
+          - entity: script.lights_on
+          - entity: script.lights_on_bright
+          - entity: script.lights_off
+          - entity: script.sleep_time
+          - entity: script.climate_control_on
+          - entity: script.climate_control_off
+          - entity: script.climate_control_enabled
+          - entity: script.climate_control_disabled
+        show_header_toggle: false
+        title: Control
+        type: entities
+      - entities:
+          - entity: light.kitchen
+          - entity: group.main_lights
+          - entity: light.bedroom
+        show_icon: true
+        show_name: true
+        show_state: true
+        title: Lights
+        type: glance
+      - aspect_ratio: '2'
+        default_zoom: 12
+        entities:
+          - entity: person.dan
+          - entity: person.rachel
+        type: map
+      - entity: media_player.living_room
+        type: media-control
+      - entities:
+          - entity: sensor.kitchen_multisensor_luminance
+        hours_to_show: 168
+        refresh_interval: 0
+        type: history-graph
+      - entity: climate.living_room
+        type: thermostat
+      - entities:
+          - entity: climate.bedroom
+          - entity: climate.living_room
+          - entity: climate.dining_room
+          - entity: sensor.kitchen_multisensor_temperature
+          - entity: sensor.multisensor_2_temperature
+        hours_to_show: 80
+        refresh_interval: 0
+        title: Temperatures
+        type: history-graph
+      - entity: climate.bedroom
+        type: thermostat
+      - entity: climate.dining_room
+        type: thermostat
+    path: default_view
+    title: Home
