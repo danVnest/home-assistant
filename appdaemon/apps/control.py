@@ -177,11 +177,7 @@ class Control(hass.Hass):
     ):  # pylint: disable=too-many-arguments
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, old, kwargs
-        self.log(f"{entity} is {new}")
-        self.log(
-            self.get_state(f"person.{'rachel' if entity.endswith('dan') else 'dan'}")
-            != "home"
-        )
+        self.log(f"{entity} is {new}", level="DEBUG")
         if new == "home":
             if self.scene.startswith("away"):
                 self.notify(
