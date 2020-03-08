@@ -34,13 +34,6 @@ views:
       - entity: media_player.living_room
         type: media-control
       - entities:
-          - entity: sensor.kitchen_multisensor_luminance
-        hours_to_show: 168
-        refresh_interval: 0
-        type: history-graph
-      - entity: climate.living_room
-        type: thermostat
-      - entities:
           - entity: climate.bedroom
           - entity: climate.living_room
           - entity: climate.dining_room
@@ -51,6 +44,8 @@ views:
         title: Temperatures
         type: history-graph
       - entity: climate.bedroom
+        type: thermostat
+      - entity: climate.living_room
         type: thermostat
       - entity: climate.dining_room
         type: thermostat
