@@ -76,7 +76,9 @@ class Control(hass.Hass):
     def detect_scene(self) -> str:
         """Detect and return scene based on who's home, time, stored scene, etc."""
         self.log("Detecting scene")
-        if "home" not in self.get_state("person").values():
+        if all(
+            person["state"] != "home" for person in self.get_state("person").values()
+        ):
             return "away_day" if self.time() < self.evening_time() else "away_night"
         if (
             self.scene == "sleep"
@@ -107,7 +109,7 @@ class Control(hass.Hass):
         del kwargs
         self.log("Morning triggered")
         self.set_scene(
-            "day" if "home" in self.get_state("person").values() else "day_away"
+            "day" if "home" in self.get_state("person").values() else "away_day"
         )
 
     def evening(self, kwargs: dict):
