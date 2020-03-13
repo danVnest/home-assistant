@@ -5,13 +5,15 @@ Coordinates all other apps by listening to and firing events.
 
 User defined variables are configued in control.yaml
 """
+
 import datetime
 
-import appdaemon.plugins.hass.hassapi as hass
 import yaml
 
+from app import App
 
-class Control(hass.Hass):
+
+class Control(App):
     """Coordinate all home automation based on user input and automated rules."""
 
     def __init__(self, *args, **kwargs):
@@ -235,11 +237,6 @@ class Control(hass.Hass):
                 and self.error_notifier_timer is None
             ):
                 self.error_notifier_timer = self.run_in(self.notify_error, 5)
-
-    def notify(self, message: str, **kwargs):
-        """Send a notification to users and log the message."""
-        super().notify(message, **kwargs)
-        self.log(f"NOTIFICATION: {message}")
 
     def notify_error(self, kwargs: dict):
         """Notify users of errors in a structured and paced way."""
