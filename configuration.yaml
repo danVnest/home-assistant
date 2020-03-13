@@ -7,6 +7,10 @@ default_config:
 homeassistant:
   customize: !include customize.yaml
 
+counter:
+  warnings:
+  errors:
+
 http:
   base_url: !secret http_url
   server_port: !secret http_port

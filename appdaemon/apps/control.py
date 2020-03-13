@@ -5,7 +5,6 @@ Coordinates all other apps by listening to and firing events.
 
 User defined variables are configued in control.yaml
 """
-
 import datetime
 
 import yaml
@@ -18,10 +17,6 @@ class Control(App):
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
-        self.warning_count = 0
-        self.error_count = 0
-        self.error_notifier_timer = None
-        self.next_notify_error_datetime = None
         self.states = None
         self.scene = None
         self.last_device_date = None
@@ -32,7 +27,7 @@ class Control(App):
 
         Appdaemon defined init function called once ready after __init__.
         """
-        self.next_notify_error_datetime = self.datetime()
+        self.call_service("counter/reset", entity_id=f"counter")
         self.listen_log(self.handle_log)
         self.states = self.get_saved_states()
         self.scene = self.states["scene"]
@@ -217,41 +212,13 @@ class Control(App):
         message: str,
         kwargs: dict,
     ):  # pylint: disable=too-many-arguments
-        """Check if logged message is a WARNING/ERROR, and notify users if appropriate."""
+        """Increment counters if logged message is a WARNING or ERROR."""
         del app_name, timestamp, kwargs
-        new_warning = False
-        new_error = False
         if log_type == "error_log":
-            if message.startswith("Traceback"):
-                new_error = True
-        else:
-            if level == "WARNING":
-                new_warning = True
-            elif level == "ERROR":
-                new_error = True
-        if new_warning or new_error:
-            self.warning_count += int(new_warning)
-            self.error_count += int(new_error)
-            if (
-                self.datetime() > self.next_notify_error_datetime
-                and self.error_notifier_timer is None
-            ):
-                self.error_notifier_timer = self.run_in(self.notify_error, 5)
-
-    def notify_error(self, kwargs: dict):
-        """Notify users of errors in a structured and paced way."""
-        del kwargs
-        title = "Issues Encountered"
-        message = (
-            f"There have been {self.error_count} errors and {self.warning_count}"
-            " warnings logged since the previous issue notification"
-        )
-        self.call_service(
-            "persistent_notification/create", title=title, message=message
-        )
-        self.next_notify_error_datetime = self.datetime() + datetime.timedelta(
-            minutes=self.args["notify_error_delay"]
-        )
-        self.error_notifier_timer = None
-        self.warning_count = 0
-        self.error_count = 0
+            level = "ERROR" if message.startswith("Traceback") else None
+        elif log_type == "main_log" and message.endswith("errors.log"):
+            level = None
+        if level in ("WARNING", "ERROR"):
+            self.call_service(
+                "counter/increment", entity_id=f"counter.{level.lower()}s"
+            )

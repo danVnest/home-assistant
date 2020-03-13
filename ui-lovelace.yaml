@@ -1,8 +1,8 @@
 title: Nest
 views:
-  - badges:
-      - entity: binary_sensor.updater
-      - entity: sensor.hacs
+  - path: default_view
+    title: Home
+    badges: []
     cards:
       - entities:
           - entity: script.lights_on
@@ -49,5 +49,15 @@ views:
         type: thermostat
       - entity: climate.dining_room
         type: thermostat
-    path: default_view
-    title: Home
+  - path: system
+    title: System
+    badges:
+      - entity: binary_sensor.updater
+      - entity: sensor.hacs
+    cards:
+      - entities:
+          - entity: counter.warnings
+          - entity: counter.errors
+        hours_to_show: 80
+        refresh_interval: 0
+        type: history-graph
