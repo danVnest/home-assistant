@@ -7,6 +7,23 @@ default_config:
 homeassistant:
   customize: !include customize.yaml
 
+input_select:
+  scene:
+    name: Scene
+    options:
+    - Day
+    - Night
+    - Sleep
+    - Bright
+    - TV
+    - Away (Day)
+    - Away (Night)
+
+input_boolean:
+  climate_control:
+    name: Automatic Climate Control
+  aircon:
+
 counter:
   warnings:
   errors:

@@ -13,18 +13,17 @@ from __future__ import annotations
 import statistics
 from typing import Type
 
-import appdaemon.plugins.hass.hassapi as hass
 from meteocalc import Temp, heat_index
 
+import app
 
-class Climate(hass.Hass):
+
+class Climate(app.App):
     """Control aircon based on user input and automated rules."""
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
-        self.climate_control_enabled = True
         self.suggested = False
-        self.scene = None
         self.aircon_trigger_timer = None
         self.temperature_monitor = None
         self.aircons = None
@@ -40,20 +39,56 @@ class Climate(hass.Hass):
             aircon: Aircon(f"climate.{aircon}", self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
-        self.listen_event(self.climate_control_change, "CLIMATE")
-        self.listen_event(self.scene_change, "SCENE")
+        self.listen_state(self.climate_control_change, "input_boolean.climate_control")
+        self.listen_state(self.aircon_change, "input_boolean.aircon")
+        self.listen_state(self.scene_change, "input_select.scene")
         self.handle_inside_temperature()
 
-    def climate_control_change(self, event_name: str, data: dict, kwargs: dict):
-        """Control climate based on commands sent via users."""
-        del event_name, kwargs
-        self.log(f"Climate control command: '{data['command']}' received")
+    @property
+    def climate_control(self) -> bool:
+        """Scene is stored in Home Assistant as a sensor"""
+        return self.get_state("input_boolean.climate_control")
+
+    @climate_control.setter
+    def climate_control(self, new_setting: bool):
+        """"""
+        if new_setting != self.climate_control:
+            self.call_service(
+                f"input_boolean/turn_{'on' if new_setting is True else 'off'}",
+                entity_id="input_boolean.climate_control",
+            )
+
+    def climate_control_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Control climate based on commands sent via users."""  # TODO: NO!
+        del entity, attribute, old, kwargs
+        self.log(f"{'En' if new else 'Dis'}abling climate control")
         self.allow_suggestion()
-        if data["command"] == "enabled":
-            self.enable_climate_control()
-        elif data["command"] == "disabled":
-            self.disable_climate_control()
-        elif data["command"] == "on":
+        if new is True:
+            """Enable climate control and reinitialise temperature_monitor."""
+            self.temperature_monitor.start_monitoring()
+            self.handle_inside_temperature()
+
+    @property
+    def aircon(self) -> bool:
+        """Scene is stored in Home Assistant as a sensor"""
+        return self.get_state("input_boolean.aircon")
+
+    @aircon.setter
+    def aircon(self, new_setting: bool):
+        """"""
+        self.call_service(
+            f"input_boolean/turn_{'on' if new_setting is True else 'off'}",
+            entity_id="input_boolean.aircon",
+        )
+
+    def aircon_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        del entity, attribute, old, kwargs
+        self.log(f"Turning aircon {'on' if new is True else 'off'}")
+        if new is True:
             self.disable_climate_control_if_would_trigger_off()
             if self.temperature_monitor.is_below_target_temperature():
                 self.turn_aircon_on("heat")
@@ -61,44 +96,42 @@ class Climate(hass.Hass):
                 self.turn_aircon_on("cool")
             else:
                 self.turn_aircon_on(self.temperature_monitor.closer_to_heat_or_cool())
-        elif data["command"] == "off":
+        else:
             self.disable_climate_control_if_would_trigger_on()
             self.turn_aircon_off()
 
-    def scene_change(self, event_name: str, data: dict, kwargs: dict):
+    def scene_change(
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
         """Change temperature triggers and rechecks forecasts if necessary."""
-        del event_name, kwargs
-        self.scene = data["scene"]
+        del entity, attribute, old, kwargs
         self.allow_suggestion()
-        if self.scene == "day":
+        if new == "Day":
             self.temperature_monitor.current_max_temperature_trigger = self.args[
                 "max_day_temperature_trigger"
             ]
             self.suggest_climate_control_if_disabled_and_forecast()
-        elif self.scene == "night" or self.scene == "tv" or self.scene == "sleep":
+        elif new in ("Night", "TV", "Sleep"):
             self.temperature_monitor.current_max_temperature_trigger = self.args[
                 "max_night_temperature_trigger"
             ]
-            if self.scene == "sleep":
+            if new == "Sleep":
                 self.aircons["living_room"].turn_off()
                 self.aircons["dining_room"].turn_off()
-            self.suggest_climate_control_if_disabled_and_forecast()
-        elif self.scene == "away_day" or self.scene == "away_night":
-            self.disable_climate_control()
-            self.turn_aircon_off()
+                self.temperature_monitor.start_monitoring()
+                self.suggest_climate_control_if_disabled_and_forecast()
+        elif new.startswith("Away"):
+            self.climate_control = False
+            # TODO: don't do above, instead constrain if away
+            self.aircon = False
         self.handle_inside_temperature()
 
     def handle_inside_temperature(self):
         """Control aircon or suggest based on changes in inside temperature."""
-        if self.get_state("climate.bedroom") == "off":
-            mode = None
-            if self.temperature_monitor.is_too_cold():
-                mode = "heat"
-            elif self.temperature_monitor.is_too_hot():
-                mode = "cool"
-            if mode:
-                if self.climate_control_enabled:
-                    self.turn_aircon_on_after_delay(mode)
+        if self.aircon is False:
+            if self.temperature_monitor.is_too_hot_or_cold():
+                if self.climate_control is True:
+                    self.turn_aircon_on_after_delay()
                 else:
                     self.suggest_climate_control()
         elif self.temperature_monitor.is_within_target_temperatures():
@@ -106,8 +139,8 @@ class Climate(hass.Hass):
                 f"A desirable inside temperature of"
                 f" {self.temperature_monitor.inside_temperature}º has been reached,"
             )
-            if self.climate_control_enabled:
-                self.turn_aircon_off()
+            if self.climate_control is True:
+                self.aircon = False
                 self.notify(f"{message} turning aircon off")
             else:
                 self.suggest(f"{message} consider enabling climate control")
@@ -115,8 +148,8 @@ class Climate(hass.Hass):
     def handle_outside_temperature(self):
         """If nicer outside, suggest (if appropriate) to open up the house."""
         if (
-            self.climate_control_enabled
-            and self.get_state("climate.bedroom") != "off"
+            self.climate_control is True
+            and self.aircon is True
             and self.temperature_monitor.is_outside_temperature_nicer()
         ):
             self.suggest(
@@ -128,7 +161,7 @@ class Climate(hass.Hass):
 
     def suggest_climate_control_if_disabled_and_forecast(self):
         """Suggest user enables control if extreme's forecast (only if disabled)."""
-        if not self.climate_control_enabled:
+        if self.climate_control is False:
             if self.temperature_monitor.is_maximum_forecast():
                 self.suggest(
                     "It's forecast to reach"
@@ -157,13 +190,11 @@ class Climate(hass.Hass):
                 " consider enabling climate control."
             )
 
-    def turn_aircon_on_after_delay(self, mode: str):
+    def turn_aircon_on_after_delay(self):
         """Start a timer to turn aircon on soon, and notify user."""
         if self.aircon_trigger_timer is None:
             self.aircon_trigger_timer = self.run_in(
-                self.aircon_trigger_timer_up,
-                self.args["aircon_trigger_delay"] * 60,
-                mode=mode,
+                self.aircon_trigger_timer_up, self.args["aircon_trigger_delay"] * 60,
             )
             self.notify(
                 f"Temperature inside is {self.temperature_monitor.inside_temperature}º,"
@@ -173,11 +204,12 @@ class Climate(hass.Hass):
 
     def aircon_trigger_timer_up(self, kwargs: dict):
         """Timer requires kwargs, would otherwise use turn_aircon_on."""
-        self.turn_aircon_on(kwargs["mode"])
+        del kwargs
+        self.aircon = True
 
     def turn_aircon_on(self, mode: str):
         """Turn aircon on, handling sleep scene."""
-        if self.scene == "sleep":
+        if self.scene == "Sleep":
             self.aircons["bedroom"].turn_on(mode)
             self.aircons["bedroom"].set_fan_mode("low")
         else:
@@ -194,28 +226,10 @@ class Climate(hass.Hass):
             aircon.turn_off()
         self.allow_suggestion()
 
-    def enable_climate_control(self):
-        """Enable climate control and reinitialise temperature_monitor."""
-        if not self.climate_control_enabled:
-            self.log("Enabling climate control")
-            self.climate_control_enabled = True
-            self.temperature_monitor.start_monitoring()
-            self.handle_inside_temperature()
-        else:
-            self.log(
-                "Attempted to enable climate control when already enabled",
-                level="WARNING",
-            )
-
-    def disable_climate_control(self):
-        """Disables climate control through flag checks elsewhere."""
-        self.climate_control_enabled = False
-        self.log("Disabled climate control")
-
     def disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
         if (
-            self.climate_control_enabled
+            self.climate_control is True
             and self.temperature_monitor.is_too_hot_or_cold()
         ):
             self.notify(
@@ -223,12 +237,12 @@ class Climate(hass.Hass):
                 f"{self.temperature_monitor.inside_temperature}º) will immediately"
                 " trigger aircon on again - disabling climate control to prevent this"
             )
-            self.disable_climate_control()
+            self.climate_control = False
 
     def disable_climate_control_if_would_trigger_off(self):
         """Disables climate control only if it would immediately trigger aircon off."""
         if self.temperature_monitor.is_within_target_temperatures():
-            self.disable_climate_control()
+            self.climate_control = False
             self.notify(
                 "Inside is already within the desired temperature range,"
                 " climate control is now disabled"
@@ -240,7 +254,7 @@ class Climate(hass.Hass):
         if not self.suggested:
             self.suggested = True
             self.notify(message)
-            if not self.climate_control_enabled:
+            if self.climate_control is False:
                 self.temperature_monitor.stop_monitoring()
 
     def allow_suggestion(self):
@@ -512,31 +526,18 @@ class TemperatureMonitor:
         self.controller.log(f"Outside temperature is not better than inside {vs_str}")
         return False
 
-    def is_too_cold(self) -> bool:
-        """Check if temperature inside is below the minimum trigger."""
-        if self.inside_temperature < self.controller.args["min_temperature_trigger"]:
-            self.controller.log(
-                f"The temperature inside ({self.inside_temperature} degrees) is below"
-                " the minimum trigger "
-                f"({self.controller.args['min_temperature_trigger']} degrees)"
-            )
-            return True
-        return False
-
-    def is_too_hot(self) -> bool:
-        """Check if temperature inside is above the maximum trigger."""
-        if self.inside_temperature > self.current_max_temperature_trigger:
-            self.controller.log(
-                f"The temperature inside ({self.inside_temperature} degrees) is above"
-                " the maximum trigger "
-                f"({self.current_max_temperature_trigger} degrees)"
-            )
-            return True
-        return False
-
     def is_too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
-        return self.is_too_cold() or self.is_too_hot()
+        if (
+            self.controller.args["min_temperature_trigger"]
+            < self.inside_temperature
+            < self.current_max_temperature_trigger
+        ):
+            return False
+        self.controller.log(
+            f"It's too hot or cold inside ({self.inside_temperature} degrees)"
+        )
+        return True
 
     def closer_to_heat_or_cool(self) -> str:
         """Return if temperature inside is closer to needing heating or cooling."""

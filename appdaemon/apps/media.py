@@ -6,10 +6,10 @@ not playing.
 User defined variables are configued in media.yaml
 """
 
-import appdaemon.plugins.hass.hassapi as hass
+from app import App
 
 
-class Media(hass.Hass):
+class Media(App):
     """Detect media state changes and fire corresponding events."""
 
     def initialize(self):
@@ -35,6 +35,9 @@ class Media(hass.Hass):
     def tv_state_change(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
-        """Fire an event when media state changes."""
+        """Handle TV events at night and change the scene."""
         del entity, attribute, old, kwargs
-        self.fire_event("TV", state=new)
+        if new == "playing" and self.scene == "night":
+            self.scene = "tv"
+        elif self.scene == "tv":
+            self.scene = "night"
