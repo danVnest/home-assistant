@@ -23,6 +23,7 @@ input_boolean:
   climate_control:
     name: Automatic Climate Control
   aircon:
+    name: Aircon
 
 counter:
   warnings:
@@ -134,4 +135,3 @@ tts:
 
 group: !include groups.yaml
 automation: !include automations.yaml
-script: !include scripts.yaml

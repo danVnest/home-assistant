@@ -32,14 +32,12 @@ class Control(app.App):
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
 
-    @property
     def morning_time(self) -> datetime.time:
         """Return the time that night becomes morning (as configured relative to sunrise)."""
         return (
             self.sunrise() + datetime.timedelta(minutes=self.args["sunrise_offset"])
         ).time()
 
-    @property
     def evening_time(self) -> datetime.time:
         """Return the time that day becomes night (as configured relative to sunset)."""
         return (
@@ -49,12 +47,14 @@ class Control(app.App):
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         if not self.anyone_home():
-            scene = f"Away ({'Day' if self.time() < self.evening_time else 'Night'})"
+            scene = f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
         elif (
-            not self.morning_time < self.time() < datetime.time(self.args["sleeptime"])
+            not self.morning_time()
+            < self.time()
+            < datetime.time(self.args["sleeptime"])
         ):
             scene = "Sleep"
-        elif self.time() < self.evening_time:
+        elif self.time() < self.evening_time():
             scene = "Day"
         elif self.get_state("media_player.living_room") == "playing":
             scene = "TV"

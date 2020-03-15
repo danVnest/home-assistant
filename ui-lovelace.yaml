@@ -1,18 +1,11 @@
 title: Nest
 views:
-  - path: default_view
-    title: Home
-    badges: []
+  - badges: []
     cards:
       - entities:
-          - entity: script.lights_on
-          - entity: script.lights_on_bright
-          - entity: script.lights_off
-          - entity: script.sleep_time
-          - entity: script.climate_control_on
-          - entity: script.climate_control_off
-          - entity: script.climate_control_enabled
-          - entity: script.climate_control_disabled
+          - entity: input_select.scene
+          - entity: input_boolean.climate_control
+          - entity: input_boolean.aircon
         show_header_toggle: false
         title: Control
         type: entities
@@ -25,6 +18,25 @@ views:
         show_state: true
         title: Lights
         type: glance
+      - type: markdown
+        content: >-
+          **Lighting** and climate settings are automatically adjusted between
+          different scenes. You can select a preferred scene here or tell Siri/Google:
+
+          - lights on/off
+
+          - lights on bright
+
+          - sleep time
+
+
+          **Automatic climate control** will control all aircon units based on
+          the temperature and scene. Aircon can also be manually turned on/off.
+          These settings can be controlled by telling Siri/Google:
+
+          - climate control on/off
+
+          - aircon on/off
       - aspect_ratio: '2'
         default_zoom: 12
         entities:
@@ -49,9 +61,9 @@ views:
         type: thermostat
       - entity: climate.dining_room
         type: thermostat
-  - path: system
-    title: System
-    badges:
+    path: default_view
+    title: Home
+  - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
     cards:
@@ -61,3 +73,5 @@ views:
         hours_to_show: 80
         refresh_interval: 0
         type: history-graph
+    path: system
+    title: System
