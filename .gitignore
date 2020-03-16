@@ -1,6 +1,6 @@
 !.gitignore
 
-# Sensative information
+# Sensitive information
 ip_bans.yaml
 known_devices.yaml
 secrets.yaml
@@ -15,9 +15,10 @@ logs
 OZW_Log.txt
 
 # System files
+.remote-sync.json
+.uuid
 .storage
 .homekit.state
-states.yaml
 *.db
 options.xml
 zwscene.xml
