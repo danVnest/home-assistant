@@ -28,7 +28,7 @@ class Control(app.App):
         """
         super().initialize()
         for app_name in ["climate", "lights", "media", "safety"]:
-            setattr(self, app, self.get_app(app_name))
+            setattr(self, app_name, self.get_app(app_name))
         self.listen_log(self.handle_log)
         self.reset_scene()
         self.last_device_date = self.date()
