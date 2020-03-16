@@ -1,11 +1,49 @@
-# TODO: replace default with my own config ?
-default_config:
-# mobile_app: # included in default
-# discovery: # included in default
-# ios:  # included in default
+badnest:
+  issue_token: !secret badnest_token
+  cookie: !secret badnest_cookie
+  region: !secret badnest_region
+
+climate:
+  platform: sensibo
+  api_key: !secret sensibo_key
+
+config:
+
+counter:
+  warnings:
+  errors:
+
+device_tracker:
+  platform: netgear
+  password: !secret orbi_password
+  consider_home: 0:05
+  accesspoints: true # forces use of Orbi API v2, which is much faster
+
+frontend:
+
+group: !include groups.yaml
+
+history:
 
 homeassistant:
   customize: !include customize.yaml
+
+http:
+  base_url: !secret http_url
+  server_port: !secret http_port
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+  ip_ban_enabled: True
+  login_attempts_threshold: 10
+
+ifttt:
+  key: !secret ifttt_key
+
+input_boolean:
+  climate_control:
+    name: Automatic Climate Control
+  aircon:
+    name: Aircon
 
 input_select:
   scene:
@@ -18,52 +56,6 @@ input_select:
     - TV
     - Away (Day)
     - Away (Night)
-
-input_boolean:
-  climate_control:
-    name: Automatic Climate Control
-  aircon:
-    name: Aircon
-
-counter:
-  warnings:
-  errors:
-
-http:
-  base_url: !secret http_url
-  server_port: !secret http_port
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
-  ip_ban_enabled: True
-  login_attempts_threshold: 10
-
-zwave:
-  usb_path: /dev/ttyACM0
-  network_key: !secret zwave_key
-  #device_config: !include zwave_device_config.yaml
-
-homekit:
-  auto_start: false
-  filter:
-    exclude_domains:
-    - automation
-    - device_tracker
-    - group
-    - person
-    - sun
-    - weather
-    - zone
-    - z-wave
-  # TODO: what do I even want here? All automations will be done through home assistant automatically or via siri.
-  # TODO: setup up each device appropriately: https://www.home-assistant.io/integrations/homekit
-
-ifttt:
-  key: !secret ifttt_key
-
-mqtt:
-  broker: core-mosquitto
-  username: !secret mqtt_username
-  password: !secret mqtt_password
 
 light:
 - platform: wiz_light
@@ -86,28 +78,26 @@ light:
   command_topic: "light-office/cmnd/POWER"
   state_topic: "light-office/stat/RESULT"
   value_template: "{{ value_json.POWER }}"
-  #availability_topic: "light-office/tele/LWT"
-  #payload_available: "Online"
-  #payload_not_available: "Offline"
   qos: 1
 - platform: mqtt
   name: 'Bedroom'
   command_topic: "light-bedroom/cmnd/POWER"
   state_topic: "light-bedroom/stat/RESULT"
   value_template: "{{ value_json.POWER }}"
-  #availability_topic: "light-bedroom/tele/LWT"
-  #payload_available: "Online"
-  #payload_not_available: "Offline"
   qos: 1
 
-climate:
-  platform: sensibo
-  api_key: !secret sensibo_key
+logbook:
 
-badnest:
-  issue_token: !secret badnest_token
-  cookie: !secret badnest_cookie
-  region: !secret badnest_region
+map:
+
+mobile_app:
+
+mqtt:
+  broker: core-mosquitto
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+
+person:
 
 sensor:
 - platform: badnest
@@ -124,14 +114,18 @@ sensor:
   - 'max'
   - 'min'
 
-device_tracker:
-  platform: netgear
-  password: !secret orbi_password
-  consider_home: 0:05
-  accesspoints: true # forces use of Orbi API v2, which is much faster
+sun:
+
+system_health:
 
 tts:
   platform: google_translate
 
-group: !include groups.yaml
-automation: !include automations.yaml
+updater:
+  include_used_components: True
+
+zeroconf:
+
+zwave:
+  usb_path: /dev/ttyACM0
+  network_key: !secret zwave_key
