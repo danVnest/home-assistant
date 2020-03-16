@@ -16,6 +16,10 @@ class Control(app.App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.last_device_date = None
+        self.climate = None
+        self.lights = None
+        self.media = None
+        self.safety = None
 
     def initialize(self):
         """Schedule events, listen for presence changes, user input and log messages.
@@ -23,12 +27,15 @@ class Control(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        for app_name in ["climate", "lights", "media", "safety"]:
+            setattr(self, app, self.get_app(app_name))
         self.listen_log(self.handle_log)
         self.reset_scene()
         self.last_device_date = self.date()
         self.run_at_sunrise(self.morning, offset=self.args["sunrise_offset"] * 60)
         self.run_at_sunset(self.evening, offset=-self.args["sunset_offset"] * 60)
         self.listen_event(self.button, "zwave.scene_activated")
+        self.listen_event(self.ifttt, "ifttt_webhook_received")
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
 
@@ -90,6 +97,16 @@ class Control(app.App):
         elif data["scene_data"] == 2:  # held
             self.log(f"Button '{data['entity_id']}' held")
             self.scene = "Sleep" if self.scene == "Night" else "Night"
+
+    def ifttt(self, event_name: str, data: dict, kwargs: dict):
+        """Handle commands coming in via IFTTT."""
+        del event_name, kwargs
+        if "scene" in data:
+            self.scene = data["scene"]
+        elif "climate_control" in data:
+            self.climate.climate_control = data["climate_control"]
+        elif "aircon" in data:
+            self.climate.aircon = data["aircon"]
 
     def handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""

@@ -13,13 +13,11 @@ class App(hass.Hass):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
+        self.control = None
 
     def initialize(self):
-        """Start listening to events and monitoring logs."""
-        if "dependencies" in self.args:
-            for app in self.args["dependencies"]:
-                if getattr(self, app, None) is None:
-                    setattr(self, app, self.get_app(app))
+        """Allow easy access to control app (which has access to all other apps)."""
+        self.control = self.get_app("control")
 
     @property
     def scene(self) -> str:
