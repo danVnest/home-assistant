@@ -6,10 +6,10 @@ not playing.
 User defined variables are configued in media.yaml
 """
 
-from app import App
+import app
 
 
-class Media(App):
+class Media(app.App):
     """Detect media state changes and fire corresponding events."""
 
     def initialize(self):
@@ -17,7 +17,7 @@ class Media(App):
 
         Appdaemon defined init function called once ready after __init__.
         """
-        # self.scene = None
+        super().initialize()
         self.listen_state(
             self.tv_state_change,
             "media_player.living_room",

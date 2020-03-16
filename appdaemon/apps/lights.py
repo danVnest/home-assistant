@@ -16,19 +16,20 @@ class Lights(app.App):
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
+        super().__init__(*args, **kwargs)
         self.circadian_brightness = None
         self.circadian_kelvin = None
         self.circadian_timer = None
         self.circadian_start_datetime = None
         self.circadian_end_datetime = None
         self.lights = {"tv": None, "hall": None, "bedroom": None, "kitchen": None}
-        super().__init__(*args, **kwargs)
 
     def initialize(self):
         """Initialise lights and start listening to scene events.
 
         Appdaemon defined init function called once ready after __init__.
         """
+        super().initialize()
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.lights["tv"] = Light("group.tv_lights", self)

@@ -4,22 +4,23 @@ Monitors smoke sensors and triggers corresponding alarm routines.
 
 User defined variables are configued in safety.yaml
 """
-import appdaemon.plugins.hass.hassapi as hass
+import app
 
 
-class Safety(hass.Hass):
+class Safety(app.App):
     """Set up smoke sensors."""
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
-        self.smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
         super().__init__(*args, **kwargs)
+        self.smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
 
         Appdaemon defined init function called once ready after __init__.
         """
+        super().initialize()
         for sensor_id in self.smoke_sensors:
             self.smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
 

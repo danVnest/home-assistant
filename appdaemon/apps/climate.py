@@ -23,17 +23,18 @@ class Climate(app.App):
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
+        super().__init__(*args, **kwargs)
         self.suggested = False
         self.aircon_trigger_timer = None
         self.temperature_monitor = None
         self.aircons = None
-        super().__init__(*args, **kwargs)
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
 
         Appdaemon defined init function called once ready after __init__.
         """
+        super().initialize()
         self.temperature_monitor = TemperatureMonitor(self)
         self.aircons = {
             aircon: Aircon(f"climate.{aircon}", self)
