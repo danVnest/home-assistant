@@ -47,12 +47,12 @@ class Climate(app.App):
 
     @property
     def climate_control(self) -> bool:
-        """Scene is stored in Home Assistant as a sensor"""
+        """Climate control setting is stored in Home Assistant as an input_boolean."""
         return self.get_state("input_boolean.climate_control")
 
     @climate_control.setter
     def climate_control(self, new_setting: bool):
-        """"""
+        """Call the input_boolean/turn_on/off service to set climate control."""
         if new_setting != self.climate_control:
             self.call_service(
                 f"input_boolean/turn_{'on' if new_setting is True else 'off'}",
@@ -62,23 +62,22 @@ class Climate(app.App):
     def climate_control_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
-        """Control climate based on commands sent via users."""  # TODO: NO!
+        """Act on climate control setting changes from user or the system."""
         del entity, attribute, old, kwargs
         self.log(f"{'En' if new else 'Dis'}abling climate control")
         self.allow_suggestion()
         if new is True:
-            """Enable climate control and reinitialise temperature_monitor."""
             self.temperature_monitor.start_monitoring()
             self.handle_inside_temperature()
 
     @property
     def aircon(self) -> bool:
-        """Scene is stored in Home Assistant as a sensor"""
+        """Aircon setting is stored in Home Assistant as an input_boolean."""
         return self.get_state("input_boolean.aircon")
 
     @aircon.setter
     def aircon(self, new_setting: bool):
-        """"""
+        """Call the input_boolean/turn_on/off service to set aircon."""
         self.call_service(
             f"input_boolean/turn_{'on' if new_setting is True else 'off'}",
             entity_id="input_boolean.aircon",
@@ -87,6 +86,7 @@ class Climate(app.App):
     def aircon_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
+        """Act on aircon setting changes from user or the system."""
         del entity, attribute, old, kwargs
         self.log(f"Turning aircon {'on' if new is True else 'off'}")
         if new is True:
@@ -142,7 +142,11 @@ class Climate(app.App):
             )
             if self.climate_control is True:
                 self.aircon = False
-                self.notify(f"{message} turning aircon off")
+                self.notify(
+                    f"{message} turning aircon off",
+                    title="Aircon",
+                    target="anyone_home" if self.anyone_home() else "all",
+                )
             else:
                 self.suggest(f"{message} consider enabling climate control")
 
@@ -200,7 +204,9 @@ class Climate(app.App):
             self.notify(
                 f"Temperature inside is {self.temperature_monitor.inside_temperature}º,"
                 f" aircon will be turned on in {self.args['aircon_trigger_delay']}"
-                " minutes (unless you disable climate control)"
+                " minutes (unless you disable climate control)",
+                title="Aircon",
+                target="anyone_home" if self.anyone_home() else "all",
             )
 
     def aircon_trigger_timer_up(self, kwargs: dict):
@@ -236,7 +242,9 @@ class Climate(app.App):
             self.notify(
                 "The current temperature ("
                 f"{self.temperature_monitor.inside_temperature}º) will immediately"
-                " trigger aircon on again - disabling climate control to prevent this"
+                " trigger aircon on again - disabling climate control to prevent this",
+                title="Climate Control",
+                target="anyone_home" if self.anyone_home() else "all",
             )
             self.climate_control = False
 
@@ -247,14 +255,20 @@ class Climate(app.App):
             self.notify(
                 "Inside is already within the desired temperature range,"
                 " climate control is now disabled"
-                " (you'll need to manually turn aircon off)"
+                " (you'll need to manually turn aircon off)",
+                title="Climate Control",
+                target="anyone_home" if self.anyone_home() else "all",
             )
 
     def suggest(self, message: str):
         """Make a suggestion to the users, but only if one has not already been sent."""
         if not self.suggested:
             self.suggested = True
-            self.notify(message)
+            self.notify(
+                message,
+                title="Aircon",
+                target="anyone_home" if self.anyone_home() else "all",
+            )
             if self.climate_control is False:
                 self.temperature_monitor.stop_monitoring()
 
@@ -263,11 +277,6 @@ class Climate(app.App):
         self.temperature_monitor.start_monitoring()
         if self.suggested:
             self.suggested = False
-
-    def notify(self, message: str, **kwargs):
-        """Send a notification to users and log the message."""
-        super().notify(message, title="Climate Control")
-        self.log(f"NOTIFICATION: {message}")
 
 
 class Sensor:

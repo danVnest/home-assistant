@@ -114,7 +114,10 @@ class Control(app.App):
         self.log(f"New device added: {data}, {kwargs}")
         if self.scene.startswith("Away"):
             if self.last_device_date < self.date() - datetime.timedelta(hours=3):
-                self.notify(f'A guest has added a device: "{data["host_name"]}"')
+                self.notify(
+                    f'A guest has added a device: "{data["host_name"]}"',
+                    title="Guest Device",
+                )
                 self.last_device_date = self.date()
 
     def handle_presence_change(

@@ -24,11 +24,6 @@ class Safety(app.App):
         for sensor_id in self.smoke_sensors:
             self.smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
 
-    def notify(self, message: str, **kwargs):
-        """Send a notification to users and log the message."""
-        super().notify(message, title="Safety")
-        self.log(f"NOTIFICATION: {message}")
-
 
 class SmokeSensor:  # pylint: disable=too-few-public-methods
     """Monitors smoke and carbon monoxide alarms from a sensor."""
@@ -50,5 +45,7 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
         del attribute, old, kwargs
         self.controller.log(f"{entity}: {new}")
         if new != 0:
-            self.controller.notify(f"SMOKE OR CARBON MONOXIDE DETECTED BY: {entity}")
+            self.controller.notify(
+                f"SMOKE OR CARBON MONOXIDE DETECTED BY: {entity}", title="SMOKE ALARM"
+            )
             self.controller.fire_event("SCENE", scene="bright")
