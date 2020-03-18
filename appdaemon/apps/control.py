@@ -39,18 +39,6 @@ class Control(app.App):
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
 
-    def morning_time(self) -> datetime.time:
-        """Return the time that night becomes morning (as configured relative to sunrise)."""
-        return (
-            self.sunrise() + datetime.timedelta(minutes=self.args["sunrise_offset"])
-        ).time()
-
-    def evening_time(self) -> datetime.time:
-        """Return the time that day becomes night (as configured relative to sunset)."""
-        return (
-            self.sunset() - datetime.timedelta(minutes=self.args["sunset_offset"])
-        ).time()
-
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         if not self.anyone_home():
@@ -112,7 +100,7 @@ class Control(app.App):
         """If not home and someone adds a device, notify."""
         del event_name
         self.log(f"New device added: {data}, {kwargs}")
-        if self.scene.startswith("Away"):
+        if "Away" in self.scene:
             if self.last_device_date < self.date() - datetime.timedelta(hours=3):
                 self.notify(
                     f'A guest has added a device: "{data["host_name"]}"',
@@ -127,10 +115,10 @@ class Control(app.App):
         del attribute, old, kwargs
         self.log(f"{entity} is {new}")
         if new == "home":
-            if self.scene.startswith("Away"):
+            if "Away" in self.scene:
                 self.reset_scene()
         elif (
-            self.scene.startswith("Away") is False
+            "Away" not in self.scene
             and self.get_state(
                 f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
             )

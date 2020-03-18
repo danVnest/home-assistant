@@ -4,6 +4,8 @@ This class should be the inherited class of every app.
 It inherits methods for interaction with Home Assistant, and includes several useful
 utility functions used by multiple or all apps.
 """
+import datetime
+
 import appdaemon.plugins.hass.hassapi as hass
 
 
@@ -17,7 +19,7 @@ class App(hass.Hass):
 
     def initialize(self):
         """Allow easy access to control app (which has access to all other apps)."""
-        self.control = self.get_app("control")
+        self.control = self.get_app("Control")
 
     @property
     def scene(self) -> str:
@@ -33,6 +35,20 @@ class App(hass.Hass):
             entity_id="input_select.scene",
             option=new_scene,
         )
+
+    def morning_time(self) -> datetime.time:
+        """Return the time that night becomes morning (as configured relative to sunrise)."""
+        return (
+            self.sunrise()
+            + datetime.timedelta(minutes=self.control.args["sunrise_offset"])
+        ).time()
+
+    def evening_time(self) -> datetime.time:
+        """Return the time that day becomes night (as configured relative to sunset)."""
+        return (
+            self.sunset()
+            - datetime.timedelta(minutes=self.control.args["sunset_offset"])
+        ).time()
 
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
