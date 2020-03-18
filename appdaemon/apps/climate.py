@@ -28,6 +28,7 @@ class Climate(app.App):
         self.aircon_trigger_timer = None
         self.temperature_monitor = None
         self.aircons = None
+        self.climate_control_before_away = None
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -40,6 +41,7 @@ class Climate(app.App):
             aircon: Aircon(f"climate.{aircon}", self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
+        self.climate_control_before_away = self.climate_control
         self.listen_state(self.climate_control_change, "input_boolean.climate_control")
         self.listen_state(self.aircon_change, "input_boolean.aircon")
         self.listen_state(self.scene_change, "input_select.scene")
@@ -65,10 +67,11 @@ class Climate(app.App):
         """Act on climate control setting changes from user or the system."""
         del entity, attribute, old, kwargs
         self.log(f"{'En' if new else 'Dis'}abling climate control")
-        self.allow_suggestion()
         if new is True:
             self.temperature_monitor.start_monitoring()
             self.handle_inside_temperature()
+        else:
+            self.allow_suggestion()
 
     @property
     def aircon(self) -> bool:
@@ -103,28 +106,24 @@ class Climate(app.App):
 
     def scene_change(
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments #noqa
         """Change temperature triggers and rechecks forecasts if necessary."""
-        del entity, attribute, old, kwargs
-        self.allow_suggestion()
-        if new == "Day":
-            self.temperature_monitor.current_max_temperature_trigger = self.args[
-                "max_day_temperature_trigger"
-            ]
-            self.suggest_climate_control_if_disabled_and_forecast()
-        elif new in ("Night", "TV", "Sleep"):
-            self.temperature_monitor.current_max_temperature_trigger = self.args[
-                "max_night_temperature_trigger"
-            ]
-            if new == "Sleep":
-                self.aircons["living_room"].turn_off()
-                self.aircons["dining_room"].turn_off()
-                self.temperature_monitor.start_monitoring()
-                self.suggest_climate_control_if_disabled_and_forecast()
-        elif new.startswith("Away"):
+        del entity, attribute, kwargs
+        self.temperature_monitor.adjust_current_max_temperature_trigger()
+        if "Away" in new and "Away" not in old:
+            self.climate_control_before_away = self.climate_control
             self.climate_control = False
-            # TODO: don't do above, instead constrain if away
             self.aircon = False
+        elif "Away" not in new and "Away" in old:
+            self.climate_control = self.climate_control_before_away
+        if new == "Sleep" or old == "Sleep":
+            self.transition_aircon_for_sleep()
+        if self.climate_control is False and any(
+            new == "Day" and old == "Sleep",
+            new == "Night" and old == "Day",
+            "Away" not in new and "Away" in old,
+        ):
+            self.suggest_if_trigger_forecast()
         self.handle_inside_temperature()
 
     def handle_inside_temperature(self):
@@ -164,21 +163,14 @@ class Climate(app.App):
                 " consider opening up the house."
             )
 
-    def suggest_climate_control_if_disabled_and_forecast(self):
+    def suggest_if_trigger_forecast(self):
         """Suggest user enables control if extreme's forecast (only if disabled)."""
-        if self.climate_control is False:
-            if self.temperature_monitor.is_maximum_forecast():
-                self.suggest(
-                    "It's forecast to reach"
-                    f" {self.temperature_monitor.forecast['maximum']}º,"
-                    " consider enabling climate control."
-                )
-            if self.temperature_monitor.is_minimum_forecast():
-                self.suggest(
-                    "It's forecast to fall to"
-                    f" {self.temperature_monitor.forecast['minimum']}º,"
-                    " consider enabling climate control."
-                )
+        self.allow_suggestion()
+        forecast = self.temperature_monitor.get_forecast_if_will_trigger()
+        if forecast is not None:
+            self.suggest(
+                f"It's forecast to reach {forecast}º, consider enabling climate control."
+            )
 
     def suggest_climate_control(self):
         """Suggest user enables control (variants for if outside is nicer or not)."""
@@ -233,6 +225,17 @@ class Climate(app.App):
             aircon.turn_off()
         self.allow_suggestion()
 
+    def transition_aircon_for_sleep(self):
+        """Have only bedroom aircon on when in Sleep scene, otherwise all on."""
+        if self.climate_control or self.suggested is False:
+            self.temperature_monitor.start_monitoring()
+        if self.aircon is True:
+            if self.scene == "Sleep":
+                self.aircons["living_room"].turn_off()
+                self.aircons["dining_room"].turn_off()
+            else:
+                self.turn_aircon_on(self.get_state("climate.bedroom"))
+
     def disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
         if (
@@ -274,7 +277,6 @@ class Climate(app.App):
 
     def allow_suggestion(self):
         """Allow suggestions to be made again. Use after user events & scene changes."""
-        self.temperature_monitor.start_monitoring()
         if self.suggested:
             self.suggested = False
 
@@ -420,7 +422,6 @@ class TemperatureMonitor:
         self.inside_temperature = None
         self.last_inside_temperature = None
         self.outside_temperature = None
-        self.forecast = {"minimum": None, "maximum": None}
         self.start_monitoring()
 
     def start_monitoring(self):
@@ -562,23 +563,31 @@ class TemperatureMonitor:
             return "cool"
         return "heat"
 
-    def is_minimum_forecast(self) -> bool:
-        """Check if the minimum temperature forecast is below the minimum trigger."""
-        forecast = self.controller.get_state("sensor.bom_forecast_min_temp_c_0")
-        if forecast == "n/a":
-            forecast = self.controller.get_state("sensor.bom_forecast_min_temp_c_1")
-        self.forecast["minimum"] = float(forecast)
-        return (
-            self.forecast["minimum"] <= self.controller.args["min_temperature_trigger"]
-        )
+    def get_forecast_if_will_trigger(self) -> float:
+        """Return the forecasted temperature if it exceeds thresholds."""
+        forecasts = [
+            float(
+                self.controller.get_state(
+                    f"sensor.dark_sky_apparent_temperature_{hour}h"
+                )
+            )
+            for hour in ["2", "4", "6", "8"]
+        ]
+        max_forecast = max(forecasts)
+        if max_forecast >= self.current_max_temperature_trigger:
+            return max_forecast
+        min_forecast = min(forecasts)
+        if min_forecast <= self.controller.args["min_temperature_trigger"]:
+            return min_forecast
+        return None
 
-    def is_maximum_forecast(self) -> bool:
-        """Check if the maximum temperature forecast is above the maximum trigger."""
-        forecast = self.controller.get_state("sensor.bom_forecast_max_temp_c_0")
-        if forecast == "n/a":
-            forecast = self.controller.get_state("sensor.bom_forecast_max_temp_c_1")
-        self.forecast["maximum"] = float(forecast)
-        return self.forecast["maximum"] >= self.current_max_temperature_trigger
+    def adjust_current_max_temperature_trigger(self):
+        """Adjust the current max temperature trigger based on the current scene."""
+        self.current_max_temperature_trigger = self.controller.args[
+            "max_day_temperature_trigger"
+            if "Day" in self.controller.scene
+            else "max_day_temperature_trigger"
+        ]
 
 
 class Aircon:

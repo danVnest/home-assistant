@@ -106,13 +106,15 @@ sensor:
   station: !secret bom_station
   monitored_conditions:
   - apparent_t
-- platform: bom_forecast
-  product_id: !secret bom_forecast_id
-  name: Forecast
-  forecast_days: 1
+- platform: darksky
+  api_key: !secret darksky_key
+  hourly_forecast:
+  - 2
+  - 4
+  - 6
+  - 8
   monitored_conditions:
-  - 'max'
-  - 'min'
+  - apparent_temperature
 
 sun:
 
