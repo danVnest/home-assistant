@@ -30,14 +30,13 @@ class Media(app.App):
             old="playing",
             duration=self.args["steady_state_delay"],
         )
-        # self.listen_event(self.scene_change, 'SCENE')
 
     def tv_state_change(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
         """Handle TV events at night and change the scene."""
         del entity, attribute, old, kwargs
-        if new == "playing" and self.scene == "night":
-            self.scene = "tv"
-        elif self.scene == "tv":
-            self.scene = "night"
+        if new == "playing" and self.scene == "Night":
+            self.scene = "TV"
+        elif self.scene == "TV":
+            self.scene = "Night"
