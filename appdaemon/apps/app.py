@@ -66,7 +66,7 @@ class App(hass.Hass):
                 super().notify(
                     message, title=kwargs["title"], name=mobile_name, data=data,
                 )
-                self.log(f"NOTIFICATION: {kwargs['title']}: {message}")
+                self.log(f"Notified {targets}: {kwargs['title']}: {message}")
 
     def anyone_home(self, **kwargs) -> bool:
         """Check if anyone is home."""
