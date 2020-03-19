@@ -1,6 +1,8 @@
-title: Nest
+title: Smart Nest
 views:
-  - badges: []
+  - path: default_view
+    title: Control & Status
+    badges: []
     cards:
       - entities:
           - entity: input_select.scene
@@ -8,6 +10,15 @@ views:
           - entity: input_boolean.aircon
         show_header_toggle: false
         title: Control
+        type: entities
+      - entities:
+          - entity: input_number.cooling_target_temperature
+          - entity: input_number.heating_target_temperature
+          - entity: input_number.day_high_temperature_trigger
+          - entity: input_number.night_high_temperature_trigger
+          - entity: input_number.min_temperature_trigger
+        show_header_toggle: false
+        title: Climate Control Temperatures
         type: entities
       - entities:
           - entity: light.kitchen
@@ -18,10 +29,10 @@ views:
         show_state: true
         title: Lights
         type: glance
-      - type: markdown
-        content: >-
+      - content: >-
           **Lighting** and climate settings are automatically adjusted between
-          different scenes. You can select a preferred scene here or tell Siri/Google:
+          different scenes. You can select a preferred scene here or tell
+          Siri/Google:
 
           - lights on/off
 
@@ -37,6 +48,7 @@ views:
           - climate control on/off
 
           - aircon on/off
+        type: markdown
       - aspect_ratio: '2'
         default_zoom: 12
         entities:
@@ -55,14 +67,14 @@ views:
         refresh_interval: 0
         title: Temperatures
         type: history-graph
-      - entity: climate.bedroom
-        type: thermostat
-      - entity: climate.living_room
-        type: thermostat
-      - entity: climate.dining_room
-        type: thermostat
-    path: default_view
-    title: Home
+      - cards:
+          - entity: climate.living_room
+            type: thermostat
+          - entity: climate.dining_room
+            type: thermostat
+          - entity: climate.bedroom
+            type: thermostat
+        type: vertical-stack
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
@@ -70,8 +82,12 @@ views:
       - entities:
           - entity: counter.warnings
           - entity: counter.errors
-        hours_to_show: 80
+          - entity: input_select.scene
+        hours_to_show: 24
         refresh_interval: 0
         type: history-graph
     path: system
     title: System
+    visible:
+      - user: 15ff7a86d4ae4d38a60003ad4064ff78
+      - user: d678a59ca9604e2ba14c3ac3705ba943

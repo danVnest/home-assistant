@@ -45,6 +45,38 @@ input_boolean:
   aircon:
     name: Aircon
 
+input_number:
+  cooling_target_temperature:
+    name: Cool down to
+    min: 15
+    max: 25
+    unit_of_measurement: "º"
+    mode: "box"
+  heating_target_temperature:
+    name: Heat up to
+    min: 15
+    max: 25
+    unit_of_measurement: "º"
+    mode: "box"
+  day_high_temperature_trigger:
+    name: Cool when above (Day)
+    min: 20
+    max: 40
+    unit_of_measurement: "º"
+    mode: "box"
+  night_high_temperature_trigger:
+    name: Cool when above (Night)
+    min: 20
+    max: 40
+    unit_of_measurement: "º"
+    mode: "box"
+  min_temperature_trigger:
+    name: Heat when below
+    min: 0
+    max: 20
+    unit_of_measurement: "º"
+    mode: "box"
+
 input_select:
   scene:
     name: Scene
