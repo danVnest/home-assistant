@@ -151,9 +151,11 @@ class Climate(app.App):
         if new == "Sleep" or old == "Sleep":
             self.transition_aircon_for_sleep()
         if self.climate_control is False and any(
-            new == "Day" and old == "Sleep",
-            new == "Night" and old == "Day",
-            "Away" not in new and "Away" in old,
+            [
+                new == "Day" and old == "Sleep",
+                new == "Night" and old == "Day",
+                "Away" not in new and "Away" in old,
+            ]
         ):
             self.suggest_if_trigger_forecast()
         self.handle_inside_temperature()
