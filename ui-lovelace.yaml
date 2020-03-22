@@ -1,20 +1,22 @@
-title: Nest
+title: Smart Nest
 views:
-  - badges:
-      - entity: binary_sensor.updater
-      - entity: sensor.hacs
+  - badges: []
     cards:
       - entities:
-          - entity: script.lights_on
-          - entity: script.lights_on_bright
-          - entity: script.lights_off
-          - entity: script.sleep_time
-          - entity: script.climate_control_on
-          - entity: script.climate_control_off
-          - entity: script.climate_control_enabled
-          - entity: script.climate_control_disabled
+          - entity: input_select.scene
+          - entity: input_boolean.climate_control
+          - entity: input_boolean.aircon
         show_header_toggle: false
         title: Control
+        type: entities
+      - entities:
+          - entity: input_number.cooling_target_temperature
+          - entity: input_number.heating_target_temperature
+          - entity: input_number.day_high_temperature_trigger
+          - entity: input_number.night_high_temperature_trigger
+          - entity: input_number.low_temperature_trigger
+        show_header_toggle: false
+        title: Climate Control Temperatures
         type: entities
       - entities:
           - entity: light.kitchen
@@ -25,6 +27,26 @@ views:
         show_state: true
         title: Lights
         type: glance
+      - content: >-
+          **Lighting** and climate settings are automatically adjusted between
+          different scenes. You can select a preferred scene here or tell
+          Siri/Google:
+
+          - lights on/off
+
+          - lights on bright
+
+          - sleep time
+
+
+          **Automatic climate control** will control all aircon units based on
+          the temperature and scene. Aircon can also be manually turned on/off.
+          These settings can be controlled by telling Siri/Google:
+
+          - climate control on/off
+
+          - aircon on/off
+        type: markdown
       - aspect_ratio: '2'
         default_zoom: 12
         entities:
@@ -34,25 +56,48 @@ views:
       - entity: media_player.living_room
         type: media-control
       - entities:
-          - entity: sensor.kitchen_multisensor_luminance
-        hours_to_show: 168
-        refresh_interval: 0
-        type: history-graph
-      - entity: climate.living_room
-        type: thermostat
-      - entities:
           - entity: climate.bedroom
           - entity: climate.living_room
           - entity: climate.dining_room
           - entity: sensor.kitchen_multisensor_temperature
           - entity: sensor.multisensor_2_temperature
-        hours_to_show: 80
+          - entity: input_number.cooling_target_temperature
+          - entity: input_number.heating_target_temperature
+          - entity: input_number.day_high_temperature_trigger
+          - entity: input_number.night_high_temperature_trigger
+          - entity: input_number.low_temperature_trigger
+          - entity: sensor.apparent_inside_temperature
         refresh_interval: 0
         title: Temperatures
         type: history-graph
-      - entity: climate.bedroom
-        type: thermostat
-      - entity: climate.dining_room
-        type: thermostat
+        hours_to_show: 72
+      - cards:
+          - entity: climate.living_room
+            type: thermostat
+          - entity: climate.dining_room
+            type: thermostat
+          - entity: climate.bedroom
+            type: thermostat
+          - content: >-
+              To manually control the individual airconditioning units above,
+              you should disable automatic climate control beforehand.
+            type: markdown
+        type: vertical-stack
     path: default_view
-    title: Home
+    title: Control & Status
+  - badges:
+      - entity: binary_sensor.updater
+      - entity: sensor.hacs
+    cards:
+      - entities:
+          - entity: sensor.warnings_numeric
+          - entity: sensor.errors_numeric
+          - entity: input_select.scene
+        hours_to_show: 36
+        refresh_interval: 0
+        type: history-graph
+    path: system
+    title: System
+    visible:
+      - user: 15ff7a86d4ae4d38a60003ad4064ff78
+      - user: d678a59ca9604e2ba14c3ac3705ba943

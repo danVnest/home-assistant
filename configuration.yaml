@@ -1,8 +1,29 @@
-# TODO: replace default with my own config ?
-default_config:
-# mobile_app: # included in default
-# discovery: # included in default
-# ios:  # included in default
+badnest:
+  issue_token: !secret badnest_token
+  cookie: !secret badnest_cookie
+  region: !secret badnest_region
+
+climate:
+  platform: sensibo
+  api_key: !secret sensibo_key
+
+config:
+
+counter:
+  warnings:
+  errors:
+
+device_tracker:
+  platform: netgear
+  password: !secret orbi_password
+  consider_home: 0:05
+  accesspoints: true # forces use of Orbi API v2, which is much faster
+
+frontend:
+
+group: !include groups.yaml
+
+history:
 
 homeassistant:
   customize: !include customize.yaml
@@ -15,33 +36,58 @@ http:
   ip_ban_enabled: True
   login_attempts_threshold: 10
 
-zwave:
-  usb_path: /dev/ttyACM0
-  network_key: !secret zwave_key
-  #device_config: !include zwave_device_config.yaml
-
-homekit:
-  auto_start: false
-  filter:
-    exclude_domains:
-    - automation
-    - device_tracker
-    - group
-    - person
-    - sun
-    - weather
-    - zone
-    - z-wave
-  # TODO: what do I even want here? All automations will be done through home assistant automatically or via siri.
-  # TODO: setup up each device appropriately: https://www.home-assistant.io/integrations/homekit
-
 ifttt:
   key: !secret ifttt_key
 
-mqtt:
-  broker: core-mosquitto
-  username: !secret mqtt_username
-  password: !secret mqtt_password
+input_boolean:
+  climate_control:
+    name: "Automatic climate control"
+  aircon:
+    name: "Aircon"
+
+input_number:
+  cooling_target_temperature:
+    name: "Cool down to"
+    min: 15
+    max: 25
+    unit_of_measurement: "°C"
+    mode: "box"
+  heating_target_temperature:
+    name: "Heat up to"
+    min: 15
+    max: 25
+    unit_of_measurement: "°C"
+    mode: "box"
+  day_high_temperature_trigger:
+    name: "Cool when above (Day)"
+    min: 20
+    max: 40
+    unit_of_measurement: "°C"
+    mode: "box"
+  night_high_temperature_trigger:
+    name: "Cool when above (Night)"
+    min: 20
+    max: 40
+    unit_of_measurement: "°C"
+    mode: "box"
+  low_temperature_trigger:
+    name: "Heat when below"
+    min: 0
+    max: 20
+    unit_of_measurement: "°C"
+    mode: "box"
+
+input_select:
+  scene:
+    name: Scene
+    options:
+    - Day
+    - Night
+    - Sleep
+    - Bright
+    - TV
+    - Away (Day)
+    - Away (Night)
 
 light:
 - platform: wiz_light
@@ -64,28 +110,26 @@ light:
   command_topic: "light-office/cmnd/POWER"
   state_topic: "light-office/stat/RESULT"
   value_template: "{{ value_json.POWER }}"
-  #availability_topic: "light-office/tele/LWT"
-  #payload_available: "Online"
-  #payload_not_available: "Offline"
   qos: 1
 - platform: mqtt
   name: 'Bedroom'
   command_topic: "light-bedroom/cmnd/POWER"
   state_topic: "light-bedroom/stat/RESULT"
   value_template: "{{ value_json.POWER }}"
-  #availability_topic: "light-bedroom/tele/LWT"
-  #payload_available: "Online"
-  #payload_not_available: "Offline"
   qos: 1
 
-climate:
-  platform: sensibo
-  api_key: !secret sensibo_key
+logbook:
 
-badnest:
-  issue_token: !secret badnest_token
-  cookie: !secret badnest_cookie
-  region: !secret badnest_region
+map:
+
+mobile_app:
+
+mqtt:
+  broker: core-mosquitto
+  username: !secret mqtt_username
+  password: !secret mqtt_password
+
+person:
 
 sensor:
 - platform: badnest
@@ -94,23 +138,38 @@ sensor:
   station: !secret bom_station
   monitored_conditions:
   - apparent_t
-- platform: bom_forecast
-  product_id: !secret bom_forecast_id
-  name: Forecast
-  forecast_days: 1
+- platform: darksky
+  api_key: !secret darksky_key
+  hourly_forecast:
+  - 2
+  - 4
+  - 6
+  - 8
   monitored_conditions:
-  - 'max'
-  - 'min'
+  - apparent_temperature
+- platform: template
+  sensors:
+    warnings_numeric:
+      friendly_name: "Warnings"
+      unit_of_measurement: "#"
+      value_template: "{{ states('counter.warnings') }}"
+    errors_numeric:
+      friendly_name: "Errors"
+      unit_of_measurement: "#"
+      value_template: "{{ states('counter.errors') }}"
 
-device_tracker:
-  platform: netgear
-  password: !secret orbi_password
-  consider_home: 0:05
-  accesspoints: true # forces use of Orbi API v2, which is much faster
+sun:
+
+system_health:
 
 tts:
   platform: google_translate
 
-group: !include groups.yaml
-automation: !include automations.yaml
-script: !include scripts.yaml
+updater:
+  include_used_components: True
+
+zeroconf:
+
+zwave:
+  usb_path: /dev/ttyACM0
+  network_key: !secret zwave_key

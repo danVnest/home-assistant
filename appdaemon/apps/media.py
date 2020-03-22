@@ -6,10 +6,10 @@ not playing.
 User defined variables are configued in media.yaml
 """
 
-import appdaemon.plugins.hass.hassapi as hass
+import app
 
 
-class Media(hass.Hass):
+class Media(app.App):
     """Detect media state changes and fire corresponding events."""
 
     def initialize(self):
@@ -17,7 +17,7 @@ class Media(hass.Hass):
 
         Appdaemon defined init function called once ready after __init__.
         """
-        # self.scene = None
+        super().initialize()
         self.listen_state(
             self.tv_state_change,
             "media_player.living_room",
@@ -30,11 +30,13 @@ class Media(hass.Hass):
             old="playing",
             duration=self.args["steady_state_delay"],
         )
-        # self.listen_event(self.scene_change, 'SCENE')
 
     def tv_state_change(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
-        """Fire an event when media state changes."""
+        """Handle TV events at night and change the scene."""
         del entity, attribute, old, kwargs
-        self.fire_event("TV", state=new)
+        if new == "playing" and self.scene == "Night":
+            self.scene = "TV"
+        elif self.scene == "TV":
+            self.scene = "Night"

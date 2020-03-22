@@ -6,9 +6,6 @@ logs:
     filename: /config/appdaemon/logs/errors.log
   diag_log:
     filename: /config/appdaemon/logs/diag.log
-    #log_generations: 5
-    #log_size: 1024
-    #format: "{asctime} {levelname:<8} {appname:<10}: {message}"
   access_log:
     filename: /config/appdaemon/logs/access.log
 appdaemon:
@@ -17,9 +14,7 @@ appdaemon:
   elevation: !secret location_elevation
   time_zone: !secret location_time_zone
   # production_mode: true
-  # utility_delay: 10 # the number of seconds between each utility loop run - will warn if the loop takes more than 90% of that time
-  # thread_duration_warning_threshold: 20 # something causes circadian_progression to hang for about 10 seconds, even though it only takes max 2 seconds from first to last line of code
-  missing_app_warnings: 1
+  # missing_app_warnings: false
   plugins:
     HASS:
       type: hass
