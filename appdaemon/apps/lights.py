@@ -154,7 +154,7 @@ class Light:
         self.kelvin_before_off = 4500
         self.dimmable = (
             self.controller.get_state(self.light_id, attribute="supported_features")
-            != "0"
+            != 0
         )
 
     @property
