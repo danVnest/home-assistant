@@ -28,7 +28,7 @@ class Control(app.App):
         """
         super().initialize()
         for app_name in ["climate", "lights", "media", "safety"]:
-            setattr(self, app_name, self.get_app(app_name))
+            setattr(self, app_name, self.get_app(app_name.title()))
         self.listen_log(self.handle_log)
         self.reset_scene()
         self.last_device_date = self.date()
@@ -89,6 +89,7 @@ class Control(app.App):
     def ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
+        self.log(f"Received {data} from IFTTT: ")
         if "scene" in data:
             self.scene = data["scene"]
         elif "climate_control" in data:
