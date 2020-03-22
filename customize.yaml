@@ -13,3 +13,6 @@ light.tv_middle:
 light.tv_right:
   max_mireds: 500
   min_mireds: 222
+sensor.apparent_inside_temperature:
+  friendly_name: "Apparent inside temperature"
+  unit_of_measurement: "°C"

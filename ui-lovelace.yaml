@@ -1,8 +1,6 @@
 title: Smart Nest
 views:
-  - path: default_view
-    title: Control & Status
-    badges: []
+  - badges: []
     cards:
       - entities:
           - entity: input_select.scene
@@ -16,7 +14,7 @@ views:
           - entity: input_number.heating_target_temperature
           - entity: input_number.day_high_temperature_trigger
           - entity: input_number.night_high_temperature_trigger
-          - entity: input_number.min_temperature_trigger
+          - entity: input_number.low_temperature_trigger
         show_header_toggle: false
         title: Climate Control Temperatures
         type: entities
@@ -63,10 +61,16 @@ views:
           - entity: climate.dining_room
           - entity: sensor.kitchen_multisensor_temperature
           - entity: sensor.multisensor_2_temperature
-        hours_to_show: 80
+          - entity: input_number.cooling_target_temperature
+          - entity: input_number.heating_target_temperature
+          - entity: input_number.day_high_temperature_trigger
+          - entity: input_number.night_high_temperature_trigger
+          - entity: input_number.low_temperature_trigger
+          - entity: sensor.apparent_inside_temperature
         refresh_interval: 0
         title: Temperatures
         type: history-graph
+        hours_to_show: 72
       - cards:
           - entity: climate.living_room
             type: thermostat
@@ -74,16 +78,22 @@ views:
             type: thermostat
           - entity: climate.bedroom
             type: thermostat
+          - content: >-
+              To manually control the individual airconditioning units above,
+              you should disable automatic climate control beforehand.
+            type: markdown
         type: vertical-stack
+    path: default_view
+    title: Control & Status
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
     cards:
       - entities:
-          - entity: counter.warnings
-          - entity: counter.errors
+          - entity: sensor.warnings_numeric
+          - entity: sensor.errors_numeric
           - entity: input_select.scene
-        hours_to_show: 24
+        hours_to_show: 36
         refresh_interval: 0
         type: history-graph
     path: system

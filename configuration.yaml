@@ -41,40 +41,40 @@ ifttt:
 
 input_boolean:
   climate_control:
-    name: Automatic Climate Control
+    name: "Automatic climate control"
   aircon:
-    name: Aircon
+    name: "Aircon"
 
 input_number:
   cooling_target_temperature:
-    name: Cool down to
+    name: "Cool down to"
     min: 15
     max: 25
-    unit_of_measurement: "º"
+    unit_of_measurement: "°C"
     mode: "box"
   heating_target_temperature:
-    name: Heat up to
+    name: "Heat up to"
     min: 15
     max: 25
-    unit_of_measurement: "º"
+    unit_of_measurement: "°C"
     mode: "box"
   day_high_temperature_trigger:
-    name: Cool when above (Day)
+    name: "Cool when above (Day)"
     min: 20
     max: 40
-    unit_of_measurement: "º"
+    unit_of_measurement: "°C"
     mode: "box"
   night_high_temperature_trigger:
-    name: Cool when above (Night)
+    name: "Cool when above (Night)"
     min: 20
     max: 40
-    unit_of_measurement: "º"
+    unit_of_measurement: "°C"
     mode: "box"
-  min_temperature_trigger:
-    name: Heat when below
+  low_temperature_trigger:
+    name: "Heat when below"
     min: 0
     max: 20
-    unit_of_measurement: "º"
+    unit_of_measurement: "°C"
     mode: "box"
 
 input_select:
@@ -147,6 +147,16 @@ sensor:
   - 8
   monitored_conditions:
   - apparent_temperature
+- platform: template
+  sensors:
+    warnings_numeric:
+      friendly_name: "Warnings"
+      unit_of_measurement: "#"
+      value_template: "{{ states('counter.warnings') }}"
+    errors_numeric:
+      friendly_name: "Errors"
+      unit_of_measurement: "#"
+      value_template: "{{ states('counter.errors') }}"
 
 sun:
 

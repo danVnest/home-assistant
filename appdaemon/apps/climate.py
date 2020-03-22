@@ -437,6 +437,9 @@ class TemperatureMonitor:
     def __init__(self, controller: Climate):
         """Initialise with Climate controller and create sensor objects."""
         self.controller = controller
+        self.inside_temperature = self.controller.get_state(
+            "climate.bedroom", attribute=f"current_temperature"
+        )
         self.current_max_temperature_trigger = float(
             self.controller.get_state("input_number.day_high_temperature_trigger")
         )
@@ -451,10 +454,21 @@ class TemperatureMonitor:
                 "sensor.bom_weather_feels_like_c",
             ]
         }
-        self.inside_temperature = None
         self.last_inside_temperature = None
         self.outside_temperature = None
         self.start_monitoring()
+
+    @property
+    def inside_temperature(self) -> float:
+        """Get the calculated inside temperature as saved to Home Assistant."""
+        return float(self.controller.get_state("sensor.apparent_inside_temperature"))
+
+    @inside_temperature.setter
+    def inside_temperature(self, temperature: float):
+        """Store the calculated inside temperature in Home Assistant."""
+        self.controller.set_state(
+            "sensor.apparent_inside_temperature", state=temperature
+        )
 
     def start_monitoring(self):
         """Get values from appropriate sensors and calculate inside temperature."""
@@ -540,7 +554,7 @@ class TemperatureMonitor:
             > self.outside_temperature + self.controller.args["inside_outside_trigger"]
         )
         too_hot_or_cold_outside = (
-            not float(self.controller.get_state("input_number.min_temperature_trigger"))
+            not float(self.controller.get_state("input_number.low_temperature_trigger"))
             <= self.outside_temperature
             <= self.current_max_temperature_trigger
         )
@@ -561,7 +575,7 @@ class TemperatureMonitor:
     def is_too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
         if (
-            float(self.controller.get_state("input_number.min_temperature_trigger"))
+            float(self.controller.get_state("input_number.low_temperature_trigger"))
             < self.inside_temperature
             < self.current_max_temperature_trigger
         ):
@@ -603,7 +617,7 @@ class TemperatureMonitor:
             return max_forecast
         min_forecast = min(forecasts)
         if min_forecast <= float(
-            self.controller.get_state("input_number.min_temperature_trigger")
+            self.controller.get_state("input_number.low_temperature_trigger")
         ):
             return min_forecast
         return None
