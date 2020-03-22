@@ -17,8 +17,6 @@ class Lights(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.circadian_brightness = None
-        self.circadian_kelvin = None
         self.circadian_timer = None
         self.circadian_start_datetime = None
         self.circadian_end_datetime = None
@@ -88,51 +86,46 @@ class Lights(app.App):
     def circadian_progression(self, kwargs: dict):
         """Calculate appropriate lighting levels and implement."""
         del kwargs
-        self.calculate_circadian_progress()
-        self.lights["kitchen"].adjust_circadian(
-            self.circadian_brightness, self.circadian_kelvin
-        )
-        self.lights["tv"].adjust(self.circadian_brightness, self.circadian_kelvin)
-        self.lights["hall"].adjust(self.circadian_brightness, self.circadian_kelvin)
+        brightness, kelvin = self.calculate_circadian_brightness_kelvin()
+        self.lights["kitchen"].adjust_circadian(brightness, kelvin)
+        self.lights["tv"].adjust(brightness, kelvin)
+        self.lights["hall"].adjust(brightness, kelvin)
         self.log("Adjusted lighting based on circadian progression", level="DEBUG")
 
-    def calculate_circadian_progress(self):
+    def calculate_circadian_brightness_kelvin(self) -> Tuple[float, float]:
         """Calculate appropriate lighting levels based on the current time of night."""
         time = self.time()
         if time <= self.circadian_start_datetime.time():
-            self.circadian_brightness = self.args["max_circadian_brightness"]
-            self.circadian_kelvin = self.args["max_circadian_kelvin"]
             self.cancel_timer(self.circadian_timer)
             self.log("Circadian progression not triggered - too early")
-        elif time >= self.circadian_end_datetime.time():
-            self.circadian_brightness = self.args["min_circadian_brightness"]
-            self.circadian_kelvin = self.args["min_circadian_kelvin"]
+            return (
+                self.args["max_circadian_brightness"],
+                self.args["max_circadian_kelvin"],
+            )
+        if time >= self.circadian_end_datetime.time():
             self.cancel_timer(self.circadian_timer)
             self.log("Circadian progression not triggered - already completed")
-        else:
-            circadian_progress = (self.circadian_end_datetime - self.datetime()) / (
-                self.circadian_end_datetime - self.circadian_start_datetime
+            return (
+                self.args["min_circadian_brightness"],
+                self.args["min_circadian_kelvin"],
             )
-            self.circadian_brightness = (
-                self.args["min_circadian_brightness"]
-                + (
-                    self.args["max_circadian_brightness"]
-                    - self.args["min_circadian_brightness"]
-                )
-                * circadian_progress
+        circadian_progress = (self.circadian_end_datetime - self.datetime()) / (
+            self.circadian_end_datetime - self.circadian_start_datetime
+        )
+        self.log(
+            f"Circadian progress calculated as: {circadian_progress}", level="DEBUG",
+        )
+        return (
+            self.args["min_circadian_brightness"]
+            + (
+                self.args["max_circadian_brightness"]
+                - self.args["min_circadian_brightness"]
             )
-            self.circadian_kelvin = (
-                self.args["min_circadian_kelvin"]
-                + (
-                    self.args["max_circadian_kelvin"]
-                    - self.args["min_circadian_kelvin"]
-                )
-                * circadian_progress
-            )
-            self.log(
-                f"Circadian progress calculated as: {circadian_progress}",
-                level="DEBUG",
-            )
+            * circadian_progress,
+            self.args["min_circadian_kelvin"]
+            + (self.args["max_circadian_kelvin"] - self.args["min_circadian_kelvin"])
+            * circadian_progress,
+        )
 
     def redate_circadian(self, kwargs: dict):
         """Configure the start and end times for lighting adjustment for today."""
@@ -161,7 +154,7 @@ class Light:
         self.kelvin_before_off = 4500
         self.dimmable = (
             self.controller.get_state(self.light_id, attribute="supported_features")
-            == "0"
+            != "0"
         )
 
     @property
@@ -174,9 +167,9 @@ class Light:
         return brightness
 
     @brightness.setter
-    def brightness(self, value):
+    def brightness(self, value: float):
         """Set and validate light's brightness."""
-        value = round(value)
+        value = int(value)
         if self.brightness != value:
             if not 0 <= value <= 255:
                 self.controller.log(
@@ -205,10 +198,10 @@ class Light:
         )  # Home Assistant uses mireds, so convert from kelvin and round to mired step
 
     @kelvin.setter
-    def kelvin(self, value):
+    def kelvin(self, value: float):
         """Set and validate light's warmth of colour."""
         if value is not None and self.dimmable is True:
-            value = 20 * round(
+            value = 20 * int(
                 value / 20
             )  # 20 is the biggest mired step (1e6/222 - 1e6/223)
             if self.kelvin != value:
