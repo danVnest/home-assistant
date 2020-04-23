@@ -1,7 +1,6 @@
 Control:
   module: control
   class: Control
-  sunrise_offset: 90 # time in minutes to delay trigger of morning routine after to sunrise
-  sunset_offset: 120 # time in minutes to trigger evening routine in advance of sunset
   sleeptime: 22 # hour of the night after which scene will be sleep (only in the event Home Assistant is restarted)
-  notify_error_delay: 60 # minimum time in minutes between error notifications
+  day_min_luminance: 40
+  night_max_luminance: 50

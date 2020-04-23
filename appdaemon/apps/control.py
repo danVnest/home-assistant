@@ -32,12 +32,13 @@ class Control(app.App):
         self.listen_log(self.handle_log)
         self.reset_scene()
         self.last_device_date = self.date()
-        self.run_at_sunrise(self.morning, offset=self.args["sunrise_offset"] * 60)
-        self.run_at_sunset(self.evening, offset=-self.args["sunset_offset"] * 60)
         self.listen_event(self.button, "zwave.scene_activated")
         self.listen_event(self.ifttt, "ifttt_webhook_received")
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
+        self.listen_state(
+            self.handle_light_change, "sensor.kitchen_multisensor_luminance"
+        )
         for battery in [
             "entryway_protect_battery_health_state",
             "living_room_protect_battery_health_state",
@@ -69,19 +70,24 @@ class Control(app.App):
             self.log("Detecting scene to be reset to")
             self.scene = scene
 
-    def morning(self, kwargs: dict):
-        """Change scene to day (callback for run_at_sunrise with offset)."""
-        del kwargs
-        self.log("Morning triggered")
-        self.scene = "Day" if self.anyone_home() else "Away (Day)"
-
-    def evening(self, kwargs: dict):
-        """Set scene to Night or TV (callback for run_at_sunset with offset)."""
-        del kwargs
-        self.log("Evening triggered")
-        self.scene = (
-            "TV" if self.get_state("media_player.living_room") == "playing" else "Night"
-        )
+    def handle_light_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Change scene to day or night based on luminance levels."""
+        del entity, attribute, old, kwargs
+        if "Day" in self.scene:
+            if float(new) <= self.args["day_min_luminance"]:
+                self.log(f"Light level is {new}, transitioning to night scene")
+                if self.get_state("media_player.living_room") == "playing":
+                    self.scene = "TV"
+                elif self.anyone_home():
+                    self.scene = "Night"
+                else:
+                    self.scene = "Away (Night)"
+        elif self.scene != "Bright":
+            if float(new) >= self.args["night_max_luminance"]:
+                self.log(f"Light level is {new}, transitioning to day scene")
+                self.scene = "Day" if self.anyone_home() else "Away (Day)"
 
     def button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
