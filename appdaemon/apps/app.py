@@ -54,8 +54,12 @@ class App(hass.Hass):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs["targets"] if "targets" in kwargs else "all"
         for person in self.get_state("person").values():
-            if targets == "all" or (
-                targets == "anyone_home" and person["state"] == "home"
+            if any(
+                [
+                    targets == "all",
+                    targets == "anyone_home" and person["state"] == "home",
+                    targets == person["entity_id"].split(".")[-1],
+                ]
             ):
                 if person["entity_id"] == "person.dan":
                     mobile_name = "mobile_app_dans_phone"

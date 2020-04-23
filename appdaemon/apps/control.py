@@ -38,6 +38,16 @@ class Control(app.App):
         self.listen_event(self.ifttt, "ifttt_webhook_received")
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
+        for battery in [
+            "entryway_protect_battery_health_state",
+            "living_room_protect_battery_health_state",
+            "garage_protect_battery_health_state",
+            "kitchen_multisensor_battery_level",
+            "multisensor_battery_level",
+            "switch1_battery_level",
+            "switch2_battery_level",
+        ]:
+            self.listen_state(self.handle_battery_level_change, f"sensor.{battery}")
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
@@ -128,6 +138,19 @@ class Control(app.App):
             self.scene = (
                 f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
             )
+
+    def handle_battery_level_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Notify if a device's battery is low."""
+        del attribute, old, kwargs
+        if "protect" in entity:
+            if new != "Ok":
+                low_message = f"{entity} is low"
+        elif float(new) < 20:
+            low_message = f"{entity} is low ({new}%)"
+        if low_message is not None:
+            self.notify(low_message, title="Low Battery", targets="dan")
 
     def handle_log(
         self,
