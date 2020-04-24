@@ -19,6 +19,13 @@ views:
         title: Climate Control Temperatures
         type: entities
       - entities:
+          - entity: sensor.apparent_inside_temperature_numeric
+            name: Inside
+          - entity: sensor.dark_sky_apparent_temperature
+            name: Outside
+        show_name: true
+        type: glance
+      - entities:
           - entity: light.kitchen
           - entity: group.main_lights
           - entity: light.bedroom
@@ -48,10 +55,12 @@ views:
           - aircon on/off
         type: markdown
       - aspect_ratio: '2'
+        dark_mode: false
         default_zoom: 12
         entities:
           - entity: person.dan
           - entity: person.rachel
+        hours_to_show: 1
         type: map
       - entity: media_player.living_room
         type: media-control
@@ -61,16 +70,17 @@ views:
           - entity: climate.dining_room
           - entity: sensor.kitchen_multisensor_temperature
           - entity: sensor.multisensor_2_temperature
+          - entity: sensor.dark_sky_apparent_temperature
           - entity: input_number.cooling_target_temperature
           - entity: input_number.heating_target_temperature
           - entity: input_number.day_high_temperature_trigger
           - entity: input_number.night_high_temperature_trigger
           - entity: input_number.low_temperature_trigger
-          - entity: sensor.apparent_inside_temperature
+          - entity: sensor.apparent_inside_temperature_numeric
+        hours_to_show: 72
         refresh_interval: 0
         title: Temperatures
         type: history-graph
-        hours_to_show: 72
       - cards:
           - entity: climate.living_room
             type: thermostat
@@ -90,11 +100,31 @@ views:
       - entity: sensor.hacs
     cards:
       - entities:
+          - entity: input_select.scene
+          - entity: input_boolean.climate_control
+          - entity: input_boolean.aircon
+        hours_to_show: 72
+        refresh_interval: 0
+        title: Control History
+        type: history-graph
+      - entities:
           - entity: sensor.warnings_numeric
           - entity: sensor.errors_numeric
-          - entity: input_select.scene
-        hours_to_show: 36
+        hours_to_show: 72
         refresh_interval: 0
+        title: Warnings & Errors
+        type: history-graph
+      - entities:
+          - entity: sensor.entryway_protect_battery_health_state
+          - entity: sensor.living_room_protect_battery_health_state
+          - entity: sensor.garage_protect_battery_health_state
+          - entity: sensor.kitchen_multisensor_battery_level
+          - entity: sensor.multisensor_battery_level
+          - entity: sensor.switch1_battery_level
+          - entity: sensor.switch2_battery_level
+        hours_to_show: 72
+        refresh_interval: 0
+        title: Battery Levels
         type: history-graph
     path: system
     title: System

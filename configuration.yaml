@@ -92,19 +92,19 @@ input_select:
 light:
 - platform: wiz_light
   name: Hall
-  host: 192.168.20.25
+  host: 192.168.20.50
 - platform: wiz_light
   name: TV Left
-  host: 192.168.20.24
+  host: 192.168.20.51
 - platform: wiz_light
   name: TV Middle
-  host: 192.168.20.26
+  host: 192.168.20.52
 - platform: wiz_light
   name: TV Right
-  host: 192.168.20.23
+  host: 192.168.20.53
 - platform: wiz_light
   name: Kitchen
-  host: 192.168.20.22
+  host: 192.168.20.54
 - platform: mqtt
   name: 'Office'
   command_topic: "light-office/cmnd/POWER"
@@ -149,6 +149,11 @@ sensor:
   - apparent_temperature
 - platform: template
   sensors:
+    apparent_inside_temperature_numeric:
+      friendly_name: "Apparent inside temperature"
+      unit_of_measurement: "°C"
+      value_template: "{{ states('sensor.apparent_inside_temperature') }}"
+      icon_template: "mdi:thermometer"
     warnings_numeric:
       friendly_name: "Warnings"
       unit_of_measurement: "#"
