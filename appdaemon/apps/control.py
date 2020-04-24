@@ -131,7 +131,7 @@ class Control(app.App):
         del entity, attribute, old, kwargs
         if "Day" in self.scene:
             if float(new) <= self.args["day_min_luminance"]:
-                self.log(f"Light level is {new}, transitioning to night scene")
+                self.log(f"Light levels are low ({new}%) transitioning to night scene")
                 if self.get_state("media_player.living_room") == "playing":
                     self.scene = "TV"
                 elif self.anyone_home():
@@ -140,14 +140,14 @@ class Control(app.App):
                     self.scene = "Away (Night)"
         elif self.scene != "Bright":
             if float(new) >= self.args["night_max_luminance"]:
-                self.log(f"Light level is {new}, transitioning to day scene")
+                self.log(f"Light levels are high ({new}%), transitioning to day scene")
                 self.scene = "Day" if self.anyone_home() else "Away (Day)"
 
     def is_ambient_light_sufficient(self) -> bool:
         """Return if there is enough ambient light to not require further lighting."""
         return (
             float(self.get_state("sensor.kitchen_multisensor_luminance"))
-            >= self.control.args["day_min_luminance"]
+            >= self.control.args["night_max_luminance"]
         )
 
     def handle_battery_level_change(

@@ -2,4 +2,4 @@ Control:
   module: control
   class: Control
   day_min_luminance: 40
-  night_max_luminance: 50
+  night_max_luminance: 60

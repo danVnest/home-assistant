@@ -4,7 +4,6 @@ This class should be the inherited class of every app.
 It inherits methods for interaction with Home Assistant, and includes several useful
 utility functions used by multiple or all apps.
 """
-import datetime
 
 import appdaemon.plugins.hass.hassapi as hass
 
