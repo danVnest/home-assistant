@@ -1,6 +1,5 @@
 Control:
   module: control
   class: Control
-  sleeptime: 22 # hour of the night after which scene will be sleep (only in the event Home Assistant is restarted)
   day_min_luminance: 40
   night_max_luminance: 50

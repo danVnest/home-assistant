@@ -36,20 +36,6 @@ class App(hass.Hass):
             option=new_scene,
         )
 
-    def morning_time(self) -> datetime.time:
-        """Return the time that night becomes morning (as configured relative to sunrise)."""
-        return (
-            self.sunrise()
-            + datetime.timedelta(minutes=self.control.args["sunrise_offset"])
-        ).time()
-
-    def evening_time(self) -> datetime.time:
-        """Return the time that day becomes night (as configured relative to sunset)."""
-        return (
-            self.sunset()
-            - datetime.timedelta(minutes=self.control.args["sunset_offset"])
-        ).time()
-
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs["targets"] if "targets" in kwargs else "all"

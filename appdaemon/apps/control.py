@@ -52,42 +52,21 @@ class Control(app.App):
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
-        if not self.anyone_home():
-            scene = f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
-        elif (
-            not self.morning_time()
-            < self.time()
-            < datetime.time(self.args["sleeptime"])
-        ):
-            scene = "Sleep"
-        elif self.time() < self.evening_time():
-            scene = "Day"
+        self.log("Detecting current appropriate scene")
+        if self.scene == "Bright":
+            self.log("Scene was set as 'Bright', will not be reset")
+        elif not self.anyone_home():
+            self.scene = (
+                f"Away ({'Day' if self.is_ambient_light_sufficient() else 'Night'})"
+            )
+        elif self.is_ambient_light_sufficient():
+            self.scene = "Day"
         elif self.get_state("media_player.living_room") == "playing":
-            scene = "TV"
+            self.scene = "TV"
+        elif self.scene == "Sleep":
+            self.log("It is night but scene was set as 'Sleep', will not be reset")
         else:
-            scene = "Night"
-        if scene != self.scene:
-            self.log("Detecting scene to be reset to")
-            self.scene = scene
-
-    def handle_light_change(
-        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
-        """Change scene to day or night based on luminance levels."""
-        del entity, attribute, old, kwargs
-        if "Day" in self.scene:
-            if float(new) <= self.args["day_min_luminance"]:
-                self.log(f"Light level is {new}, transitioning to night scene")
-                if self.get_state("media_player.living_room") == "playing":
-                    self.scene = "TV"
-                elif self.anyone_home():
-                    self.scene = "Night"
-                else:
-                    self.scene = "Away (Night)"
-        elif self.scene != "Bright":
-            if float(new) >= self.args["night_max_luminance"]:
-                self.log(f"Light level is {new}, transitioning to day scene")
-                self.scene = "Day" if self.anyone_home() else "Away (Day)"
+            self.scene = "Night"
 
     def button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
@@ -142,8 +121,34 @@ class Control(app.App):
             != "home"
         ):
             self.scene = (
-                f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
+                f"Away ({'Day' if self.is_ambient_light_sufficient() else 'Night'})"
             )
+
+    def handle_light_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Change scene to day or night based on luminance levels."""
+        del entity, attribute, old, kwargs
+        if "Day" in self.scene:
+            if float(new) <= self.args["day_min_luminance"]:
+                self.log(f"Light level is {new}, transitioning to night scene")
+                if self.get_state("media_player.living_room") == "playing":
+                    self.scene = "TV"
+                elif self.anyone_home():
+                    self.scene = "Night"
+                else:
+                    self.scene = "Away (Night)"
+        elif self.scene != "Bright":
+            if float(new) >= self.args["night_max_luminance"]:
+                self.log(f"Light level is {new}, transitioning to day scene")
+                self.scene = "Day" if self.anyone_home() else "Away (Day)"
+
+    def is_ambient_light_sufficient(self) -> bool:
+        """Return if there is enough ambient light to not require further lighting."""
+        return (
+            float(self.get_state("sensor.kitchen_multisensor_luminance"))
+            >= self.control.args["day_min_luminance"]
+        )
 
     def handle_battery_level_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
