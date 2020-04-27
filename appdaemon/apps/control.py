@@ -37,7 +37,7 @@ class Control(app.App):
         self.listen_event(self.handle_new_device, "device_tracker_new_device")
         self.listen_state(self.handle_presence_change, "person")
         self.listen_state(
-            self.handle_light_change, "sensor.kitchen_multisensor_luminance"
+            self.handle_ambient_light_change, "sensor.kitchen_multisensor_luminance"
         )
         for battery in [
             "entryway_protect_battery_health_state",
@@ -124,13 +124,13 @@ class Control(app.App):
                 f"Away ({'Day' if self.is_ambient_light_sufficient() else 'Night'})"
             )
 
-    def handle_light_change(
+    def handle_ambient_light_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Change scene to day or night based on luminance levels."""
         del entity, attribute, old, kwargs
         if "Day" in self.scene:
-            if float(new) <= self.args["day_min_luminance"]:
+            if float(new) - self.lighting_luminance() <= self.args["day_min_luminance"]:
                 self.log(f"Light levels are low ({new}%) transitioning to night scene")
                 if self.get_state("media_player.living_room") == "playing":
                     self.scene = "TV"
@@ -139,7 +139,10 @@ class Control(app.App):
                 else:
                     self.scene = "Away (Night)"
         elif self.scene != "Bright":
-            if float(new) >= self.args["night_max_luminance"]:
+            if (
+                float(new) - self.lighting_luminance()
+                >= self.args["night_max_luminance"]
+            ):
                 self.log(f"Light levels are high ({new}%), transitioning to day scene")
                 self.scene = "Day" if self.anyone_home() else "Away (Day)"
 
@@ -147,7 +150,17 @@ class Control(app.App):
         """Return if there is enough ambient light to not require further lighting."""
         return (
             float(self.get_state("sensor.kitchen_multisensor_luminance"))
+            - self.lighting_luminance()
             >= self.control.args["night_max_luminance"]
+        )
+
+    def lighting_luminance(self) -> float:
+        """Return approximate luminance of the powered lighting affecting light sensors."""
+        brightness = self.get_state("light.kitchen", attribute="brightness")
+        return (
+            0
+            if brightness is None
+            else brightness / 255 * self.args["lighting_luminance_factor"]
         )
 
     def handle_battery_level_change(

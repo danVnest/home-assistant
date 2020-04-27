@@ -1,5 +1,6 @@
 Control:
   module: control
   class: Control
-  day_min_luminance: 40
-  night_max_luminance: 60
+  day_min_luminance: 40 # minimum ambient luminance to trigger transition to night scenes
+  night_max_luminance: 60 # maximum ambient luminance to trigger transition to day scenes
+  lighting_luminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)
