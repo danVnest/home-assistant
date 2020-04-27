@@ -360,8 +360,9 @@ class Sensor:
     ):  # pylint: disable=too-many-arguments
         """Save new value then recalculate inside temperature and handle any change."""
         del entity, attribute, old
-        self.measures[kwargs["measure"]] = float(new)
-        self.monitor.calculate_and_handle_inside_temperature()
+        if new is not None:
+            self.measures[kwargs["measure"]] = float(new)
+            self.monitor.calculate_and_handle_inside_temperature()
 
 
 class ClimateSensor(Sensor):
@@ -428,7 +429,8 @@ class WeatherSensor(Sensor):
         del entity, attribute, old, kwargs
         self.monitor.outside_temperature = float(new)
         self.monitor.controller.log(
-            f"Outside temperature changed to {self.monitor.outside_temperature} degrees"
+            f"Outside temperature changed to {self.monitor.outside_temperature} degrees",
+            level="DEBUG",
         )
         self.monitor.controller.handle_outside_temperature()
 
@@ -509,7 +511,8 @@ class TemperatureMonitor:
         )
         if self.last_inside_temperature != self.inside_temperature:
             self.controller.log(
-                f"Inside temperature calculated as {self.inside_temperature} degrees"
+                f"Inside temperature calculated as {self.inside_temperature} degrees",
+                level="DEBUG",
             )
 
     def calculate_and_handle_inside_temperature(self):
