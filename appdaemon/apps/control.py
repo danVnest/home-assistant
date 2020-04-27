@@ -157,11 +157,9 @@ class Control(app.App):
         del attribute, old, kwargs
         if "protect" in entity:
             if new != "Ok":
-                low_message = f"{entity} is low"
-        elif float(new) < 20:
-            low_message = f"{entity} is low ({new}%)"
-        if low_message is not None:
-            self.notify(low_message, title="Low Battery", targets="dan")
+                self.notify(f"{entity} is low", title="Low Battery", targets="dan")
+        elif float(new) <= 20:
+            self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
     def handle_log(
         self,
