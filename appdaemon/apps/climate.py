@@ -91,9 +91,10 @@ class Climate(app.App):
             ):
                 if self.aircon is True:
                     self.turn_aircon_on(mode)
-        elif "temperature_trigger" in entity:
+        elif "trigger" in entity:
             if self.aircon_trigger_timer is not None:
                 self.cancel_timer(self.aircon_trigger_timer)
+            self.temperature_monitor.adjust_current_low_temperature_trigger()
             self.temperature_monitor.adjust_current_high_temperature_trigger()
         self.handle_inside_temperature()
 
@@ -444,9 +445,10 @@ class TemperatureMonitor:
         self.inside_temperature = self.controller.get_state(
             "climate.bedroom", attribute=f"current_temperature"
         )
-        self.current_max_temperature_trigger = float(
-            self.controller.get_state("input_number.day_high_temperature_trigger")
-        )
+        self.current_min_temperature_trigger = 0
+        self.current_max_temperature_trigger = 0
+        self.adjust_current_low_temperature_trigger()
+        self.adjust_current_high_temperature_trigger()
         self.sensors = {
             sensor_id: Sensor.detect_type_and_create(sensor_id, self)
             for sensor_id in [
@@ -559,7 +561,7 @@ class TemperatureMonitor:
             > self.outside_temperature + self.controller.args["inside_outside_trigger"]
         )
         too_hot_or_cold_outside = (
-            not float(self.controller.get_state("input_number.low_temperature_trigger"))
+            not self.current_min_temperature_trigger
             <= self.outside_temperature
             <= self.current_max_temperature_trigger
         )
@@ -580,7 +582,7 @@ class TemperatureMonitor:
     def is_too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
         if (
-            float(self.controller.get_state("input_number.low_temperature_trigger"))
+            self.current_min_temperature_trigger
             < self.inside_temperature
             < self.current_max_temperature_trigger
         ):
@@ -621,19 +623,30 @@ class TemperatureMonitor:
         if max_forecast >= self.current_max_temperature_trigger:
             return max_forecast
         min_forecast = min(forecasts)
-        if min_forecast <= float(
-            self.controller.get_state("input_number.low_temperature_trigger")
-        ):
+        if min_forecast <= float(self.current_min_temperature_trigger):
             return min_forecast
         return None
 
+    def adjust_current_low_temperature_trigger(self):
+        """Adjust the current min temperature trigger based on the current scene."""
+        self.current_min_temperature_trigger = (
+            float(self.controller.get_state(f"input_number.low_temperature_trigger"))
+            - float(
+                self.controller.get_state(f"input_number.night_threshold_reduction")
+            )
+            if "Day" not in self.controller.scene
+            else 0
+        )
+
     def adjust_current_high_temperature_trigger(self):
         """Adjust the current max temperature trigger based on the current scene."""
-        self.current_max_temperature_trigger = float(
-            self.controller.get_state(
-                f"input_number.{'day' if 'Day' in self.controller.scene else 'night'}"
-                "_high_temperature_trigger"
+        self.current_max_temperature_trigger = (
+            float(self.controller.get_state(f"input_number.high_temperature_trigger"))
+            - float(
+                self.controller.get_state(f"input_number.night_threshold_reduction")
             )
+            if "Day" not in self.controller.scene
+            else 0
         )
 
 
