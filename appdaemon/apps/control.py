@@ -65,7 +65,9 @@ class Control(app.App):
         elif self.get_state("media_player.living_room") == "playing":
             self.scene = "TV"
         elif (
-            self.parse_time(self.args["morning_time"]) < self.time() < datetime.time(12)
+            self.parse_time(self.args["morning_time"])
+            < self.time()
+            < self.parse_time("12:00:00")
         ):
             self.scene = "Morning"
         elif self.scene == "Sleep":

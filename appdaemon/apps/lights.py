@@ -134,15 +134,11 @@ class Lights(app.App):
     def redate_circadian(self, kwargs: dict):
         """Configure the start and end times for lighting adjustment for today."""
         del kwargs
-        self.circadian_start_datetime = datetime.datetime.combine(
-            self.date(),
-            (
-                self.sunset()
-                - datetime.timedelta(minutes=self.args["circadian_start_sunset_offset"])
-            ).time(),
+        self.circadian_start_datetime = self.parse_datetime(
+            f"sunset - {self.args['circadian_start_sunset_offset']}"
         )
-        self.circadian_end_datetime = datetime.datetime.combine(
-            self.date(), self.parse_time(self.args["circadian_end_time"])
+        self.circadian_end_datetime = self.parse_datetime(
+            self.args["circadian_end_time"]
         )
 
 

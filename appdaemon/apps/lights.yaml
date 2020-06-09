@@ -1,8 +1,8 @@
 Lights:
   module: lights
   class: Lights
-  circadian_start_sunset_offset: 180 # minutes before sunset that the circadian adjustment process commences
-  circadian_end_time: '22:30:00' # time (in format 'H:M:S') at which the circadian adjustment process ends
+  circadian_start_sunset_offset: '03:00:00' # time (in format 'HH:MM:SS') before sunset that the circadian adjustment process commences
+  circadian_end_time: '22:30:00' # time (in format 'HH:MM:SS') at which the circadian adjustment process ends
   max_circadian_brightness: 255 # maximum brightness (up to 255) that circadian lighting can reach
   min_circadian_brightness: 50 # minimum brightness (down to 1) that circadian lighting can reach
   max_circadian_kelvin: 4500 # maximum kelvin (up to 4500) that circadian lighting can reach
