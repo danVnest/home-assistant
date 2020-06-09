@@ -73,6 +73,10 @@ class Lights(app.App):
             self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
+        elif new == "Morning":
+            self.lights["tv"].adjust(255, 4500)
+            self.lights["hall"].brightness = 0
+            self.lights["bedroom"].brightness = 0
         elif new == "Away (Day)":
             self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
@@ -138,8 +142,7 @@ class Lights(app.App):
             ).time(),
         )
         self.circadian_end_datetime = datetime.datetime.combine(
-            self.date(),
-            datetime.datetime.strptime(self.args["circadian_end_time"], "%H:%M").time(),
+            self.date(), self.parse_time(self.args["circadian_end_time"])
         )
 
 
@@ -266,6 +269,8 @@ class MotionLight(Light):
             }
         }
         self.scene_state_attributes["Away (Day)"] = self.scene_state_attributes["Day"]
+        self.configure_scene_with_user_args("Bright")
+        self.scene_state_attributes["Morning"] = self.scene_state_attributes["Bright"]
         self._scene = "Day"
 
     @property

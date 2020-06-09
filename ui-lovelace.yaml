@@ -9,24 +9,28 @@ views:
         show_header_toggle: false
         title: Control
         type: entities
-      - entities:
-          - entity: input_number.cooling_target_temperature
-          - entity: input_number.heating_target_temperature
-        show_header_toggle: false
-        title: Aircon Temperatures
-        type: entities
-      - type: conditional
-        conditions:
-          - entity: input_boolean.climate_control
-            state: 'on'
-        card:
-          type: entities
-          title: Climate Control Triggers
+      - card:
           entities:
             - entity: input_number.high_temperature_trigger
             - entity: input_number.low_temperature_trigger
-            - entity: input_number.night_trigger_reduction
           show_header_toggle: false
+          title: Climate Control Triggers
+          type: entities
+        conditions:
+          - entity: input_boolean.climate_control
+            state: 'on'
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.cooling_target_temperature
+            - entity: input_number.heating_target_temperature
+          show_header_toggle: false
+          title: Aircon Temperatures
+          type: entities
+        conditions:
+          - entity: sensor.any_climate_control
+            state: 'True'
+        type: conditional
       - entities:
           - entity: sensor.apparent_inside_temperature_numeric
             name: Inside
@@ -84,8 +88,8 @@ views:
           - entity: input_number.heating_target_temperature
           - entity: input_number.high_temperature_trigger
           - entity: input_number.low_temperature_trigger
-          - entity: input_number.night_trigger_reduction
           - entity: sensor.apparent_inside_temperature_numeric
+          - entity: sensor.bom_weather_feels_like_c
         hours_to_show: 72
         refresh_interval: 0
         title: Temperatures

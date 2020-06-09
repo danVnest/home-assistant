@@ -31,6 +31,7 @@ class Control(app.App):
             setattr(self, app_name, self.get_app(app_name.title()))
         self.listen_log(self.handle_log)
         self.reset_scene()
+        self.run_daily(self.morning, self.args["morning_time"])
         self.last_device_date = self.date()
         self.listen_event(self.button, "zwave.scene_activated")
         self.listen_event(self.ifttt, "ifttt_webhook_received")
@@ -63,10 +64,23 @@ class Control(app.App):
             self.scene = "Day"
         elif self.get_state("media_player.living_room") == "playing":
             self.scene = "TV"
+        elif (
+            self.parse_time(self.args["morning_time"]) < self.time() < datetime.time(12)
+        ):
+            self.scene = "Morning"
         elif self.scene == "Sleep":
             self.log("It is night but scene was set as 'Sleep', will not be reset")
         else:
             self.scene = "Night"
+
+    def morning(self, kwargs: dict):
+        """Change scene to Morning (callback for daily timer)."""
+        del kwargs
+        self.log(f"Morning timer triggered")
+        if self.scene == "Sleep":
+            self.scene = "Morning"
+        else:
+            self.log(f"Scene was not changed as it was {self.scene}, not Morning.")
 
     def button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""

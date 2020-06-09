@@ -94,8 +94,6 @@ class Climate(app.App):
         elif "trigger" in entity:
             if self.aircon_trigger_timer is not None:
                 self.cancel_timer(self.aircon_trigger_timer)
-            self.temperature_monitor.adjust_current_low_temperature_trigger()
-            self.temperature_monitor.adjust_current_high_temperature_trigger()
         self.handle_inside_temperature()
 
     @property
@@ -142,18 +140,17 @@ class Climate(app.App):
     ):  # pylint: disable=too-many-arguments #noqa
         """Change temperature triggers and rechecks forecasts if necessary."""
         del entity, attribute, kwargs
-        self.temperature_monitor.adjust_current_high_temperature_trigger()
         if "Away" in new and "Away" not in old:
             self.climate_control_before_away = self.climate_control
             self.climate_control = False
             self.aircon = False
         elif "Away" not in new and "Away" in old:
             self.climate_control = self.climate_control_before_away
-        if new == "Sleep" or old == "Sleep":
-            self.transition_aircon_for_sleep()
+        if new in ["Sleep", "Morning"] or old in ["Sleep", "Morning"]:
+            self.transition_aircon_between_scenes()
         if self.climate_control is False and any(
             [
-                new == "Day" and old == "Sleep",
+                new == "Day" and old in ["Sleep", "Morning"],
                 new == "Night" and old == "Day",
                 "Away" not in new and "Away" in old,
             ]
@@ -242,10 +239,16 @@ class Climate(app.App):
         self.aircon = True
 
     def turn_aircon_on(self, mode: str):
-        """Turn aircon on, handling sleep scene."""
+        """Turn aircon on, handling Sleep and Morning scenes."""
         if self.scene == "Sleep":
             self.aircons["bedroom"].turn_on(mode)
             self.aircons["bedroom"].set_fan_mode("low")
+        elif self.scene == "Morning":
+            for aircon in self.aircons.keys():
+                self.aircons[aircon].turn_on(mode)
+                self.aircons[aircon].set_fan_mode(
+                    "low" if aircon == "bedroom" else "auto"
+                )
         else:
             for aircon in self.aircons.keys():
                 self.aircons[aircon].turn_on(mode)
@@ -260,16 +263,24 @@ class Climate(app.App):
             aircon.turn_off()
         self.allow_suggestion()
 
-    def transition_aircon_for_sleep(self):
-        """Have only bedroom aircon on when in Sleep scene, otherwise all on."""
+    def transition_aircon_between_scenes(self):
+        """Have only bedroom aircon on when Sleep scene, otherwise all on."""
         if self.climate_control or self.suggested is False:
             self.temperature_monitor.start_monitoring()
         if self.aircon is True:
             if self.scene == "Sleep":
                 self.aircons["living_room"].turn_off()
                 self.aircons["dining_room"].turn_off()
+                self.aircons["bedroom"].set_fan_mode("low")
+            elif self.scene == "Morning":
+                for aircon in ["living_room", "dining_room"]:
+                    self.aircons[aircon].turn_on(self.get_state("climate.bedroom"))
+                    self.aircons[aircon].set_fan_mode("auto")
+                self.aircons["bedroom"].set_fan_mode("low")
             else:
-                self.turn_aircon_on(self.get_state("climate.bedroom"))
+                for aircon in self.aircons.keys():
+                    self.aircons[aircon].turn_on(self.get_state("climate.bedroom"))
+                    self.aircons[aircon].set_fan_mode("auto")
 
     def disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
@@ -445,10 +456,6 @@ class TemperatureMonitor:
         self.inside_temperature = self.controller.get_state(
             "climate.bedroom", attribute=f"current_temperature"
         )
-        self.current_min_temperature_trigger = 0
-        self.current_max_temperature_trigger = 0
-        self.adjust_current_low_temperature_trigger()
-        self.adjust_current_high_temperature_trigger()
         self.sensors = {
             sensor_id: Sensor.detect_type_and_create(sensor_id, self)
             for sensor_id in [
@@ -479,14 +486,10 @@ class TemperatureMonitor:
     def start_monitoring(self):
         """Get values from appropriate sensors and calculate inside temperature."""
         for sensor in self.sensors.values():
-            if (
-                self.controller.scene != "sleep"
-                or sensor.location == "outside"
-                or (self.controller.scene == "sleep" and sensor.location == "bedroom")
-            ):
-                sensor.enable()
-            else:
+            if self.controller.scene == "Sleep" and sensor.location == "inside":
                 sensor.disable()
+            else:
+                sensor.enable()
         self.calculate_inside_temperature()
 
     def stop_monitoring(self):
@@ -561,9 +564,13 @@ class TemperatureMonitor:
             > self.outside_temperature + self.controller.args["inside_outside_trigger"]
         )
         too_hot_or_cold_outside = (
-            not self.current_min_temperature_trigger
+            not float(
+                self.controller.get_state(f"input_number.low_temperature_trigger")
+            )
             <= self.outside_temperature
-            <= self.current_max_temperature_trigger
+            <= float(
+                self.controller.get_state(f"input_number.high_temperature_trigger")
+            )
         )
         vs_str = f"({self.outside_temperature} vs {self.inside_temperature} degrees)"
         if any(
@@ -582,9 +589,9 @@ class TemperatureMonitor:
     def is_too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
         if (
-            self.current_min_temperature_trigger
+            float(self.controller.get_state(f"input_number.low_temperature_trigger"))
             < self.inside_temperature
-            < self.current_max_temperature_trigger
+            < float(self.controller.get_state(f"input_number.high_temperature_trigger"))
         ):
             return False
         self.controller.log(
@@ -620,34 +627,16 @@ class TemperatureMonitor:
             for hour in ["2", "4", "6", "8"]
         ]
         max_forecast = max(forecasts)
-        if max_forecast >= self.current_max_temperature_trigger:
+        if max_forecast >= float(
+            self.controller.get_state(f"input_number.high_temperature_trigger")
+        ):
             return max_forecast
         min_forecast = min(forecasts)
-        if min_forecast <= float(self.current_min_temperature_trigger):
+        if min_forecast <= float(
+            float(self.controller.get_state(f"input_number.low_temperature_trigger"))
+        ):
             return min_forecast
         return None
-
-    def adjust_current_low_temperature_trigger(self):
-        """Adjust the current min temperature trigger based on the current scene."""
-        self.current_min_temperature_trigger = (
-            float(self.controller.get_state(f"input_number.low_temperature_trigger"))
-            - float(
-                self.controller.get_state(f"input_number.night_threshold_reduction")
-            )
-            if "Day" not in self.controller.scene
-            else 0
-        )
-
-    def adjust_current_high_temperature_trigger(self):
-        """Adjust the current max temperature trigger based on the current scene."""
-        self.current_max_temperature_trigger = (
-            float(self.controller.get_state(f"input_number.high_temperature_trigger"))
-            - float(
-                self.controller.get_state(f"input_number.night_threshold_reduction")
-            )
-            if "Day" not in self.controller.scene
-            else 0
-        )
 
 
 class Aircon:
