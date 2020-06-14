@@ -151,12 +151,16 @@ class Climate(app.App):
             self.climate_control = self.climate_control_before_away
         if new in ["Sleep", "Morning"] or old in ["Sleep", "Morning"]:
             self.transition_aircon_between_scenes()
-        if self.climate_control is False and any(
-            [
-                new == "Day" and old in ["Sleep", "Morning"],
-                new == "Night" and old == "Day",
-                "Away" not in new and "Away" in old,
-            ]
+        if (
+            self.aircon is False
+            and self.climate_control is False
+            and any(
+                [
+                    new == "Day" and old in ["Sleep", "Morning"],
+                    new == "Night" and old == "Day",
+                    "Away" not in new and "Away" in old,
+                ]
+            )
         ):
             self.suggest_if_trigger_forecast()
         self.handle_inside_temperature()
@@ -199,7 +203,7 @@ class Climate(app.App):
             )
 
     def suggest_if_trigger_forecast(self):
-        """Suggest user enables control if extreme's forecast (only if disabled)."""
+        """Suggest user enables control if extreme's forecast."""
         self.allow_suggestion()
         forecast = self.temperature_monitor.get_forecast_if_will_trigger()
         if forecast is not None:
