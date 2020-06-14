@@ -74,7 +74,7 @@ class Lights(app.App):
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
         elif new == "Morning":
-            self.lights["tv"].adjust(255, 4500)
+            self.lights["tv"].brightness = 0
             self.lights["hall"].brightness = 0
             self.lights["bedroom"].brightness = 0
         elif new == "Away (Day)":
