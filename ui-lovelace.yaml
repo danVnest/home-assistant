@@ -19,6 +19,21 @@ views:
         conditions:
           - entity: input_boolean.climate_control
             state: 'on'
+          - entity: input_select.scene
+            state_not: Sleep
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.sleep_high_temperature_trigger
+            - entity: input_number.sleep_low_temperature_trigger
+          show_header_toggle: false
+          title: Climate Control Triggers
+          type: entities
+        conditions:
+          - entity: input_boolean.climate_control
+            state: 'on'
+          - entity: input_select.scene
+            state: Sleep
         type: conditional
       - card:
           entities:
@@ -30,6 +45,21 @@ views:
         conditions:
           - entity: sensor.any_climate_control
             state: 'True'
+          - entity: input_select.scene
+            state_not: Sleep
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.sleep_cooling_target_temperature
+            - entity: input_number.sleep_heating_target_temperature
+          show_header_toggle: false
+          title: Aircon Temperatures
+          type: entities
+        conditions:
+          - entity: sensor.any_climate_control
+            state: 'True'
+          - entity: input_select.scene
+            state: Sleep
         type: conditional
       - entities:
           - entity: sensor.apparent_inside_temperature_numeric
@@ -60,8 +90,8 @@ views:
 
 
           **Automatic climate control** will control all aircon units based on
-          the temperature and scene. Aircon can also be manually turned on/off.
-          These settings can be controlled by telling Siri/Google:
+          the temperature and scene. **Aircon** can also be manually turned
+          on/off. These settings can be controlled by telling Siri/Google:
 
           - climate control on/off
 
