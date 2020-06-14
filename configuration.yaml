@@ -50,14 +50,12 @@ input_number:
     name: "Cool down to"
     min: 15
     max: 25
-    step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
   heating_target_temperature:
     name: "Heat up to"
     min: 15
     max: 25
-    step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
   high_temperature_trigger:

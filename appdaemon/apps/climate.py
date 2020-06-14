@@ -74,6 +74,7 @@ class Climate(app.App):
         else:
             if self.aircon_trigger_timer is not None:
                 self.cancel_timer(self.aircon_trigger_timer)
+                self.aircon_trigger_timer = None
             self.allow_suggestion()
 
     def settings_change(
@@ -94,6 +95,7 @@ class Climate(app.App):
         elif "trigger" in entity:
             if self.aircon_trigger_timer is not None:
                 self.cancel_timer(self.aircon_trigger_timer)
+                self.aircon_trigger_timer = None
         self.handle_inside_temperature()
 
     @property
@@ -117,6 +119,7 @@ class Climate(app.App):
         self.log(f"Turning aircon {new}")
         if self.aircon_trigger_timer is not None:
             self.cancel_timer(self.aircon_trigger_timer)
+            self.aircon_trigger_timer = None
         if new == "on":
             self.disable_climate_control_if_would_trigger_off()
             if self.temperature_monitor.is_below_target_temperature():
@@ -234,7 +237,7 @@ class Climate(app.App):
             )
 
     def aircon_trigger_timer_up(self, kwargs: dict):
-        """Timer requires kwargs, would otherwise use turn_aircon_on."""
+        """Timer callback which triggers turn_aircon_on."""
         del kwargs
         self.aircon = True
 
