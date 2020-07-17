@@ -1,7 +1,6 @@
 """Monitors media devices.
 
-Fires an event to signify the Living Room Apple TV toggling between playing and
-not playing.
+Monitors the Living Room Apple TV to change the scene appropriately.
 
 User defined variables are configued in media.yaml
 """
@@ -10,7 +9,7 @@ import app
 
 
 class Media(app.App):
-    """Detect media state changes and fire corresponding events."""
+    """Listen for media state changes to set the scene appropriately."""
 
     def initialize(self):
         """Start listening to media states.
@@ -30,6 +29,11 @@ class Media(app.App):
             old="playing",
             duration=self.args["steady_state_delay"],
         )
+
+    @property
+    def is_playing(self) -> bool:
+        """Check if the TV is currently playing or not."""
+        return self.get_state("media_player.living_room") == "playing"
 
     def tv_state_change(
         self, entity, attribute, old, new, kwargs

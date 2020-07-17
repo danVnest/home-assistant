@@ -56,9 +56,3 @@ class App(hass.Hass):
                     message, title=kwargs["title"], name=mobile_name, data=data,
                 )
                 self.log(f"Notified {targets}: {kwargs['title']}: {message}")
-
-    def anyone_home(self, **kwargs) -> bool:
-        """Check if anyone is home."""
-        return any(
-            person["state"] == "home" for person in self.get_state("person").values()
-        )

@@ -1,7 +1,7 @@
 """Coordinates lighting based primarily on scenes.
 
-Includes circadian adjustments to brightness and kelvin settings for ergonomics.
-Also includes localised adjustments based on motion detection.
+Includes circadian adjustments to brightness and kelvin settings for ergonomics,
+localised adjustments based on presence callbacks, and luminance monitoring.
 
 User defined variables are configued in lights.yaml
 """
@@ -20,7 +20,7 @@ class Lights(app.App):
         self.circadian_timer = None
         self.circadian_start_datetime = None
         self.circadian_end_datetime = None
-        self.lights = {"tv": None, "hall": None, "bedroom": None, "kitchen": None}
+        self.lights = {}
 
     def initialize(self):
         """Initialise lights and start listening to scene events.
@@ -30,27 +30,30 @@ class Lights(app.App):
         super().initialize()
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
+        self.lights["entryway"] = Light("group.entryway_lights", self)
+        self.lights["kitchen"] = Light("light.kitchen", self)
         self.lights["tv"] = Light("group.tv_lights", self)
+        self.lights["dining"] = Light("group.dining_lights", self)
         self.lights["hall"] = Light("light.hall", self)
         self.lights["bedroom"] = Light("light.bedroom", self)
-        self.lights["kitchen"] = MotionLight(
-            "light.kitchen", "sensor.kitchen_multisensor_motion", self
-        )
+        self.lights["office"] = Light("light.office", self)
         self.listen_state(self.scene_change, "input_select.scene")
+        self.listen_state(
+            self.handle_luminance_change, "sensor.kitchen_multisensor_luminance",
+        )
 
-    def scene_change(
+    def scene_change(  # noqa: C901
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+    ):  # pylint: disable=too-many-arguments,too-many-branches
         """Change lighting based on the new scene."""
         del entity, attribute, old, kwargs
         if self.circadian_timer is not None:
             self.cancel_timer(self.circadian_timer)
             self.circadian_timer = None
-        self.lights["kitchen"].scene = new
-        if new == "Day":
-            self.lights["tv"].brightness = 0
-            self.lights["hall"].brightness = 0
-            self.lights["bedroom"].brightness = 0
+        if "Day" in new:
+            for light in self.lights.values():
+                light.ignore_presence()
+                light.brightness = 0
         elif new == "Night":
             self.circadian_progression(None)
             self.circadian_timer = self.run_every(
@@ -59,87 +62,173 @@ class Lights(app.App):
                 60,
             )  # (end_time - start_time) / 255) ≈ 60 seconds
         elif new == "Bright":
-            bright = 255
-            white = 4500
-            self.lights["tv"].adjust(bright, white)
-            self.lights["hall"].adjust(bright, white)
-            self.lights["bedroom"].adjust(bright, white)
+            for light in self.lights.values():
+                light.ignore_presence()
+                light.adjust(255, 4500)
         elif new == "TV":
-            self.lights["tv"].adjust(self.args["tv_brightness"], self.args["tv_kelvin"])
-            self.lights["hall"].adjust(
-                self.args["tv_brightness"], self.args["tv_kelvin"]
+            self.lights["entryway"].set_presence_adjustments(
+                occupied=(self.args["tv_motion_brightness"], self.args["tv_kelvin"])
             )
+            self.lights["kitchen"].set_presence_adjustments(
+                vacant=(self.args["tv_brightness"], self.args["tv_kelvin"]),
+                occupied=(self.args["tv_motion_brightness"], self.args["tv_kelvin"]),
+                vacating_delay=self.args["tv_no_motion_delay"],
+            )
+            for light_name in ["tv", "hall"]:
+                self.lights[light_name].adjust(
+                    self.args["tv_brightness"], self.args["tv_kelvin"]
+                )
+            self.lights["dining"].brightness = 0
         elif new == "Sleep":
-            self.lights["tv"].brightness = 0
-            self.lights["hall"].brightness = 0
-            self.lights["bedroom"].brightness = 0
+            for light_name in ["entryway", "kitchen"]:
+                self.lights[light_name].set_presence_adjustments(
+                    occupied=(
+                        self.args["sleep_motion_brightness"],
+                        self.args["sleep_motion_kelvin"],
+                    ),
+                    vacating_delay=self.args["sleep_no_motion_delay"],
+                )
+            for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+                light.brightness = 0
         elif new == "Morning":
-            self.lights["tv"].brightness = 0
-            self.lights["hall"].brightness = 0
-            self.lights["bedroom"].brightness = 0
-        elif new == "Away (Day)":
-            self.lights["tv"].brightness = 0
-            self.lights["hall"].brightness = 0
-            self.lights["bedroom"].brightness = 0
+            self.lights["entryway"].set_presence_adjustments(
+                occupied=(168, 4500), vacating_delay=60
+            )
+            self.lights["kitchen"].set_presence_adjustments(
+                vacant=(168, 4500), occupied=(255, 4500), vacating_delay=300
+            )
+            for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+                light.brightness = 0
         elif new == "Away (Night)":
-            self.lights["tv"].brightness = 0
-            self.lights["hall"].adjust(255, kelvin=4500)
-            self.lights["bedroom"].brightness = 0
+            for light_name in ["entryway", "kitchen"]:
+                self.lights[light_name].set_presence_adjustments(
+                    occupied=(255, 4500), vacating_delay=60
+                )
+            self.lights["dining"].adjust(255, 4500)
+            for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+                self.lights[light_name].ignore_presence()
+                self.lights[light_name].brightness = 0
         self.log(f"Light scene changed to {new}")
 
     def circadian_progression(self, kwargs: dict):
         """Calculate appropriate lighting levels and implement."""
         del kwargs
         brightness, kelvin = self.calculate_circadian_brightness_kelvin()
-        self.lights["kitchen"].adjust_circadian(brightness, kelvin)
-        self.lights["tv"].adjust(brightness, kelvin)
-        self.lights["hall"].adjust(brightness, kelvin)
+        self.lights["entryway"].set_presence_adjustments(
+            vacant=(1, kelvin),
+            occupied=(brightness, kelvin),
+            vacating_delay=self.args["night_no_motion_delay"],
+        )
+        self.lights["kitchen"].set_presence_adjustments(
+            vacant=(brightness, kelvin),
+            occupied=(255, kelvin),
+            vacating_delay=self.args["night_no_motion_delay"],
+        )
+        for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+            if self.lights[light_name].brightness != 0:
+                self.lights[light_name].adjust(brightness, kelvin)
         self.log("Adjusted lighting based on circadian progression", level="DEBUG")
 
-    def calculate_circadian_brightness_kelvin(self) -> Tuple[float, float]:
+    def calculate_circadian_brightness_kelvin(self) -> Tuple[int, int]:
         """Calculate appropriate lighting levels based on the current time of night."""
-        time = self.time()
-        if time <= self.circadian_start_datetime.time():
-            self.cancel_timer(self.circadian_timer)
+        if (
+            self.circadian_start_datetime.time()
+            < self.time()
+            < self.circadian_end_datetime.time()
+        ):
+            circadian_progress = (self.circadian_end_datetime - self.datetime()) / (
+                self.circadian_end_datetime - self.circadian_start_datetime
+            )
+            self.log(
+                f"Circadian progress calculated as: {circadian_progress}",
+                level="DEBUG",
+            )
+            return (
+                int(
+                    self.args["min_circadian_brightness"]
+                    + (
+                        self.args["max_circadian_brightness"]
+                        - self.args["min_circadian_brightness"]
+                    )
+                    * circadian_progress
+                ),
+                int(
+                    self.args["min_circadian_kelvin"]
+                    + (
+                        self.args["max_circadian_kelvin"]
+                        - self.args["min_circadian_kelvin"]
+                    )
+                    * circadian_progress
+                ),
+            )
+        self.cancel_timer(self.circadian_timer)
+        if (
+            self.parse_time(self.control.args["morning_time"])
+            < self.time()
+            < self.circadian_start_datetime.time()
+        ):
             self.log("Circadian progression not triggered - too early")
             return (
                 self.args["max_circadian_brightness"],
                 self.args["max_circadian_kelvin"],
             )
-        if time >= self.circadian_end_datetime.time():
-            self.cancel_timer(self.circadian_timer)
-            self.log("Circadian progression not triggered - already completed")
-            return (
-                self.args["min_circadian_brightness"],
-                self.args["min_circadian_kelvin"],
-            )
-        circadian_progress = (self.circadian_end_datetime - self.datetime()) / (
-            self.circadian_end_datetime - self.circadian_start_datetime
-        )
-        self.log(
-            f"Circadian progress calculated as: {circadian_progress}", level="DEBUG",
-        )
+        self.log("Circadian progression not triggered - already completed")
         return (
-            self.args["min_circadian_brightness"]
-            + (
-                self.args["max_circadian_brightness"]
-                - self.args["min_circadian_brightness"]
-            )
-            * circadian_progress,
-            self.args["min_circadian_kelvin"]
-            + (self.args["max_circadian_kelvin"] - self.args["min_circadian_kelvin"])
-            * circadian_progress,
+            self.args["min_circadian_brightness"],
+            self.args["min_circadian_kelvin"],
         )
 
     def redate_circadian(self, kwargs: dict):
         """Configure the start and end times for lighting adjustment for today."""
         del kwargs
-        self.circadian_start_datetime = self.parse_datetime(
-            f"sunset - {self.args['circadian_start_sunset_offset']}"
+        self.circadian_start_datetime = datetime.datetime.combine(
+            self.date(),
+            self.parse_time(f"sunset - {self.args['circadian_start_sunset_offset']}"),
         )
         self.circadian_end_datetime = self.parse_datetime(
             self.args["circadian_end_time"]
         )
+
+    def is_lighting_sufficient(self) -> bool:
+        """Return if there is enough light to not require further lighting."""
+        return (
+            float(self.get_state("sensor.kitchen_multisensor_luminance"))
+            - self.lighting_luminance()
+            >= self.args["night_max_luminance"]
+        )
+
+    def lighting_luminance(self) -> float:
+        """Return approximate luminance of the powered lighting affecting light sensors."""
+        brightness = self.get_state("light.kitchen", attribute="brightness")
+        return (
+            0
+            if brightness is None
+            else brightness / 255 * self.args["lighting_luminance_factor"]
+        )
+
+    def handle_luminance_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Change scene to day or night based on luminance levels."""
+        del entity, attribute, old, kwargs
+        if "Day" in self.scene:
+            if float(new) - self.lighting_luminance() <= self.args["day_min_luminance"]:
+                self.log(f"Light levels are low ({new}%) transitioning to night scene")
+                if self.control.media.is_playing:
+                    self.scene = "TV"
+                elif self.control.presence.anyone_home():
+                    self.scene = "Night"
+                else:
+                    self.scene = "Away (Night)"
+        elif self.scene != "Bright":
+            if (
+                float(new) - self.lighting_luminance()
+                >= self.args["night_max_luminance"]
+            ):
+                self.log(f"Light levels are high ({new}%), transitioning to day scene")
+                self.scene = (
+                    "Day" if self.control.presence.anyone_home() else "Away (Day)"
+                )
 
 
 class Light:
@@ -149,30 +238,26 @@ class Light:
         """Initialise with attributes for light parameters, and a Light controller."""
         self.light_id = light_id
         self.controller = controller
-        self.brightness_before_off = 0
-        self.kelvin_before_off = 4500
-        self.dimmable = (
-            self.controller.get_state(self.light_id, attribute="supported_features")
-            != 0
+        self.before_off = {"brightness": 0, "kelvin": 4500}
+        self.room_name = (
+            light_id.split(".", 1)[-1]
+            if light_id.startswith("light")
+            else light_id.split(".", 1)[-1].split("_")[0]
         )
+        self.presence_adjustments = {}
 
     @property
     def brightness(self) -> int:
         """Get the brightness of the light from Home Assistant."""
-        if self.dimmable is True:
-            brightness = self.get_attribute("brightness", 0)
-        else:
-            brightness = 255 if self.controller.get_state(self.light_id) == "on" else 0
-        return brightness
+        return self.get_attribute("brightness", 0)
 
     @brightness.setter
-    def brightness(self, value: float):
+    def brightness(self, value: int):
         """Set and validate light's brightness."""
-        value = int(value)
         if self.brightness != value:
             if not 0 <= value <= 255:
                 self.controller.log(
-                    f"Brightness ({value}) out of bounds for'{self.light_id}'",
+                    f"Brightness ({value}) out of bounds for '{self.light_id}'",
                     level="WARNING",
                 )
             self.controller.log(
@@ -182,8 +267,8 @@ class Light:
             if value != 0:
                 self.controller.turn_on(self.light_id, brightness=value)
             else:
-                self.brightness_before_off = self.brightness
-                self.kelvin_before_off = self.kelvin
+                self.before_off["brightness"] = self.brightness
+                self.before_off["kelvin"] = self.kelvin
                 self.controller.turn_off(self.light_id)
 
     @property
@@ -193,20 +278,20 @@ class Light:
         return (
             20 * round(1e6 / 20 / kelvin)
             if kelvin is not None
-            else self.kelvin_before_off
+            else self.before_off["kelvin"]
         )  # Home Assistant uses mireds, so convert from kelvin and round to mired step
 
     @kelvin.setter
-    def kelvin(self, value: float):
+    def kelvin(self, value: int):
         """Set and validate light's warmth of colour."""
-        if value is not None and self.dimmable is True:
+        if value is not None:
             value = 20 * int(
                 value / 20
             )  # 20 is the biggest mired step (1e6/222 - 1e6/223)
             if self.kelvin != value:
                 if not 2000 <= value <= 4500:
                     self.controller.log(
-                        f"Kelvin ({value}) out of bounds for'{self.light_id}'",
+                        f"Kelvin ({value}) out of bounds for '{self.light_id}'",
                         level="WARNING",
                     )
                 self.controller.log(
@@ -217,22 +302,30 @@ class Light:
 
     def adjust(self, brightness: int, kelvin: int):
         """Intelligently adjusts light brightness and kelvin in the nicest order."""
-        change_kelvin_first = True
-        if brightness <= self.brightness:  # when dimming, nice if brightness goes first
-            change_kelvin_first = False
-        elif self.brightness == 0:
-            brightness_too_different = abs(brightness - self.brightness_before_off) > 50
-            kelvin_too_different = abs(kelvin - self.kelvin_before_off) > 1000
-            if brightness_too_different and kelvin_too_different:
-                self.brightness = 1  # nice if turned on at low brightness first
-            elif brightness_too_different:
-                change_kelvin_first = False
-        if change_kelvin_first:
-            self.kelvin = kelvin
-            self.brightness = brightness
+        if brightness == 0:
+            self.brightness = 0
         else:
-            self.brightness = brightness
-            self.kelvin = kelvin
+            change_kelvin_first = True
+            if brightness <= self.brightness:
+                # when dimming, nice if brightness goes first
+                change_kelvin_first = False
+            elif self.brightness == 0:
+                brightness_too_different = (
+                    abs(brightness - self.before_off["brightness"]) > 50
+                )
+                kelvin_too_different = abs(kelvin - self.before_off["kelvin"]) > 1000
+                if brightness_too_different:
+                    if kelvin_too_different:
+                        # nice if turned on at low brightness first
+                        self.brightness = 1
+                    else:
+                        change_kelvin_first = False
+            if change_kelvin_first:
+                self.kelvin = kelvin
+                self.brightness = brightness
+            else:
+                self.brightness = brightness
+                self.kelvin = kelvin
 
     def get_attribute(self, attribute: str, default: int = None) -> int:
         """Get light's attribute (of the first entity if it's a group)."""
@@ -243,7 +336,76 @@ class Light:
             attribute=attribute,
             default=default,
         )
-        return float(value) if value is not None else None
+        return int(value) if value is not None else None
+
+    def set_presence_adjustments(
+        self,
+        vacant: Tuple[int, int] = (0, 0),
+        # entered: Tuple[int, int] = (0, 0),
+        occupied: Tuple[int, int] = (0, 0),
+        # transition_period: int = 0,
+        vacating_delay: int = 0,
+    ):  # pylint: disable=too-many-arguments
+        """Configure the light to adjust based on presence in the room."""
+        self.presence_adjustments["vacant"] = {
+            "brightness": vacant[0],
+            "kelvin": vacant[1],
+        }
+        # self.presence_adjustments["entered"] = {
+        #    "brightness": entered[0],
+        #    "kelvin": entered[1],
+        # }
+        self.presence_adjustments["occupied"] = {
+            "brightness": occupied[0],
+            "kelvin": occupied[1],
+        }
+        # self.presence_adjustments["transition_period"] = transition_period
+        presence = (
+            "vacant"
+            if self.controller.control.presence.rooms[self.room_name].is_vacant
+            else "occupied"
+        )
+        # if transition_period != 0:
+        #    time_in_room = self.controller.control.presence.rooms[self.room_name].time_in_room
+        #    if 0 < transition_period < time_in_room:
+        #        # TODO: calculate
+        self.adjust(
+            self.presence_adjustments[presence]["brightness"],
+            self.presence_adjustments[presence]["kelvin"],
+        )
+        if self.presence_adjustments.get("vacating_delay") != vacating_delay:
+            self.ignore_presence()
+            self.presence_adjustments["vacating_delay"] = vacating_delay
+        if self.presence_adjustments.get("handle") is None:
+            self.presence_adjustments[
+                "handle"
+            ] = self.controller.control.presence.rooms[
+                self.room_name
+            ].register_callback(
+                self.handle_presence_change, vacating_delay
+            )
+        self.controller.log(
+            f"Configured {self.light_id}'s presence adjustments", level="DEBUG",
+        )
+
+    def ignore_presence(self):
+        """Set light to ignore presence by cancelling its presence callback."""
+        if self.presence_adjustments.get("handle") is not None:
+            self.controller.control.presence.rooms[self.room_name].cancel_callback(
+                self.presence_adjustments["handle"]
+            )
+            self.presence_adjustments["handle"] = None
+
+    def handle_presence_change(self, is_vacant: bool):
+        """Adjust lighting based on presence in the room."""
+        presence = "vacant" if is_vacant else "occupied"
+        # if presence == "occupied" and self.presence_adjustments["transition_period"] != 0:
+        #    presence = "entered"
+        self.controller.log(self.presence_adjustments[presence])
+        self.adjust(
+            self.presence_adjustments[presence]["brightness"],
+            self.presence_adjustments[presence]["kelvin"],
+        )
 
 
 class MotionLight(Light):

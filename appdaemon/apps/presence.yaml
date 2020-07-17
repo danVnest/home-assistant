@@ -1,0 +1,4 @@
+Presence:
+  module: presence
+  class: Presence
+  priority: 2

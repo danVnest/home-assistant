@@ -48,3 +48,7 @@ Lights:
   night_long_motion_kelvin: 4500
   night_long_motion_delay: 30 # motion light period for which triggers long motion config in night scene (only if the the below triggers)
   motion_brightness_threshold: 192 # brightnesses below this value will trigger brightening in certain scenes
+  day_min_luminance: 40 # minimum ambient luminance to trigger transition to night scenes
+  night_max_luminance: 60 # maximum ambient luminance to trigger transition to day scenes
+  lighting_luminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)
+  # TODO: move all/most yaml to new UI page

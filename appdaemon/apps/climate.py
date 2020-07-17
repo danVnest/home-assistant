@@ -227,7 +227,9 @@ class Climate(app.App):
                 self.notify(
                     f"{message} turning aircon off",
                     title="Aircon",
-                    targets="anyone_home" if self.anyone_home() else "all",
+                    targets="anyone_home"
+                    if self.control.presence.anyone_home()
+                    else "all",
                 )
             else:
                 self.suggest(f"{message} consider enabling climate control")
@@ -281,7 +283,7 @@ class Climate(app.App):
                 f" aircon will be turned on in {self.args['aircon_trigger_delay']}"
                 " minutes (unless you disable climate control or change temperature settings)",
                 title="Aircon",
-                targets="anyone_home" if self.anyone_home() else "all",
+                targets="anyone_home" if self.control.presence.anyone_home() else "all",
             )
 
     def aircon_trigger_timer_up(self, kwargs: dict):
@@ -344,7 +346,7 @@ class Climate(app.App):
                 f"{self.temperature_monitor.inside_temperature}º) will immediately"
                 " trigger aircon on again - disabling climate control to prevent this",
                 title="Climate Control",
-                targets="anyone_home" if self.anyone_home() else "all",
+                targets="anyone_home" if self.control.presence.anyone_home() else "all",
             )
             self.climate_control = False
 
@@ -357,7 +359,7 @@ class Climate(app.App):
                 " climate control is now disabled"
                 " (you'll need to manually turn aircon off)",
                 title="Climate Control",
-                targets="anyone_home" if self.anyone_home() else "all",
+                targets="anyone_home" if self.control.presence.anyone_home() else "all",
             )
 
     def suggest(self, message: str):
@@ -367,7 +369,7 @@ class Climate(app.App):
             self.notify(
                 message,
                 title="Aircon",
-                targets="anyone_home" if self.anyone_home() else "all",
+                targets="anyone_home" if self.control.presence.anyone_home() else "all",
             )
             if self.climate_control is False:
                 self.temperature_monitor.stop_monitoring()
@@ -513,8 +515,8 @@ class TemperatureMonitor:
                 "climate.bedroom",
                 "climate.living_room",
                 "climate.dining_room",
+                "sensor.entryway_multisensor",
                 "sensor.kitchen_multisensor",
-                "sensor.multisensor_2",
                 "sensor.bom_weather_feels_like_c",
             ]
         }
