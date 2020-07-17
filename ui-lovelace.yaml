@@ -68,15 +68,26 @@ views:
             name: Outside
         show_name: true
         type: glance
-      - entities:
-          - entity: light.kitchen
-          - entity: group.main_lights
-          - entity: light.bedroom
-        show_icon: true
-        show_name: true
-        show_state: true
-        title: Lights
-        type: glance
+      - cards:
+          - entities:
+              - entity: group.all_lights
+              - entity: group.entryway_lights
+              - entity: light.kitchen
+              - entity: group.tv_lights
+              - entity: group.dining_lights
+              - entity: light.hall
+              - entity: light.bedroom
+              - entity: light.office
+            show_icon: true
+            show_name: true
+            show_state: true
+            title: Lights
+            type: glance
+          - content: >-
+              To manually control lighting above, you should first set the scene
+              to anything except "Night".
+            type: markdown
+        type: vertical-stack
       - content: >-
           **Lighting** and climate settings are automatically adjusted between
           different scenes. You can select a preferred scene here or tell

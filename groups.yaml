@@ -1,18 +1,33 @@
+entryway_lights:
+  name: Entryway Lights
+  entities:
+    - light.entryway
+    - light.stairway
+
 tv_lights:
   name: TV Lights
   entities:
   - light.tv_left
   - light.tv_middle
   - light.tv_right
-  
-main_lights:
-  name: Main Lights
+
+dining_lights:
+  name: Dining Lights
   entities:
-  - group.tv_lights
+  - light.dining_left
+  - light.dining_right
+
+all_lights:
+  name: All Lights
+  entities:
+  - light.entryway
+  - light.stairway
+  - light.kitchen
+  - light.tv_left
+  - light.tv_middle
+  - light.tv_right
+  - light.dining_left
+  - light.dining_right
   - light.hall
-  
-#dining_lights:
-#  name: Dining Lights
-#  entities:
-#  - group.dining_close
-#  - light.dining_far
+  - light.bedroom
+  - light.office

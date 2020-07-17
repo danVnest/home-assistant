@@ -114,8 +114,14 @@ input_select:
 
 light:
 - platform: wiz_light
-  name: Hall
-  host: 192.168.20.50
+  name: Entryway
+  host: 192.168.20.81
+- platform: wiz_light
+  name: Stairway
+  host: 192.168.20.82
+- platform: wiz_light
+  name: Kitchen
+  host: 192.168.20.54
 - platform: wiz_light
   name: TV Left
   host: 192.168.20.51
@@ -126,31 +132,26 @@ light:
   name: TV Right
   host: 192.168.20.53
 - platform: wiz_light
-  name: Kitchen
-  host: 192.168.20.54
-- platform: mqtt
-  name: 'Office'
-  command_topic: "light-office/cmnd/POWER"
-  state_topic: "light-office/stat/RESULT"
-  value_template: "{{ value_json.POWER }}"
-  qos: 1
-- platform: mqtt
-  name: 'Bedroom'
-  command_topic: "light-bedroom/cmnd/POWER"
-  state_topic: "light-bedroom/stat/RESULT"
-  value_template: "{{ value_json.POWER }}"
-  qos: 1
+  name: Dining Left
+  host: 192.168.20.86
+- platform: wiz_light
+  name: Dining Right
+  host: 192.168.20.85
+- platform: wiz_light
+  name: Hall
+  host: 192.168.20.50
+- platform: wiz_light
+  name: Bedroom
+  host: 192.168.20.84
+- platform: wiz_light
+  name: Office
+  host: 192.168.20.83
 
 logbook:
 
 map:
 
 mobile_app:
-
-mqtt:
-  broker: core-mosquitto
-  username: !secret mqtt_username
-  password: !secret mqtt_password
 
 person:
 
