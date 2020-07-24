@@ -20,6 +20,7 @@ class Control(app.App):
         self.media = None
         self.presence = None
         self.safety = None
+        self.__morning_timer = None
 
     def initialize(self):
         """Monitor logs then wait until after all other apps are initialised.
@@ -29,18 +30,31 @@ class Control(app.App):
         super().initialize()
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
-        self.listen_log(self.handle_log)
-        self.listen_event(self.everything_initialized, "appd_started")
+        self.listen_log(self.__handle_log)
+        self.listen_event(self.__everything_initialized, "appd_started")
 
-    def everything_initialized(self, event_name: str, data: dict, kwargs: dict):
+    def __everything_initialized(self, event_name: str, data: dict, kwargs: dict):
         """Link all other apps, set scene, listen for user input and monitor batteries."""
         del event_name, data, kwargs
         for app_name in ["climate", "lights", "media", "presence", "safety"]:
             setattr(self, app_name, self.get_app(app_name.title()))
-        self.reset_scene()
-        self.run_daily(self.morning, self.args["morning_time"])
-        self.listen_event(self.button, "zwave.scene_activated")
-        self.listen_event(self.ifttt, "ifttt_webhook_received")
+        self.__reset_scene()
+        self.__morning_timer = self.run_daily(
+            self.__morning, self.get_setting("morning_time")
+        )
+        self.listen_event(self.__button, "zwave.scene_activated")
+        self.listen_event(self.__ifttt, "ifttt_webhook_received")
+        for setting in [
+            "input_boolean",
+            "input_datetime",
+            "input_number",
+            "input_select",
+        ]:
+            self.listen_state(
+                self.__handle_settings_change,
+                setting,
+                duration=self.args["settings_change_delay"],
+            )
         for battery in [
             "entryway_protect_battery_health_state",
             "living_room_protect_battery_health_state",
@@ -50,9 +64,9 @@ class Control(app.App):
             "switch1_battery_level",
             "switch2_battery_level",
         ]:
-            self.listen_state(self.handle_battery_level_change, f"sensor.{battery}")
+            self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
 
-    def reset_scene(self):
+    def __reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
         if self.scene == "Bright":
@@ -66,7 +80,7 @@ class Control(app.App):
         elif self.media.is_playing:
             self.scene = "TV"
         elif (
-            self.parse_time(self.args["morning_time"])
+            self.parse_time(self.get_setting("morning_time"))
             < self.time()
             < self.parse_time("12:00:00")
         ):
@@ -76,7 +90,7 @@ class Control(app.App):
         else:
             self.scene = "Night"
 
-    def morning(self, kwargs: dict):
+    def __morning(self, kwargs: dict):
         """Change scene to Morning (callback for daily timer)."""
         del kwargs
         self.log(f"Morning timer triggered")
@@ -85,7 +99,7 @@ class Control(app.App):
         else:
             self.log(f"Scene was not changed as it was {self.scene}, not Morning.")
 
-    def button(self, event_name: str, data: dict, kwargs: dict):
+    def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
         room = "bedroom" if data["entity_id"] == "zwave.switch1" else "kitchen"
@@ -103,7 +117,7 @@ class Control(app.App):
             else:
                 self.scene = "Night" if self.scene in ("Bright", "TV") else "Bright"
 
-    def ifttt(self, event_name: str, data: dict, kwargs: dict):
+    def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
         self.log(f"Received {data} from IFTTT: ")
@@ -114,7 +128,39 @@ class Control(app.App):
         elif "aircon" in data:
             self.climate.aircon = data["aircon"]
 
-    def handle_battery_level_change(
+    def get_setting(self, setting_name) -> int:
+        """Get UI input_number setting values."""
+        if setting_name == "morning_time":
+            return self.get_state(f"input_datetime.{setting_name}")
+        return int(float(self.get_state(f"input_number.{setting_name}")))
+
+    def __handle_settings_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Act on setting changes made by the user through the UI."""
+        del attribute, kwargs
+        entity = entity.split(".")
+        input_type = entity[0]
+        setting = entity[1]
+        self.log(f"UI setting '{setting}' changed to {new}")
+        if input_type == "input_boolean":
+            setattr(self.climate, setting, new == "on")
+        elif input_type == "input_datetime":
+            if setting == "morning_time":
+                self.cancel_timer(self.__morning_timer)
+                self.__morning_timer = self.run_daily(self.__morning, new)
+            else:
+                self.lights.redate_circadian(None)
+        elif input_type == "input_number":
+            if "temperature" in setting:
+                self.climate.reset()
+            else:
+                self.lights.transition_to_scene(self.scene)
+        else:
+            self.lights.transition_to_scene(new)
+            self.climate.transition_between_scenes(new, old)
+
+    def __handle_battery_level_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Notify if a device's battery is low."""
@@ -125,7 +171,7 @@ class Control(app.App):
         elif float(new) <= 20:
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
-    def handle_log(
+    def __handle_log(
         self,
         app_name: str,
         timestamp: datetime.datetime,

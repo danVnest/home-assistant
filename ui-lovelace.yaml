@@ -6,6 +6,7 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
+          - entity: input_datetime.morning_time
         show_header_toggle: false
         title: Control
         type: entities
@@ -89,24 +90,65 @@ views:
             type: markdown
         type: vertical-stack
       - content: >-
-          **Lighting** and climate settings are automatically adjusted between
-          different scenes. You can select a preferred scene here or tell
-          Siri/Google:
+          **Lighting** and **climate settings** (if enabled) are automatically
+          adjusted between different scenes. You can select a preferred scene
+          here or tell Siri or Google:
 
-          - lights on/off
+          - **"lights on"** or **"lights off"** for the *Night* and *Day* scenes
 
-          - lights on bright
+          - **"lights on bright"** for the *Bright* scene
 
-          - sleep time
+          - **"sleep time"** for the *Sleep* scene
 
 
           **Automatic climate control** will control all aircon units based on
-          the temperature and scene. **Aircon** can also be manually turned
-          on/off. These settings can be controlled by telling Siri/Google:
+          the temperature and scene. **Aircon** can also be manually turned on
+          and off. These settings can be controlled by telling Siri or Google:
 
-          - climate control on/off
+          - **"climate control on"** or **"climate control off"**
 
-          - aircon on/off
+          - **"aircon on"** or **"aircon off"**
+
+
+          Each **scene** has a particular purpose:
+
+          - ***Morning*** is designed to trigger before anyone wakes up (at the
+          time specified in the settings here), providing dim kitchen lighting
+          plus climate control to the whole house (rather than just the
+          bedroom). Thus when anyone does get up it is to a comfortable
+          temperature and sufficient lighting.
+
+          - ***Day*** is triggered when ambient lighting in the house is
+          sufficient, and thus turns off all lighting.
+
+          - ***Night*** is triggered when there is insufficent lighting, turning
+          on the main lights in the house. The brightness and colour temperature
+          of all lighting adjusts as the night goes on, getting dimmer and
+          warmer so as to reduce the impact to your circadian rhythm.
+
+          - ***Sleep*** turns off all lighting in the house. If climate control
+          is enabled, only the bedroom is monitored and controlled. This scene
+          has to be manually triggered.
+
+          - ***TV*** dims the lights for a nice viewing experience,
+          automatically triggered when the TV is playing at Night.
+
+          - ***Bright*** turns all lights on at full brightness and has to be
+          manually triggered.
+
+          - ***Away (Night/Day)*** turns off all lights (except one obvious one
+          at night for security purposes) and disables climate control.
+          Automatically triggered when both of us have left the house.
+
+
+          The **buttons** in the kitchen and bedroom will turn on/off their
+          corresponding light. Holding the kitchen button will toggle the scene
+          between ***Bright*** and ***Night*** while the bedroom will toggle
+          between ***Sleep*** and ***Night***.
+
+
+          Lighting in the kitchen and entryway will automatically brighten when
+          a presence is detected.
         type: markdown
       - aspect_ratio: '2'
         dark_mode: false
@@ -185,3 +227,52 @@ views:
     visible:
       - user: 15ff7a86d4ae4d38a60003ad4064ff78
       - user: d678a59ca9604e2ba14c3ac3705ba943
+  - badges: []
+    cards:
+      - cards:
+          - entities:
+              - entity: input_datetime.circadian_start_sunset_offset
+              - entity: input_datetime.circadian_end_time
+              - entity: input_number.max_circadian_brightness
+              - entity: input_number.max_circadian_kelvin
+              - entity: input_number.min_circadian_brightness
+              - entity: input_number.min_circadian_kelvin
+            type: entities
+          - content: >-
+              Lighting at night will start at the maximum brightness and colour
+              and transition to the minimum values specified here. Maximum
+              occurs before sunset (specified by *circadian sunset offset* in
+              hours/minutes) and reaches minimum at the *circadian end time*.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - entities:
+              - entity: input_number.night_motion_brightness
+              - entity: input_number.night_motion_kelvin
+              - entity: input_number.night_transition_period
+              - entity: input_number.night_vacating_delay
+              - entity: input_number.morning_brightness
+              - entity: input_number.morning_kelvin
+              - entity: input_number.morning_vacating_delay
+              - entity: input_number.sleep_motion_brightness
+              - entity: input_number.sleep_motion_kelvin
+              - entity: input_number.sleep_transition_period
+              - entity: input_number.sleep_vacating_delay
+              - entity: input_number.tv_brightness
+              - entity: input_number.tv_kelvin
+              - entity: input_number.tv_motion_brightness
+              - entity: input_number.tv_transition_period
+              - entity: input_number.tv_vacating_delay
+            type: entities
+          - content: >-
+              Values here specify the brightness and colour temperature of
+              lighting in different scenes. *Motion* indicates it is specific to
+              when the room is occupied. Vacating delays specify how long the
+              light will wait after someone leaves the room before reverting to
+              its previous state. If a transition period is available the light
+              will smoothly change over that period to or from the brightness
+              and kelvin specified.
+            type: markdown
+        type: vertical-stack
+    path: lights
+    title: Lights

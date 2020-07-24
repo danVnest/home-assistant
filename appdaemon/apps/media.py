@@ -18,13 +18,13 @@ class Media(app.App):
         """
         super().initialize()
         self.listen_state(
-            self.tv_state_change,
+            self.__tv_state_change,
             "media_player.living_room",
             new="playing",
             duration=self.args["steady_state_delay"],
         )
         self.listen_state(
-            self.tv_state_change,
+            self.__tv_state_change,
             "media_player.living_room",
             old="playing",
             duration=self.args["steady_state_delay"],
@@ -35,7 +35,7 @@ class Media(app.App):
         """Check if the TV is currently playing or not."""
         return self.get_state("media_player.living_room") == "playing"
 
-    def tv_state_change(
+    def __tv_state_change(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
         """Handle TV events at night and change the scene."""

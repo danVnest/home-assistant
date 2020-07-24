@@ -1,5 +1,5 @@
 Control:
   module: control
   class: Control
-  morning_time: '6:00:00' # time (in format 'H:M:S') at which sleep transitions to morning scene
+  settings_change_delay: 2
   priority: 1
