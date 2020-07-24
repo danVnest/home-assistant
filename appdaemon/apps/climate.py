@@ -28,7 +28,7 @@ class Climate(app.App):
         self.__aircon_trigger_timer = None
         self.__temperature_monitor = None
         self.__aircons = None
-        self.__climate_control_before_away = None
+        self.__climate_control_history = {"overridden": False, "before_away": None}
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -41,7 +41,7 @@ class Climate(app.App):
             aircon: Aircon(f"climate.{aircon}", self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
-        self.__climate_control_before_away = self.climate_control
+        self.__climate_control_history["before_away"] = self.climate_control
         self.__temperature_monitor.start_monitoring()
 
     @property
@@ -67,6 +67,19 @@ class Climate(app.App):
                     self.cancel_timer(self.__aircon_trigger_timer)
                     self.__aircon_trigger_timer = None
                 self.__allow_suggestion()
+            if (
+                self.__climate_control_history["overridden"]
+                and (
+                    (
+                        self.datetime(True)
+                        - self.convert_utc(
+                            self.entities.input_boolean.climate_control.last_changed
+                        )
+                    ).total_seconds()
+                )
+                > 10
+            ):
+                self.__climate_control_history["overridden"] = False
 
     @property
     def aircon(self) -> bool:
@@ -86,6 +99,9 @@ class Climate(app.App):
             if self.__aircon_trigger_timer is not None:
                 self.cancel_timer(self.__aircon_trigger_timer)
                 self.__aircon_trigger_timer = None
+            if self.__climate_control_history["overridden"]:
+                self.log("Re-enabling climate control")
+                self.climate_control = True
             if state:
                 self.__disable_climate_control_if_would_trigger_off()
                 self.__turn_aircon_on()
@@ -109,11 +125,11 @@ class Climate(app.App):
     def transition_between_scenes(self, new_scene: str, old_scene: str):
         """Adjust aircon & temperature triggers, plus suggest climate control if appropriate."""
         if "Away" in new_scene and "Away" not in old_scene:
-            self.__climate_control_before_away = self.climate_control
+            self.__climate_control_history["before_away"] = self.climate_control
             self.climate_control = False
             self.aircon = False
         elif "Away" not in new_scene and "Away" in old_scene:
-            self.climate_control = self.__climate_control_before_away
+            self.climate_control = self.__climate_control_history["before_away"]
         if self.aircon:
             self.__turn_aircon_on()
         elif self.climate_control is False and any(
@@ -256,23 +272,25 @@ class Climate(app.App):
 
     def __disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
-        if (
-            self.climate_control is True
-            and self.__temperature_monitor.is_too_hot_or_cold()
-        ):
+        if self.climate_control and self.__temperature_monitor.is_too_hot_or_cold():
+            self.climate_control = False
+            self.__climate_control_history["overridden"] = True
             self.notify(
                 "The current temperature ("
                 f"{self.__temperature_monitor.inside_temperature}º) will immediately"
-                " trigger aircon on again - disabling climate control to prevent this",
+                " trigger aircon on again - climate control is now disabled to prevent this",
                 title="Climate Control",
                 targets="anyone_home" if self.control.presence.anyone_home() else "all",
             )
-            self.climate_control = False
 
     def __disable_climate_control_if_would_trigger_off(self):
         """Disables climate control only if it would immediately trigger aircon off."""
-        if self.__temperature_monitor.is_within_target_temperatures():
+        if (
+            self.climate_control
+            and self.__temperature_monitor.is_within_target_temperatures()
+        ):
             self.climate_control = False
+            self.__climate_control_history["overridden"] = True
             self.notify(
                 "Inside is already within the desired temperature range,"
                 " climate control is now disabled"
