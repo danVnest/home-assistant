@@ -49,11 +49,8 @@ input_datetime:
   morning_time:
     name: Morning time
     has_time: true
-  circadian_start_sunset_offset:
-    name: Circadian sunset offset
-    has_time: true
   circadian_end_time:
-    name: Circadian end time
+    name: End time
     has_time: true
 
 input_number:
@@ -109,103 +106,109 @@ input_number:
     step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
-  max_circadian_brightness:
-    name: Max circadian brightness
+  initial_circadian_brightness:
+    name: Initial brightness
     min: 25
     max: 255
     step: 10
-  min_circadian_brightness:
-    name: Min circadian brightness
+  initial_circadian_kelvin:
+    name: Initial kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  final_circadian_brightness:
+    name: Final brightness
     min: 25
     max: 255
     step: 10
-  max_circadian_kelvin:
-    name: Max circadian kelvin
+  final_circadian_kelvin:
+    name: Final kelvin
     min: 2000
     max: 4500
     step: 250
-  min_circadian_kelvin:
-    name: Min circadian kelvin
-    min: 2000
-    max: 4500
-    step: 250
+  circadian_initial_sunset_offset:
+    name: Initial sunset offset
+    min: -3
+    max: 3
+    step: 0.5
+    mode: box
   night_motion_brightness:
-    name: Night motion brightness
+    name: Motion brightness
     min: 25
     max: 255
     step: 10
   night_motion_kelvin:
-    name: Night motion kelvin
+    name: Motion kelvin
     min: 2000
     max: 4500
     step: 250
   night_transition_period:
-    name: Night transition period
+    name: Transition period
     min: 30
     max: 300
     step: 15
   night_vacating_delay:
-    name: Night vacating delay
-    min: 0
-    max: 300
-    step: 15
-  morning_brightness:
-    name: Morning brightness
-    min: 25
-    max: 255
-    step: 10
-  morning_kelvin:
-    name: Morning kelvin
-    min: 2000
-    max: 4500
-    step: 250
-  morning_vacating_delay:
-    name: Morning vacating delay
-    min: 0
-    max: 300
-    step: 15
-  sleep_motion_brightness:
-    name: Sleep motion brightness
-    min: 25
-    max: 255
-    step: 10
-  sleep_motion_kelvin:
-    name: Sleep motion kelvin
-    min: 2000
-    max: 4500
-    step: 250
-  sleep_transition_period:
-    name: Sleep transition period
-    min: 30
-    max: 300
-    step: 15
-  sleep_vacating_delay:
-    name: Sleep vacating delay
+    name: Vacating delay
     min: 0
     max: 300
     step: 15
   tv_brightness:
-    name: TV brightness
+    name: Brightness
     min: 25
     max: 255
     step: 10
   tv_motion_brightness:
-    name: TV motion brightness
+    name: Motion brightness
     min: 25
     max: 255
     step: 10
   tv_kelvin:
-    name: TV kelvin
+    name: Kelvin
     min: 2000
     max: 4500
     step: 250
   tv_transition_period:
-    name: TV transition period
+    name: Transition period
     min: 30
     max: 300
     step: 15
   tv_vacating_delay:
-    name: TV vacating delay
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+  sleep_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+  sleep_motion_kelvin:
+    name: Motion kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  sleep_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+  sleep_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+  morning_brightness:
+    name: Brightness
+    min: 25
+    max: 255
+    step: 10
+  morning_kelvin:
+    name: Kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  morning_vacating_delay:
+    name: Vacating delay
     min: 0
     max: 300
     step: 15

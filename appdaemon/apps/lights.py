@@ -19,6 +19,9 @@ class Lights(app.App):
         super().__init__(*args, **kwargs)
         self.__circadian = {}
         self.lights = {}
+        self.constants["brightness_per_step"] = 2.55
+        self.constants["kelvin_per_step"] = 20
+        self.constants["mired_kelvin_reciprocal"] = 1e6
 
     def initialize(self):
         """Initialise lights and start listening to scene events.
@@ -163,18 +166,18 @@ class Lights(app.App):
             )
             return (
                 int(
-                    self.args["min_circadian_brightness"]
+                    self.entities.input_number.final_circadian_brightness.state
                     + (
-                        self.args["max_circadian_brightness"]
-                        - self.args["min_circadian_brightness"]
+                        self.entities.input_number.initial_circadian_brightness.state
+                        - self.entities.input_number.final_circadian_brightness.state
                     )
                     * circadian_progress
                 ),
                 int(
-                    self.args["min_circadian_kelvin"]
+                    self.entities.input_number.final_circadian_kelvin.state
                     + (
-                        self.args["max_circadian_kelvin"]
-                        - self.args["min_circadian_kelvin"]
+                        self.entities.input_number.initial_circadian_kelvin.state
+                        - self.entities.input_number.final_circadian_kelvin.state
                     )
                     * circadian_progress
                 ),
@@ -196,21 +199,41 @@ class Lights(app.App):
             self.args["min_circadian_kelvin"],
         )
 
-    def redate_circadian(self, kwargs: dict):
+    def redate_circadian(self, kwargs: dict) -> bool:
         """Configure the start and end times for lighting adjustment for today."""
         del kwargs
-        self.__circadian["start_time"] = datetime.datetime.combine(
-            self.date(),
-            self.parse_time(
-                f"sunset - {self.get_state('input_datetime.circadian_start_sunset_offset')}"
-            ),
+        start_time = datetime.datetime.combine(
+            self.date(), self.sunset().time()
+        ) + datetime.timedelta(
+            hours=float(
+                self.entities.input_number.circadian_initial_sunset_offset.state
+            )
         )
-        self.__circadian["end_time"] = self.parse_datetime(
-            self.get_state("input_datetime.circadian_end_time")
+        end_time = self.parse_datetime(
+            self.entities.input_datetime.circadian_end_time.state
         )
-        self.__circadian["time_step"] = (
-            self.__circadian["end_time"] - self.__circadian["start_time"]
-        ) / 125  # ≈125 discrete kelvin steps (more than the 100 brightness steps)
+        time_step = (end_time - start_time) / max(
+            abs(
+                float(self.entities.input_number.initial_circadian_brightness.state)
+                - float(self.entities.input_number.final_circadian_brightness.state)
+            )
+            / self.constants["brightness_per_step"],
+            abs(
+                float(self.entities.input_number.initial_circadian_kelvin.state)
+                - float(self.entities.input_number.final_circadian_kelvin.state)
+            )
+            / self.constants["kelvin_per_step"],
+        )
+        if time_step.total_seconds() < 0:
+            return False
+        self.__circadian["start_time"] = start_time
+        self.__circadian["end_time"] = end_time
+        self.__circadian["time_step"] = time_step
+        self.log(
+            f"Circadian redated to start at {start_time.time()} with "
+            f"time step of {time_step.total_seconds() / 60} minutes"
+        )
+        return True
 
     def is_lighting_sufficient(self) -> bool:
         """Return if there is enough light to not require further lighting."""
@@ -226,7 +249,9 @@ class Lights(app.App):
         return (
             0
             if brightness is None
-            else brightness / 255 * self.args["lighting_luminance_factor"]
+            else brightness
+            / self.args["max_brightness"]
+            * self.args["lighting_luminance_factor"]
         )
 
     def __handle_luminance_change(
@@ -311,12 +336,17 @@ class Light:
     @property
     def kelvin(self) -> int:
         """Get the colour warmth value of the light from Home Assistant."""
-        kelvin = self.__get_attribute("color_temp")
+        mired = self.__get_attribute("color_temp")
         return (
-            20 * round(1e6 / 20 / kelvin)
-            if kelvin is not None
+            self.controller.constants["kelvin_per_step"]
+            * round(
+                self.controller.constants["mired_kelvin_reciprocal"]
+                / self.controller.constants["kelvin_per_step"]
+                / mired
+            )
+            if mired is not None
             else self.__kelvin_before_off
-        )  # Home Assistant uses mireds, so convert from kelvin and round to mired step
+        )
 
     @kelvin.setter
     def kelvin(self, value: int):
@@ -340,8 +370,9 @@ class Light:
                 f"Kelvin ({value}) out of bounds for '{self.light_id}'",
                 level="WARNING",
             )
-        return 20 * int(value / 20)
-        # 20 is the biggest mired step (1e6/222 - 1e6/223)
+        return self.controller.constants["kelvin_per_step"] * int(
+            value / self.controller.constants["kelvin_per_step"]
+        )
 
     def adjust(self, brightness: int, kelvin: int):
         """Adjust light brightness and kelvin at the same time."""
@@ -352,7 +383,7 @@ class Light:
             kelvin = self.__validate_kelvin(kelvin)
             self.controller.log(
                 f"Adjusting {self.light_id} to {brightness} & {kelvin}K '"
-                f"(from {self.brightness} & {self.kelvin})",
+                f"(from {self.brightness} & {self.kelvin}K)",
                 level="DEBUG",
             )
             self.controller.turn_on(self.light_id, brightness=brightness, kelvin=kelvin)

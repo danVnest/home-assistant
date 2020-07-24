@@ -142,23 +142,37 @@ class Control(app.App):
         entity = entity.split(".")
         input_type = entity[0]
         setting = entity[1]
+        valid = True
         self.log(f"UI setting '{setting}' changed to {new}")
-        if input_type == "input_boolean":
-            setattr(self.climate, setting, new == "on")
-        elif input_type == "input_datetime":
-            if setting == "morning_time":
-                self.cancel_timer(self.__morning_timer)
-                self.__morning_timer = self.run_daily(self.__morning, new)
-            else:
-                self.lights.redate_circadian(None)
-        elif input_type == "input_number":
-            if "temperature" in setting:
-                self.climate.reset()
-            else:
-                self.lights.transition_to_scene(self.scene)
-        else:
+        if setting == "scene":
             self.lights.transition_to_scene(new)
             self.climate.transition_between_scenes(new, old)
+        elif input_type == "input_boolean":
+            setattr(self.climate, setting, new == "on")
+        elif setting.startswith("circadian"):
+            valid = self.lights.redate_circadian(None)
+        elif setting == "morning_time":
+            valid = self.parse_datetime(
+                self.get_state(entity)
+            ) < datetime.datetime.combine(self.date(), self.sunrise().time())
+            if valid:
+                self.cancel_timer(self.__morning_timer)
+                self.__morning_timer = self.run_daily(self.__morning, new)
+        elif "temperature" in setting:
+            self.climate.reset()
+        else:
+            self.lights.transition_to_scene(self.scene)
+        if not valid:
+            if input_type == "input_datetime":
+                self.call_service(
+                    "input_datetime/set_datetime", entity_id=entity, time=old
+                )
+            else:
+                self.call_service("input_number/set_value", entity_id=entity, value=old)
+            self.notify(
+                f"Reverted invalid change of '{new}' for setting '{setting}'",
+                title="Invalid Setting",
+            )
 
     def __handle_battery_level_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict

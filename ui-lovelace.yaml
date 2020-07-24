@@ -141,14 +141,15 @@ views:
           Automatically triggered when both of us have left the house.
 
 
-          The **buttons** in the kitchen and bedroom will turn on/off their
-          corresponding light. Holding the kitchen button will toggle the scene
-          between ***Bright*** and ***Night*** while the bedroom will toggle
-          between ***Sleep*** and ***Night***.
+          The **buttons** in the kitchen and bedroom will toggle their
+          corresponding light. Holding a button will toggle the scene (between
+          ***Bright*** and ***Night*** for the kitchen, and ***Sleep*** and
+          ***Night*** for the bedroom).
 
 
           Lighting in the kitchen and entryway will automatically brighten when
-          a presence is detected.
+          someone enters, and dim shortly after they leave (depending on scene
+          settings).
         type: markdown
       - aspect_ratio: '2'
         dark_mode: false
@@ -191,6 +192,80 @@ views:
         type: vertical-stack
     path: default_view
     title: Control & Status
+  - badges: []
+    cards:
+      - cards:
+          - entities:
+              - entity: input_number.initial_circadian_brightness
+              - entity: input_number.initial_circadian_kelvin
+              - entity: input_number.final_circadian_brightness
+              - entity: input_number.final_circadian_kelvin
+              - entity: input_number.circadian_initial_sunset_offset
+              - entity: input_datetime.circadian_end_time
+            title: Circadian Rhythm
+            type: entities
+          - content: >-
+              Lighting at night will gradually transition between the intial and
+              final brightness and colour values specified here.
+
+
+              Initial circadian settings occur after sunset (specified in hours
+              by *initial sunset offset*) and reaches the final values at *end
+              time*.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - content: >-
+              Values here specify the *brightness* and colour temperature of
+              lighting in different scenes. Colour temperature ranges from warm
+              white (2000 *kelvin*) to cold white (4500 *kelvin*).
+
+
+              *Motion* indicates the value is specific to when the room is
+              occupied (otherwise defaulting to the normal values specified, the
+              current circadian value, off, or maximum - depending on the
+              scene).
+
+
+              *Vacating delay* specifies how long the light will wait after
+              someone leaves the room before reverting to its previous state.
+
+
+              If a *transition period* is available the light will smoothly
+              change over that period to or from the motion brightness and
+              kelvin specified or implied.
+            type: markdown
+          - entities:
+              - entity: input_number.night_motion_brightness
+              - entity: input_number.night_motion_kelvin
+              - entity: input_number.night_transition_period
+              - entity: input_number.night_vacating_delay
+            title: Night
+            type: entities
+          - entities:
+              - entity: input_number.tv_brightness
+              - entity: input_number.tv_kelvin
+              - entity: input_number.tv_motion_brightness
+              - entity: input_number.tv_transition_period
+              - entity: input_number.tv_vacating_delay
+            title: TV
+            type: entities
+          - entities:
+              - entity: input_number.sleep_motion_brightness
+              - entity: input_number.sleep_motion_kelvin
+              - entity: input_number.sleep_transition_period
+              - entity: input_number.sleep_vacating_delay
+            title: Sleep
+            type: entities
+          - entities:
+              - entity: input_number.morning_brightness
+              - entity: input_number.morning_kelvin
+              - entity: input_number.morning_vacating_delay
+            title: Morning
+            type: entities
+        type: vertical-stack
+    path: lights
+    title: Lights
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
@@ -227,52 +302,3 @@ views:
     visible:
       - user: 15ff7a86d4ae4d38a60003ad4064ff78
       - user: d678a59ca9604e2ba14c3ac3705ba943
-  - badges: []
-    cards:
-      - cards:
-          - entities:
-              - entity: input_datetime.circadian_start_sunset_offset
-              - entity: input_datetime.circadian_end_time
-              - entity: input_number.max_circadian_brightness
-              - entity: input_number.max_circadian_kelvin
-              - entity: input_number.min_circadian_brightness
-              - entity: input_number.min_circadian_kelvin
-            type: entities
-          - content: >-
-              Lighting at night will start at the maximum brightness and colour
-              and transition to the minimum values specified here. Maximum
-              occurs before sunset (specified by *circadian sunset offset* in
-              hours/minutes) and reaches minimum at the *circadian end time*.
-            type: markdown
-        type: vertical-stack
-      - cards:
-          - entities:
-              - entity: input_number.night_motion_brightness
-              - entity: input_number.night_motion_kelvin
-              - entity: input_number.night_transition_period
-              - entity: input_number.night_vacating_delay
-              - entity: input_number.morning_brightness
-              - entity: input_number.morning_kelvin
-              - entity: input_number.morning_vacating_delay
-              - entity: input_number.sleep_motion_brightness
-              - entity: input_number.sleep_motion_kelvin
-              - entity: input_number.sleep_transition_period
-              - entity: input_number.sleep_vacating_delay
-              - entity: input_number.tv_brightness
-              - entity: input_number.tv_kelvin
-              - entity: input_number.tv_motion_brightness
-              - entity: input_number.tv_transition_period
-              - entity: input_number.tv_vacating_delay
-            type: entities
-          - content: >-
-              Values here specify the brightness and colour temperature of
-              lighting in different scenes. *Motion* indicates it is specific to
-              when the room is occupied. Vacating delays specify how long the
-              light will wait after someone leaves the room before reverting to
-              its previous state. If a transition period is available the light
-              will smoothly change over that period to or from the brightness
-              and kelvin specified.
-            type: markdown
-        type: vertical-stack
-    path: lights
-    title: Lights

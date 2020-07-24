@@ -15,6 +15,7 @@ class App(hass.Hass):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.control = None
+        self.constants = {}
 
     def initialize(self):
         """Allow easy access to control app (which has access to all other apps)."""
