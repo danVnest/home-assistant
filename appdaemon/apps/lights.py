@@ -166,18 +166,22 @@ class Lights(app.App):
             )
             return (
                 int(
-                    self.entities.input_number.final_circadian_brightness.state
+                    float(self.entities.input_number.final_circadian_brightness.state)
                     + (
-                        self.entities.input_number.initial_circadian_brightness.state
-                        - self.entities.input_number.final_circadian_brightness.state
+                        float(
+                            self.entities.input_number.initial_circadian_brightness.state
+                        )
+                        - float(
+                            self.entities.input_number.final_circadian_brightness.state
+                        )
                     )
                     * circadian_progress
                 ),
                 int(
-                    self.entities.input_number.final_circadian_kelvin.state
+                    float(self.entities.input_number.final_circadian_kelvin.state)
                     + (
-                        self.entities.input_number.initial_circadian_kelvin.state
-                        - self.entities.input_number.final_circadian_kelvin.state
+                        float(self.entities.input_number.initial_circadian_kelvin.state)
+                        - float(self.entities.input_number.final_circadian_kelvin.state)
                     )
                     * circadian_progress
                 ),
