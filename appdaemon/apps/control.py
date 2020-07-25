@@ -38,7 +38,7 @@ class Control(app.App):
         del event_name, data, kwargs
         for app_name in ["climate", "lights", "media", "presence", "safety"]:
             setattr(self, app_name, self.get_app(app_name.title()))
-        self.__reset_scene()
+        self.reset_scene()
         self.__morning_timer = self.run_daily(
             self.__morning, self.get_setting("morning_time")
         )
@@ -66,7 +66,7 @@ class Control(app.App):
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
 
-    def __reset_scene(self):
+    def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
         if self.scene == "Bright":
