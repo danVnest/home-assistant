@@ -31,13 +31,24 @@ class Control(app.App):
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         self.listen_log(self.__handle_log)
-        self.listen_event(self.__everything_initialized, "appd_started")
+        self.listen_event(self.__add_app, "app_initialized", namespace="admin")
 
-    def __everything_initialized(self, event_name: str, data: dict, kwargs: dict):
-        """Link all other apps, set scene, listen for user input and monitor batteries."""
-        del event_name, data, kwargs
-        for app_name in ["climate", "lights", "media", "presence", "safety"]:
-            setattr(self, app_name, self.get_app(app_name.title()))
+    def __add_app(self, event_name: str, data: dict, kwargs: dict):
+        """Link the app and check if all are now ready."""
+        del event_name, kwargs
+        if data["app"] == "Control":
+            for app_name in ["Climate", "Lights", "Media", "Presence", "Safety"]:
+                setattr(self, app_name.lower(), self.get_app(app_name))
+        else:
+            if getattr(self, data["app"].lower()) != self.get_app(data["app"]):
+                setattr(self, data["app"].lower(), self.get_app(data["app"]))
+            else:
+                return
+        if all([self.climate, self.lights, self.media, self.presence, self.safety]):
+            self.__final_initialize()
+
+    def __final_initialize(self):
+        """Set scene, listen for user input and monitor batteries."""
         self.reset_scene()
         self.__morning_timer = self.run_daily(
             self.__morning, self.get_setting("morning_time")
@@ -65,6 +76,7 @@ class Control(app.App):
             "switch2_battery_level",
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
+        self.log("App 'Control' initialised and linked to all other apps")
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
