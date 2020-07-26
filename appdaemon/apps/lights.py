@@ -67,7 +67,7 @@ class Lights(app.App):
                 light.ignore_presence()
                 light.adjust(self.args["max_brightness"], self.args["max_kelvin"])
         elif scene == "TV":
-            kelvin = int(float(self.get_state("input_number.tv_kelvin")))
+            kelvin = int(float(self.entities.input_number.tv_kelvin.state))
             self.lights["entryway"].set_presence_adjustments(
                 occupied=(self.control.get_setting("tv_motion_brightness"), kelvin,)
             )
@@ -246,14 +246,14 @@ class Lights(app.App):
     def is_lighting_sufficient(self) -> bool:
         """Return if there is enough light to not require further lighting."""
         return (
-            float(self.get_state("sensor.kitchen_multisensor_luminance"))
+            float(self.entities.sensor.kitchen_multisensor_luminance.state)
             - self.__lighting_luminance()
             >= self.args["night_max_luminance"]
         )
 
     def __lighting_luminance(self) -> float:
         """Return approximate luminance of the powered lighting affecting light sensors."""
-        brightness = self.get_state("light.kitchen", attribute="brightness")
+        brightness = self.entities.light.kitchen.attributes.brightness
         return (
             0
             if brightness is None

@@ -47,7 +47,7 @@ class Climate(app.App):
     @property
     def climate_control(self) -> bool:
         """Climate control setting is stored in Home Assistant as an input_boolean."""
-        return self.get_state("input_boolean.climate_control") == "on"
+        return self.entities.input_boolean.climate_control.state == "on"
 
     @climate_control.setter
     def climate_control(self, state: bool):
@@ -84,7 +84,7 @@ class Climate(app.App):
     @property
     def aircon(self) -> bool:
         """Aircon setting is stored in Home Assistant as an input_boolean."""
-        return self.get_state("input_boolean.aircon") == "on"
+        return self.entities.input_boolean.aircon.state == "on"
 
     @aircon.setter
     def aircon(self, state: bool):
@@ -420,8 +420,8 @@ class TemperatureMonitor:
     def __init__(self, controller: Climate):
         """Initialise with Climate controller and create sensor objects."""
         self.controller = controller
-        self.inside_temperature = self.controller.get_state(
-            "climate.bedroom", attribute=f"current_temperature"
+        self.inside_temperature = (
+            self.controller.entities.climate.bedroom.attributes.current_temperature
         )
         self.sensors = {
             sensor_id: Sensor.detect_type_and_create(sensor_id, self)
@@ -439,7 +439,7 @@ class TemperatureMonitor:
     @property
     def inside_temperature(self) -> float:
         """Get the calculated inside temperature as saved to Home Assistant."""
-        return float(self.controller.get_state("sensor.apparent_inside_temperature"))
+        return float(self.controller.entities.sensor.apparent_inside_temperature.state)
 
     @inside_temperature.setter
     def inside_temperature(self, temperature: float):
@@ -451,7 +451,7 @@ class TemperatureMonitor:
     @property
     def outside_temperature(self) -> float:
         """Get the calculated outside temperature from Home Assistant."""
-        return float(self.controller.get_state("sensor.bom_weather_feels_like_c"))
+        return float(self.controller.entities.sensor.bom_weather_feels_like_c.state)
 
     def start_monitoring(self):
         """Get values from appropriate sensors and calculate inside temperature."""
@@ -528,7 +528,7 @@ class TemperatureMonitor:
 
     def is_outside_temperature_nicer(self) -> bool:
         """Check if outside is a nicer temperature than inside."""
-        mode = self.controller.get_state("climate.bedroom")
+        mode = self.controller.entities.climate.bedroom.state
         hotter_outside = (
             self.inside_temperature
             < self.outside_temperature - self.controller.args["inside_outside_trigger"]

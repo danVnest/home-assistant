@@ -39,7 +39,7 @@ class Presence(app.App):
     def anyone_home(self, **kwargs) -> bool:
         """Check if anyone is home."""
         return any(
-            person["state"] == "home" for person in self.get_state("person").values()
+            person["state"] == "home" for person in self.entities.person.values()
         )
 
     def __handle_presence_change(

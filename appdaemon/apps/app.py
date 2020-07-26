@@ -24,7 +24,7 @@ class App(hass.Hass):
     @property
     def scene(self) -> str:
         """Scene is stored in Home Assistant as an input_select entity."""
-        return self.get_state("input_select.scene")
+        return self.entities.input_select.scene.state
 
     @scene.setter
     def scene(self, new_scene: str):
@@ -39,15 +39,15 @@ class App(hass.Hass):
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs["targets"] if "targets" in kwargs else "all"
-        for person in self.get_state("person").values():
+        for person, info in self.entities.person.items():
             if any(
                 [
                     targets == "all",
-                    targets == "anyone_home" and person["state"] == "home",
-                    targets == person["entity_id"].split(".")[-1],
+                    targets == "anyone_home" and info["state"] == "home",
+                    targets == person,
                 ]
             ):
-                if person["entity_id"] == "person.dan":
+                if person == "dan":
                     mobile_name = "mobile_app_dans_phone"
                     data = {"apns_headers": {"apns-collapse-id": kwargs["title"]}}
                 else:

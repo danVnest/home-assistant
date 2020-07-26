@@ -33,7 +33,7 @@ class Media(app.App):
     @property
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        return self.get_state("media_player.living_room") == "playing"
+        return self.entities.media_player.living_room.state == "playing"
 
     def __tv_state_change(
         self, entity, attribute, old, new, kwargs
