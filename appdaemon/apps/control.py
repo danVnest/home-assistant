@@ -109,7 +109,7 @@ class Control(app.App):
                 brightness, kelvin = self.lights.calculate_circadian_brightness_kelvin()
                 self.lights.lights[room].adjust(brightness, kelvin)
             else:
-                self.lights.lights[room].brightness = 0
+                self.lights.lights[room].turn_off()
         elif data["scene_data"] == 2:  # held
             self.log(f"Button '{data['entity_id']}' held")
             if room == "bedroom":
@@ -128,7 +128,7 @@ class Control(app.App):
         elif "aircon" in data:
             self.climate.aircon = data["aircon"]
 
-    def get_setting(self, setting_name) -> int:
+    def get_setting(self, setting_name: str) -> int:
         """Get UI input_number setting values."""
         if setting_name == "morning_time":
             return self.get_state(f"input_datetime.{setting_name}")

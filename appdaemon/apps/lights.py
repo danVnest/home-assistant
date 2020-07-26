@@ -198,13 +198,13 @@ class Lights(app.App):
         ):
             self.log("Circadian progression not triggered - too early")
             return (
-                self.entities.input_number.initial_circadian_brightness.state,
-                self.entities.input_number.initial_circadian_kelvin.state,
+                float(self.entities.input_number.initial_circadian_brightness.state),
+                float(self.entities.input_number.initial_circadian_kelvin.state),
             )
         self.log("Circadian progression not triggered - already completed")
         return (
-            self.entities.input_number.final_circadian_brightness.state,
-            self.entities.input_number.final_circadian_kelvin.state,
+            float(self.entities.input_number.final_circadian_brightness.state),
+            float(self.entities.input_number.final_circadian_kelvin.state),
         )
 
     def redate_circadian(self, kwargs: dict) -> bool:
