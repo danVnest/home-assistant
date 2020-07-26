@@ -198,13 +198,13 @@ class Lights(app.App):
         ):
             self.log("Circadian progression not triggered - too early")
             return (
-                self.args["max_circadian_brightness"],
-                self.args["max_circadian_kelvin"],
+                self.entities.input_number.initial_circadian_brightness.state,
+                self.entities.input_number.initial_circadian_kelvin.state,
             )
         self.log("Circadian progression not triggered - already completed")
         return (
-            self.args["min_circadian_brightness"],
-            self.args["min_circadian_kelvin"],
+            self.entities.input_number.final_circadian_brightness.state,
+            self.entities.input_number.final_circadian_kelvin.state,
         )
 
     def redate_circadian(self, kwargs: dict) -> bool:
@@ -253,11 +253,8 @@ class Lights(app.App):
 
     def __lighting_luminance(self) -> float:
         """Return approximate luminance of the powered lighting affecting light sensors."""
-        brightness = self.entities.light.kitchen.attributes.brightness
         return (
-            0
-            if brightness is None
-            else brightness
+            self.lights["kitchen"].brightness
             / self.args["max_brightness"]
             * self.args["lighting_luminance_factor"]
         )
