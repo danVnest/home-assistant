@@ -49,12 +49,6 @@ class Control(app.App):
 
     def __final_initialize(self):
         """Set scene, listen for user input and monitor batteries."""
-        self.reset_scene()
-        self.__morning_timer = self.run_daily(
-            self.__morning, self.get_setting("morning_time")
-        )
-        self.listen_event(self.__button, "zwave.scene_activated")
-        self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for setting in [
             "input_boolean",
             "input_datetime",
@@ -66,6 +60,12 @@ class Control(app.App):
                 setting,
                 duration=self.args["settings_change_delay"],
             )
+        self.reset_scene()
+        self.__morning_timer = self.run_daily(
+            self.__morning, self.get_setting("morning_time")
+        )
+        self.listen_event(self.__button, "zwave.scene_activated")
+        self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
             "entryway_protect_battery_health_state",
             "living_room_protect_battery_health_state",
@@ -151,6 +151,8 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
+        if new == old:
+            return
         entity = entity.split(".")
         input_type = entity[0]
         setting = entity[1]

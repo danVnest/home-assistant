@@ -56,12 +56,12 @@ class Lights(app.App):
                 light.ignore_presence()
                 light.turn_off()
         elif scene == "Night":
-            self.__circadian_progression(None)
             self.__circadian["timer"] = self.run_every(
                 self.__circadian_progression,
                 self.datetime() + self.__circadian["time_step"],
                 self.__circadian["time_step"].total_seconds(),
             )
+            self.__circadian_progression(None)
         elif scene == "Bright":
             for light in self.lights.values():
                 light.ignore_presence()
@@ -388,7 +388,7 @@ class Light:
             brightness = self.__validate_brightness(brightness)
             kelvin = self.__validate_kelvin(kelvin)
             self.controller.log(
-                f"Adjusting {self.light_id} to {brightness} & {kelvin}K '"
+                f"Adjusting {self.light_id} to {brightness} & {kelvin}K "
                 f"(from {self.brightness} & {self.kelvin}K)",
                 level="DEBUG",
             )
