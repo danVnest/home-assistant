@@ -56,12 +56,7 @@ class Lights(app.App):
                 light.ignore_presence()
                 light.turn_off()
         elif scene == "Night":
-            self.__circadian["timer"] = self.run_every(
-                self.__circadian_progression,
-                self.datetime() + self.__circadian["time_step"],
-                self.__circadian["time_step"].total_seconds(),
-            )
-            self.__circadian_progression(None)
+            self.__start_circadian()
         elif scene == "Bright":
             for light in self.lights.values():
                 light.ignore_presence()
@@ -123,10 +118,33 @@ class Lights(app.App):
                 self.lights[light_name].turn_off()
         self.log(f"Light scene changed to {scene}")
 
+    def __start_circadian(self):
+        """Schedule a timer to periodically set the lighting appropriately."""
+        circadian_progress = self.__calculate_circadian_progress()
+        self.__circadian_progression({"circadian_progress": circadian_progress})
+        if circadian_progress not in (0, 1):
+            self.__circadian["timer"] = self.run_every(
+                self.__circadian_progression,
+                self.datetime() + self.__circadian["time_step"],
+                self.__circadian["time_step"].total_seconds(),
+            )
+
     def __circadian_progression(self, kwargs: dict):
         """Calculate appropriate lighting levels and implement."""
-        del kwargs
-        brightness, kelvin = self.calculate_circadian_brightness_kelvin()
+        circadian_progress = kwargs.get(
+            "circadian_progress", self.__calculate_circadian_progress()
+        )
+        if circadian_progress in (0, 1):
+            self.cancel_timer(self.__circadian.get("timer"))
+            self.__circadian["timer"] = self.run_every(
+                self.__circadian_progression,
+                self.__circadian["start_time"]
+                + datetime.timedelta(days=circadian_progress),
+                self.__circadian["time_step"].total_seconds(),
+            )
+        brightness, kelvin = self.calculate_circadian_brightness_kelvin(
+            circadian_progress
+        )
         self.lights["entryway"].set_presence_adjustments(
             vacant=(self.args["min_brightness"], kelvin),
             occupied=(brightness, kelvin),
@@ -154,57 +172,51 @@ class Lights(app.App):
                 self.lights[light_name].adjust(brightness, kelvin)
         self.log("Adjusted lighting based on circadian progression", level="DEBUG")
 
-    def calculate_circadian_brightness_kelvin(self) -> Tuple[int, int]:
-        """Calculate appropriate lighting levels based on the current time of night."""
-        if (
-            self.__circadian["start_time"].time()
-            < self.time()
-            < self.__circadian["end_time"].time()
-        ):
-            circadian_progress = (self.__circadian["end_time"] - self.datetime()) / (
-                self.__circadian["end_time"] - self.__circadian["start_time"]
+    def __calculate_circadian_progress(self) -> float:
+        """Calculate how far through the circadian rhythm we should be right now."""
+        circadian_progress = (self.datetime() - self.__circadian["start_time"]) / (
+            self.__circadian["end_time"] - self.__circadian["start_time"]
+        )
+        if not 0 < circadian_progress < 1:
+            circadian_progress = (
+                0
+                if (
+                    self.parse_time(self.control.get_setting("morning_time"))
+                    < self.time()
+                    < self.__circadian["start_time"].time()
+                )
+                else 1
             )
-            self.log(
-                f"Circadian progress calculated as: {circadian_progress}",
-                level="DEBUG",
-            )
-            return (
-                int(
-                    float(self.entities.input_number.final_circadian_brightness.state)
-                    + (
-                        float(
-                            self.entities.input_number.initial_circadian_brightness.state
-                        )
-                        - float(
-                            self.entities.input_number.final_circadian_brightness.state
-                        )
-                    )
-                    * circadian_progress
-                ),
-                int(
-                    float(self.entities.input_number.final_circadian_kelvin.state)
-                    + (
-                        float(self.entities.input_number.initial_circadian_kelvin.state)
-                        - float(self.entities.input_number.final_circadian_kelvin.state)
-                    )
-                    * circadian_progress
-                ),
-            )
-        self.cancel_timer(self.__circadian.get("timer"))
-        if (
-            self.parse_time(self.control.get_setting("morning_time"))
-            < self.time()
-            < self.__circadian["start_time"].time()
-        ):
-            self.log("Circadian progression not triggered - too early")
-            return (
-                float(self.entities.input_number.initial_circadian_brightness.state),
-                float(self.entities.input_number.initial_circadian_kelvin.state),
-            )
-        self.log("Circadian progression not triggered - already completed")
+        self.log(
+            f"Circadian progress calculated as: {circadian_progress}", level="DEBUG"
+        )
+        return circadian_progress
+
+    def calculate_circadian_brightness_kelvin(
+        self, circadian_progress: float = None
+    ) -> Tuple[int, int]:
+        """Calculate appropriate lighting levels based on the current circadian progression."""
+        if circadian_progress is None:
+            circadian_progress = self.__calculate_circadian_progress()
         return (
-            float(self.entities.input_number.final_circadian_brightness.state),
-            float(self.entities.input_number.final_circadian_kelvin.state),
+            int(
+                float(self.entities.input_number.initial_circadian_brightness.state)
+                + (
+                    float(self.entities.input_number.final_circadian_brightness.state)
+                    - float(
+                        self.entities.input_number.initial_circadian_brightness.state
+                    )
+                )
+                * circadian_progress
+            ),
+            int(
+                float(self.entities.input_number.initial_circadian_kelvin.state)
+                + (
+                    float(self.entities.input_number.final_circadian_kelvin.state)
+                    - float(self.entities.input_number.initial_circadian_kelvin.state)
+                )
+                * circadian_progress
+            ),
         )
 
     def redate_circadian(self, kwargs: dict) -> bool:
