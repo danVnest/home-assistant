@@ -160,6 +160,8 @@ class Control(app.App):
         if setting == "scene":
             self.lights.transition_to_scene(new)
             self.climate.transition_between_scenes(new, old)
+            if new == "Sleep" or "Away" in new:
+                self.media.standby()
         elif input_type == "input_boolean":
             setattr(self.climate, setting, new == "on")
         elif setting.startswith("circadian"):
