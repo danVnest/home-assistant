@@ -49,17 +49,18 @@ class Control(app.App):
 
     def __final_initialize(self):
         """Set scene, listen for user input and monitor batteries."""
-        for setting in [
+        for setting_type in [
             "input_boolean",
             "input_datetime",
             "input_number",
             "input_select",
         ]:
-            self.listen_state(
-                self.__handle_settings_change,
-                setting,
-                duration=self.args["settings_change_delay"],
-            )
+            for setting in self.get_state(setting_type):
+                self.listen_state(
+                    self.__handle_settings_change,
+                    setting,
+                    duration=self.args["settings_change_delay"],
+                )
         self.reset_scene()
         self.__morning_timer = self.run_daily(
             self.__morning, self.get_setting("morning_time")
@@ -151,8 +152,6 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
-        if new == old:
-            return
         entity = entity.split(".")
         input_type = entity[0]
         setting = entity[1]
