@@ -126,6 +126,9 @@ class Climate(app.App):
             self.aircon = False
         elif "Away" not in new_scene and "Away" in old_scene:
             self.climate_control = self.__climate_control_history["before_away"]
+        if self.climate_control or not self.__suggested:
+            self.__temperature_monitor.start_monitoring()
+            self.handle_inside_temperature()
         if self.aircon:
             self.__turn_aircon_on()
         elif self.climate_control is False and any(
@@ -136,7 +139,6 @@ class Climate(app.App):
             ]
         ):
             self.__suggest_if_trigger_forecast()
-        self.handle_inside_temperature()
 
     def handle_inside_temperature(self):
         """Control aircon or suggest based on changes in inside temperature."""
@@ -258,9 +260,9 @@ class Climate(app.App):
 
     def __turn_aircon_off(self):
         """Turn all aircon units off and allow suggestions again."""
-        self.log("Turning aircon off")
         for aircon in self.__aircons.values():
             aircon.turn_off()
+        self.log("Turned aircon off")
         self.__allow_suggestion()
 
     def __disable_climate_control_if_would_trigger_on(self):
