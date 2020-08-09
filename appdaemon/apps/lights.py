@@ -582,31 +582,31 @@ class Light:
 
     def __transition_towards_occupied(self, kwargs: dict):
         """Step towards occupied lighting settings."""
-        if kwargs["timer_id"] == self.__transition_timer:
-            steps_remaining = kwargs["steps_remaining"] - 1
-            if steps_remaining <= 0:
-                self.controller.log(
-                    f"Transition to occupied complete for {self.light_id}",
-                    level="DEBUG",
-                )
-                self.__transition_timer = None
-                self.adjust(
-                    self.__presence_adjustments["occupied"]["brightness"],
-                    self.__presence_adjustments["occupied"]["kelvin"],
-                )
-            else:
-                self.adjust(
-                    self.__presence_adjustments["occupied"]["brightness"]
-                    - kwargs["brightness_step"] * steps_remaining,
-                    self.__presence_adjustments["occupied"]["kelvin"]
-                    - kwargs["kelvin_step"] * steps_remaining,
-                )
-                self.controller.run_in(
-                    self.__transition_towards_occupied,
-                    kwargs["step_time"],
-                    brightness_step=kwargs["brightness_step"],
-                    kelvin_step=kwargs["kelvin_step"],
-                    step_time=kwargs["step_time"],
-                    steps_remaining=steps_remaining,
-                    timer_id=kwargs["timer_id"],
-                )
+        if kwargs["timer_id"] != self.__transition_timer:
+            return
+        steps_remaining = kwargs["steps_remaining"] - 1
+        if steps_remaining <= 0:
+            self.controller.log(
+                f"Transition to occupied complete for {self.light_id}", level="DEBUG",
+            )
+            self.__transition_timer = None
+            self.adjust(
+                self.__presence_adjustments["occupied"]["brightness"],
+                self.__presence_adjustments["occupied"]["kelvin"],
+            )
+        else:
+            self.adjust(
+                self.__presence_adjustments["occupied"]["brightness"]
+                - kwargs["brightness_step"] * steps_remaining,
+                self.__presence_adjustments["occupied"]["kelvin"]
+                - kwargs["kelvin_step"] * steps_remaining,
+            )
+            self.controller.run_in(
+                self.__transition_towards_occupied,
+                kwargs["step_time"],
+                brightness_step=kwargs["brightness_step"],
+                kelvin_step=kwargs["kelvin_step"],
+                step_time=kwargs["step_time"],
+                steps_remaining=steps_remaining,
+                timer_id=kwargs["timer_id"],
+            )
