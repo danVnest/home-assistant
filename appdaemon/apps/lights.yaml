@@ -6,5 +6,5 @@ Lights:
   max_kelvin: 4500 # maximum kelvin that lighting can reach
   min_kelvin: 2000 # minimum kelvin that lighting can reach
   day_min_luminance: 40 # minimum ambient luminance to trigger transition to night scenes
-  night_max_luminance: 60 # maximum ambient luminance to trigger transition to day scenes
+  night_max_luminance: 70 # maximum ambient luminance to trigger transition to day scenes
   lighting_luminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)
