@@ -20,8 +20,7 @@ class Control(app.App):
         self.media = None
         self.presence = None
         self.safety = None
-        self.__morning_timer = None
-        self.__setting_delay_timers = {}
+        self.__timers = {"morning_timer": None, "setting_delay_timers": {}}
 
     def initialize(self):
         """Monitor logs then wait until after all other apps are initialised.
@@ -58,7 +57,7 @@ class Control(app.App):
         ]:
             self.listen_state(self.__delay_handle_settings_change, setting)
         self.reset_scene()
-        self.__morning_timer = self.run_daily(
+        self.__timers["morning_timer"] = self.run_daily(
             self.__morning, self.get_setting("morning_time")
         )
         self.listen_event(self.__button, "zwave.scene_activated")
@@ -148,10 +147,10 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Delay handling of setting changes made by the user through the UI."""
         del attribute, kwargs
-        if entity in self.__setting_delay_timers:
-            self.cancel_timer(self.__setting_delay_timers[entity])
-            del self.__setting_delay_timers[entity]
-        self.__setting_delay_timers[entity] = self.run_in(
+        if entity in self.__timers["setting_delay_timers"]:
+            self.cancel_timer(self.__timers["setting_delay_timers"][entity])
+            del self.__timers["setting_delay_timers"][entity]
+        self.__timers["setting_delay_timers"][entity] = self.run_in(
             self.__handle_settings_change,
             self.args["settings_change_delay"],
             entity=entity,
@@ -163,7 +162,6 @@ class Control(app.App):
         """Act on setting changes made by the user through the UI."""
         (input_type, setting) = kwargs["entity"].split(".")
         self.log(f"UI setting '{setting}' changed to {kwargs['new']}")
-        valid = True
         if setting == "scene":
             self.lights.transition_to_scene(kwargs["new"])
             self.climate.transition_between_scenes(kwargs["new"], kwargs["old"])
@@ -172,35 +170,39 @@ class Control(app.App):
         elif input_type == "input_boolean":
             setattr(self.climate, setting, kwargs["new"] == "on")
         elif setting.startswith("circadian"):
-            valid = self.lights.redate_circadian(None)
+            try:
+                self.lights.redate_circadian(None)
+            except ValueError:
+                self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif setting == "morning_time":
-            valid = self.parse_datetime(
+            if self.parse_datetime(
                 self.get_state(kwargs["entity"])
-            ) < datetime.datetime.combine(self.date(), self.sunrise().time())
-            if valid:
-                self.cancel_timer(self.__morning_timer)
-                self.__morning_timer = self.run_daily(self.__morning, kwargs["new"])
+            ) < datetime.datetime.combine(self.date(), self.sunrise().time()):
+                self.cancel_timer(self.__timers["morning_timer"])
+                self.__timers["morning_timer"] = self.run_daily(
+                    self.__morning, kwargs["new"]
+                )
+            else:
+                self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif "temperature" in setting:
             self.climate.reset()
         else:
             self.lights.transition_to_scene(self.scene)
-        if not valid:
-            if input_type == "input_datetime":
-                self.call_service(
-                    "input_datetime/set_datetime",
-                    entity_id=kwargs["entity"],
-                    time=kwargs["old"],
-                )
-            else:
-                self.call_service(
-                    "input_number/set_value",
-                    entity_id=kwargs["entity"],
-                    value=kwargs["old"],
-                )
-            self.notify(
-                f"Reverted invalid change of '{kwargs['new']}' for setting '{setting}'",
-                title="Invalid Setting",
+
+    def __revert_setting(self, setting_id: str, value: str):
+        """Revert setting to specified value & notify."""
+        if setting_id.startswith("input_datetime"):
+            self.call_service(
+                "input_datetime/set_datetime", entity_id=setting_id, time=value,
             )
+        else:
+            self.call_service(
+                "input_number/set_value", entity_id=setting_id, value=value,
+            )
+        self.notify(
+            f"Invalid value for setting '{setting_id}' - reverted to previous",
+            title="Invalid Setting",
+        )
 
     def __handle_battery_level_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict

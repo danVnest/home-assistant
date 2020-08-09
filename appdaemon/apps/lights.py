@@ -229,7 +229,7 @@ class Lights(app.App):
             ),
         )
 
-    def redate_circadian(self, kwargs: dict) -> bool:
+    def redate_circadian(self, kwargs: dict):
         """Configure the start and end times for lighting adjustment for today."""
         del kwargs
         start_time = datetime.datetime.combine(
@@ -255,7 +255,10 @@ class Lights(app.App):
             / self.constants["kelvin_per_step"],
         )
         if time_step.total_seconds() < 0:
-            return False
+            raise ValueError(
+                "Circadian end time is before start time "
+                f"(by {time_step.total_seconds()/-60} minutes)"
+            )
         self.__circadian["start_time"] = start_time
         self.__circadian["end_time"] = end_time
         self.__circadian["time_step"] = time_step
@@ -265,7 +268,6 @@ class Lights(app.App):
         )
         if self.scene == "Night":
             self.__start_circadian()
-        return True
 
     def is_lighting_sufficient(self) -> bool:
         """Return if there is enough light to not require further lighting."""
