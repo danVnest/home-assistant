@@ -453,14 +453,16 @@ class Light:
         self.__presence_adjustments["transition_period"] = transition_period
         presence = (
             "vacant"
-            if self.controller.control.presence.rooms[self.room_name].is_vacant
+            if self.controller.control.presence.rooms[self.room_name].is_vacant(
+                vacating_delay
+            )
             else "occupied"
         )
         if transition_period != 0 and entered != (0, 0):
             if presence == "occupied":
                 seconds_in_room = self.controller.control.presence.rooms[
                     self.room_name
-                ].seconds_in_room()
+                ].seconds_in_room(vacating_delay)
                 if seconds_in_room < transition_period:
                     presence = "entered"
                     self.__start_transition_towards_occupied(
@@ -488,7 +490,9 @@ class Light:
                 self.__handle_presence_change, vacating_delay
             )
         self.controller.log(
-            f"Configured {self.light_id}'s presence adjustments", level="DEBUG",
+            f"Configured {self.light_id}'s with presence '{presence}' and "
+            f"presence adjustments: {self.__presence_adjustments}",
+            level="DEBUG",
         )
 
     def ignore_presence(self):
@@ -503,12 +507,11 @@ class Light:
         """Adjust lighting based on presence in the room."""
         self.__transition_timer = None
         presence = "vacant" if is_vacant else "occupied"
-        if (
-            presence == "occupied"
-            and self.__presence_adjustments["transition_period"] != 0
-        ):
+        if not is_vacant and self.__presence_adjustments["transition_period"] != 0:
             if (
-                self.controller.control.presence.rooms[self.room_name].seconds_in_room()
+                self.controller.control.presence.rooms[self.room_name].seconds_in_room(
+                    self.__presence_adjustments["vacating_delay"]
+                )
                 < self.__presence_adjustments["transition_period"]
             ):
                 presence = "entered"
@@ -517,6 +520,7 @@ class Light:
             self.__presence_adjustments[presence]["brightness"],
             self.__presence_adjustments[presence]["kelvin"],
         )
+        self.controller.log(f"Presence changed to {presence}", level="DEBUG")
 
     def __start_transition_towards_occupied(self, completion: float = 0):
         """Calculate the light change required and start the transition."""
