@@ -44,6 +44,14 @@ class Lights(app.App):
             self.__handle_luminance_change, "sensor.kitchen_multisensor_luminance",
         )
 
+    def terminate(self):
+        """Cancel presence callbacks before termination.
+
+        Appdaemon defined function called before termination.
+        """
+        for light in self.lights.values():
+            light.ignore_presence()
+
     def transition_to_scene(  # noqa: C901
         self, scene: str
     ):  # pylint: disable=too-many-branches
