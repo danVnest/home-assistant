@@ -31,8 +31,6 @@ class Lights(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.redate_circadian(None)
-        self.run_daily(self.redate_circadian, "00:00:01")
         self.lights["entryway"] = Light("group.entryway_lights", self)
         self.lights["kitchen"] = Light("light.kitchen", self)
         self.lights["tv"] = Light("group.tv_lights", self)
@@ -40,6 +38,8 @@ class Lights(app.App):
         self.lights["hall"] = Light("light.hall", self)
         self.lights["bedroom"] = Light("light.bedroom", self)
         self.lights["office"] = Light("light.office", self)
+        self.redate_circadian(None)
+        self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
             self.__handle_luminance_change, "sensor.kitchen_multisensor_luminance",
         )
@@ -128,6 +128,7 @@ class Lights(app.App):
                 self.datetime() + self.__circadian["time_step"],
                 self.__circadian["time_step"].total_seconds(),
             )
+            self.log("Started circadian progression")
 
     def __circadian_progression(self, kwargs: dict):
         """Calculate appropriate lighting levels and implement."""
@@ -136,17 +137,21 @@ class Lights(app.App):
         )
         if circadian_progress in (0, 1):
             self.cancel_timer(self.__circadian.get("timer"))
+            next_start = self.__circadian["start_time"] + datetime.timedelta(
+                days=circadian_progress
+            )
             self.__circadian["timer"] = self.run_every(
                 self.__circadian_progression,
-                self.__circadian["start_time"]
-                + datetime.timedelta(days=circadian_progress),
+                next_start,
                 self.__circadian["time_step"].total_seconds(),
+            )
+            self.log(
+                f"Set circadian progression to commence at {next_start}", level="DEBUG"
             )
         brightness, kelvin = self.calculate_circadian_brightness_kelvin(
             circadian_progress
         )
         self.lights["entryway"].set_presence_adjustments(
-            vacant=(self.args["min_brightness"], kelvin),
             occupied=(brightness, kelvin),
             vacating_delay=self.control.get_setting("night_vacating_delay"),
         )
@@ -154,10 +159,7 @@ class Lights(app.App):
             vacant=(brightness, kelvin),
             entered=(brightness, kelvin)
             if brightness >= self.control.get_setting("night_motion_brightness")
-            else (
-                self.control.get_setting("night_motion_brightness"),
-                self.control.get_setting("night_motion_kelvin"),
-            ),
+            else (self.control.get_setting("night_motion_brightness"), kelvin),
             occupied=(
                 self.args["max_brightness"],
                 self.control.get_setting("night_motion_kelvin"),
@@ -253,6 +255,8 @@ class Lights(app.App):
             f"Circadian redated to start at {start_time.time()} with "
             f"time step of {time_step.total_seconds() / 60} minutes"
         )
+        if self.scene == "Night":
+            self.__start_circadian()
         return True
 
     def is_lighting_sufficient(self) -> bool:
