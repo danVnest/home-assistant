@@ -23,7 +23,7 @@ class Control(app.App):
         self.__timers = {"morning_timer": None, "setting_delay_timers": {}}
 
     def initialize(self):
-        """Monitor logs then wait until after all other apps are initialised.
+        """Monitor logs, listen for user input, monitor batteries and set timers.
 
         Appdaemon defined init function called once ready after __init__.
         """
@@ -31,24 +31,6 @@ class Control(app.App):
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         self.listen_log(self.__handle_log)
-        self.listen_event(self.__add_app, "app_initialized", namespace="admin")
-
-    def __add_app(self, event_name: str, data: dict, kwargs: dict):
-        """Link the app and check if all are now ready."""
-        del event_name, kwargs
-        if data["app"] == "Control":
-            for app_name in ["Climate", "Lights", "Media", "Presence", "Safety"]:
-                setattr(self, app_name.lower(), self.get_app(app_name))
-        else:
-            if getattr(self, data["app"].lower()) != self.get_app(data["app"]):
-                setattr(self, data["app"].lower(), self.get_app(data["app"]))
-            else:
-                return
-        if all([self.climate, self.lights, self.media, self.presence, self.safety]):
-            self.__final_initialize()
-
-    def __final_initialize(self):
-        """Set scene, listen for user input and monitor batteries."""
         for setting in [
             "input_boolean",
             "input_datetime",
@@ -56,10 +38,6 @@ class Control(app.App):
             "input_select",
         ]:
             self.listen_state(self.__delay_handle_settings_change, setting)
-        self.reset_scene()
-        self.__timers["morning_timer"] = self.run_daily(
-            self.__morning, self.get_setting("morning_time")
-        )
         self.listen_event(self.__button, "zwave.scene_activated")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
@@ -72,7 +50,17 @@ class Control(app.App):
             "switch2_battery_level",
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
-        self.log("App 'Control' initialised and linked to all other apps")
+        self.listen_event(self.__add_app, "app_initialized", namespace="admin")
+        self.__set_morning_timer()
+
+    def __add_app(self, event_name: str, data: dict, kwargs: dict):
+        """Link the app and check if all are now ready."""
+        del event_name, data, kwargs
+        for app_name in ["Climate", "Lights", "Media", "Presence", "Safety"]:
+            setattr(self, app_name.lower(), self.get_app(app_name))
+        if all([self.climate, self.lights, self.media, self.presence, self.safety]):
+            self.log("All apps ready, resetting scene")
+            self.reset_scene()
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
@@ -97,6 +85,13 @@ class Control(app.App):
             self.log("It is night but scene was set as 'Sleep', will not be reset")
         else:
             self.scene = "Night"
+
+    def __set_morning_timer(self, time: str = None):
+        """Set morning timer as specified by the setting morning_time (or as supplied)."""
+        self.cancel_timer(self.__timers["morning_timer"])
+        self.__timers["morning_timer"] = self.run_daily(
+            self.__morning, time if time else self.get_setting("morning_time")
+        )
 
     def __morning(self, kwargs: dict):
         """Change scene to Morning (callback for daily timer)."""
@@ -175,13 +170,10 @@ class Control(app.App):
             except ValueError:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif setting == "morning_time":
-            if self.parse_datetime(
-                self.get_state(kwargs["entity"])
-            ) < datetime.datetime.combine(self.date(), self.sunrise().time()):
-                self.cancel_timer(self.__timers["morning_timer"])
-                self.__timers["morning_timer"] = self.run_daily(
-                    self.__morning, kwargs["new"]
-                )
+            if self.parse_datetime(kwargs["new"]) < datetime.datetime.combine(
+                self.date(), self.sunrise().time()
+            ):
+                self.__set_morning_timer(kwargs["new"])
             else:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif "temperature" in setting:
