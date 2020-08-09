@@ -45,6 +45,14 @@ input_boolean:
   aircon:
     name: "Aircon"
 
+input_datetime:
+  morning_time:
+    name: Morning time
+    has_time: true
+  circadian_end_time:
+    name: End time
+    has_time: true
+
 input_number:
   cooling_target_temperature:
     name: "Cool down to"
@@ -58,24 +66,152 @@ input_number:
     max: 25
     unit_of_measurement: "°C"
     mode: "box"
-  day_high_temperature_trigger:
-    name: "Cool when above (Day)"
-    min: 20
-    max: 40
+  sleep_cooling_target_temperature:
+    name: "Cool down to"
+    min: 15
+    max: 25
     unit_of_measurement: "°C"
     mode: "box"
-  night_high_temperature_trigger:
-    name: "Cool when above (Night)"
+  sleep_heating_target_temperature:
+    name: "Heat up to"
+    min: 15
+    max: 25
+    unit_of_measurement: "°C"
+    mode: "box"
+  high_temperature_trigger:
+    name: "Cool when above"
     min: 20
     max: 40
+    step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
   low_temperature_trigger:
     name: "Heat when below"
     min: 0
     max: 20
+    step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
+  sleep_high_temperature_trigger:
+    name: "Cool when above"
+    min: 20
+    max: 40
+    step: 0.5
+    unit_of_measurement: "°C"
+    mode: "box"
+  sleep_low_temperature_trigger:
+    name: "Heat when below"
+    min: 0
+    max: 20
+    step: 0.5
+    unit_of_measurement: "°C"
+    mode: "box"
+  initial_circadian_brightness:
+    name: Initial brightness
+    min: 25
+    max: 255
+    step: 10
+  initial_circadian_kelvin:
+    name: Initial kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  final_circadian_brightness:
+    name: Final brightness
+    min: 25
+    max: 255
+    step: 10
+  final_circadian_kelvin:
+    name: Final kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  circadian_initial_sunset_offset:
+    name: Initial sunset offset
+    min: -3
+    max: 3
+    step: 0.5
+    mode: box
+  night_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+  night_motion_kelvin:
+    name: Motion kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  night_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+  night_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+  tv_brightness:
+    name: Brightness
+    min: 25
+    max: 255
+    step: 10
+  tv_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+  tv_kelvin:
+    name: Kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  tv_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+  tv_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+  sleep_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+  sleep_motion_kelvin:
+    name: Motion kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  sleep_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+  sleep_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+  morning_brightness:
+    name: Brightness
+    min: 25
+    max: 255
+    step: 10
+  morning_kelvin:
+    name: Kelvin
+    min: 2000
+    max: 4500
+    step: 250
+  morning_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
 
 input_select:
   scene:
@@ -83,51 +219,53 @@ input_select:
     options:
     - Day
     - Night
-    - Sleep
     - Bright
+    - Sleep
+    - Morning
     - TV
     - Away (Day)
     - Away (Night)
 
 light:
 - platform: wiz_light
-  name: Hall
-  host: 192.168.20.25
+  name: Entryway
+  host: 192.168.20.81
 - platform: wiz_light
-  name: TV Left
-  host: 192.168.20.24
-- platform: wiz_light
-  name: TV Middle
-  host: 192.168.20.26
-- platform: wiz_light
-  name: TV Right
-  host: 192.168.20.23
+  name: Stairway
+  host: 192.168.20.82
 - platform: wiz_light
   name: Kitchen
-  host: 192.168.20.22
-- platform: mqtt
-  name: 'Office'
-  command_topic: "light-office/cmnd/POWER"
-  state_topic: "light-office/stat/RESULT"
-  value_template: "{{ value_json.POWER }}"
-  qos: 1
-- platform: mqtt
-  name: 'Bedroom'
-  command_topic: "light-bedroom/cmnd/POWER"
-  state_topic: "light-bedroom/stat/RESULT"
-  value_template: "{{ value_json.POWER }}"
-  qos: 1
+  host: 192.168.20.54
+- platform: wiz_light
+  name: TV Left
+  host: 192.168.20.51
+- platform: wiz_light
+  name: TV Middle
+  host: 192.168.20.52
+- platform: wiz_light
+  name: TV Right
+  host: 192.168.20.53
+- platform: wiz_light
+  name: Dining Left
+  host: 192.168.20.86
+- platform: wiz_light
+  name: Dining Right
+  host: 192.168.20.85
+- platform: wiz_light
+  name: Hall
+  host: 192.168.20.50
+- platform: wiz_light
+  name: Bedroom
+  host: 192.168.20.84
+- platform: wiz_light
+  name: Office
+  host: 192.168.20.83
 
 logbook:
 
 map:
 
 mobile_app:
-
-mqtt:
-  broker: core-mosquitto
-  username: !secret mqtt_username
-  password: !secret mqtt_password
 
 person:
 
@@ -149,6 +287,11 @@ sensor:
   - apparent_temperature
 - platform: template
   sensors:
+    apparent_inside_temperature_numeric:
+      friendly_name: "Apparent inside temperature"
+      unit_of_measurement: "°C"
+      value_template: "{{ states('sensor.apparent_inside_temperature') }}"
+      icon_template: "mdi:thermometer"
     warnings_numeric:
       friendly_name: "Warnings"
       unit_of_measurement: "#"
@@ -157,6 +300,8 @@ sensor:
       friendly_name: "Errors"
       unit_of_measurement: "#"
       value_template: "{{ states('counter.errors') }}"
+    any_climate_control:
+      value_template: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
 
 sun:
 

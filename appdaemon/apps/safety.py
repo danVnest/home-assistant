@@ -13,7 +13,7 @@ class Safety(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
+        self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -21,8 +21,8 @@ class Safety(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        for sensor_id in self.smoke_sensors:
-            self.smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
+        for sensor_id in self.__smoke_sensors:
+            self.__smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
 
 
 class SmokeSensor:  # pylint: disable=too-few-public-methods
@@ -32,13 +32,13 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
         """Start listening to smoke and co status."""
         self.controller = controller
         self.controller.listen_state(
-            self.smoke, f"sensor.{sensor_id}_protect_smoke_status"
+            self.__handle_smoke, f"sensor.{sensor_id}_protect_smoke_status"
         )
         self.controller.listen_state(
-            self.smoke, f"sensor.{sensor_id}_protect_co_status"
+            self.__handle_smoke, f"sensor.{sensor_id}_protect_co_status"
         )
 
-    def smoke(
+    def __handle_smoke(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
         """React when high smoke level detected."""

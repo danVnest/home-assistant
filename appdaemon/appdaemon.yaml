@@ -13,6 +13,8 @@ appdaemon:
   longitude: !secret location_longitude
   elevation: !secret location_elevation
   time_zone: !secret location_time_zone
+  internal_function_timeout: 30
+  thread_duration_warning_threshold: 15
   # production_mode: true
   # missing_app_warnings: false
   plugins:

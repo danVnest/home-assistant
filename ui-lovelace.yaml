@@ -6,52 +6,158 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
+          - entity: input_datetime.morning_time
         show_header_toggle: false
         title: Control
         type: entities
+      - card:
+          entities:
+            - entity: input_number.high_temperature_trigger
+            - entity: input_number.low_temperature_trigger
+          show_header_toggle: false
+          title: Climate Control Triggers
+          type: entities
+        conditions:
+          - entity: input_boolean.climate_control
+            state: 'on'
+          - entity: input_select.scene
+            state_not: Sleep
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.sleep_high_temperature_trigger
+            - entity: input_number.sleep_low_temperature_trigger
+          show_header_toggle: false
+          title: Climate Control Triggers
+          type: entities
+        conditions:
+          - entity: input_boolean.climate_control
+            state: 'on'
+          - entity: input_select.scene
+            state: Sleep
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.cooling_target_temperature
+            - entity: input_number.heating_target_temperature
+          show_header_toggle: false
+          title: Aircon Temperatures
+          type: entities
+        conditions:
+          - entity: sensor.any_climate_control
+            state: 'True'
+          - entity: input_select.scene
+            state_not: Sleep
+        type: conditional
+      - card:
+          entities:
+            - entity: input_number.sleep_cooling_target_temperature
+            - entity: input_number.sleep_heating_target_temperature
+          show_header_toggle: false
+          title: Aircon Temperatures
+          type: entities
+        conditions:
+          - entity: sensor.any_climate_control
+            state: 'True'
+          - entity: input_select.scene
+            state: Sleep
+        type: conditional
       - entities:
-          - entity: input_number.cooling_target_temperature
-          - entity: input_number.heating_target_temperature
-          - entity: input_number.day_high_temperature_trigger
-          - entity: input_number.night_high_temperature_trigger
-          - entity: input_number.low_temperature_trigger
-        show_header_toggle: false
-        title: Climate Control Temperatures
-        type: entities
-      - entities:
-          - entity: light.kitchen
-          - entity: group.main_lights
-          - entity: light.bedroom
-        show_icon: true
+          - entity: sensor.apparent_inside_temperature_numeric
+            name: Inside
+          - entity: sensor.dark_sky_apparent_temperature
+            name: Outside
         show_name: true
-        show_state: true
-        title: Lights
         type: glance
+      - cards:
+          - entities:
+              - entity: group.all_lights
+              - entity: group.entryway_lights
+              - entity: light.kitchen
+              - entity: group.tv_lights
+              - entity: group.dining_lights
+              - entity: light.hall
+              - entity: light.bedroom
+              - entity: light.office
+            show_icon: true
+            show_name: true
+            show_state: true
+            title: Lights
+            type: glance
+          - content: >-
+              To manually control lighting above, you should first set the scene
+              to anything except "Night".
+            type: markdown
+        type: vertical-stack
       - content: >-
-          **Lighting** and climate settings are automatically adjusted between
-          different scenes. You can select a preferred scene here or tell
-          Siri/Google:
+          **Lighting** and **climate settings** (if enabled) are automatically
+          adjusted between different scenes. You can select a preferred scene
+          here or tell Siri or Google:
 
-          - lights on/off
+          - **"lights on"** or **"lights off"** for the *Night* and *Day* scenes
 
-          - lights on bright
+          - **"lights on bright"** for the *Bright* scene
 
-          - sleep time
+          - **"sleep time"** for the *Sleep* scene
 
 
           **Automatic climate control** will control all aircon units based on
-          the temperature and scene. Aircon can also be manually turned on/off.
-          These settings can be controlled by telling Siri/Google:
+          the temperature and scene. **Aircon** can also be manually turned on
+          and off. These settings can be controlled by telling Siri or Google:
 
-          - climate control on/off
+          - **"climate control on"** or **"climate control off"**
 
-          - aircon on/off
+          - **"aircon on"** or **"aircon off"**
+
+
+          Each **scene** has a particular purpose:
+
+          - ***Morning*** is designed to trigger before anyone wakes up (at the
+          time specified in the settings here), providing dim kitchen lighting
+          plus climate control to the whole house (rather than just the
+          bedroom). Thus when anyone does get up it is to a comfortable
+          temperature and sufficient lighting.
+
+          - ***Day*** is triggered when ambient lighting in the house is
+          sufficient, and thus turns off all lighting.
+
+          - ***Night*** is triggered when there is insufficent lighting, turning
+          on the main lights in the house. The brightness and colour temperature
+          of all lighting adjusts as the night goes on, getting dimmer and
+          warmer so as to reduce the impact to your circadian rhythm.
+
+          - ***Sleep*** turns off all lighting in the house. If climate control
+          is enabled, only the bedroom is monitored and controlled. This scene
+          has to be manually triggered.
+
+          - ***TV*** dims the lights for a nice viewing experience,
+          automatically triggered when the TV is playing at Night.
+
+          - ***Bright*** turns all lights on at full brightness and has to be
+          manually triggered.
+
+          - ***Away (Night/Day)*** turns off all lights (except one obvious one
+          at night for security purposes) and disables climate control.
+          Automatically triggered when both of us have left the house.
+
+
+          The **buttons** in the kitchen and bedroom will toggle their
+          corresponding light. Holding a button will toggle the scene (between
+          ***Bright*** and ***Night*** for the kitchen, and ***Sleep*** and
+          ***Night*** for the bedroom).
+
+
+          Lighting in the kitchen and entryway will automatically brighten when
+          someone enters, and dim shortly after they leave (depending on scene
+          settings).
         type: markdown
       - aspect_ratio: '2'
+        dark_mode: false
         default_zoom: 12
         entities:
           - entity: person.dan
           - entity: person.rachel
+        hours_to_show: 1
         type: map
       - entity: media_player.living_room
         type: media-control
@@ -61,16 +167,17 @@ views:
           - entity: climate.dining_room
           - entity: sensor.kitchen_multisensor_temperature
           - entity: sensor.multisensor_2_temperature
+          - entity: sensor.dark_sky_apparent_temperature
           - entity: input_number.cooling_target_temperature
           - entity: input_number.heating_target_temperature
-          - entity: input_number.day_high_temperature_trigger
-          - entity: input_number.night_high_temperature_trigger
+          - entity: input_number.high_temperature_trigger
           - entity: input_number.low_temperature_trigger
-          - entity: sensor.apparent_inside_temperature
+          - entity: sensor.apparent_inside_temperature_numeric
+          - entity: sensor.bom_weather_feels_like_c
+        hours_to_show: 72
         refresh_interval: 0
         title: Temperatures
         type: history-graph
-        hours_to_show: 72
       - cards:
           - entity: climate.living_room
             type: thermostat
@@ -85,16 +192,110 @@ views:
         type: vertical-stack
     path: default_view
     title: Control & Status
+  - badges: []
+    cards:
+      - cards:
+          - entities:
+              - entity: input_number.initial_circadian_brightness
+              - entity: input_number.initial_circadian_kelvin
+              - entity: input_number.final_circadian_brightness
+              - entity: input_number.final_circadian_kelvin
+              - entity: input_number.circadian_initial_sunset_offset
+              - entity: input_datetime.circadian_end_time
+            title: Circadian Rhythm
+            type: entities
+          - content: >-
+              Lighting at night will gradually transition between the intial and
+              final brightness and colour values specified here.
+
+
+              Initial circadian settings occur after sunset (specified in hours
+              by *initial sunset offset*) and reaches the final values at *end
+              time*.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - content: >-
+              Values here specify the *brightness* and colour temperature of
+              lighting in different scenes. Colour temperature ranges from warm
+              white (2000 *kelvin*) to cold white (4500 *kelvin*).
+
+
+              *Motion* indicates the value is specific to when the room is
+              occupied (otherwise defaulting to the normal values specified, the
+              current circadian value, off, or maximum - depending on the
+              scene).
+
+
+              *Vacating delay* specifies how long the light will wait after
+              someone leaves the room before reverting to its previous state.
+
+
+              If a *transition period* is available the light will smoothly
+              change over that period to or from the motion brightness and
+              kelvin specified or implied.
+            type: markdown
+          - entities:
+              - entity: input_number.night_motion_brightness
+              - entity: input_number.night_motion_kelvin
+              - entity: input_number.night_transition_period
+              - entity: input_number.night_vacating_delay
+            title: Night
+            type: entities
+          - entities:
+              - entity: input_number.tv_brightness
+              - entity: input_number.tv_kelvin
+              - entity: input_number.tv_motion_brightness
+              - entity: input_number.tv_transition_period
+              - entity: input_number.tv_vacating_delay
+            title: TV
+            type: entities
+          - entities:
+              - entity: input_number.sleep_motion_brightness
+              - entity: input_number.sleep_motion_kelvin
+              - entity: input_number.sleep_transition_period
+              - entity: input_number.sleep_vacating_delay
+            title: Sleep
+            type: entities
+          - entities:
+              - entity: input_number.morning_brightness
+              - entity: input_number.morning_kelvin
+              - entity: input_number.morning_vacating_delay
+            title: Morning
+            type: entities
+        type: vertical-stack
+    path: lights
+    title: Lights
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
     cards:
       - entities:
+          - entity: input_select.scene
+          - entity: input_boolean.climate_control
+          - entity: input_boolean.aircon
+        hours_to_show: 72
+        refresh_interval: 0
+        title: Control History
+        type: history-graph
+      - entities:
           - entity: sensor.warnings_numeric
           - entity: sensor.errors_numeric
-          - entity: input_select.scene
-        hours_to_show: 36
+        hours_to_show: 72
         refresh_interval: 0
+        title: Warnings & Errors
+        type: history-graph
+      - entities:
+          - entity: sensor.entryway_protect_battery_health_state
+          - entity: sensor.living_room_protect_battery_health_state
+          - entity: sensor.garage_protect_battery_health_state
+          - entity: sensor.kitchen_multisensor_battery_level
+          - entity: sensor.multisensor_battery_level
+          - entity: sensor.switch1_battery_level
+          - entity: sensor.switch2_battery_level
+        hours_to_show: 72
+        refresh_interval: 0
+        title: Battery Levels
         type: history-graph
     path: system
     title: System

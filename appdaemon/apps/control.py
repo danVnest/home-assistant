@@ -1,6 +1,6 @@
 """Coordinates all home automation control.
 
-Schedules scene changes, reacts to user input from buttons, monitors presence and logs.
+Schedules scene changes, reacts to user input, reports errors & low batteries.
 
 User defined variables are configued in control.yaml
 """
@@ -15,78 +15,117 @@ class Control(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.last_device_date = None
         self.climate = None
         self.lights = None
         self.media = None
+        self.presence = None
         self.safety = None
+        self.__timers = {"morning_timer": None, "setting_delay_timers": {}}
 
     def initialize(self):
-        """Schedule events, listen for presence changes, user input and log messages.
+        """Monitor logs then wait until after all other apps are initialised.
 
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        for app_name in ["climate", "lights", "media", "safety"]:
-            setattr(self, app_name, self.get_app(app_name.title()))
-        self.listen_log(self.handle_log)
+        self.call_service("counter/reset", entity_id="counter.warnings")
+        self.call_service("counter/reset", entity_id="counter.errors")
+        self.listen_log(self.__handle_log)
+        self.listen_event(self.__add_app, "app_initialized", namespace="admin")
+
+    def __add_app(self, event_name: str, data: dict, kwargs: dict):
+        """Link the app and check if all are now ready."""
+        del event_name, kwargs
+        if data["app"] == "Control":
+            for app_name in ["Climate", "Lights", "Media", "Presence", "Safety"]:
+                setattr(self, app_name.lower(), self.get_app(app_name))
+        else:
+            if getattr(self, data["app"].lower()) != self.get_app(data["app"]):
+                setattr(self, data["app"].lower(), self.get_app(data["app"]))
+            else:
+                return
+        if all([self.climate, self.lights, self.media, self.presence, self.safety]):
+            self.__final_initialize()
+
+    def __final_initialize(self):
+        """Set scene, listen for user input and monitor batteries."""
+        for setting in [
+            "input_boolean",
+            "input_datetime",
+            "input_number",
+            "input_select",
+        ]:
+            self.listen_state(self.__delay_handle_settings_change, setting)
         self.reset_scene()
-        self.last_device_date = self.date()
-        self.run_at_sunrise(self.morning, offset=self.args["sunrise_offset"] * 60)
-        self.run_at_sunset(self.evening, offset=-self.args["sunset_offset"] * 60)
-        self.listen_event(self.button, "zwave.scene_activated")
-        self.listen_event(self.ifttt, "ifttt_webhook_received")
-        self.listen_event(self.handle_new_device, "device_tracker_new_device")
-        self.listen_state(self.handle_presence_change, "person")
+        self.__timers["morning_timer"] = self.run_daily(
+            self.__morning, self.get_setting("morning_time")
+        )
+        self.listen_event(self.__button, "zwave.scene_activated")
+        self.listen_event(self.__ifttt, "ifttt_webhook_received")
+        for battery in [
+            "entryway_protect_battery_health_state",
+            "living_room_protect_battery_health_state",
+            "garage_protect_battery_health_state",
+            "entryway_multisensor_battery_level",
+            "kitchen_multisensor_battery_level",
+            "switch1_battery_level",
+            "switch2_battery_level",
+        ]:
+            self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
+        self.log("App 'Control' initialised and linked to all other apps")
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
-        if not self.anyone_home():
-            scene = f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
+        self.log("Detecting current appropriate scene")
+        if self.scene == "Bright":
+            self.log("Scene was set as 'Bright', will not be reset")
+        elif not self.presence.anyone_home():
+            self.scene = (
+                f"Away ({'Day' if self.lights.is_lighting_sufficient() else 'Night'})"
+            )
+        elif self.lights.is_lighting_sufficient():
+            self.scene = "Day"
+        elif self.media.is_playing:
+            self.scene = "TV"
         elif (
-            not self.morning_time()
+            self.parse_time(self.get_setting("morning_time"))
             < self.time()
-            < datetime.time(self.args["sleeptime"])
+            < self.parse_time("12:00:00")
         ):
-            scene = "Sleep"
-        elif self.time() < self.evening_time():
-            scene = "Day"
-        elif self.get_state("media_player.living_room") == "playing":
-            scene = "TV"
+            self.scene = "Morning"
+        elif self.scene == "Sleep":
+            self.log("It is night but scene was set as 'Sleep', will not be reset")
         else:
-            scene = "Night"
-        if scene != self.scene:
-            self.log("Detecting scene to be reset to")
-            self.scene = scene
+            self.scene = "Night"
 
-    def morning(self, kwargs: dict):
-        """Change scene to day (callback for run_at_sunrise with offset)."""
+    def __morning(self, kwargs: dict):
+        """Change scene to Morning (callback for daily timer)."""
         del kwargs
-        self.log("Morning triggered")
-        self.scene = "Day" if self.anyone_home() else "Away (Day)"
+        self.log(f"Morning timer triggered")
+        if self.scene == "Sleep":
+            self.scene = "Morning"
+        else:
+            self.log(f"Scene was not changed as it was {self.scene}, not Morning.")
 
-    def evening(self, kwargs: dict):
-        """Set scene to Night or TV (callback for run_at_sunset with offset)."""
-        del kwargs
-        self.log("Evening triggered")
-        self.scene = (
-            "TV" if self.get_state("media_player.living_room") == "playing" else "Night"
-        )
-
-    def button(self, event_name: str, data: dict, kwargs: dict):
+    def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
+        room = "bedroom" if data["entity_id"] == "zwave.switch1" else "kitchen"
         if data["scene_data"] == 0:  # clicked
-            self.log(f"Button '{data['entity_id']}' clicked")
-            if data["entity_id"] == "zwave.switch1":
-                self.toggle("light.bedroom")
+            self.log(f"Button in '{room}' clicked")
+            if self.lights.lights[room].brightness == 0:
+                brightness, kelvin = self.lights.calculate_circadian_brightness_kelvin()
+                self.lights.lights[room].adjust(brightness, kelvin)
             else:
-                self.toggle("light.kitchen")
+                self.lights.lights[room].turn_off()
         elif data["scene_data"] == 2:  # held
             self.log(f"Button '{data['entity_id']}' held")
-            self.scene = "Sleep" if self.scene == "Night" else "Night"
+            if room == "bedroom":
+                self.scene = "Sleep" if self.scene == "Night" else "Night"
+            else:
+                self.scene = "Night" if self.scene in ("Bright", "TV") else "Bright"
 
-    def ifttt(self, event_name: str, data: dict, kwargs: dict):
+    def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
         self.log(f"Received {data} from IFTTT: ")
@@ -97,39 +136,86 @@ class Control(app.App):
         elif "aircon" in data:
             self.climate.aircon = data["aircon"]
 
-    def handle_new_device(self, event_name: str, data: dict, kwargs: dict):
-        """If not home and someone adds a device, notify."""
-        del event_name
-        self.log(f"New device added: {data}, {kwargs}")
-        if "Away" in self.scene:
-            if self.last_device_date < self.date() - datetime.timedelta(hours=3):
-                self.notify(
-                    f'A guest has added a device: "{data["host_name"]}"',
-                    title="Guest Device",
-                )
-                self.last_device_date = self.date()
+    def get_setting(self, setting_name: str) -> int:
+        """Get UI input_number setting values."""
+        if setting_name == "morning_time":
+            return self.get_state(f"input_datetime.{setting_name}")
+        return int(float(self.get_state(f"input_number.{setting_name}")))
 
-    def handle_presence_change(
-        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+    def __delay_handle_settings_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
-        """Change scene if everyone has left home or if someone has come back."""
-        del attribute, old, kwargs
-        self.log(f"{entity} is {new}")
-        if new == "home":
-            if "Away" in self.scene:
-                self.reset_scene()
-        elif (
-            "Away" not in self.scene
-            and self.get_state(
-                f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
-            )
-            != "home"
-        ):
-            self.scene = (
-                f"Away ({'Day' if self.time() < self.evening_time() else 'Night'})"
-            )
+        """Delay handling of setting changes made by the user through the UI."""
+        del attribute, kwargs
+        if entity in self.__timers["setting_delay_timers"]:
+            self.cancel_timer(self.__timers["setting_delay_timers"][entity])
+            del self.__timers["setting_delay_timers"][entity]
+        self.__timers["setting_delay_timers"][entity] = self.run_in(
+            self.__handle_settings_change,
+            self.args["settings_change_delay"],
+            entity=entity,
+            new=new,
+            old=old,
+        )
 
-    def handle_log(
+    def __handle_settings_change(self, kwargs: dict):
+        """Act on setting changes made by the user through the UI."""
+        (input_type, setting) = kwargs["entity"].split(".")
+        self.log(f"UI setting '{setting}' changed to {kwargs['new']}")
+        if setting == "scene":
+            self.lights.transition_to_scene(kwargs["new"])
+            self.climate.transition_between_scenes(kwargs["new"], kwargs["old"])
+            if kwargs["new"] == "Sleep" or "Away" in kwargs["new"]:
+                self.media.standby()
+        elif input_type == "input_boolean":
+            setattr(self.climate, setting, kwargs["new"] == "on")
+        elif setting.startswith("circadian"):
+            try:
+                self.lights.redate_circadian(None)
+            except ValueError:
+                self.__revert_setting(kwargs["entity"], kwargs["old"])
+        elif setting == "morning_time":
+            if self.parse_datetime(
+                self.get_state(kwargs["entity"])
+            ) < datetime.datetime.combine(self.date(), self.sunrise().time()):
+                self.cancel_timer(self.__timers["morning_timer"])
+                self.__timers["morning_timer"] = self.run_daily(
+                    self.__morning, kwargs["new"]
+                )
+            else:
+                self.__revert_setting(kwargs["entity"], kwargs["old"])
+        elif "temperature" in setting:
+            self.climate.reset()
+        else:
+            self.lights.transition_to_scene(self.scene)
+
+    def __revert_setting(self, setting_id: str, value: str):
+        """Revert setting to specified value & notify."""
+        if setting_id.startswith("input_datetime"):
+            self.call_service(
+                "input_datetime/set_datetime", entity_id=setting_id, time=value,
+            )
+        else:
+            self.call_service(
+                "input_number/set_value", entity_id=setting_id, value=value,
+            )
+        self.notify(
+            f"Invalid value for setting '{setting_id}' - reverted to previous",
+            title="Invalid Setting",
+        )
+
+    def __handle_battery_level_change(
+        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Notify if a device's battery is low."""
+        del attribute, old, kwargs
+        if "protect" in entity:
+            if new != "Ok":
+                self.notify(f"{entity} is low", title="Low Battery", targets="dan")
+        elif float(new) <= 20:
+            self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
+
+    def __handle_log(
         self,
         app_name: str,
         timestamp: datetime.datetime,

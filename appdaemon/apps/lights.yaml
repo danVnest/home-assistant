@@ -1,50 +1,10 @@
 Lights:
   module: lights
   class: Lights
-  circadian_start_sunset_offset: 180 # minutes before sunset that the circadian adjustment process commences
-  circadian_end_time: '22:30' # time (in format '%H:%M') at which the circadian adjustment process ends
-  max_circadian_brightness: 255 # maximum brightness (up to 255) that circadian lighting can reach
-  min_circadian_brightness: 50 # minimum brightness (down to 1) that circadian lighting can reach
-  max_circadian_kelvin: 4500 # maximum kelvin (up to 4500) that circadian lighting can reach
-  min_circadian_kelvin: 2000 # maximum kelvin (down to 2000) that circadian lighting can reach
-  tv_brightness: 1 # light brightness in tv scene
-  tv_kelvin: 2000 # light kelvin in tv scene
-  tv_no_motion_delay: 30 # delay in seconds after last motion is detected before reverting motion light to normal config in tv scene
-  tv_motion_brightness: 168 # motion light brightness when motion detected in tv scene
-  tv_motion_kelvin: 2000
-  tv_long_motion_brightness: 255 # motion light brightness when motion detected for a long period in tv scene
-  tv_long_motion_kelvin: 4500 # motion light kelvin when motion detected for a long period in tv scene
-  tv_long_motion_delay: 30 # motion light period for which triggers long motion config in tv scene
-  bright_brightness: 255
-  bright_kelvin: 4500
-  bright_no_motion_delay: 'off'
-  bright_motion_brightness: 255
-  bright_motion_kelvin: 4500
-  bright_long_motion_brightness: 255
-  bright_long_motion_kelvin: 4500
-  bright_long_motion_delay: 'off'
-  sleep_brightness: 0 # off when there's no motion
-  sleep_kelvin: null # off when there's no motion
-  sleep_no_motion_delay: 30
-  sleep_motion_brightness: 1 # motion light brightness when motion detected in sleep scene
-  sleep_motion_kelvin: 2000 # motion light kelvin when motion detected in sleep scene
-  sleep_long_motion_brightness: 168 # motion light brightness when motion detected for a long period in sleep scene
-  sleep_long_motion_kelvin: 3000 # motion light kelvin when motion detected for a long period in sleep scene
-  sleep_long_motion_delay: 120 # motion light period for which triggers long motion config in sleep scene
-  away_night_brightness: 0 # off when there's no motion
-  away_night_kelvin: null # off when there's no motion
-  away_night_no_motion_delay: 300
-  away_night_motion_brightness: 255 # motion light brightness when motion detected in sleep scene
-  away_night_motion_kelvin: 4500 # motion light kelvin when motion detected in sleep scene
-  away_night_long_motion_brightness: 255 # motion light brightness when motion detected for a long period in sleep scene
-  away_night_long_motion_kelvin: 4500 # motion light kelvin when motion detected for a long period in sleep scene
-  away_night_long_motion_delay: 'off' # motion light period for which triggers long motion config in sleep scene
-  night_brightness: 255 # overriden by circadian
-  night_kelvin: 4500 # overriden by circadian
-  night_no_motion_delay: 120 # delay in seconds after last motion is detected before reverting motion light to normal config in night scene
-  night_motion_brightness: 255 # overriden by circadian
-  night_motion_kelvin: 4500 # overriden by circadian
-  night_long_motion_brightness: 255
-  night_long_motion_kelvin: 4500
-  night_long_motion_delay: 30 # motion light period for which triggers long motion config in night scene (only if the the below triggers)
-  motion_brightness_threshold: 192 # brightnesses below this value will trigger brightening in certain scenes
+  max_brightness: 255 # maximum brightness value that lighting can reach
+  min_brightness: 25 # minimum brightness possible (0 turns off the light, anything higher defaults to minimum)
+  max_kelvin: 4500 # maximum kelvin that lighting can reach
+  min_kelvin: 2000 # minimum kelvin that lighting can reach
+  day_min_luminance: 40 # minimum ambient luminance to trigger transition to night scenes
+  night_max_luminance: 70 # maximum ambient luminance to trigger transition to day scenes
+  lighting_luminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)

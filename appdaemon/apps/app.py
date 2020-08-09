@@ -4,7 +4,6 @@ This class should be the inherited class of every app.
 It inherits methods for interaction with Home Assistant, and includes several useful
 utility functions used by multiple or all apps.
 """
-import datetime
 
 import appdaemon.plugins.hass.hassapi as hass
 
@@ -16,6 +15,7 @@ class App(hass.Hass):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.control = None
+        self.constants = {}
 
     def initialize(self):
         """Allow easy access to control app (which has access to all other apps)."""
@@ -24,7 +24,7 @@ class App(hass.Hass):
     @property
     def scene(self) -> str:
         """Scene is stored in Home Assistant as an input_select entity."""
-        return self.get_state("input_select.scene")
+        return self.entities.input_select.scene.state
 
     @scene.setter
     def scene(self, new_scene: str):
@@ -36,28 +36,18 @@ class App(hass.Hass):
             option=new_scene,
         )
 
-    def morning_time(self) -> datetime.time:
-        """Return the time that night becomes morning (as configured relative to sunrise)."""
-        return (
-            self.sunrise()
-            + datetime.timedelta(minutes=self.control.args["sunrise_offset"])
-        ).time()
-
-    def evening_time(self) -> datetime.time:
-        """Return the time that day becomes night (as configured relative to sunset)."""
-        return (
-            self.sunset()
-            - datetime.timedelta(minutes=self.control.args["sunset_offset"])
-        ).time()
-
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs["targets"] if "targets" in kwargs else "all"
-        for person in self.get_state("person").values():
-            if targets == "all" or (
-                targets == "anyone_home" and person["state"] == "home"
+        for person, info in self.entities.person.items():
+            if any(
+                [
+                    targets == "all",
+                    targets == "anyone_home" and info["state"] == "home",
+                    targets == person,
+                ]
             ):
-                if person["entity_id"] == "person.dan":
+                if person == "dan":
                     mobile_name = "mobile_app_dans_phone"
                     data = {"apns_headers": {"apns-collapse-id": kwargs["title"]}}
                 else:
@@ -67,9 +57,3 @@ class App(hass.Hass):
                     message, title=kwargs["title"], name=mobile_name, data=data,
                 )
                 self.log(f"Notified {targets}: {kwargs['title']}: {message}")
-
-    def anyone_home(self, **kwargs) -> bool:
-        """Check if anyone is home."""
-        return any(
-            person["state"] == "home" for person in self.get_state("person").values()
-        )
