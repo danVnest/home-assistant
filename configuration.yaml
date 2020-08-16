@@ -49,6 +49,9 @@ input_datetime:
   morning_time:
     name: Morning time
     has_time: true
+  bed_time:
+    name: Bed time
+    has_time: true
   circadian_end_time:
     name: End time
     has_time: true

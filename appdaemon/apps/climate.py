@@ -107,11 +107,9 @@ class Climate(app.App):
 
     def get_setting(self, setting_name) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
-        return float(
-            self.get_state(
-                f"input_number.{'sleep_' if self.scene == 'Sleep' else ''}{setting_name}"
-            )
-        )
+        if self.scene == "Sleep" or self.control.is_bed_time():
+            setting_name = f"sleep_{setting_name}"
+        return float(self.get_state(f"input_number.{setting_name}"))
 
     def reset(self):
         """Reset climate control using latest settings."""
@@ -229,7 +227,7 @@ class Climate(app.App):
         self.aircon = True
 
     def __turn_aircon_on(self):
-        """Turn aircon on, calculating mode and handling Sleep and Morning scenes."""
+        """Turn aircon on, calculating mode, handling Sleep/Morning scenes and bed time."""
         if self.climate_control or self.__suggested is False:
             self.__temperature_monitor.start_monitoring()
         if self.__temperature_monitor.is_below_target_temperature():
@@ -243,7 +241,7 @@ class Climate(app.App):
             f" degrees) is {'above' if mode == 'cool' else 'below'} the target ("
             f"{self.get_state(f'input_number.{mode}ing_target_temperature')} degrees)"
         )
-        if self.scene == "Sleep":
+        if self.scene == "Sleep" or self.control.is_bed_time():
             self.__aircons["bedroom"].turn_on(mode, "low")
             for room in ["living_room", "dining_room"]:
                 self.__aircons[room].turn_off()
@@ -450,8 +448,9 @@ class TemperatureMonitor:
 
     def start_monitoring(self):
         """Get values from appropriate sensors and calculate inside temperature."""
+        bed = self.controller.scene == "Sleep" or self.controller.control.is_bed_time()
         for sensor in self.sensors.values():
-            if self.controller.scene == "Sleep" and sensor.location == "inside":
+            if bed and sensor.location == "inside":
                 sensor.disable()
             else:
                 sensor.enable()

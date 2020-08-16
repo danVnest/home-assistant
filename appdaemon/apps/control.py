@@ -20,7 +20,11 @@ class Control(app.App):
         self.media = None
         self.presence = None
         self.safety = None
-        self.__timers = {"morning_timer": None, "setting_delay_timers": {}}
+        self.__timers = {
+            "morning_time": None,
+            "bed_time": None,
+            "setting_delay_timers": {},
+        }
 
     def initialize(self):
         """Monitor logs, listen for user input, monitor batteries and set timers.
@@ -50,8 +54,9 @@ class Control(app.App):
             "switch2_battery_level",
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
+        self.__set_timer("morning_time")
+        self.__set_timer("bed_time")
         self.listen_event(self.__add_app, "app_initialized", namespace="admin")
-        self.__set_morning_timer()
 
     def __add_app(self, event_name: str, data: dict, kwargs: dict):
         """Link the app and check if all are now ready."""
@@ -86,14 +91,23 @@ class Control(app.App):
         else:
             self.scene = "Night"
 
-    def __set_morning_timer(self, time: str = None):
-        """Set morning timer as specified by the setting morning_time (or as supplied)."""
-        self.cancel_timer(self.__timers["morning_timer"])
-        self.__timers["morning_timer"] = self.run_daily(
-            self.__morning, time if time else self.get_setting("morning_time")
+    def __set_timer(self, name: str):
+        """Set morning or bed timer as specified by the corresponding settings."""
+        self.cancel_timer(self.__timers[name])
+        self.__timers[name] = self.run_daily(
+            self.__morning_time if name == "morning_time" else self.__bed_time,
+            self.get_setting(name),
         )
 
-    def __morning(self, kwargs: dict):
+    def __are_time_settings_valid(self) -> bool:
+        """Check if morning and bed times are appropriate."""
+        return (
+            self.parse_time(self.get_setting("morning_time"))
+            < self.parse_time("12:00:00")
+            < self.parse_time(self.get_setting("bed_time"))
+        )
+
+    def __morning_time(self, kwargs: dict):
         """Change scene to Morning (callback for daily timer)."""
         del kwargs
         self.log(f"Morning timer triggered")
@@ -101,6 +115,16 @@ class Control(app.App):
             self.scene = "Morning"
         else:
             self.log(f"Scene was not changed as it was {self.scene}, not Morning.")
+
+    def __bed_time(self, kwargs: dict):
+        """Adjust climate control when approaching bed time (callback for daily timer)."""
+        del kwargs
+        self.log(f"Bed timer triggered")
+        self.climate.reset()
+
+    def is_bed_time(self) -> bool:
+        """Return if the time is after bed time (and before midnight)."""
+        return self.time() > self.parse_time(self.get_setting("bed_time"))
 
     def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
@@ -133,7 +157,7 @@ class Control(app.App):
 
     def get_setting(self, setting_name: str) -> int:
         """Get UI input_number setting values."""
-        if setting_name == "morning_time":
+        if setting_name.endswith("_time"):
             return self.get_state(f"input_datetime.{setting_name}")
         return int(float(self.get_state(f"input_number.{setting_name}")))
 
@@ -169,11 +193,9 @@ class Control(app.App):
                 self.lights.redate_circadian(None)
             except ValueError:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
-        elif setting == "morning_time":
-            if self.parse_datetime(kwargs["new"]) < datetime.datetime.combine(
-                self.date(), self.sunrise().time()
-            ):
-                self.__set_morning_timer(kwargs["new"])
+        elif setting.endswith("_time"):
+            if self.__are_time_settings_valid():
+                self.__set_timer(setting)
             else:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif "temperature" in setting:

@@ -7,6 +7,7 @@ views:
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
           - entity: input_datetime.morning_time
+          - entity: input_datetime.bed_time
         show_header_toggle: false
         title: Control
         type: entities
@@ -150,6 +151,10 @@ views:
           Lighting in the kitchen and entryway will automatically brighten when
           someone enters, and dim shortly after they leave (depending on scene
           settings).
+
+
+          Only the bedroom aircon will be controlled after the specified bed
+          time.
         type: markdown
       - aspect_ratio: '2'
         dark_mode: false
