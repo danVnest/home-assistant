@@ -21,8 +21,8 @@ views:
         conditions:
           - entity: input_boolean.climate_control
             state: 'on'
-          - entity: input_select.scene
-            state_not: Sleep
+          - entity: binary_sensor.display_day_card
+            state: 'on'
         type: conditional
       - card:
           entities:
@@ -34,8 +34,8 @@ views:
         conditions:
           - entity: input_boolean.climate_control
             state: 'on'
-          - entity: input_select.scene
-            state: Sleep
+          - entity: binary_sensor.display_day_card
+            state: 'off'
         type: conditional
       - card:
           entities:
@@ -47,8 +47,8 @@ views:
         conditions:
           - entity: sensor.any_climate_control
             state: 'True'
-          - entity: input_select.scene
-            state_not: Sleep
+          - entity: binary_sensor.display_day_card
+            state: 'on'
         type: conditional
       - card:
           entities:
@@ -60,8 +60,8 @@ views:
         conditions:
           - entity: sensor.any_climate_control
             state: 'True'
-          - entity: input_select.scene
-            state: Sleep
+          - entity: binary_sensor.display_day_card
+            state: 'off'
         type: conditional
       - entities:
           - entity: sensor.apparent_inside_temperature_numeric
@@ -179,10 +179,10 @@ views:
           - entity: input_number.low_temperature_trigger
           - entity: sensor.apparent_inside_temperature_numeric
           - entity: sensor.bom_weather_feels_like_c
-        hours_to_show: 72
         refresh_interval: 0
         title: Temperatures
         type: history-graph
+        hours_to_show: 24
       - cards:
           - entity: climate.living_room
             type: thermostat

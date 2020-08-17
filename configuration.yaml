@@ -3,6 +3,14 @@ badnest:
   cookie: !secret badnest_cookie
   region: !secret badnest_region
 
+binary_sensor:
+  - platform: template
+    sensors:
+      display_day_card:
+        value_template: >
+           {% set time = now() %}
+           {{ states.input_select.scene.state != "Sleep" and states.input_datetime.bed_time.attributes.timestamp > (time - time.replace(hour=0,minute=0,second=0,microsecond=0)).total_seconds() }}
+
 climate:
   platform: sensibo
   api_key: !secret sensibo_key
