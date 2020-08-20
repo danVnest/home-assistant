@@ -15,14 +15,12 @@ class Control(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.climate = None
-        self.lights = None
-        self.media = None
-        self.presence = None
-        self.safety = None
+        self.apps = dict.fromkeys(["climate", "lights", "media", "presence", "safety"])
+        self.__online = False
         self.__timers = {
             "morning_time": None,
             "bed_time": None,
+            "init_delay": None,
             "setting_delay_timers": {},
         }
 
@@ -32,6 +30,8 @@ class Control(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        for app_name in self.apps:
+            self.apps[app_name] = self.get_app(app_name.capitalize())
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         self.listen_log(self.__handle_log)
@@ -56,29 +56,39 @@ class Control(app.App):
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
         self.__set_timer("morning_time")
         self.__set_timer("bed_time")
+        self.__timers["heartbeat"] = self.run_every(
+            self.__heartbeat,
+            self.datetime() + datetime.timedelta(seconds=5),
+            self.args["heartbeat_period"],
+        )
         self.listen_event(self.__add_app, "app_initialized", namespace="admin")
 
     def __add_app(self, event_name: str, data: dict, kwargs: dict):
-        """Link the app and check if all are now ready."""
-        del event_name, data, kwargs
-        for app_name in ["Climate", "Lights", "Media", "Presence", "Safety"]:
-            setattr(self, app_name.lower(), self.get_app(app_name))
-        if all([self.climate, self.lights, self.media, self.presence, self.safety]):
-            self.log("All apps ready, resetting scene")
-            self.reset_scene()
+        """Link the app and restart the timer that finalises initialisation."""
+        del event_name, kwargs
+        self.apps[data["app"].lower()] = self.get_app(data["app"])
+        if self.__timers["init_delay"] is not None:
+            self.cancel_timer(self.__timers["init_delay"])
+        self.__timers["init_delay"] = self.run_in(
+            self.__all_initialized, self.args["init_delay"]
+        )
+
+    def __all_initialized(self, kwargs: dict = None):
+        """Configure all apps with the current scene."""
+        del kwargs
+        self.log("All apps ready, resetting scene")
+        self.reset_scene()
 
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
         if self.scene == "Bright":
             self.log("Scene was set as 'Bright', will not be reset")
-        elif not self.presence.anyone_home():
-            self.scene = (
-                f"Away ({'Day' if self.lights.is_lighting_sufficient() else 'Night'})"
-            )
-        elif self.lights.is_lighting_sufficient():
+        elif not self.apps["presence"].anyone_home():
+            self.scene = f"Away ({'Day' if self.apps['lights'].is_lighting_sufficient() else 'Night'})"
+        elif self.apps["lights"].is_lighting_sufficient():
             self.scene = "Day"
-        elif self.media.is_playing:
+        elif self.apps["media"].is_playing:
             self.scene = "TV"
         elif (
             self.parse_time(self.get_setting("morning_time"))
@@ -120,7 +130,7 @@ class Control(app.App):
         """Adjust climate control when approaching bed time (callback for daily timer)."""
         del kwargs
         self.log(f"Bed timer triggered")
-        self.climate.reset()
+        self.apps["climate"].reset()
 
     def is_bed_time(self) -> bool:
         """Return if the time is after bed time (and before midnight)."""
@@ -132,11 +142,13 @@ class Control(app.App):
         room = "bedroom" if data["entity_id"] == "zwave.switch1" else "kitchen"
         if data["scene_data"] == 0:  # clicked
             self.log(f"Button in '{room}' clicked")
-            if self.lights.lights[room].brightness == 0:
-                brightness, kelvin = self.lights.calculate_circadian_brightness_kelvin()
-                self.lights.lights[room].adjust(brightness, kelvin)
+            if self.apps["lights"].lights[room].brightness == 0:
+                brightness, kelvin = self.apps[
+                    "lights"
+                ].calculate_circadian_brightness_kelvin()
+                self.apps["lights"].lights[room].adjust(brightness, kelvin)
             else:
-                self.lights.lights[room].turn_off()
+                self.apps["lights"].lights[room].turn_off()
         elif data["scene_data"] == 2:  # held
             self.log(f"Button '{data['entity_id']}' held")
             if room == "bedroom":
@@ -151,9 +163,9 @@ class Control(app.App):
         if "scene" in data:
             self.scene = data["scene"]
         elif "climate_control" in data:
-            self.climate.climate_control = data["climate_control"]
+            self.apps["climate"].climate_control = data["climate_control"]
         elif "aircon" in data:
-            self.climate.aircon = data["aircon"]
+            self.apps["climate"].aircon = data["aircon"]
 
     def get_setting(self, setting_name: str) -> int:
         """Get UI input_number setting values."""
@@ -182,15 +194,15 @@ class Control(app.App):
         (input_type, setting) = kwargs["entity"].split(".")
         self.log(f"UI setting '{setting}' changed to {kwargs['new']}")
         if setting == "scene":
-            self.lights.transition_to_scene(kwargs["new"])
-            self.climate.transition_between_scenes(kwargs["new"], kwargs["old"])
+            self.apps["lights"].transition_to_scene(kwargs["new"])
+            self.apps["climate"].transition_between_scenes(kwargs["new"], kwargs["old"])
             if kwargs["new"] == "Sleep" or "Away" in kwargs["new"]:
-                self.media.standby()
+                self.apps["media"].standby()
         elif input_type == "input_boolean":
-            setattr(self.climate, setting, kwargs["new"] == "on")
+            setattr(self.apps["climate"], setting, kwargs["new"] == "on")
         elif setting.startswith("circadian"):
             try:
-                self.lights.redate_circadian(None)
+                self.apps["lights"].redate_circadian(None)
             except ValueError:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif setting.endswith("_time"):
@@ -199,9 +211,9 @@ class Control(app.App):
             else:
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif "temperature" in setting:
-            self.climate.reset()
+            self.apps["climate"].reset()
         else:
-            self.lights.transition_to_scene(self.scene)
+            self.apps["lights"].transition_to_scene(self.scene)
 
     def __revert_setting(self, setting_id: str, value: str):
         """Revert setting to specified value & notify."""

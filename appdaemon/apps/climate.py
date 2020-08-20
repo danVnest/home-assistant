@@ -157,7 +157,7 @@ class Climate(app.App):
                     f"{message} turning aircon off",
                     title="Aircon",
                     targets="anyone_home"
-                    if self.control.presence.anyone_home()
+                    if self.control.apps["presence"].anyone_home()
                     else "all",
                 )
             else:
@@ -218,7 +218,9 @@ class Climate(app.App):
                 f" aircon will be turned on in {self.args['aircon_trigger_delay']}"
                 " minutes (unless you disable climate control or change temperature settings)",
                 title="Aircon",
-                targets="anyone_home" if self.control.presence.anyone_home() else "all",
+                targets="anyone_home"
+                if self.apps["presence"].presence.anyone_home()
+                else "all",
             )
 
     def __aircon_trigger_timer_up(self, kwargs: dict):
@@ -273,7 +275,9 @@ class Climate(app.App):
                 f"{self.__temperature_monitor.inside_temperature}º) will immediately"
                 " trigger aircon on again - climate control is now disabled to prevent this",
                 title="Climate Control",
-                targets="anyone_home" if self.control.presence.anyone_home() else "all",
+                targets="anyone_home"
+                if self.control.apps["presence"].anyone_home()
+                else "all",
             )
 
     def __disable_climate_control_if_would_trigger_off(self):
@@ -289,7 +293,9 @@ class Climate(app.App):
                 " climate control is now disabled"
                 " (you'll need to manually turn aircon off)",
                 title="Climate Control",
-                targets="anyone_home" if self.control.presence.anyone_home() else "all",
+                targets="anyone_home"
+                if self.control.apps["presence"].anyone_home()
+                else "all",
             )
 
     def __suggest(self, message: str):
@@ -299,7 +305,9 @@ class Climate(app.App):
             self.notify(
                 message,
                 title="Aircon",
-                targets="anyone_home" if self.control.presence.anyone_home() else "all",
+                targets="anyone_home"
+                if self.control.apps["presence"].anyone_home()
+                else "all",
             )
             if self.climate_control is False:
                 self.__temperature_monitor.stop_monitoring()

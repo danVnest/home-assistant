@@ -1,5 +1,6 @@
 Control:
   module: control
   class: Control
+  init_delay: 10
   settings_change_delay: 2
   priority: 1
