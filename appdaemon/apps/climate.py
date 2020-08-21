@@ -430,7 +430,6 @@ class TemperatureMonitor:
                 "climate.bedroom",
                 "climate.living_room",
                 "climate.dining_room",
-                "sensor.entryway_multisensor",
                 "sensor.kitchen_multisensor",
                 "sensor.bom_weather_feels_like_c",
             ]
