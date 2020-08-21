@@ -219,7 +219,7 @@ class Climate(app.App):
                 " minutes (unless you disable climate control or change temperature settings)",
                 title="Aircon",
                 targets="anyone_home"
-                if self.apps["presence"].presence.anyone_home()
+                if self.control.apps["presence"].presence.anyone_home()
                 else "all",
             )
 
