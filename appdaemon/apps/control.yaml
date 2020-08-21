@@ -3,4 +3,7 @@ Control:
   class: Control
   init_delay: 10
   settings_change_delay: 2
+  heartbeat_url: !secret heartbeat_url
+  heartbeat_timeout: 30
+  heartbeat_period: 60
   priority: 1

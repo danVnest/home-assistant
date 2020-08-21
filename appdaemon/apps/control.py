@@ -5,6 +5,8 @@ Schedules scene changes, reacts to user input, reports errors & low batteries.
 User defined variables are configued in control.yaml
 """
 import datetime
+import socket
+import urllib.request
 
 import app
 
@@ -22,6 +24,7 @@ class Control(app.App):
             "bed_time": None,
             "init_delay": None,
             "setting_delay_timers": {},
+            "heartbeat": None,
         }
 
     def initialize(self):
@@ -57,9 +60,7 @@ class Control(app.App):
         self.__set_timer("morning_time")
         self.__set_timer("bed_time")
         self.__timers["heartbeat"] = self.run_every(
-            self.__heartbeat,
-            self.datetime() + datetime.timedelta(seconds=5),
-            self.args["heartbeat_period"],
+            self.__heartbeat, "now", self.args["heartbeat_period"],
         )
         self.listen_event(self.__add_app, "app_initialized", namespace="admin")
 
@@ -240,6 +241,22 @@ class Control(app.App):
                 self.notify(f"{entity} is low", title="Low Battery", targets="dan")
         elif float(new) <= 20:
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
+
+    def __heartbeat(self, kwargs: dict):
+        """Send a heartbeat then handle if it is received or not."""
+        del kwargs
+        try:
+            urllib.request.urlopen(
+                self.args["heartbeat_url"], timeout=self.args["heartbeat_timeout"],
+            )
+        except socket.error:
+            if self.__online:
+                self.__online = False
+                self.error("Heartbeat timed out")
+        else:
+            if not self.__online:
+                self.__online = True
+                self.log("Heartbeat sent and received")
 
     def __handle_log(
         self,
