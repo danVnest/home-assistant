@@ -357,13 +357,23 @@ class Sensor:
                 self.monitor.controller.cancel_listen_state(listener)
                 self.listeners[name] = None
 
+    def validate_measure(self, value: str) -> float:
+        """Return numerical value of measure, warning if invalid."""
+        try:
+            return float(value)
+        except TypeError:
+            self.monitor.controller.log(
+                f"{self.sensor_id} could not get measure", level="WARNING"
+            )
+            return None
+
 
 class ClimateSensor(Sensor):
     """Capture temperature and humidity data from climate.x entities."""
 
     def get_measure(self, measure) -> float:
         """Get latest value from the sensor in Home Assistant."""
-        return float(
+        return self.validate_measure(
             self.monitor.controller.get_state(
                 self.sensor_id, attribute=f"current_{measure}"
             )
@@ -386,7 +396,9 @@ class MultiSensor(Sensor):
 
     def get_measure(self, measure) -> float:
         """Get latest value from the sensor in Home Assistant."""
-        return float(self.monitor.controller.get_state(f"{self.sensor_id}_{measure}"))
+        return self.validate_measure(
+            self.monitor.controller.get_state(f"{self.sensor_id}_{measure}")
+        )
 
     def enable(self):
         """Initialise sensor values and listen for further updates."""
@@ -493,8 +505,8 @@ class TemperatureMonitor:
                 humidities.append(sensor.get_measure("humidity"))
         self.inside_temperature = round(
             heat_index(
-                temperature=Temp(statistics.mean(temperatures), "c",),
-                humidity=statistics.mean(humidities),
+                temperature=Temp(statistics.mean(filter(None, temperatures)), "c",),
+                humidity=statistics.mean(filter(None, humidities)),
             ).c,
             1,
         )

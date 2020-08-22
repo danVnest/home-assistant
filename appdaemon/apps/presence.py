@@ -85,10 +85,22 @@ class Room:
         """Initialise with attributes for light parameters, and a Light controller."""
         self.room_id = room_id
         self.controller = controller
-        vacant = float(self.controller.get_state(sensor_id)) == 0
-        last_changed = self.controller.convert_utc(
-            self.controller.get_state(sensor_id, attribute="last_changed")
-        ).replace(tzinfo=None) + timedelta(minutes=self.controller.get_tz_offset())
+        try:
+            vacant = float(self.controller.get_state(sensor_id)) == 0
+            last_changed = self.controller.convert_utc(
+                self.controller.get_state(sensor_id, attribute="last_changed")
+            ).replace(tzinfo=None) + timedelta(minutes=self.controller.get_tz_offset())
+        except ValueError:
+            self.controller.notify(
+                f"Sensor in {room_id} is {self.controller.get_state(sensor_id)}",
+                title="Sensor Error",
+                targets="dan",
+            )
+            self.controller.log(
+                f"Initialising room {room_id} with default state", level="WARNING"
+            )
+            vacant = True
+            last_changed = self.controller.datetime()
         self.last_vacated = last_changed - timedelta(hours=0 if vacant else 2)
         self.last_entered = last_changed - timedelta(hours=2 if vacant else 0)
         self.callbacks = {}
