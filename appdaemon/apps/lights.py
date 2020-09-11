@@ -122,7 +122,7 @@ class Lights(app.App):
             self.lights["dining"].adjust(
                 self.args["max_brightness"], self.args["max_kelvin"]
             )
-            for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+            for light_name in ["tv", "hall", "bedroom", "office"]:
                 self.lights[light_name].turn_off()
         self.log(f"Light scene changed to {scene}")
 
