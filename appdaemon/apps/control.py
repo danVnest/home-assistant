@@ -140,7 +140,7 @@ class Control(app.App):
     def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
-        room = "bedroom" if data["entity_id"] == "zwave.switch1" else "kitchen"
+        room = data["entity_id"].replace("zwave.", "").replace("_button", "")
         if data["scene_data"] == 0:  # clicked
             self.log(f"Button in '{room}' clicked")
             if self.apps["lights"].lights[room].brightness == 0:
