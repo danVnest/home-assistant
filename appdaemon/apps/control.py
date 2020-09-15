@@ -25,6 +25,7 @@ class Control(app.App):
             "init_delay": None,
             "setting_delay_timers": {},
             "heartbeat": None,
+            "heartbeat_fail_count": 0,
         }
 
     def initialize(self):
@@ -250,12 +251,18 @@ class Control(app.App):
                 self.args["heartbeat_url"], timeout=self.args["heartbeat_timeout"],
             )
         except socket.error:
-            if self.__online:
+            self.__timers["heartbeat_fail_count"] += 1
+            if (
+                self.__online
+                and self.__timers["heartbeat_fail_count"]
+                >= self.args["heartbeat_max_fail_count"]
+            ):
                 self.__online = False
                 self.error("Heartbeat timed out")
         else:
             if not self.__online:
                 self.__online = True
+                self.__timers["heartbeat_fail_count"] = 0
                 self.log("Heartbeat sent and received")
 
     def __handle_log(
