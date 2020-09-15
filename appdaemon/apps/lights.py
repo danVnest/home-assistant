@@ -32,7 +32,7 @@ class Lights(app.App):
         """
         super().initialize()
         self.lights["entryway"] = Light("group.entryway_lights", self)
-        self.lights["kitchen"] = Light("light.kitchen", self)
+        self.lights["kitchen"] = Light("group.kitchen_lights", self)
         self.lights["tv"] = Light("group.tv_lights", self)
         self.lights["dining"] = Light("group.dining_lights", self)
         self.lights["hall"] = Light("light.hall", self)

@@ -4,6 +4,12 @@ entryway_lights:
     - light.entryway
     - light.stairway
 
+kitchen_lights:
+  name: Kitchen Lights
+  entities:
+    - light.kitchen
+    - light.kitchen_strip
+
 tv_lights:
   name: TV Lights
   entities:

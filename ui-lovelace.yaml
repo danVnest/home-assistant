@@ -74,7 +74,7 @@ views:
           - entities:
               - entity: group.all_lights
               - entity: group.entryway_lights
-              - entity: light.kitchen
+              - entity: group.kitchen_lights
               - entity: group.tv_lights
               - entity: group.dining_lights
               - entity: light.hall
