@@ -269,6 +269,10 @@ views:
             title: Morning
             type: entities
         type: vertical-stack
+      - type: entities
+        entities:
+          - entity: input_number.office_vacating_delay
+        title: Office
     path: lights
     title: Lights
   - badges:

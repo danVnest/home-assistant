@@ -223,6 +223,11 @@ input_number:
     min: 0
     max: 300
     step: 15
+  office_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
 
 input_select:
   scene:

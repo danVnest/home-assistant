@@ -29,6 +29,7 @@ all_lights:
   - light.entryway
   - light.stairway
   - light.kitchen
+  - light.kitchen_strip
   - light.tv_left
   - light.tv_middle
   - light.tv_right

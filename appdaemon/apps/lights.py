@@ -61,8 +61,19 @@ class Lights(app.App):
             self.__circadian["timer"] = None
         if "Day" in scene:
             for light in self.lights.values():
-                light.ignore_presence()
-                light.turn_off()
+                if light.room_name == "office":
+                    light.set_presence_adjustments(
+                        occupied=(self.args["max_brightness"], self.args["max_kelvin"]),
+                        vacating_delay=self.control.get_setting(
+                            "office_vacating_delay"
+                        ),
+                    )
+                    self.log(
+                        self.control.apps["presence"].rooms["office"].seconds_in_room()
+                    )
+                else:
+                    light.ignore_presence()
+                    light.turn_off()
         elif scene == "Night":
             self.__start_circadian()
         elif scene == "Bright":
@@ -99,7 +110,11 @@ class Lights(app.App):
                     ),
                     vacating_delay=self.control.get_setting("sleep_vacating_delay"),
                 )
-            for light_name in ["tv", "dining", "hall", "bedroom", "office"]:
+            self.lights["office"].set_presence_adjustments(
+                occupied=(self.args["min_brightness"], self.args["min_kelvin"]),
+                vacating_delay=self.control.get_setting("office_vacating_delay"),
+            )
+            for light_name in ["tv", "dining", "hall", "bedroom"]:
                 self.lights[light_name].turn_off()
         elif scene == "Morning":
             brightness = self.control.get_setting("morning_brightness")
@@ -112,6 +127,10 @@ class Lights(app.App):
                 vacant=(brightness, kelvin),
                 occupied=(self.args["max_brightness"], kelvin),
                 vacating_delay=vacating_delay,
+            )
+            self.lights["office"].set_presence_adjustments(
+                occupied=(brightness, kelvin),
+                vacating_delay=self.control.get_setting("office_vacating_delay"),
             )
         elif scene == "Away (Night)":
             for light_name in ["entryway", "kitchen"]:
@@ -177,9 +196,12 @@ class Lights(app.App):
         )
         for light_name in ["tv", "dining", "hall"]:
             self.lights[light_name].adjust(brightness, kelvin)
-        for light_name in ["bedroom", "office"]:
-            if self.lights[light_name].brightness != 0:
-                self.lights[light_name].adjust(brightness, kelvin)
+        self.lights["office"].set_presence_adjustments(
+            occupied=(brightness, kelvin),
+            vacating_delay=self.control.get_setting("office_vacating_delay"),
+        )
+        if self.lights["bedroom"].brightness != 0:
+            self.lights["bedroom"].adjust(brightness, kelvin)
         self.log("Adjusted lighting based on circadian progression", level="DEBUG")
 
     def __calculate_circadian_progress(self) -> float:
@@ -327,9 +349,9 @@ class Light:
             - self.controller.args["min_brightness"]
         ) / 2
         self.room_name = (
-            light_id.split(".", 1)[-1]
+            light_id.replace("light.", "")
             if light_id.startswith("light")
-            else light_id.split(".", 1)[-1].split("_")[0]
+            else light_id.replace("group.", "").replace("_lights", "")
         )
         self.__presence_adjustments = {}
         self.__transition_timer = None
