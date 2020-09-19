@@ -33,9 +33,6 @@ group: !include groups.yaml
 
 history:
 
-homeassistant:
-  customize: !include customize.yaml
-
 http:
   base_url: !secret http_url
   server_port: !secret http_port
