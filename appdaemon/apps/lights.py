@@ -132,6 +132,8 @@ class Lights(app.App):
                 occupied=(brightness, kelvin),
                 vacating_delay=self.control.get_setting("office_vacating_delay"),
             )
+            for light_name in ["tv", "dining", "hall"]:
+                self.lights[light_name].turn_off()
         elif scene == "Away (Night)":
             for light_name in ["entryway", "kitchen"]:
                 self.lights[light_name].set_presence_adjustments(

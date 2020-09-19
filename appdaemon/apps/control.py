@@ -92,7 +92,7 @@ class Control(app.App):
             self.scene = "Day"
         elif self.apps["media"].is_playing:
             self.scene = "TV"
-        elif (
+        elif self.scene in ("Morning", "Sleep") and (
             self.parse_time(self.get_setting("morning_time"))
             < self.time()
             < self.parse_time("12:00:00")
