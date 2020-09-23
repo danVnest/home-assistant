@@ -221,7 +221,12 @@ input_number:
     max: 300
     step: 15
   office_vacating_delay:
-    name: Vacating delay
+    name: Office
+    min: 0
+    max: 300
+    step: 15
+  bedroom_vacating_delay:
+    name: Bedroom
     min: 0
     max: 300
     step: 15
@@ -268,11 +273,11 @@ light:
   name: Hall
   host: 192.168.20.50
 - platform: wiz_light
-  name: Bedroom
-  host: 192.168.20.84
-- platform: wiz_light
   name: Office
   host: 192.168.20.83
+- platform: wiz_light
+  name: Bedroom
+  host: 192.168.20.84
 
 logbook:
 

@@ -26,7 +26,7 @@ class Presence(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        for room in ["entryway", "kitchen", "office"]:
+        for room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[room] = Room(room, f"sensor.{room}_multisensor_motion", self)
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")

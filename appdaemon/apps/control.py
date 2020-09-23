@@ -54,6 +54,7 @@ class Control(app.App):
             "garage_protect_battery_health_state",
             "entryway_multisensor_battery_level",
             "kitchen_multisensor_battery_level",
+            "bedroom_multisensor_battery_level",
             "kitchen_button_battery_level",
             "bedroom_button_battery_level",
         ]:
@@ -144,19 +145,51 @@ class Control(app.App):
         room = data["entity_id"].replace("zwave.", "").replace("_button", "")
         if data["scene_data"] == 0:  # clicked
             self.log(f"Button in '{room}' clicked")
-            if self.apps["lights"].lights[room].brightness == 0:
-                brightness, kelvin = self.apps[
-                    "lights"
-                ].calculate_circadian_brightness_kelvin()
-                self.apps["lights"].lights[room].adjust(brightness, kelvin)
-            else:
-                self.apps["lights"].lights[room].turn_off()
+            if room == "kitchen":
+                if self.scene == "Night":
+                    if self.apps["lights"].is_lighting_sufficient():
+                        self.scene = "Day"
+                    elif self.apps["media"].is_playing:
+                        self.scene = "TV"
+                    else:
+                        self.scene = "Bright"
+                else:
+                    self.scene = "Night"
+            elif room == "bedroom":
+                self.__bedroom_button_clicked()
         elif data["scene_data"] == 2:  # held
-            self.log(f"Button '{data['entity_id']}' held")
-            if room == "bedroom":
-                self.scene = "Sleep" if self.scene == "Night" else "Night"
+            self.log(f"Button in '{room}' held")
+            self.scene = "Bright" if self.scene not in ("Sleep", "Bright") else "Night"
+
+    def __bedroom_button_clicked(self):
+        """Handle the bedroom button being clicked."""
+        if self.scene == "Night":
+            brightness, kelvin = self.apps[
+                "lights"
+            ].calculate_circadian_brightness_kelvin()
+            self.scene = "Sleep"
+            self.apps["lights"].lights["bedroom"].adjust(brightness, kelvin)
+        elif self.scene == "Sleep":
+            if self.apps["lights"].lights["bedroom"].brightness == 0:
+                self.scene = "Night"
             else:
-                self.scene = "Night" if self.scene in ("Bright", "TV") else "Bright"
+                self.apps["lights"].lights["bedroom"].turn_off()
+        elif self.scene == "Morning":
+            if self.apps["lights"].lights["bedroom"].is_ignoring_presence():
+                self.apps["lights"].lights["bedroom"].set_presence_adjustments(
+                    occupied=(
+                        self.apps["lights"].args["max_brightness"],
+                        self.apps["lights"].args["max_kelvin"],
+                    ),
+                    vacating_delay=self.control.get_setting("bedroom_vacating_delay"),
+                )
+            else:
+                self.apps["lights"].lights["bedroom"].ignore_presence()
+                self.apps["lights"].lights["bedroom"].turn_off()
+        elif self.apps["lights"].is_lighting_sufficient():
+            self.scene = "Day"
+        else:
+            self.scene = "Night"
 
     def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""

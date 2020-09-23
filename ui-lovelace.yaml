@@ -142,10 +142,13 @@ views:
           Automatically triggered when both of us have left the house.
 
 
-          The **buttons** in the kitchen and bedroom will toggle their
-          corresponding light. Holding a button will toggle the scene (between
-          ***Bright*** and ***Night*** for the kitchen, and ***Sleep*** and
-          ***Night*** for the bedroom).
+          The **buttons** in the kitchen and bedroom will intelligently change
+          scene based on current conditions. The bedroom button's key functions
+          are to transition the scene from ***Night*** to ***Sleep*** while
+          keeping the bedroom light on. When pressed again it will turn the
+          bedroom light off. In the morning the button will re-enable motion
+          detection based light control in the bedroom. Holding either button
+          will toggle the scene between ***Bright*** and ***Night***.
 
 
           Lighting in the kitchen and entryway will automatically brighten when
@@ -179,10 +182,10 @@ views:
           - entity: input_number.low_temperature_trigger
           - entity: sensor.apparent_inside_temperature_numeric
           - entity: sensor.bom_weather_feels_like_c
+        hours_to_show: 24
         refresh_interval: 0
         title: Temperatures
         type: history-graph
-        hours_to_show: 24
       - cards:
           - entity: climate.living_room
             type: thermostat
@@ -269,10 +272,11 @@ views:
             title: Morning
             type: entities
         type: vertical-stack
-      - type: entities
-        entities:
+      - entities:
           - entity: input_number.office_vacating_delay
-        title: Office
+          - entity: input_number.bedroom_vacating_delay
+        title: Room Vacating Delays
+        type: entities
     path: lights
     title: Lights
   - badges:
@@ -283,7 +287,7 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
-        hours_to_show: 72
+        hours_to_show: 36
         refresh_interval: 0
         title: Control History
         type: history-graph
@@ -298,10 +302,12 @@ views:
           - entity: sensor.entryway_protect_battery_health_state
           - entity: sensor.living_room_protect_battery_health_state
           - entity: sensor.garage_protect_battery_health_state
+          - entity: sensor.entryway_multisensor_battery_level
           - entity: sensor.kitchen_multisensor_battery_level
-          - entity: sensor.multisensor_battery_level
-          - entity: sensor.switch1_battery_level
-          - entity: sensor.switch2_battery_level
+          - entity: sensor.bedroom_multisensor_battery_level
+          - entity: sensor.office_multisensor_battery_level
+          - entity: sensor.kitchen_button_battery_level
+          - entity: sensor.bedroom_button_battery_level
         hours_to_show: 72
         refresh_interval: 0
         title: Battery Levels
