@@ -92,8 +92,8 @@ views:
         type: vertical-stack
       - content: >-
           **Lighting** and **climate settings** (if enabled) are automatically
-          adjusted between different scenes. You can select a preferred scene
-          here or tell Siri or Google:
+          adjusted between different scenes. You can also manually select a
+          preferred scene here, or tell Siri/Google:
 
           - **"lights on"** or **"lights off"** for the *Night* and *Day* scenes
 
@@ -103,8 +103,9 @@ views:
 
 
           **Automatic climate control** will control all aircon units based on
-          the temperature and scene. **Aircon** can also be manually turned on
-          and off. These settings can be controlled by telling Siri or Google:
+          the current scene and the temperature throughout the house as well as
+          outside. **Aircon** can also be manually turned on and off. These
+          settings can be controlled by telling Siri/Google:
 
           - **"climate control on"** or **"climate control off"**
 
@@ -143,21 +144,23 @@ views:
 
 
           The **buttons** in the kitchen and bedroom will intelligently change
-          scene based on current conditions. The bedroom button's key functions
-          are to transition the scene from ***Night*** to ***Sleep*** while
-          keeping the bedroom light on. When pressed again it will turn the
-          bedroom light off. Otherwise the button will toggle motion detection
-          based light control in the bedroom. Holding either button will toggle
-          the scene between ***Bright*** and ***Night***.
+          scene based on the current conditions. The bedroom button's key
+          functions are to transition the scene from ***Night*** to ***Sleep***
+          while keeping the bedroom light on. When clicked again it will turn
+          the bedroom light off. Otherwise the bedroom button will toggle motion
+          detection based light control in the room. Holding either button will
+          toggle the scene between ***Bright*** and ***Night***.
 
 
-          Lighting in the kitchen and entryway will automatically brighten when
-          someone enters, and dim shortly after they leave (depending on scene
-          settings).
+          Lighting in the entryway, kitchen, office and bedroom will
+          automatically brighten when someone enters, and dim shortly after they
+          leave (depending on scene settings). Bedroom light adjustments are
+          disabled as soon as the *Sleep* scene starts, only enabling again when
+          the bedroom **button** is clicked.
 
 
           Only the bedroom aircon will be controlled after the specified bed
-          time.
+          time, regardless of the scene.
         type: markdown
       - aspect_ratio: '2'
         dark_mode: false
