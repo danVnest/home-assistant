@@ -10,7 +10,6 @@ User defined variables are configued in climate.yaml
 """
 from __future__ import annotations
 
-import statistics
 from typing import Type
 
 from meteocalc import Temp, heat_index
@@ -443,6 +442,8 @@ class TemperatureMonitor:
                 "climate.living_room",
                 "climate.dining_room",
                 "sensor.kitchen_multisensor",
+                "sensor.office_multisensor",
+                "sensor.bedroom_multisensor",
                 "sensor.bom_weather_feels_like_c",
             ]
         }
@@ -501,12 +502,16 @@ class TemperatureMonitor:
         all_disabled = not self.is_monitoring()
         for sensor in self.sensors.values():
             if (all_disabled or sensor.is_enabled()) and sensor.location != "outside":
-                temperatures.append(sensor.get_measure("temperature"))
-                humidities.append(sensor.get_measure("humidity"))
+                temperature = sensor.get_measure("temperature")
+                if temperature is not None:
+                    temperatures.append(temperature)
+                humidity = sensor.get_measure("humidity")
+                if humidity is not None:
+                    humidities.append(humidity)
         self.inside_temperature = round(
             heat_index(
-                temperature=Temp(statistics.mean(filter(None, temperatures)), "c",),
-                humidity=statistics.mean(filter(None, humidities)),
+                temperature=Temp(sum(temperatures) / len(temperatures), "c",),
+                humidity=sum(humidities) / len(humidities),
             ).c,
             1,
         )
