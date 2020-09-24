@@ -146,9 +146,9 @@ views:
           scene based on current conditions. The bedroom button's key functions
           are to transition the scene from ***Night*** to ***Sleep*** while
           keeping the bedroom light on. When pressed again it will turn the
-          bedroom light off. In the morning the button will re-enable motion
-          detection based light control in the bedroom. Holding either button
-          will toggle the scene between ***Bright*** and ***Night***.
+          bedroom light off. Otherwise the button will toggle motion detection
+          based light control in the bedroom. Holding either button will toggle
+          the scene between ***Bright*** and ***Night***.
 
 
           Lighting in the kitchen and entryway will automatically brighten when

@@ -144,52 +144,51 @@ class Control(app.App):
         del event_name, kwargs
         room = data["entity_id"].replace("zwave.", "").replace("_button", "")
         if data["scene_data"] == 0:  # clicked
-            self.log(f"Button in '{room}' clicked")
-            if room == "kitchen":
-                if self.scene == "Night":
-                    if self.apps["lights"].is_lighting_sufficient():
-                        self.scene = "Day"
-                    elif self.apps["media"].is_playing:
-                        self.scene = "TV"
-                    else:
-                        self.scene = "Bright"
-                else:
-                    self.scene = "Night"
-            elif room == "bedroom":
-                self.__bedroom_button_clicked()
+            self.__button_clicked(room)
         elif data["scene_data"] == 2:  # held
             self.log(f"Button in '{room}' held")
             self.scene = "Bright" if self.scene not in ("Sleep", "Bright") else "Night"
 
-    def __bedroom_button_clicked(self):
-        """Handle the bedroom button being clicked."""
-        if self.scene == "Night":
-            brightness, kelvin = self.apps[
-                "lights"
-            ].calculate_circadian_brightness_kelvin()
-            self.scene = "Sleep"
-            self.apps["lights"].lights["bedroom"].adjust(brightness, kelvin)
-        elif self.scene == "Sleep":
-            if self.apps["lights"].lights["bedroom"].brightness == 0:
+    def __button_clicked(self, room: str):
+        """Handle a button click."""
+        self.log(f"Button in '{room}' clicked")
+        if room == "kitchen":
+            if self.scene == "Night":
+                if self.apps["lights"].is_lighting_sufficient():
+                    self.scene = "Day"
+                elif self.apps["media"].is_playing:
+                    self.scene = "TV"
+                else:
+                    self.scene = "Bright"
+            else:
                 self.scene = "Night"
+        elif room == "bedroom":
+            if self.scene == "Night":
+                brightness, kelvin = self.apps[
+                    "lights"
+                ].calculate_circadian_brightness_kelvin()
+                self.scene = "Sleep"
+                self.apps["lights"].lights["bedroom"].adjust(brightness, kelvin)
+                self.log("Bedroom light kept on")
+            elif self.scene == "Sleep":
+                if self.apps["lights"].lights["bedroom"].brightness == 0:
+                    self.scene = "Night"
+                else:
+                    self.apps["lights"].lights["bedroom"].turn_off()
+                    self.log("Bedroom light turned off")
             else:
-                self.apps["lights"].lights["bedroom"].turn_off()
-        elif self.scene == "Morning":
-            if self.apps["lights"].lights["bedroom"].is_ignoring_presence():
-                self.apps["lights"].lights["bedroom"].set_presence_adjustments(
-                    occupied=(
-                        self.apps["lights"].args["max_brightness"],
-                        self.apps["lights"].args["max_kelvin"],
-                    ),
-                    vacating_delay=self.control.get_setting("bedroom_vacating_delay"),
+                adjusting = (
+                    self.apps["lights"]
+                    .lights["bedroom"]
+                    .toggle_presence_adjustments(
+                        occupied=(
+                            self.apps["lights"].args["max_brightness"],
+                            self.apps["lights"].args["max_kelvin"],
+                        ),
+                        vacating_delay=self.get_setting("bedroom_vacating_delay"),
+                    )
                 )
-            else:
-                self.apps["lights"].lights["bedroom"].ignore_presence()
-                self.apps["lights"].lights["bedroom"].turn_off()
-        elif self.apps["lights"].is_lighting_sufficient():
-            self.scene = "Day"
-        else:
-            self.scene = "Night"
+                self.log(f"Bedroom light is now adjusting with presence: {adjusting}")
 
     def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
