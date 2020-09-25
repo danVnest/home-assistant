@@ -20,6 +20,7 @@ class Lights(app.App):
         super().__init__(*args, **kwargs)
         self.__circadian = {}
         self.lights = {}
+        self.alternative_scene = False
         self.constants["brightness_per_step"] = 2.55
         self.constants["kelvin_per_step"] = 20
         self.constants["mired_kelvin_reciprocal"] = 1e6
@@ -118,9 +119,15 @@ class Lights(app.App):
                 occupied=(self.args["min_brightness"], self.args["min_kelvin"]),
                 vacating_delay=self.control.get_setting("office_vacating_delay"),
             )
-            for light_name in ["tv", "dining", "hall", "bedroom"]:
+            for light_name in ["tv", "dining", "hall"]:
                 self.lights[light_name].ignore_presence()
                 self.lights[light_name].turn_off()
+            self.lights["bedroom"].ignore_presence()
+            if not self.alternative_scene:
+                self.lights["bedroom"].turn_off()
+            else:
+                self.log("Kept bedroom light on")
+                self.alternative_scene = False
         elif scene == "Morning":
             brightness = self.control.get_setting("morning_brightness")
             kelvin = self.control.get_setting("morning_kelvin")

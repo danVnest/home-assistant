@@ -164,12 +164,8 @@ class Control(app.App):
                 self.scene = "Night"
         elif room == "bedroom":
             if self.scene == "Night":
-                brightness, kelvin = self.apps[
-                    "lights"
-                ].calculate_circadian_brightness_kelvin()
+                self.apps["lights"].alternative_scene = True
                 self.scene = "Sleep"
-                self.apps["lights"].lights["bedroom"].adjust(brightness, kelvin)
-                self.log("Bedroom light kept on")
             elif self.scene == "Sleep":
                 if self.apps["lights"].lights["bedroom"].brightness == 0:
                     self.scene = "Night"
