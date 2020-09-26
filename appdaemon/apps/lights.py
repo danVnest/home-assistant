@@ -561,7 +561,7 @@ class Light:
 
     def is_ignoring_presence(self) -> bool:
         """Check if the light is ignoring presence in the room or not."""
-        return "handle" not in self.__presence_adjustments
+        return self.__presence_adjustments["handle"] is None
 
     def toggle_presence_adjustments(self, **adjustments: dict) -> bool:
         """Toggle between adjusting lighting based on presence and staying off."""
