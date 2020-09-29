@@ -33,7 +33,8 @@ class Lights(app.App):
         """
         super().initialize()
         self.lights["entryway"] = Light("group.entryway_lights", self)
-        self.lights["kitchen"] = Light("group.kitchen_lights", self)
+        self.lights["kitchen"] = Light("light.kitchen", self)
+        self.lights["kitchen_strip"] = Light("light.kitchen_strip", self, "kitchen")
         self.lights["tv"] = Light("group.tv_lights", self)
         self.lights["dining"] = Light("group.dining_lights", self)
         self.lights["hall"] = Light("light.hall", self)
@@ -73,6 +74,7 @@ class Lights(app.App):
             for light_name in [
                 "entryway",
                 "kitchen",
+                "kitchen_strip",
                 "tv",
                 "dining",
                 "hall",
@@ -92,6 +94,12 @@ class Lights(app.App):
             )
             self.lights["kitchen"].set_presence_adjustments(
                 vacant=(self.control.get_setting("tv_brightness"), kelvin),
+                entered=(self.control.get_setting("tv_motion_brightness"), kelvin),
+                occupied=(self.args["max_brightness"], self.args["max_kelvin"]),
+                transition_period=self.control.get_setting("tv_transition_period"),
+                vacating_delay=self.control.get_setting("tv_vacating_delay"),
+            )
+            self.lights["kitchen_strip"].set_presence_adjustments(
                 entered=(self.control.get_setting("tv_motion_brightness"), kelvin),
                 occupied=(self.args["max_brightness"], self.args["max_kelvin"]),
                 transition_period=self.control.get_setting("tv_transition_period"),
@@ -119,7 +127,7 @@ class Lights(app.App):
                 occupied=(self.args["min_brightness"], self.args["min_kelvin"]),
                 vacating_delay=self.control.get_setting("office_vacating_delay"),
             )
-            for light_name in ["tv", "dining", "hall"]:
+            for light_name in ["kitchen_strip", "tv", "dining", "hall"]:
                 self.lights[light_name].ignore_presence()
                 self.lights[light_name].turn_off()
             self.lights["bedroom"].ignore_presence()
@@ -140,6 +148,10 @@ class Lights(app.App):
                 occupied=(self.args["max_brightness"], kelvin),
                 vacating_delay=vacating_delay,
             )
+            self.lights["kitchen_strip"].set_presence_adjustments(
+                occupied=(self.args["max_brightness"], kelvin),
+                vacating_delay=vacating_delay,
+            )
             self.lights["office"].set_presence_adjustments(
                 occupied=(brightness, kelvin),
                 vacating_delay=self.control.get_setting("office_vacating_delay"),
@@ -155,7 +167,7 @@ class Lights(app.App):
             self.lights["dining"].adjust(
                 self.args["max_brightness"], self.args["max_kelvin"]
             )
-            for light_name in ["tv", "hall", "bedroom", "office"]:
+            for light_name in ["kitchen_strip", "tv", "hall", "bedroom"]:
                 self.lights[light_name].ignore_presence()
                 self.lights[light_name].turn_off()
         self.log(f"Light scene changed to {scene}")
@@ -199,6 +211,17 @@ class Lights(app.App):
         )
         self.lights["kitchen"].set_presence_adjustments(
             vacant=(brightness, kelvin),
+            entered=(brightness, kelvin)
+            if brightness >= self.control.get_setting("night_motion_brightness")
+            else (self.control.get_setting("night_motion_brightness"), kelvin),
+            occupied=(
+                self.args["max_brightness"],
+                self.control.get_setting("night_motion_kelvin"),
+            ),
+            transition_period=self.control.get_setting("night_transition_period"),
+            vacating_delay=self.control.get_setting("night_vacating_delay"),
+        )
+        self.lights["kitchen_strip"].set_presence_adjustments(
             entered=(brightness, kelvin)
             if brightness >= self.control.get_setting("night_motion_brightness")
             else (self.control.get_setting("night_motion_brightness"), kelvin),
@@ -357,7 +380,7 @@ class Lights(app.App):
 class Light:
     """Control an individual light (or a pre-configured group)."""
 
-    def __init__(self, light_id: str, controller: Lights):
+    def __init__(self, light_id: str, controller: Lights, room_name: str = None):
         """Initialise with attributes for light parameters, and a Light controller."""
         self.light_id = light_id
         self.controller = controller
@@ -366,9 +389,13 @@ class Light:
             - self.controller.args["min_brightness"]
         ) / 2
         self.room_name = (
-            light_id.replace("light.", "")
-            if light_id.startswith("light")
-            else light_id.replace("group.", "").replace("_lights", "")
+            room_name
+            if room_name is not None
+            else (
+                light_id.replace("light.", "")
+                if light_id.startswith("light")
+                else light_id.replace("group.", "").replace("_lights", "")
+            )
         )
         self.__presence_adjustments = {}
         self.__transition_timer = None
@@ -461,7 +488,6 @@ class Light:
             )
             self.controller.turn_on(self.light_id, brightness=brightness, kelvin=kelvin)
 
-        self.controller.turn_on(self.light_id)
     def turn_off(self):
         """Turn light off and record previous kelvin level."""
         if self.brightness != 0:
