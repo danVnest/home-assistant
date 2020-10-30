@@ -327,7 +327,7 @@ class Sensor:
             sensor_type = ClimateSensor
         elif "multisensor" in sensor_id:
             sensor_type = MultiSensor
-        elif "bom_weather" in sensor_id:
+        elif "outside" in sensor_id:
             sensor_type = WeatherSensor
         else:
             sensor_type = Sensor
@@ -339,7 +339,7 @@ class Sensor:
         self.monitor = monitor
         if "bedroom" in self.sensor_id:
             self.location = "bedroom"
-        elif "bom_weather" in self.sensor_id:
+        elif "outside" in self.sensor_id:
             self.location = "outside"
         else:
             self.location = "inside"
@@ -411,7 +411,7 @@ class MultiSensor(Sensor):
 
 
 class WeatherSensor(Sensor):
-    """Capture temperature data from bom_weather entities."""
+    """Capture temperature data from a Bureau of Meteorology sensor."""
 
     def __init__(self, sensor_id: str, monitor: TemperatureMonitor):
         """Keep only the temperature listener as methods change monitor's attribute."""
@@ -444,7 +444,7 @@ class TemperatureMonitor:
                 "sensor.kitchen_multisensor",
                 "sensor.office_multisensor",
                 "sensor.bedroom_multisensor",
-                "sensor.bom_weather_feels_like_c",
+                "sensor.outside_temperature_feels_like",
             ]
         }
         self.last_inside_temperature = None
@@ -464,7 +464,9 @@ class TemperatureMonitor:
     @property
     def outside_temperature(self) -> float:
         """Get the calculated outside temperature from Home Assistant."""
-        return float(self.controller.entities.sensor.bom_weather_feels_like_c.state)
+        return float(
+            self.controller.entities.sensor.outside_temperature_feels_like.state
+        )
 
     def start_monitoring(self):
         """Get values from appropriate sensors and calculate inside temperature."""

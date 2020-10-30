@@ -289,11 +289,6 @@ person:
 
 sensor:
 - platform: badnest
-- platform: bom
-  name: Weather
-  station: !secret bom_station
-  monitored_conditions:
-  - apparent_t
 - platform: darksky
   api_key: !secret darksky_key
   hourly_forecast:
