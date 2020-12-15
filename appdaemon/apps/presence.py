@@ -42,24 +42,27 @@ class Presence(app.App):
         self, entity: str, attribute: str, old: int, new: int, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Change scene if everyone has left home or if someone has come back."""
-        del attribute, old, kwargs
+        del attribute, kwargs
         self.log(f"{entity} is {new}")
         if new == "home":
             if "Away" in self.scene:
                 self.control.reset_scene()
-        elif (
-            "Away" not in self.scene
-            and self.get_state(
-                f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
-            )
-            != "home"
-        ):
-            away_scene = (
-                "Day"
-                if self.control.apps["lights"].is_lighting_sufficient()
-                else "Night"
-            )
-            self.scene = f"Away ({away_scene})"
+        else:
+            if old == "home":
+                self.call_service("lock/lock", entity_id="lock.door_lock")
+            if (
+                "Away" not in self.scene
+                and self.get_state(
+                    f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
+                )
+                != "home"
+            ):
+                away_scene = (
+                    "Day"
+                    if self.control.apps["lights"].is_lighting_sufficient()
+                    else "Night"
+                )
+                self.scene = f"Away ({away_scene})"
 
     def __handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""
@@ -140,7 +143,7 @@ class Room:
             self.last_vacated = self.controller.datetime()
         else:
             self.last_entered = self.controller.datetime()
-        for handle, callback in self.callbacks.items():
+        for handle, callback in list(self.callbacks.items()):
             if callback.get("timer_handle") is not None:
                 self.controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:

@@ -6,8 +6,7 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
-          - entity: input_datetime.morning_time
-          - entity: input_datetime.bed_time
+          - entity: lock.door_lock
         show_header_toggle: false
         title: Control
         type: entities
@@ -302,15 +301,16 @@ views:
         title: Warnings & Errors
         type: history-graph
       - entities:
+          - entity: sensor.door_lock_battery_level
+          - entity: sensor.entryway_multisensor_battery_level
+          - entity: sensor.kitchen_multisensor_battery_level
+          - entity: sensor.office_multisensor_battery_level
+          - entity: sensor.bedroom_multisensor_battery_level
+          - entity: sensor.kitchen_button_battery_level
+          - entity: sensor.bedroom_button_battery_level
           - entity: sensor.entryway_protect_battery_health_state
           - entity: sensor.living_room_protect_battery_health_state
           - entity: sensor.garage_protect_battery_health_state
-          - entity: sensor.entryway_multisensor_battery_level
-          - entity: sensor.kitchen_multisensor_battery_level
-          - entity: sensor.bedroom_multisensor_battery_level
-          - entity: sensor.office_multisensor_battery_level
-          - entity: sensor.kitchen_button_battery_level
-          - entity: sensor.bedroom_button_battery_level
         hours_to_show: 72
         refresh_interval: 0
         title: Battery Levels

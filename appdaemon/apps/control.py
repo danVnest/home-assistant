@@ -49,14 +49,16 @@ class Control(app.App):
         self.listen_event(self.__button, "zwave.scene_activated")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
-            "entryway_protect_battery_health_state",
-            "living_room_protect_battery_health_state",
-            "garage_protect_battery_health_state",
+            "door_lock_battery_level",
             "entryway_multisensor_battery_level",
             "kitchen_multisensor_battery_level",
+            "office_multisensor_battery_level",
             "bedroom_multisensor_battery_level",
             "kitchen_button_battery_level",
             "bedroom_button_battery_level",
+            "entryway_protect_battery_health_state",
+            "living_room_protect_battery_health_state",
+            "garage_protect_battery_health_state",
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
         self.__set_timer("morning_time")
@@ -134,6 +136,7 @@ class Control(app.App):
         del kwargs
         self.log(f"Bed timer triggered")
         self.apps["climate"].reset()
+        self.call_service("lock/lock", entity_id="lock.door_lock")
 
     def is_bed_time(self) -> bool:
         """Return if the time is after bed time (and before midnight)."""
@@ -227,6 +230,7 @@ class Control(app.App):
             self.apps["lights"].transition_to_scene(kwargs["new"])
             self.apps["climate"].transition_between_scenes(kwargs["new"], kwargs["old"])
             if kwargs["new"] == "Sleep" or "Away" in kwargs["new"]:
+                self.call_service("lock/lock", entity_id="lock.door_lock")
                 self.apps["media"].standby()
         elif input_type == "input_boolean":
             setattr(self.apps["climate"], setting, kwargs["new"] == "on")
