@@ -45,6 +45,7 @@ class Presence(app.App):
         del attribute, kwargs
         self.log(f"{entity} is {new}")
         if new == "home":
+            self.call_service("lock/unlock", entity_id="lock.door_lock")
             if "Away" in self.scene:
                 self.control.reset_scene()
         else:
