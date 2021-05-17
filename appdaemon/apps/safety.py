@@ -13,7 +13,8 @@ class Safety(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
+        # self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
+        # TODO: add Nest Protects when Nest integration is working properly
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
