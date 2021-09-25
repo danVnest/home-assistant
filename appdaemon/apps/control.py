@@ -50,6 +50,7 @@ class Control(app.App):
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
             "door_lock_battery_level",
+            "kitchen_door_sensor_battery_level",
             "entryway_multisensor_battery_level",
             "kitchen_multisensor_battery_level",
             "office_multisensor_battery_level",

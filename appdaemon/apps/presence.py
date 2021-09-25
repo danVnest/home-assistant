@@ -28,6 +28,7 @@ class Presence(app.App):
         super().initialize()
         for room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[room] = Room(room, f"sensor.{room}_multisensor_motion", self)
+        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_sensor")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
         self.listen_state(self.__handle_presence_change, "person")
@@ -82,7 +83,7 @@ class Room:
     """Report on presence for an individual room."""
 
     def __init__(self, room_id: str, sensor_id: str, controller: Presence):
-        """Initialise with attributes for light parameters, and a Light controller."""
+        """Initialise room presence and start listening for presence change."""
         self.room_id = room_id
         self.controller = controller
         try:
@@ -157,6 +158,21 @@ class Room:
                 self.controller.log(
                     f"Set vacation timer for callback: {callback}", level="DEBUG"
                 )
+
+    def __handle_binary_presence_change(
+        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Wrapper of __handle_presence_change for binary sensors."""
+        old = 1 if old == "on" else 0
+        new = 1 if new == "on" else 0
+        self.__handle_presence_change(entity, attribute, old, new, kwargs)
+
+    def add_sensor(self, sensor_id: str):
+        """Add binary sensor where any change represents presence in the room."""
+        if sensor_id.startswith("binary_sensor"):
+            self.controller.listen_state(
+                self.__handle_binary_presence_change, sensor_id
+            )
 
     def register_callback(self, callback, vacating_delay: int = 0) -> uuid.UUID:
         """Register a callback for when presence changes, including an optional delay."""
