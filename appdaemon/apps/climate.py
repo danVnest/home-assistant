@@ -46,7 +46,7 @@ class Climate(app.App):
             self.__handle_door_change,
             "binary_sensor.kitchen_door_sensor",
             new="on",
-            duration=60,
+            duration=self.args["aircon_trigger_delay"] * 60,
         )
         self.listen_state(
             self.__handle_door_change, "binary_sensor.kitchen_door_sensor", new="off"
