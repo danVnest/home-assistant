@@ -16,12 +16,6 @@ counter:
   warnings:
   errors:
 
-device_tracker:
-  platform: netgear
-  password: !secret orbi_password
-  consider_home: 0:05
-  accesspoints: true # forces use of Orbi API v2, which is much faster
-
 frontend:
 
 group: !include groups.yaml
@@ -29,11 +23,9 @@ group: !include groups.yaml
 history:
 
 http:
-  base_url: !secret http_url
-  server_port: !secret http_port
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem
-  ip_ban_enabled: True
+  ip_ban_enabled: true
   login_attempts_threshold: 10
 
 ifttt:
@@ -239,41 +231,6 @@ input_select:
     - Away (Day)
     - Away (Night)
 
-light:
-- platform: wiz_light
-  name: Entryway
-  host: 192.168.20.81
-- platform: wiz_light
-  name: Stairway
-  host: 192.168.20.82
-- platform: wiz_light
-  name: Kitchen
-  host: 192.168.20.54
-- platform: wiz_light
-  name: TV Left
-  host: 192.168.20.51
-- platform: wiz_light
-  name: TV Middle
-  host: 192.168.20.52
-- platform: wiz_light
-  name: TV Right
-  host: 192.168.20.53
-- platform: wiz_light
-  name: Dining Left
-  host: 192.168.20.86
-- platform: wiz_light
-  name: Dining Right
-  host: 192.168.20.85
-- platform: wiz_light
-  name: Hall
-  host: 192.168.20.50
-- platform: wiz_light
-  name: Office
-  host: 192.168.20.83
-- platform: wiz_light
-  name: Bedroom
-  host: 192.168.20.84
-
 logbook:
 
 map:
@@ -318,10 +275,6 @@ tts:
   platform: google_translate
 
 updater:
-  include_used_components: True
 
 zeroconf:
 
-zwave:
-  usb_path: /dev/ttyACM0
-  network_key: !secret zwave_key
