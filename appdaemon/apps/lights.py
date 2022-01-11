@@ -43,7 +43,8 @@ class Lights(app.App):
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
-            self.__handle_luminance_change, "sensor.kitchen_multisensor_luminance",
+            self.__handle_luminance_change,
+            "sensor.kitchen_multisensor_luminance",
         )
 
     def terminate(self):
@@ -61,13 +62,19 @@ class Lights(app.App):
         self.cancel_timer(self.__circadian["timer"])
         if "Day" in scene:
             self.lights["office"].set_presence_adjustments(
-                occupied=(self.args["max_brightness"], self.args["max_kelvin"],),
-                vacating_delay=self.control.get_setting(f"office_vacating_delay"),
+                occupied=(
+                    self.args["max_brightness"],
+                    self.args["max_kelvin"],
+                ),
+                vacating_delay=self.control.get_setting("office_vacating_delay"),
             )
             if not self.lights["bedroom"].is_ignoring_presence():
                 self.lights["bedroom"].set_presence_adjustments(
-                    occupied=(self.args["max_brightness"], self.args["max_kelvin"],),
-                    vacating_delay=self.control.get_setting(f"bedroom_vacating_delay"),
+                    occupied=(
+                        self.args["max_brightness"],
+                        self.args["max_kelvin"],
+                    ),
+                    vacating_delay=self.control.get_setting("bedroom_vacating_delay"),
                 )
             for light_name in [
                 "entryway",
@@ -88,7 +95,10 @@ class Lights(app.App):
         elif scene == "TV":
             kelvin = int(float(self.entities.input_number.tv_kelvin.state))
             self.lights["entryway"].set_presence_adjustments(
-                occupied=(self.control.get_setting("tv_motion_brightness"), kelvin,)
+                occupied=(
+                    self.control.get_setting("tv_motion_brightness"),
+                    kelvin,
+                )
             )
             self.lights["kitchen"].set_presence_adjustments(
                 vacant=(self.control.get_setting("tv_brightness"), kelvin),
@@ -666,7 +676,8 @@ class Light:
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining <= 0:
             self.controller.log(
-                f"Transition to occupied complete for {self.light_id}", level="DEBUG",
+                f"Transition to occupied complete for {self.light_id}",
+                level="DEBUG",
             )
             self.__transition_timer = None
             self.adjust(

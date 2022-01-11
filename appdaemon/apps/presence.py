@@ -183,7 +183,9 @@ class Room:
         }
         if 0 < -1 * self.seconds_in_room() < vacating_delay:
             self.callbacks[handle]["timer_handle"] = self.controller.run_in(
-                callback, vacating_delay + self.seconds_in_room(), is_vacant=True,
+                callback,
+                vacating_delay + self.seconds_in_room(),
+                is_vacant=True,
             )
 
         self.controller.log(f"Registered callback: {callback}", level="DEBUG")

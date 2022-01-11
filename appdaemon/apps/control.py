@@ -66,7 +66,9 @@ class Control(app.App):
         self.__set_timer("morning_time")
         self.__set_timer("bed_time")
         self.__timers["heartbeat"] = self.run_every(
-            self.__heartbeat, "now", self.args["heartbeat_period"],
+            self.__heartbeat,
+            "now",
+            self.args["heartbeat_period"],
         )
         self.listen_event(self.__all_initialized, "appd_started")
         self.__timers["init_delay"] = self.run_in(
@@ -153,7 +155,7 @@ class Control(app.App):
     def __morning_time(self, kwargs: dict):
         """Change scene to Morning (callback for daily timer)."""
         del kwargs
-        self.log(f"Morning timer triggered")
+        self.log("Morning timer triggered")
         if self.scene == "Sleep":
             self.scene = "Morning"
         else:
@@ -162,7 +164,7 @@ class Control(app.App):
     def __bed_time(self, kwargs: dict):
         """Adjust climate control when approaching bed time (callback for daily timer)."""
         del kwargs
-        self.log(f"Bed timer triggered")
+        self.log("Bed timer triggered")
         self.apps["climate"].reset()
         self.call_service("lock/lock", entity_id="lock.door_lock")
 
@@ -280,11 +282,15 @@ class Control(app.App):
         """Revert setting to specified value & notify."""
         if setting_id.startswith("input_datetime"):
             self.call_service(
-                "input_datetime/set_datetime", entity_id=setting_id, time=value,
+                "input_datetime/set_datetime",
+                entity_id=setting_id,
+                time=value,
             )
         else:
             self.call_service(
-                "input_number/set_value", entity_id=setting_id, value=value,
+                "input_number/set_value",
+                entity_id=setting_id,
+                value=value,
             )
         self.notify(
             f"Invalid value for setting '{setting_id}' - reverted to previous",
@@ -307,7 +313,8 @@ class Control(app.App):
         del kwargs
         try:
             urllib.request.urlopen(
-                self.args["heartbeat_url"], timeout=self.args["heartbeat_timeout"],
+                self.args["heartbeat_url"],
+                timeout=self.args["heartbeat_timeout"],
             )
         except socket.error:
             self.__timers["heartbeat_fail_count"] += 1

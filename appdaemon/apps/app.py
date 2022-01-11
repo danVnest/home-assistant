@@ -59,6 +59,9 @@ class App(hass.Hass):
                     mobile_name = "mobile_app_rachel_s_phone"
                     data = {"tag": kwargs["title"]}
                 super().notify(
-                    message, title=kwargs["title"], name=mobile_name, data=data,
+                    message,
+                    title=kwargs["title"],
+                    name=mobile_name,
+                    data=data,
                 )
                 self.log(f"Notified {targets}: {kwargs['title']}: {message}")
