@@ -18,7 +18,7 @@ class Lights(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.__circadian = {}
+        self.__circadian = {"timer": None}
         self.lights = {}
         self.alternative_scene = False
         self.constants["brightness_per_step"] = 2.55
@@ -58,9 +58,7 @@ class Lights(app.App):
         self, scene: str
     ):  # pylint: disable=too-many-branches
         """Change lighting based on the specified scene."""
-        if self.__circadian.get("timer") is not None:
-            self.cancel_timer(self.__circadian["timer"])
-            self.__circadian["timer"] = None
+        self.cancel_timer(self.__circadian["timer"])
         if "Day" in scene:
             self.lights["office"].set_presence_adjustments(
                 occupied=(self.args["max_brightness"], self.args["max_kelvin"],),
@@ -190,7 +188,7 @@ class Lights(app.App):
             "circadian_progress", self.__calculate_circadian_progress()
         )
         if circadian_progress in (0, 1):
-            self.cancel_timer(self.__circadian.get("timer"))
+            self.cancel_timer(self.__circadian["timer"])
             next_start = self.__circadian["start_time"] + datetime.timedelta(
                 days=circadian_progress
             )
@@ -397,7 +395,7 @@ class Light:
                 else light_id.replace("group.", "").replace("_lights", "")
             )
         )
-        self.__presence_adjustments = {}
+        self.__presence_adjustments = {"handle": None}
         self.__transition_timer = None
 
     @property

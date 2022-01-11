@@ -146,8 +146,7 @@ class Room:
         else:
             self.last_entered = self.controller.datetime()
         for handle, callback in list(self.callbacks.items()):
-            if callback.get("timer_handle") is not None:
-                self.controller.cancel_timer(callback["timer_handle"])
+            self.controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:
                 callback["callback"](is_vacant=is_vacant)
                 self.controller.log(f"Called callback: {callback}", level="DEBUG")
@@ -180,6 +179,7 @@ class Room:
         self.callbacks[handle] = {
             "callback": callback,
             "vacating_delay": vacating_delay,
+            "timer_handle": None,
         }
         if 0 < -1 * self.seconds_in_room() < vacating_delay:
             self.callbacks[handle]["timer_handle"] = self.controller.run_in(
@@ -192,6 +192,5 @@ class Room:
     def cancel_callback(self, handle):
         """Cancel a callback (and its timer if it has one) by passing its handle."""
         if handle in self.callbacks:
-            if self.callbacks[handle].get("timer_handle") is not None:
-                self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
+            self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
             del self.callbacks[handle]

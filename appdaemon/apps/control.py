@@ -22,11 +22,12 @@ class Control(app.App):
         self.__timers = {
             "morning_time": None,
             "bed_time": None,
-            "init_delay": None,
             "setting_delay_timers": {},
             "heartbeat": None,
             "heartbeat_fail_count": 0,
+            "init_delay": None,
         }
+        self.__is_all_initialised = False
 
     def initialize(self):
         """Monitor logs, listen for user input, monitor batteries and set timers.
@@ -67,22 +68,37 @@ class Control(app.App):
         self.__timers["heartbeat"] = self.run_every(
             self.__heartbeat, "now", self.args["heartbeat_period"],
         )
-        self.listen_event(self.__add_app, "app_initialized", namespace="admin")
-
-    def __add_app(self, event_name: str, data: dict, kwargs: dict):
-        """Link the app and restart the timer that finalises initialisation."""
-        del event_name, kwargs
-        self.apps[data["app"].lower()] = self.get_app(data["app"])
-        if self.__timers["init_delay"] is not None:
-            self.cancel_timer(self.__timers["init_delay"])
+        self.listen_event(self.__all_initialized, "appd_started")
         self.__timers["init_delay"] = self.run_in(
-            self.__all_initialized, self.args["init_delay"]
+            self.__assume_all_initialised, self.args["init_delay"]
         )
 
-    def __all_initialized(self, kwargs: dict = None):
+    def __all_initialized(self, event_name: str, data: dict, kwargs: dict):
         """Configure all apps with the current scene."""
-        del kwargs
+        del event_name, data, kwargs
         self.log("All apps ready, resetting scene")
+        self.__is_all_initialised = True
+        for app_name in self.apps:
+            self.apps[app_name] = self.get_app(app_name.capitalize())
+        self.reset_scene()
+        self.listen_event(
+            self.__handle_app_reloaded, "app_initialized", namespace="admin"
+        )
+
+    def __assume_all_initialised(self, kwargs: dict):
+        """Configure all apps if not already done normally."""
+        del kwargs
+        if not self.__is_all_initialised:
+            self.log(
+                f"Assuming initialisation complete after {self.args['init_delay']} seconds"
+            )
+            self.__all_initialized(event_name=None, data=None, kwargs=None)
+
+    def __handle_app_reloaded(self, event_name: str, data: dict, kwargs: dict):
+        """Re-link the app and set a timer to initialise it."""
+        del event_name, kwargs
+        self.apps[data["app"].lower()] = self.get_app(data["app"])
+        self.log(f"App added: {data['app']}")
         self.reset_scene()
 
     def reset_scene(self):
@@ -214,7 +230,6 @@ class Control(app.App):
         del attribute, kwargs
         if entity in self.__timers["setting_delay_timers"]:
             self.cancel_timer(self.__timers["setting_delay_timers"][entity])
-            del self.__timers["setting_delay_timers"][entity]
         self.__timers["setting_delay_timers"][entity] = self.run_in(
             self.__handle_settings_change,
             self.args["settings_change_delay"],

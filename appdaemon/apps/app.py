@@ -36,6 +36,11 @@ class App(hass.Hass):
             option=new_scene,
         )
 
+    def cancel_timer(self, handle):
+        """Cancel timer after checking it is valid and running."""
+        if self.timer_running(handle):
+            super().cancel_timer(handle)
+
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs["targets"] if "targets" in kwargs else "all"
