@@ -10,6 +10,7 @@ views:
         show_header_toggle: false
         title: Control
         type: entities
+        state_color: true
       - card:
           entities:
             - entity: input_number.high_temperature_trigger
@@ -17,6 +18,7 @@ views:
           show_header_toggle: false
           title: Climate Control Triggers
           type: entities
+          state_color: true
         conditions:
           - entity: input_boolean.climate_control
             state: 'on'
@@ -30,6 +32,7 @@ views:
           show_header_toggle: false
           title: Climate Control Triggers
           type: entities
+          state_color: true
         conditions:
           - entity: input_boolean.climate_control
             state: 'on'
@@ -43,6 +46,7 @@ views:
           show_header_toggle: false
           title: Aircon Temperatures
           type: entities
+          state_color: true
         conditions:
           - entity: sensor.any_climate_control
             state: 'True'
@@ -56,19 +60,26 @@ views:
           show_header_toggle: false
           title: Aircon Temperatures
           type: entities
+          state_color: true
         conditions:
           - entity: sensor.any_climate_control
             state: 'True'
           - entity: binary_sensor.display_day_card
             state: 'off'
         type: conditional
-      - entities:
-          - entity: sensor.apparent_inside_temperature_numeric
-            name: Inside
-          - entity: sensor.dark_sky_apparent_temperature
-            name: Outside
-        show_name: true
-        type: glance
+      - card:
+          entities:
+            - entity: sensor.apparent_inside_temperature_numeric
+              name: Inside
+            - entity: sensor.dark_sky_apparent_temperature
+              name: Outside
+          show_name: true
+          type: glance
+          state_color: true
+        conditions:
+          - entity: sensor.any_climate_control
+            state: 'True'
+        type: conditional
       - cards:
           - entities:
               - entity: group.all_lights
@@ -84,11 +95,70 @@ views:
             show_state: true
             title: Lights
             type: glance
+            state_color: true
           - content: >-
               To manually control lighting above, you should first set the scene
               to anything except "Night".
             type: markdown
         type: vertical-stack
+      - entity: media_player.tv
+        type: media-control
+      - cards:
+          - entities:
+              - entity: input_datetime.morning_time
+              - entity: input_datetime.bed_time
+            show_header_toggle: false
+            title: Times
+            type: entities
+            state_color: true
+          - content: >-
+              Specify the time for which the Morning scene and pre-sleep climate
+              control will trigger. More information in the **Instructions**
+              tab.
+            type: markdown
+        type: vertical-stack
+      - entities:
+          - entity: sensor.apparent_inside_temperature_numeric
+          - entity: sensor.smartweather_feels_like
+          - entity: climate.living_room
+          - entity: climate.dining_room
+          - entity: climate.bedroom
+          - entity: sensor.office_multisensor_temperature
+        hours_to_show: 24
+        refresh_interval: 0
+        title: Temperatures
+        type: history-graph
+      - cards:
+          - type: glance
+            entities:
+              - entity: climate.living_room
+              - entity: climate.dining_room
+              - entity: climate.bedroom
+            show_name: true
+            show_icon: true
+            show_state: true
+            state_color: true
+            title: Manual Aircon Control
+          - content: >-
+              To manually control the individual airconditioning units above,
+              make sure to disable automatic climate control beforehand.
+            type: markdown
+        type: vertical-stack
+      - aspect_ratio: '2'
+        dark_mode: true
+        default_zoom: 12
+        entities:
+          - entity: person.dan
+          - entity: person.rachel
+        hours_to_show: 1
+        type: map
+    path: default_view
+    title: Control & Status
+  - title: Instructions
+    path: instructions
+    icon: ''
+    badges: []
+    cards:
       - content: >-
           **Lighting** and **climate settings** (if enabled) are automatically
           adjusted between different scenes. You can also manually select a
@@ -161,48 +231,9 @@ views:
           Only the bedroom aircon will be controlled after the specified bed
           time, regardless of the scene.
         type: markdown
-      - aspect_ratio: '2'
-        dark_mode: false
-        default_zoom: 12
-        entities:
-          - entity: person.dan
-          - entity: person.rachel
-        hours_to_show: 1
-        type: map
-      - entity: media_player.living_room
-        type: media-control
-      - entities:
-          - entity: climate.bedroom
-          - entity: climate.living_room
-          - entity: climate.dining_room
-          - entity: sensor.kitchen_multisensor_temperature
-          - entity: sensor.multisensor_2_temperature
-          - entity: sensor.dark_sky_apparent_temperature
-          - entity: input_number.cooling_target_temperature
-          - entity: input_number.heating_target_temperature
-          - entity: input_number.high_temperature_trigger
-          - entity: input_number.low_temperature_trigger
-          - entity: sensor.apparent_inside_temperature_numeric
-          - entity: sensor.bom_weather_feels_like_c
-        hours_to_show: 24
-        refresh_interval: 0
-        title: Temperatures
-        type: history-graph
-      - cards:
-          - entity: climate.living_room
-            type: thermostat
-          - entity: climate.dining_room
-            type: thermostat
-          - entity: climate.bedroom
-            type: thermostat
-          - content: >-
-              To manually control the individual airconditioning units above,
-              you should disable automatic climate control beforehand.
-            type: markdown
-        type: vertical-stack
-    path: default_view
-    title: Control & Status
-  - badges: []
+  - path: lights
+    title: Lighting
+    badges: []
     cards:
       - cards:
           - entities:
@@ -279,8 +310,6 @@ views:
           - entity: input_number.bedroom_vacating_delay
         title: Room Vacating Delays
         type: entities
-    path: lights
-    title: Lights
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs

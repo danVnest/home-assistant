@@ -261,6 +261,8 @@ class Control(app.App):
             if kwargs["new"] == "Sleep" or "Away" in kwargs["new"]:
                 self.call_service("lock/lock", entity_id="lock.door_lock")
                 self.apps["media"].standby()
+            elif kwargs["new"] == "TV":
+                self.apps["media"].turn_on()
         elif input_type == "input_boolean":
             setattr(self.apps["climate"], setting, kwargs["new"] == "on")
         elif setting.startswith("circadian"):

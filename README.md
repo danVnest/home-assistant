@@ -28,7 +28,7 @@ This home automation system is comprised of the following devices:
 - [WiZ G95 filament bulbs](https://www.wizconnected.com/en-AU/consumer/products/g95-filament-whites/)
 - [Kogan SmarterHome RGB + cool & warm white LED strip](https://www.kogan.com/au/buy/kogan-smarterhome-rgb-cool-warm-white-smart-led-light-strip-5m/)
 - [Sensibo aircon controllers](https://www.sensibo.com)
-- [Apple TV 4K](https://www.apple.com/apple-tv-4k/)
+- [LG C1 TV](https://www.lg.com/au/tvs/lg-oled65c1ptb#)
 - [Eufy battery doorbell](https://myeufy.com.au/eufy-security-video-doorbell/)
 - [Nest Protect smoke alarms](https://store.google.com/au/product/nest_protect_2nd_gen)
 - [Vava security cameras](https://www.vava.com/products/vava-home-camera)

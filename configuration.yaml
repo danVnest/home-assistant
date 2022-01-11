@@ -235,6 +235,8 @@ logbook:
 
 map:
 
+media_player:
+
 mobile_app:
 
 person:
@@ -276,5 +278,14 @@ tts:
 
 updater:
 
-zeroconf:
+wake_on_lan:
 
+webostv:
+  host: 192.168.20.90
+  name: "TV"
+  turn_on_action:
+    service: wake_on_lan.send_magic_packet
+    data:
+      mac: !secret tv_mac
+
+zeroconf:
