@@ -104,24 +104,35 @@ class Control(app.App):
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
+        initial_scene = self.scene
         if self.scene == "Bright":
-            self.log("Scene was set as 'Bright', will not be reset")
+            self.scene = "Bright"
         elif not self.apps["presence"].anyone_home():
             self.scene = f"Away ({'Day' if self.apps['lights'].is_lighting_sufficient() else 'Night'})"
         elif self.apps["lights"].is_lighting_sufficient():
             self.scene = "Day"
         elif self.apps["media"].is_playing:
             self.scene = "TV"
-        elif self.scene in ("Morning", "Sleep") and (
-            self.parse_time(self.get_setting("morning_time"))
-            < self.time()
-            < self.parse_time("12:00:00")
-        ):
-            self.scene = "Morning"
-        elif self.scene == "Sleep":
-            self.log("It is night but scene was set as 'Sleep', will not be reset")
+        elif self.scene in ("Morning", "Sleep"):
+            self.scene = (
+                "Morning"
+                if (
+                    self.parse_time(self.get_setting("morning_time"))
+                    < self.time()
+                    < self.parse_time("12:00:00")
+                )
+                else "Sleep"
+            )
         else:
             self.scene = "Night"
+        if initial_scene == self.scene:
+            self.__delay_handle_settings_change(
+                entity="input_select.scene",
+                attribute=None,
+                old=initial_scene,
+                new=self.scene,
+                kwargs=None,
+            )
 
     def __set_timer(self, name: str):
         """Set morning or bed timer as specified by the corresponding settings."""
