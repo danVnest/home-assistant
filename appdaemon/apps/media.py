@@ -22,30 +22,19 @@ class Media(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.listen_state(
-            self.__tv_state_change,
-            self.entity_id,
-            new="on",
-            duration=self.args["steady_state_delay"],
-        )
-        self.listen_state(
-            self.__tv_state_change,
-            self.entity_id,
-            old="on",
-            duration=self.args["steady_state_delay"],
-        )
+        self.listen_state(self.__tv_state_change, self.entity_id)
         self.listen_state(
             self.__tv_state_change,
             self.entity_id,
             attribute="is_volume_muted",
         )
+        # TODO: add duration=self.args["steady_state_delay"] when play/pause detectable
 
     @property
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        return (
-            self.get_state(self.entity_id) == "on"
-        )  # FIXME: LG webos currently only detects on or off
+        return self.get_state(self.entity_id) == "on"
+        # TODO: update when LG webos supports more than on or off
 
     @property
     def is_muted(self) -> bool:
@@ -65,6 +54,9 @@ class Media(app.App):
     def pause(self):
         """Pause media being played on the TV."""
         self.call_service("media_player/media_pause", entity_id=self.entity_id)
+        self.call_service(
+            "media_player/volume_mute", is_volume_muted=True, entity_id=self.entity_id
+        )
         self.log("TV media is now paused", level="DEBUG")
 
     def __tv_state_change(

@@ -46,6 +46,7 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
         del attribute, old, kwargs
         self.controller.log(f"{entity}: {new}")
         if new != 0:
+            self.controller.apps["media"].pause()
             self.controller.notify(
                 f"SMOKE OR CARBON MONOXIDE DETECTED BY: {entity}", title="SMOKE ALARM"
             )
