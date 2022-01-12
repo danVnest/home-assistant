@@ -30,10 +30,15 @@ class Presence(app.App):
             self.rooms[room] = Room(
                 room, f"binary_sensor.{room}_multisensor_motion", self
             )
+        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing_sensor")
+        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_motion_sensor")
         self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_sensor")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
         self.listen_state(self.__handle_presence_change, "person")
+        self.listen_state(
+            self.__handle_doorbell, "binary_sensor.doorbell_ringing_sensor", new="True"
+        )
 
     def anyone_home(self, **kwargs) -> bool:
         """Check if anyone is home."""
@@ -80,6 +85,17 @@ class Presence(app.App):
                     title="Guest Device",
                 )
                 self.__last_device_date = self.date()
+
+    def __handle_doorbell(
+        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Handle doorbell when it rings."""
+        del entity, attribute, old, new, kwargs
+        self.log("Doorbell rung")
+        if self.control.apps["media"].is_playing:
+            self.control.apps["media"].pause()
+        if self.scene in ("TV", "Sleep"):
+            self.scene = "Night"
 
 
 class Room:
