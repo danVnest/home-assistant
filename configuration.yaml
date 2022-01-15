@@ -101,6 +101,13 @@ input_number:
     step: 0.5
     unit_of_measurement: "°C"
     mode: "box"
+  aircon_door_check_delay:
+    name: "Delay"
+    min: 1
+    max: 10
+    step: 1
+    unit_of_measurement: "min"
+    mode: "box"
   initial_circadian_brightness:
     name: Initial brightness
     min: 25

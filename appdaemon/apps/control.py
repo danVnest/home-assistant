@@ -277,6 +277,8 @@ class Control(app.App):
                 self.__revert_setting(kwargs["entity"], kwargs["old"])
         elif "temperature" in setting:
             self.apps["climate"].reset()
+        elif "door" in setting:
+            self.apps["climate"].set_door_check_delay(int(kwargs["new"]))
         else:
             self.apps["lights"].transition_to_scene(self.scene)
 

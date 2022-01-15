@@ -27,6 +27,7 @@ class Climate(app.App):
         self.__aircon_trigger_timer = None
         self.__temperature_monitor = None
         self.__aircons = None
+        self.__door_open_listener = None
         self.__climate_control_history = {"overridden": False, "before_away": None}
 
     def initialize(self):
@@ -42,11 +43,8 @@ class Climate(app.App):
         }
         self.__climate_control_history["before_away"] = self.climate_control
         self.__temperature_monitor.start_monitoring()
-        self.listen_state(
-            self.__handle_door_change,
-            "binary_sensor.kitchen_door_sensor",
-            new="on",
-            duration=self.args["aircon_trigger_delay"] * 60,
+        self.set_door_check_delay(
+            int(self.entities.input_number.aircon_door_check_delay.state) * 60
         )
         self.listen_state(
             self.__handle_door_change, "binary_sensor.kitchen_door_sensor", new="off"
@@ -123,6 +121,17 @@ class Climate(app.App):
         """Reset climate control using latest settings."""
         self.aircon = self.aircon
         self.handle_temperatures()
+
+    def set_door_check_delay(self, minutes):
+        """Configure listener for door opening, overwriting existing listener."""
+        if self.__door_open_listener is not None:
+            self.cancel_listen_state(self.__door_open_listener)
+        self.__door_open_listener = self.listen_state(
+            self.__handle_door_change,
+            "binary_sensor.kitchen_door_sensor",
+            new="on",
+            duration=minutes * 60,
+        )
 
     def transition_between_scenes(self, new_scene: str, old_scene: str):
         """Adjust aircon & temperature triggers, plus suggest climate control if appropriate."""

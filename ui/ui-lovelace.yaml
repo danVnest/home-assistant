@@ -310,6 +310,11 @@ views:
           - entity: input_number.bedroom_vacating_delay
         title: Room Vacating Delays
         type: entities
+      - type: entities
+        entities:
+          - entity: input_number.aircon_door_check_delay
+            icon: mdi:timer
+        title: Aircon Door Check Delay
   - badges:
       - entity: binary_sensor.updater
       - entity: sensor.hacs
