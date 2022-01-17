@@ -44,7 +44,7 @@ class Climate(app.App):
         self.__climate_control_history["before_away"] = self.climate_control
         self.__temperature_monitor.start_monitoring()
         self.set_door_check_delay(
-            int(self.entities.input_number.aircon_door_check_delay.state) * 60
+            float(self.entities.input_number.aircon_door_check_delay.state) * 60
         )
         self.listen_state(
             self.__handle_door_change, "binary_sensor.kitchen_door_sensor", new="off"
