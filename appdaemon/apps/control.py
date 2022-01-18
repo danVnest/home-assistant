@@ -180,7 +180,7 @@ class Control(app.App):
             self.__button_clicked(room)
         elif data["scene_data"] == 2:  # held
             self.log(f"Button in '{room}' held")
-            self.scene = "Bright" if self.scene not in ("Sleep", "Bright") else "Night"
+            self.apps["climate"].aircon = not self.apps["climate"].aircon
 
     def __button_clicked(self, room: str):
         """Handle a button click."""
