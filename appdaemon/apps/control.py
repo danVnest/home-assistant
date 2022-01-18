@@ -196,28 +196,21 @@ class Control(app.App):
             else:
                 self.scene = "Night"
         elif room == "bedroom":
-            if self.scene == "Night":
+            if self.scene == "Morning":
+                self.scene = "Day"
+                self.apps["lights"].lights["bedroom"].adjust_to_max()
+                self.log("Bedroom light turned on")
+            elif self.scene == "Night":
                 self.apps["lights"].alternative_scene = True
                 self.scene = "Sleep"
-            elif self.scene == "Sleep":
-                if self.apps["lights"].lights["bedroom"].brightness == 0:
-                    self.scene = "Night"
-                else:
-                    self.apps["lights"].lights["bedroom"].turn_off()
-                    self.log("Bedroom light turned off")
+            elif (
+                self.scene == "Sleep"
+                and self.apps["lights"].lights["bedroom"].brightness != 0
+            ):
+                self.apps["lights"].lights["bedroom"].turn_off()
+                self.log("Bedroom light turned off")
             else:
-                adjusting = (
-                    self.apps["lights"]
-                    .lights["bedroom"]
-                    .toggle_presence_adjustments(
-                        occupied=(
-                            self.apps["lights"].args["max_brightness"],
-                            self.apps["lights"].args["max_kelvin"],
-                        ),
-                        vacating_delay=self.get_setting("bedroom_vacating_delay"),
-                    )
-                )
-                self.log(f"Bedroom light is now adjusting with presence: {adjusting}")
+                self.scene = "Night"
 
     def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
