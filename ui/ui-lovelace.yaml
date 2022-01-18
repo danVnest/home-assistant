@@ -212,27 +212,28 @@ views:
           Automatically triggered when both of us have left the house.
 
 
-          The **buttons** in the kitchen and bedroom will intelligently change
-          scene based on the current conditions. The bedroom button's key
-          functions are to transition the scene from ***Night*** to ***Sleep***
-          while keeping the bedroom light on. When clicked again it will turn
-          the bedroom light off. Otherwise the bedroom button will toggle motion
-          detection based light control in the room. Holding either button will
-          toggle the scene between ***Bright*** and ***Night***.
+          The **buttons** in the kitchen and bedroom will essentially toggle
+          lighting when clicked, intelligently changing the scene based on the
+          current conditions. The bedroom button also allows you to first switch
+          from ***Night*** to ***Sleep*** while keeping the bedroom light on,
+          then when clicked again it will turn the bedroom light off (properly
+          entering ***Sleep***). Holding either button for a few seconds will
+          toggle the aircon.
 
 
           Lighting in the entryway, kitchen, office and bedroom will
           automatically brighten when someone enters, and dim shortly after they
-          leave (depending on scene settings). Bedroom light adjustments are
-          disabled as soon as the *Sleep* scene starts, only enabling again when
-          the bedroom **button** is clicked.
+          leave (depending on scene settings). Automatic bedroom lighting is
+          disabled as soon as the ***Sleep*** scene starts, only enabling again
+          when the bedroom **button** is clicked or after luminance levels peak
+          (i.e. after blinds are first opened in the morning).
 
 
           Only the bedroom aircon will be controlled after the specified bed
           time, regardless of the scene.
         type: markdown
   - path: lights
-    title: Lighting
+    title: Settings
     badges: []
     cards:
       - cards:
@@ -245,6 +246,7 @@ views:
               - entity: input_datetime.circadian_end_time
             title: Circadian Rhythm
             type: entities
+            state_color: false
           - content: >-
               Lighting at night will gradually transition between the intial and
               final brightness and colour values specified here.
