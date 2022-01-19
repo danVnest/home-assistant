@@ -516,7 +516,7 @@ class Light:
         if validated_value != value:
             self.controller.log(
                 f"Brightness ({value}) out of bounds for '{self.light_id}'",
-                level="WARNING",
+                level="DEBUG",
             )
         return validated_value
 
@@ -555,7 +555,7 @@ class Light:
         if validated_value != value:
             self.controller.log(
                 f"Kelvin ({value}) out of bounds for '{self.light_id}'",
-                level="WARNING",
+                level="DEBUG",
             )
         return self.controller.constants["kelvin_per_step"] * int(
             value / self.controller.constants["kelvin_per_step"]
