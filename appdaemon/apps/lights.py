@@ -466,10 +466,16 @@ class Light:
         self.light_id = light_id
         self.controller = controller
         self.kelvin_limits = {
-            "max": self.controller.constants["mired_kelvin_reciprocal"]
-            / float(self.__get_attribute("min_mireds")),
-            "min": self.controller.constants["mired_kelvin_reciprocal"]
-            / float(self.__get_attribute("max_mireds")),
+            "max": round(
+                self.controller.constants["mired_kelvin_reciprocal"]
+                / float(self.__get_attribute("min_mireds")),
+                -1,
+            ),
+            "min": round(
+                self.controller.constants["mired_kelvin_reciprocal"]
+                / float(self.__get_attribute("max_mireds")),
+                -1,
+            ),
         }
         self.__kelvin_before_off = (
             self.controller.args["max_brightness"]
