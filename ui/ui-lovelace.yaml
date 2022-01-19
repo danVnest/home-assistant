@@ -231,6 +231,31 @@ views:
 
           Only the bedroom aircon will be controlled after the specified bed
           time, regardless of the scene.
+
+
+          In order to use Siri, you will need to add the following Siri
+          shortcuts to your device: [Sleep
+          Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9),
+          [Lights On
+          Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010),
+          [Lights
+          On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd),
+          [Lights
+          Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167),
+          [Aircon
+          On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34),
+          [Aircon
+          Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655),
+          [Enable Climate
+          Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35),
+          [Disable Climate
+          Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706),
+          [Lock The
+          Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1),
+          [Unlock The
+          Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
+          [TV
+          On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
         type: markdown
   - path: lights
     title: Settings
