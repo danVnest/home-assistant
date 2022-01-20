@@ -256,6 +256,10 @@ views:
           Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
           [TV
           On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
+
+          In order to use Google, you will need to connect your Google Assistant
+          to IFTTT and add applets with webhooks to Home Assistant corresponding
+          to each command.
         type: markdown
   - path: lights
     title: Settings

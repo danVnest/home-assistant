@@ -216,12 +216,23 @@ class Control(app.App):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
         self.log(f"Received {data} from IFTTT: ")
-        if "scene" in data:
-            self.scene = data["scene"]
+        if "lights" in data:
+            self.scene = "Night" if self.scene == "Day" else "Day"
+        elif "bright" in data:
+            self.scene = "Bright"
+        elif "sleep" in data:
+            self.scene = "Sleep"
         elif "climate_control" in data:
-            self.apps["climate"].climate_control = data["climate_control"]
+            self.apps["climate"].climate_control = not self.apps[
+                "climate"
+            ].climate_control
         elif "aircon" in data:
-            self.apps["climate"].aircon = data["aircon"]
+            self.apps["climate"].aircon = not self.apps["climate"].aircon
+        elif "lock" in data:
+            command = (
+                "unlock" if self.entities.lock.door_lock.state == "locked" else "lock"
+            )
+            self.call_service(f"lock/{command}", entity_id="lock.door_lock")
 
     def get_setting(self, setting_name: str) -> int:
         """Get UI input_number setting values."""
