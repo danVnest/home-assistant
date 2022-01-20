@@ -76,9 +76,7 @@ views:
           show_name: true
           type: glance
           state_color: true
-        conditions:
-          - entity: sensor.any_climate_control
-            state: 'True'
+        conditions: []
         type: conditional
       - cards:
           - entities:

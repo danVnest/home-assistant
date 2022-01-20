@@ -37,12 +37,12 @@ class Climate(app.App):
         """
         super().initialize()
         self.__temperature_monitor = TemperatureMonitor(self)
+        self.__temperature_monitor.configure_sensors()
         self.__aircons = {
             aircon: Aircon(f"climate.{aircon}", self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
         self.__climate_control_history["before_away"] = self.climate_control
-        self.__temperature_monitor.start_monitoring()
         self.set_door_check_delay(
             float(self.entities.input_number.aircon_door_check_delay.state) * 60
         )
@@ -60,7 +60,6 @@ class Climate(app.App):
         """Enable/disable climate control and reflect state in UI."""
         self.log(f"{'En' if state else 'Dis'}abling climate control")
         if state:
-            self.__temperature_monitor.start_monitoring()
             self.handle_temperatures()
         else:
             if self.__aircon_trigger_timer is not None:
@@ -119,6 +118,7 @@ class Climate(app.App):
 
     def reset(self):
         """Reset climate control using latest settings."""
+        self.__temperature_monitor.configure_sensors()
         self.aircon = self.aircon
         self.handle_temperatures()
 
@@ -135,6 +135,7 @@ class Climate(app.App):
 
     def transition_between_scenes(self, new_scene: str, old_scene: str):
         """Adjust aircon & temperature triggers, plus suggest climate control if appropriate."""
+        self.__temperature_monitor.configure_sensors()
         if "Away" in new_scene and "Away" not in old_scene:
             self.__climate_control_history["before_away"] = self.climate_control
             self.climate_control = False
@@ -142,7 +143,6 @@ class Climate(app.App):
         elif "Away" not in new_scene and "Away" in old_scene:
             self.climate_control = self.__climate_control_history["before_away"]
         if self.climate_control or not self.__suggested:
-            self.__temperature_monitor.start_monitoring()
             self.handle_temperatures()
         if self.aircon:
             self.__turn_aircon_on()
@@ -243,8 +243,6 @@ class Climate(app.App):
 
     def __turn_aircon_on(self):
         """Turn aircon on, calculating mode, handling Sleep/Morning scenes and bed time."""
-        if self.climate_control or self.__suggested is False:
-            self.__temperature_monitor.start_monitoring()
         if self.__temperature_monitor.is_below_target_temperature():
             mode = "heat"
         elif self.__temperature_monitor.is_above_target_temperature():
@@ -322,8 +320,6 @@ class Climate(app.App):
                 if self.control.apps["presence"].anyone_home()
                 else "all",
             )
-            if self.climate_control is False:
-                self.__temperature_monitor.stop_monitoring()
 
     def __allow_suggestion(self):
         """Allow suggestions to be made again. Use after user events & scene changes."""
@@ -342,9 +338,7 @@ class Climate(app.App):
             self.notify(
                 "The kitchen door is open, turning aircon off",
                 title="Climate Control",
-                targets="anyone_home"
-                if self.control.apps["presence"].anyone_home()
-                else "all",  # TODO: if noone home... who opened the door?
+                targets="anyone_home",
             )
 
 
@@ -499,7 +493,7 @@ class TemperatureMonitor:
             self.controller.entities.sensor.outside_temperature_feels_like.state
         )
 
-    def start_monitoring(self):
+    def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
         bed = self.controller.scene == "Sleep" or self.controller.control.is_bed_time()
         for sensor in self.sensors.values():
@@ -508,16 +502,6 @@ class TemperatureMonitor:
             else:
                 sensor.enable()
         self.calculate_inside_temperature()
-
-    def stop_monitoring(self):
-        """Stop listening for sensor updates."""
-        for sensor in self.sensors.values():
-            sensor.disable()
-        self.controller.log("Stopped monitoring temperatures")
-
-    def is_monitoring(self) -> bool:
-        """Check if any sensor is enabled, and thus if monitoring is enabled."""
-        return any(sensor.is_enabled() for sensor in self.sensors.values())
 
     def handle_sensor_change(
         self, entity: str, attribute: str, old: float, new: float, kwargs: dict
@@ -532,9 +516,8 @@ class TemperatureMonitor:
         self.last_inside_temperature = self.inside_temperature
         temperatures = []
         humidities = []
-        all_disabled = not self.is_monitoring()
         for sensor in self.sensors.values():
-            if (all_disabled or sensor.is_enabled()) and sensor.location != "outside":
+            if sensor.is_enabled() and sensor.location != "outside":
                 temperature = sensor.get_measure("temperature")
                 if temperature is not None:
                     temperatures.append(temperature)
