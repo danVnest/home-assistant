@@ -282,7 +282,7 @@ class Control(app.App):
         elif "temperature" in setting:
             self.apps["climate"].reset()
         elif "door" in setting:
-            self.apps["climate"].set_door_check_delay(int(kwargs["new"]))
+            self.apps["climate"].set_door_check_delay(float(kwargs["new"]))
         else:
             self.apps["lights"].transition_to_scene(self.scene)
 
