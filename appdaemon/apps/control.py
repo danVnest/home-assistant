@@ -47,7 +47,7 @@ class Control(app.App):
             "input_select",
         ]:
             self.listen_state(self.__delay_handle_settings_change, setting)
-        self.listen_event(self.__button, "zwave.scene_activated")
+        self.listen_event(self.__button, "zwave_js_value_notification")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
             "door_lock_battery_level",
@@ -175,10 +175,10 @@ class Control(app.App):
     def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
-        room = data["entity_id"].replace("zwave.", "").replace("_button", "")
-        if data["scene_data"] == 0:  # clicked
+        room = "bedroom" if data["node_id"] == 4 else "kitchen"
+        if data["value"] == "KeyPressed":
             self.__button_clicked(room)
-        elif data["scene_data"] == 2:  # held
+        elif data["value"] == "KeyHeldDown":
             self.log(f"Button in '{room}' held")
             self.apps["climate"].aircon = not self.apps["climate"].aircon
 
