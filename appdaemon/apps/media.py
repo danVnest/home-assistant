@@ -82,7 +82,7 @@ class Media(app.App):
             )
         if self.scene == "Night" and self.is_playing and not self.is_muted:
             self.scene = "TV"
-        elif self.scene == "TV":
+        elif self.scene == "TV" and (not self.is_playing or self.is_muted):
             self.scene = "Night"
 
     def __source_change(
@@ -90,6 +90,6 @@ class Media(app.App):
     ):  # pylint: disable=too-many-arguments
         """Remember TV source before standby so it can be restored when turned on."""
         del entity, attribute, old, kwargs
-        if new:
+        if new not in (None, "HDMI 1"):
             self.__last_source = new
             self.log(f"TV source changed to {self.__last_source}", level="DEBUG")
