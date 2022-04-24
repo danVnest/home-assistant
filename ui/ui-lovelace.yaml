@@ -345,7 +345,7 @@ views:
             icon: mdi:timer
         title: Aircon Door Check Delay
   - badges:
-      - entity: binary_sensor.updater
+      - entity: binary_sensor.home_assistant_versions_update_available
       - entity: sensor.hacs
     cards:
       - entities:

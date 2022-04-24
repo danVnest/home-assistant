@@ -283,8 +283,6 @@ system_health:
 tts:
   platform: google_translate
 
-updater:
-
 wake_on_lan:
 
 webostv:
