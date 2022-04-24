@@ -1,3 +1,13 @@
+automation:
+  - alias: "Turn TV On"
+    trigger:
+      - platform: webostv.turn_on
+        entity_id: media_player.tv
+    action:
+      - service: wake_on_lan.send_magic_packet
+        data:
+          mac: !secret tv_mac
+
 binary_sensor:
   - platform: template
     sensors:
@@ -280,13 +290,5 @@ tts:
   platform: google_translate
 
 wake_on_lan:
-
-webostv:
-  host: 192.168.20.90
-  name: "TV"
-  turn_on_action:
-    service: wake_on_lan.send_magic_packet
-    data:
-      mac: !secret tv_mac
 
 zeroconf:
