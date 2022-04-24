@@ -406,7 +406,7 @@ class Lights(app.App):
                     self.scene = "Night"
                 else:
                     self.scene = "Away (Night)"
-        elif self.scene != "Bright":
+        elif self.scene not in ("Bright", "Morning"):
             if (
                 float(new) - self.__lighting_luminance()
                 >= self.args["night_max_luminance"]
@@ -424,17 +424,14 @@ class Lights(app.App):
         """Detect when to change scene from morning to day and set automatic lighting."""
         del entity, attribute, old, kwargs
         if self.scene == "Morning":
-            if (
-                float(new) - self.__lighting_luminance()
-                >= self.args["morning_max_luminance"]
-            ):
+            if float(new) >= self.args["morning_max_luminance"]:
                 self.log(
                     f"Bedroom light levels are high ({new}%), transitioning to day scene"
                 )
                 self.scene = "Day"
         elif self.scene == "Day":
             if (
-                float(new) - self.__lighting_luminance()
+                float(new) - self.__lighting_luminance("bedroom")
                 >= self.args["morning_max_luminance"]
             ):
                 if not self.lights["bedroom"].is_ignoring_presence():
