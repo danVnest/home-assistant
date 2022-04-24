@@ -6,10 +6,6 @@ binary_sensor:
            {% set time = now() %}
            {{ states.input_select.scene.state != "Sleep" and states.input_datetime.bed_time.attributes.timestamp > (time - time.replace(hour=0,minute=0,second=0,microsecond=0)).total_seconds() }}
 
-climate:
-  platform: sensibo
-  api_key: !secret sensibo_key
-
 config:
 
 counter:
