@@ -406,17 +406,30 @@ class Lights(app.App):
                     self.scene = "Night"
                 else:
                     self.scene = "Away (Night)"
-        elif self.scene not in ("Bright", "Morning"):
+        elif self.scene not in ("Bright", "Sleep"):
             if (
                 float(new) - self.__lighting_luminance()
                 >= self.args["night_max_luminance"]
             ):
-                self.log(f"Light levels are high ({new}%), transitioning to day scene")
-                self.scene = (
-                    "Day"
-                    if self.control.apps["presence"].anyone_home()
-                    else "Away (Day)"
-                )
+                if self.scene == "Morning":
+                    self.lights["kitchen"].set_presence_adjustments(
+                        occupied=(
+                            self.args["max_brightness"],
+                            self.control.get_setting("morning_kelvin"),
+                        ),
+                        vacating_delay=self.control.get_setting(
+                            "morning_vacating_delay"
+                        ),
+                    )
+                else:
+                    self.log(
+                        f"Light levels are high ({new}%), transitioning to day scene"
+                    )
+                    self.scene = (
+                        "Day"
+                        if self.control.apps["presence"].anyone_home()
+                        else "Away (Day)"
+                    )
 
     def __handle_bedroom_luminance_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
