@@ -10,18 +10,22 @@ custom_components/*/*
 !custom_components/*/manifest.json
 
 # Logs
+home-assistant.log*
 logs
 *.log
-OZW_Log.txt
 
 # System files
-.remote-sync.json
-.uuid
-.storage
-.homekit.state
+blueprints
 *.db
+*.db-shm
+*.db-wal
+.homekit.state
+image
 options.xml
-zwscene.xml
-zwcfg_*
-pyozw.sqlite
 __pycache__
+pyozw.sqlite
+.storage
+tts
+ui
+webostv.conf
+zwcfg_*
