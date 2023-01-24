@@ -23,18 +23,13 @@ class App(hass.Hass):
 
     @property
     def scene(self) -> str:
-        """Scene is stored in Home Assistant as an input_select entity."""
-        return self.entities.input_select.scene.state
+        """Scene is stored in the control app and synced with Home Assistant."""
+        return self.control.scene
 
     @scene.setter
     def scene(self, new_scene: str):
-        """Call the input_select/select_option service to set the scene."""
-        self.log(f"Setting scene to '{new_scene}' (transitioning from '{self.scene}')")
-        self.call_service(
-            "input_select/select_option",
-            entity_id="input_select.scene",
-            option=new_scene,
-        )
+        """Use the control app to change the scene and sync with Home Assistant."""
+        self.control.scene = new_scene
 
     def cancel_timer(self, handle):
         """Cancel timer after checking it is valid and running."""

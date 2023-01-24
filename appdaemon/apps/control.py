@@ -22,12 +22,12 @@ class Control(app.App):
         self.__timers = {
             "morning_time": None,
             "bed_time": None,
-            "setting_delay_timers": {},
             "heartbeat": None,
             "heartbeat_fail_count": 0,
             "init_delay": None,
         }
         self.__is_all_initialised = False
+        self.__scene = None
 
     def initialize(self):
         """Monitor logs, listen for user input, monitor batteries and set timers.
@@ -35,6 +35,7 @@ class Control(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        self.__scene = self.entities.input_select.scene.state
         for app_name in self.apps:
             self.apps[app_name] = self.get_app(app_name.capitalize())
         self.call_service("counter/reset", entity_id="counter.warnings")
@@ -46,7 +47,7 @@ class Control(app.App):
             "input_number",
             "input_select",
         ]:
-            self.listen_state(self.__delay_handle_settings_change, setting)
+            self.listen_state(self.__handle_settings_change, setting)
         self.listen_event(self.__button, "zwave_js_value_notification")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
@@ -103,10 +104,33 @@ class Control(app.App):
         self.log(f"App added: {data['app']}")
         self.reset_scene()
 
+    @property
+    def scene(self) -> str:
+        """Scene setting is retrieved by all apps from here rather than Home Assistant."""
+        return self.__scene
+
+    @scene.setter
+    def scene(self, new_scene: str):
+        """Propagate scene change to other apps and sync scene with Home Assistant."""
+        old_scene = self.__scene
+        self.__scene = new_scene
+        self.log(f"Setting scene to '{new_scene}' (transitioning from '{old_scene}')")
+        self.apps["lights"].transition_to_scene(new_scene)
+        self.apps["climate"].transition_between_scenes(new_scene, old_scene)
+        if new_scene == "Sleep" or "Away" in new_scene:
+            self.call_service("lock/lock", entity_id="lock.door_lock")
+            self.apps["media"].standby()
+        elif new_scene == "TV":
+            self.apps["media"].turn_on()
+        self.call_service(
+            "input_select/select_option",
+            entity_id="input_select.scene",
+            option=new_scene,
+        )
+
     def reset_scene(self):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
-        initial_scene = self.scene
         if self.scene == "Bright":
             self.scene = "Bright"
         elif not self.apps["presence"].anyone_home():
@@ -127,14 +151,6 @@ class Control(app.App):
             )
         else:
             self.scene = "Night"
-        if initial_scene == self.scene:
-            self.__delay_handle_settings_change(
-                entity="input_select.scene",
-                attribute=None,
-                old=initial_scene,
-                new=self.scene,
-                kwargs=None,
-            )
 
     def __set_timer(self, name: str):
         """Set morning or bed timer as specified by the corresponding settings."""
@@ -240,49 +256,34 @@ class Control(app.App):
             return self.get_state(f"input_datetime.{setting_name}")
         return int(float(self.get_state(f"input_number.{setting_name}")))
 
-    def __delay_handle_settings_change(
+    def __handle_settings_change(
         self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
-        """Delay handling of setting changes made by the user through the UI."""
-        del attribute, kwargs
-        if entity in self.__timers["setting_delay_timers"]:
-            self.cancel_timer(self.__timers["setting_delay_timers"][entity])
-        self.__timers["setting_delay_timers"][entity] = self.run_in(
-            self.__handle_settings_change,
-            self.args["settings_change_delay"],
-            entity=entity,
-            new=new,
-            old=old,
-        )
-
-    def __handle_settings_change(self, kwargs: dict):
         """Act on setting changes made by the user through the UI."""
-        (input_type, setting) = kwargs["entity"].split(".")
-        self.log(f"UI setting '{setting}' changed to {kwargs['new']}")
+        del attribute, kwargs
+        (input_type, setting) = entity.split(".")
         if setting == "scene":
-            self.apps["lights"].transition_to_scene(kwargs["new"])
-            self.apps["climate"].transition_between_scenes(kwargs["new"], kwargs["old"])
-            if kwargs["new"] == "Sleep" or "Away" in kwargs["new"]:
-                self.call_service("lock/lock", entity_id="lock.door_lock")
-                self.apps["media"].standby()
-            elif kwargs["new"] == "TV":
-                self.apps["media"].turn_on()
-        elif input_type == "input_boolean":
-            setattr(self.apps["climate"], setting, kwargs["new"] == "on")
+            if new != self.scene:
+                self.log(f"UI scene selection changed to {new} from {old}")
+                self.scene = new
+        else:
+            self.log(f"UI setting '{setting}' changed to {new} from {old}")
+            if input_type == "input_boolean":
+                setattr(self.apps["climate"], setting, new == "on")
         elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
             except ValueError:
-                self.__revert_setting(kwargs["entity"], kwargs["old"])
+                    self.__revert_setting(entity, old)
         elif setting.endswith("_time"):
             if self.__are_time_settings_valid():
                 self.__set_timer(setting)
             else:
-                self.__revert_setting(kwargs["entity"], kwargs["old"])
+                    self.__revert_setting(entity, old)
         elif "temperature" in setting:
             self.apps["climate"].reset()
         elif "door" in setting:
-            self.apps["climate"].set_door_check_delay(float(kwargs["new"]))
+                self.apps["climate"].set_door_check_delay(float(new))
         else:
             self.apps["lights"].transition_to_scene(self.scene)
 
