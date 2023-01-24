@@ -53,7 +53,7 @@ class App(hass.Hass):
                 ]
             ):
                 if person == "dan":
-                    mobile_name = "mobile_app_dans_phone"
+                    mobile_name = "mobile_app_daniels_phone"
                     data = {"apns_headers": {"apns-collapse-id": kwargs["title"]}}
                 else:
                     mobile_name = "mobile_app_rachel_s_phone"
