@@ -5,6 +5,7 @@ Monitors the TV to change the scene appropriately.
 User defined variables are configued in media.yaml
 """
 
+import subprocess
 import app
 
 
@@ -25,7 +26,7 @@ class Media(app.App):
         super().initialize()
         self.__last_source = self.get_state(self.__entity_id, attribute="source")
         if self.__last_source is None:
-            self.__last_source = "Netflix"
+            self.__last_source = self.args["default_source"]
         self.listen_state(self.__state_change, self.__entity_id)
         self.listen_state(
             self.__state_change,
@@ -41,6 +42,11 @@ class Media(app.App):
         )
 
     @property
+    def is_on(self) -> bool:
+        """Check if the TV is currently on or not."""
+        return self.get_state(self.__entity_id) == "on"
+
+    @property
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
         return self.get_state(self.__entity_id) == "on"
@@ -50,6 +56,11 @@ class Media(app.App):
     def is_muted(self) -> bool:
         """Check if the TV is currently muted or not."""
         return self.get_state(self.__entity_id, attribute="is_volume_muted")
+
+    @property
+    def is_pc_on(self) -> bool:
+        """Check if the PC is currently on or not."""
+        return subprocess.call(["ping", "-c", "1", self.args["pc_ip"]]) == 0
 
     def standby(self):
         """Turn the TV off."""
@@ -77,7 +88,7 @@ class Media(app.App):
         if new == "on":
             self.call_service(
                 "media_player/select_source",
-                source=self.__last_source,
+                source="PC" if self.is_pc_on else self.__last_source,
                 entity_id=self.__entity_id,
             )
         if self.scene == "Night" and self.is_playing and not self.is_muted:
@@ -90,6 +101,7 @@ class Media(app.App):
     ):  # pylint: disable=too-many-arguments
         """Remember TV source before standby so it can be restored when turned on."""
         del entity, attribute, old, kwargs
-        if new not in (None, "HDMI 1"):
-            self.__last_source = new
+        if new is not None:
+            if new != "PC":
+                self.__last_source = new
             self.log(f"TV source changed to {self.__last_source}", level="DEBUG")

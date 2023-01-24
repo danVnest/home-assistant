@@ -2,3 +2,5 @@ Media:
   module: media
   class: Media
   steady_state_delay: 5 # delay in seconds before firing a tv state change
+  default_source: Netflix
+  pc_ip: 192.168.20.91
