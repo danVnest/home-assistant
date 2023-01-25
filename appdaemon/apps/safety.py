@@ -13,8 +13,7 @@ class Safety(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        # self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
-        # TODO: add Nest Protects when Nest integration is working properly
+        self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -46,23 +45,29 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
 
     def __init__(self, sensor_id: str, controller: Safety):
         """Start listening to smoke and co status."""
-        self.controller = controller
-        self.controller.listen_state(
-            self.__handle_smoke, f"sensor.{sensor_id}_protect_smoke_status"
-        )
-        self.controller.listen_state(
-            self.__handle_smoke, f"sensor.{sensor_id}_protect_co_status"
-        )
+        self.__sensor_id = sensor_id
+        self.__controller = controller
+        for sensor_type in ["smoke", "co", "heat"]:
+            self.__controller.listen_state(
+                self.__handle_smoke,
+                f"binary_sensor.nest_protect_{sensor_id}_{sensor_type}_status",
+                new="on",
+            )
 
     def __handle_smoke(
         self, entity, attribute, old, new, kwargs
     ):  # pylint: disable=too-many-arguments
         """React when high smoke level detected."""
-        del attribute, old, kwargs
-        self.controller.log(f"{entity}: {new}")
-        if new != 0:
-            self.controller.apps["media"].pause()
-            self.controller.notify(
-                f"SMOKE OR CARBON MONOXIDE DETECTED BY: {entity}", title="SMOKE ALARM"
-            )
-            self.controller.fire_event("SCENE", scene="bright")
+        del attribute, new, old, kwargs
+        self.__controller.scene = "Bright"
+        self.__controller.apps["media"].pause()
+        if "smoke" in entity:
+            sensor_type = "Smoke"
+        elif "heat" in entity:
+            sensor_type = "Heat"
+        else:
+            sensor_type = "Carbon monoxide"
+        self.__controller.notify(
+            f"{sensor_type} detected in {self.__sensor_id.replace('_', ' ')}",
+            title="Smoke Alarm",
+        )
