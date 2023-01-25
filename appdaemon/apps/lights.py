@@ -496,23 +496,23 @@ class Light:
 
     def __init__(self, light_id: str, controller: Lights, room_name: str = None):
         """Initialise with attributes for light parameters, and a Light controller."""
-        self.light_id = light_id
-        self.controller = controller
+        self.__light_id = light_id
+        self.__controller = controller
         self.kelvin_limits = {
             "max": round(
-                self.controller.constants["mired_kelvin_reciprocal"]
+                self.__controller.constants["mired_kelvin_reciprocal"]
                 / float(self.__get_attribute("min_mireds")),
                 -1,
             ),
             "min": round(
-                self.controller.constants["mired_kelvin_reciprocal"]
+                self.__controller.constants["mired_kelvin_reciprocal"]
                 / float(self.__get_attribute("max_mireds")),
                 -1,
             ),
         }
         self.__kelvin_before_off = (
-            self.controller.args["max_brightness"]
-            - self.controller.args["min_brightness"]
+            self.__controller.args["max_brightness"]
+            - self.__controller.args["min_brightness"]
         ) / 2
         self.room_name = (
             room_name
@@ -537,24 +537,24 @@ class Light:
         if self.brightness != value:
             value = self.__validate_brightness(value)
             if value != 0:
-                self.controller.log(
-                    f"Setting {self.light_id}'s brightness to {value} (from {self.brightness})",
+                self.__controller.log(
+                    f"Setting {self.__light_id}'s brightness to {value} (from {self.brightness})",
                     level="DEBUG",
                 )
-                self.controller.turn_on(self.light_id, brightness=value)
+                self.__controller.turn_on(self.__light_id, brightness=value)
             else:
                 self.turn_off()
 
     def __validate_brightness(self, value: int) -> int:
         """Return closest valid value for brightness."""
         validated_value = value
-        if value < self.controller.args["min_brightness"]:
-            validated_value = self.controller.args["min_brightness"] if value > 0 else 0
-        elif value > self.controller.args["max_brightness"]:
-            validated_value = self.controller.args["max_brightness"]
+        if value < self.__controller.args["min_brightness"]:
+            validated_value = self.__controller.args["min_brightness"] if value > 0 else 0
+        elif value > self.__controller.args["max_brightness"]:
+            validated_value = self.__controller.args["max_brightness"]
         if validated_value != value:
-            self.controller.log(
-                f"Brightness ({value}) out of bounds for '{self.light_id}'",
+            self.__controller.log(
+                f"Brightness ({value}) out of bounds for '{self.__light_id}'",
                 level="DEBUG",
             )
         return validated_value
@@ -564,10 +564,10 @@ class Light:
         """Get the colour warmth value of the light from Home Assistant."""
         mired = self.__get_attribute("color_temp")
         return (
-            self.controller.constants["kelvin_per_step"]
+            self.__controller.constants["kelvin_per_step"]
             * round(
-                self.controller.constants["mired_kelvin_reciprocal"]
-                / self.controller.constants["kelvin_per_step"]
+                self.__controller.constants["mired_kelvin_reciprocal"]
+                / self.__controller.constants["kelvin_per_step"]
                 / mired
             )
             if mired not in (None, 0)
@@ -578,11 +578,11 @@ class Light:
     def kelvin(self, value: int):
         """Set and validate light's warmth of colour."""
         value = self.__validate_kelvin(value)
-        self.controller.log(
-            f"Setting {self.light_id}'s kelvin to {value} (from {self.kelvin})",
+        self.__controller.log(
+            f"Setting {self.__light_id}'s kelvin to {value} (from {self.kelvin})",
             level="DEBUG",
         )
-        self.controller.turn_on(self.light_id, kelvin=value)
+        self.__controller.turn_on(self.__light_id, kelvin=value)
 
     def __validate_kelvin(self, value: int) -> int:
         """Return closest valid value for kelvin."""
@@ -592,12 +592,12 @@ class Light:
         if validated_value > self.kelvin_limits["max"]:
             validated_value = self.kelvin_limits["max"]
         if validated_value != value:
-            self.controller.log(
-                f"Kelvin ({value}) out of bounds for '{self.light_id}'",
+            self.__controller.log(
+                f"Kelvin ({value}) out of bounds for '{self.__light_id}'",
                 level="DEBUG",
             )
-        return self.controller.constants["kelvin_per_step"] * int(
-            value / self.controller.constants["kelvin_per_step"]
+        return self.__controller.constants["kelvin_per_step"] * int(
+            value / self.__controller.constants["kelvin_per_step"]
         )
 
     def adjust(self, brightness: int, kelvin: int):
@@ -607,34 +607,34 @@ class Light:
         else:
             brightness = self.__validate_brightness(brightness)
             kelvin = self.__validate_kelvin(kelvin)
-            self.controller.log(
-                f"Adjusting {self.light_id} to {brightness} & {kelvin}K "
+            self.__controller.log(
+                f"Adjusting {self.__light_id} to {brightness} & {kelvin}K "
                 f"(from {self.brightness} & {self.kelvin}K)",
                 level="DEBUG",
             )
-            self.controller.turn_on(self.light_id, brightness=brightness, kelvin=kelvin)
+            self.__controller.turn_on(self.__light_id, brightness=brightness, kelvin=kelvin)
 
     def adjust_to_max(self):
         """Adjust light brightness and kelvin at the same time to maximum values."""
-        self.adjust(self.controller.args["max_brightness"], self.kelvin_limits["max"])
+        self.adjust(self.__controller.args["max_brightness"], self.kelvin_limits["max"])
 
     def turn_off(self):
         """Turn light off and record previous kelvin level."""
         if self.brightness != 0:
             self.__kelvin_before_off = self.kelvin
-            self.controller.log(
-                f"Turning {self.light_id}'s off "
+            self.__controller.log(
+                f"Turning {self.__light_id}'s off "
                 f"(previously at {self.brightness} brightness, {self.kelvin} kelvin)",
                 level="DEBUG",
             )
-            self.controller.turn_off(self.light_id)
+            self.__controller.turn_off(self.__light_id)
 
     def __get_attribute(self, attribute: str, default: int = None) -> int:
         """Get light's attribute (of the first entity if it's a group)."""
-        value = self.controller.get_state(
-            self.light_id
-            if not self.light_id.startswith("group")
-            else self.controller.get_state(self.light_id, attribute="entity_id")[0],
+        value = self.__controller.get_state(
+            self.__light_id
+            if not self.__light_id.startswith("group")
+            else self.__controller.get_state(self.__light_id, attribute="entity_id")[0],
             attribute=attribute,
             default=default,
         )
@@ -665,7 +665,7 @@ class Light:
         self.__presence_adjustments["transition_period"] = transition_period
         presence = (
             "vacant"
-            if self.controller.control.apps["presence"]
+            if self.__controller.control.apps["presence"]
             .rooms[self.room_name]
             .is_vacant(vacating_delay)
             else "occupied"
@@ -673,7 +673,7 @@ class Light:
         if transition_period != 0 and entered != (0, 0):
             if presence == "occupied":
                 seconds_in_room = (
-                    self.controller.control.apps["presence"]
+                    self.__controller.control.apps["presence"]
                     .rooms[self.room_name]
                     .seconds_in_room(vacating_delay)
                 )
@@ -683,8 +683,8 @@ class Light:
                         seconds_in_room / transition_period
                     )
         elif transition_period != 0 or entered != (0, 0):
-            self.controller.log(
-                f"{self.light_id} set to transition with invalid parameters",
+            self.__controller.log(
+                f"{self.__light_id} set to transition with invalid parameters",
                 level="WARNING",
             )
         if presence != "entered":
@@ -697,12 +697,12 @@ class Light:
             self.__presence_adjustments["vacating_delay"] = vacating_delay
         if self.__presence_adjustments.get("handle") is None:
             self.__presence_adjustments["handle"] = (
-                self.controller.control.apps["presence"]
+                self.__controller.control.apps["presence"]
                 .rooms[self.room_name]
                 .register_callback(self.__handle_presence_change, vacating_delay)
             )
-        self.controller.log(
-            f"Configured {self.light_id}'s with presence '{presence}' and "
+        self.__controller.log(
+            f"Configured {self.__light_id}'s with presence '{presence}' and "
             f"presence adjustments: {self.__presence_adjustments}",
             level="DEBUG",
         )
@@ -710,7 +710,7 @@ class Light:
     def ignore_presence(self):
         """Set light to ignore presence by cancelling its presence callback."""
         if self.__presence_adjustments.get("handle") is not None:
-            self.controller.control.apps["presence"].rooms[
+            self.__controller.control.apps["presence"].rooms[
                 self.room_name
             ].cancel_callback(self.__presence_adjustments["handle"])
             self.__presence_adjustments["handle"] = None
@@ -740,7 +740,7 @@ class Light:
         presence = "vacant" if is_vacant else "occupied"
         if not is_vacant and self.__presence_adjustments["transition_period"] != 0:
             if (
-                self.controller.control.apps["presence"]
+                self.__controller.control.apps["presence"]
                 .rooms[self.room_name]
                 .seconds_in_room(self.__presence_adjustments["vacating_delay"])
                 < self.__presence_adjustments["transition_period"]
@@ -751,7 +751,7 @@ class Light:
             self.__presence_adjustments[presence]["brightness"],
             self.__presence_adjustments[presence]["kelvin"],
         )
-        self.controller.log(f"Presence changed to {presence}", level="DEBUG")
+        self.__controller.log(f"Presence changed to {presence}", level="DEBUG")
 
     def __start_transition_towards_occupied(self, completion: float = 0):
         """Calculate the light change required and start the transition."""
@@ -766,20 +766,20 @@ class Light:
         if brightness_change == 0 and kelvin_change == 0:
             return
         steps = max(
-            abs(brightness_change) / self.controller.constants["brightness_per_step"],
-            abs(kelvin_change) / self.controller.constants["kelvin_per_step"],
+            abs(brightness_change) / self.__controller.constants["brightness_per_step"],
+            abs(kelvin_change) / self.__controller.constants["kelvin_per_step"],
             1,
         )
         max_steps = (
             self.__presence_adjustments["transition_period"]
-            * self.controller.constants["max_steps_per_second"]
+            * self.__controller.constants["max_steps_per_second"]
         )
         if steps > max_steps:
             steps = max_steps
         brightness_step = brightness_change / steps
         kelvin_step = kelvin_change / steps
         step_time = self.__presence_adjustments["transition_period"] / steps
-        self.controller.log(
+        self.__controller.log(
             "Starting transition from entered state to occupied state with: "
             f"steps = {steps}, step_time = {step_time}, "
             f"brightness_step = {brightness_step}, kelvin_step = {kelvin_step}, "
@@ -787,7 +787,7 @@ class Light:
             level="DEBUG",
         )
         self.__transition_timer = uuid.uuid4().hex
-        self.controller.run_in(
+        self.__controller.run_in(
             self.__transition_towards_occupied,
             step_time,
             brightness_step=brightness_step,
@@ -803,8 +803,8 @@ class Light:
             return
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining <= 0:
-            self.controller.log(
-                f"Transition to occupied complete for {self.light_id}",
+            self.__controller.log(
+                f"Transition to occupied complete for {self.__light_id}",
                 level="DEBUG",
             )
             self.__transition_timer = None
@@ -819,7 +819,7 @@ class Light:
                 self.__presence_adjustments["occupied"]["kelvin"]
                 - kwargs["kelvin_step"] * steps_remaining,
             )
-            self.controller.run_in(
+            self.__controller.run_in(
                 self.__transition_towards_occupied,
                 kwargs["step_time"],
                 brightness_step=kwargs["brightness_step"],

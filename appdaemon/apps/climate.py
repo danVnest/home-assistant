@@ -460,7 +460,7 @@ class TemperatureMonitor:
         self.inside_temperature = (
             self.controller.entities.climate.bedroom.attributes.current_temperature
         )
-        self.sensors = {
+        self.__sensors = {
             sensor_id: Sensor.detect_type_and_create(sensor_id, self)
             for sensor_id in [
                 "climate.bedroom",
@@ -472,7 +472,7 @@ class TemperatureMonitor:
                 "sensor.outside_temperature_feels_like",
             ]
         }
-        self.last_inside_temperature = None
+        self.__last_inside_temperature = None
 
     @property
     def inside_temperature(self) -> float:
@@ -496,7 +496,7 @@ class TemperatureMonitor:
     def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
         bed = self.controller.scene == "Sleep" or self.controller.control.is_bed_time()
-        for sensor in self.sensors.values():
+        for sensor in self.__sensors.values():
             if bed and sensor.location == "inside":
                 sensor.disable()
             else:
@@ -513,10 +513,10 @@ class TemperatureMonitor:
 
     def calculate_inside_temperature(self):
         """Use stored sensor values to calculate the 'feels like' temperature inside."""
-        self.last_inside_temperature = self.inside_temperature
+        self.__last_inside_temperature = self.inside_temperature
         temperatures = []
         humidities = []
-        for sensor in self.sensors.values():
+        for sensor in self.__sensors.values():
             if sensor.is_enabled() and sensor.location != "outside":
                 temperature = sensor.get_measure("temperature")
                 if temperature is not None:
@@ -534,7 +534,7 @@ class TemperatureMonitor:
             ).c,
             1,
         )
-        if self.last_inside_temperature != self.inside_temperature:
+        if self.__last_inside_temperature != self.inside_temperature:
             self.controller.log(
                 f"Inside temperature calculated as {self.inside_temperature} degrees",
                 level="DEBUG",

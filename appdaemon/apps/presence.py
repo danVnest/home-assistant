@@ -103,50 +103,50 @@ class Room:
 
     def __init__(self, room_id: str, sensor_id: str, controller: Presence):
         """Initialise room presence and start listening for presence change."""
-        self.room_id = room_id
-        self.controller = controller
+        self.__room_id = room_id
+        self.__controller = controller
         try:
-            vacant = self.controller.get_state(sensor_id) == "off"
-            last_changed = self.controller.convert_utc(
-                self.controller.get_state(sensor_id, attribute="last_changed")
-            ).replace(tzinfo=None) + timedelta(minutes=self.controller.get_tz_offset())
+            vacant = self.__controller.get_state(sensor_id) == "off"
+            last_changed = self.__controller.convert_utc(
+                self.__controller.get_state(sensor_id, attribute="last_changed")
+            ).replace(tzinfo=None) + timedelta(minutes=self.__controller.get_tz_offset())
         except ValueError:
-            self.controller.notify(
-                f"Sensor in {room_id} is {self.controller.get_state(sensor_id)}",
+            self.__controller.notify(
+                f"Sensor in {room_id} is {self.__controller.get_state(sensor_id)}",
                 title="Sensor Error",
                 targets="dan",
             )
-            self.controller.log(
+            self.__controller.log(
                 f"Initialising room {room_id} with default state", level="WARNING"
             )
             vacant = True
-            last_changed = self.controller.datetime()
-        self.last_vacated = last_changed - timedelta(hours=0 if vacant else 2)
-        self.last_entered = last_changed - timedelta(hours=2 if vacant else 0)
-        self.callbacks = {}
-        self.controller.listen_state(self.__handle_presence_change, sensor_id)
-        self.controller.log(
+            last_changed = self.__controller.datetime()
+        self.__last_vacated = last_changed - timedelta(hours=0 if vacant else 2)
+        self.__last_entered = last_changed - timedelta(hours=2 if vacant else 0)
+        self.__callbacks = {}
+        self.__controller.listen_state(self.__handle_presence_change, sensor_id)
+        self.__controller.log(
             f"Room '{room_id}' initialised as last {'vacat' if vacant else 'enter'}ed at "
-            f"{self.last_vacated if vacant else self.last_entered}",
+            f"{self.__last_vacated if vacant else self.__last_entered}",
             level="DEBUG",
         )
 
     def is_vacant(self, vacating_delay: int = 0) -> bool:
         """Check if vacant based on last time vacated and entered, with optional delay."""
         return (
-            self.last_entered
-            < self.last_vacated
-            < self.controller.datetime() - timedelta(seconds=vacating_delay)
+            self.__last_entered
+            < self.__last_vacated
+            < self.__controller.datetime() - timedelta(seconds=vacating_delay)
         )
 
     def seconds_in_room(self, vacating_delay: int = 0) -> int:
         """Return number of seconds room has been occupied (or vacant if negative)."""
         return (
-            self.last_vacated
-            - self.controller.datetime()
+            self.__last_vacated
+            - self.__controller.datetime()
             + timedelta(seconds=vacating_delay)
             if self.is_vacant(vacating_delay)
-            else self.controller.datetime() - self.last_entered
+            else self.__controller.datetime() - self.__last_entered
         ).total_seconds()
 
     def __handle_presence_change(
@@ -155,53 +155,53 @@ class Room:
         """If room presence changes, trigger all registered callbacks."""
         del entity, attribute, old, kwargs
         is_vacant = new == "off"
-        self.controller.log(
-            f"The {self.room_id} is now {'vacant' if is_vacant else 'occupied'}",
+        self.__controller.log(
+            f"The {self.__room_id} is now {'vacant' if is_vacant else 'occupied'}",
             level="DEBUG",
         )
         if is_vacant:
-            self.last_vacated = self.controller.datetime()
+            self.__last_vacated = self.__controller.datetime()
         else:
-            self.last_entered = self.controller.datetime()
-        for handle, callback in list(self.callbacks.items()):
-            self.controller.cancel_timer(callback["timer_handle"])
+            self.__last_entered = self.__controller.datetime()
+        for handle, callback in list(self.__callbacks.items()):
+            self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:
                 callback["callback"](is_vacant=is_vacant)
-                self.controller.log(f"Called callback: {callback}", level="DEBUG")
+                self.__controller.log(f"Called callback: {callback}", level="DEBUG")
             else:
-                self.callbacks[handle]["timer_handle"] = self.controller.run_in(
+                self.__callbacks[handle]["timer_handle"] = self.__controller.run_in(
                     callback["callback"],
                     callback["vacating_delay"],
                     is_vacant=True,
                 )
-                self.controller.log(
+                self.__controller.log(
                     f"Set vacation timer for callback: {callback}", level="DEBUG"
                 )
 
     def add_sensor(self, sensor_id: str):
         """Add additional sensor to room."""
-        self.controller.listen_state(self.__handle_presence_change, sensor_id)
+        self.__controller.listen_state(self.__handle_presence_change, sensor_id)
 
     def register_callback(self, callback, vacating_delay: int = 0) -> uuid.UUID:
         """Register a callback for when presence changes, including an optional delay."""
         handle = uuid.uuid4().hex
-        self.callbacks[handle] = {
+        self.__callbacks[handle] = {
             "callback": callback,
             "vacating_delay": vacating_delay,
             "timer_handle": None,
         }
         if 0 < -1 * self.seconds_in_room() < vacating_delay:
-            self.callbacks[handle]["timer_handle"] = self.controller.run_in(
+            self.__callbacks[handle]["timer_handle"] = self.__controller.run_in(
                 callback,
                 vacating_delay + self.seconds_in_room(),
                 is_vacant=True,
             )
 
-        self.controller.log(f"Registered callback: {callback}", level="DEBUG")
+        self.__controller.log(f"Registered callback: {callback}", level="DEBUG")
         return handle
 
     def cancel_callback(self, handle):
         """Cancel a callback (and its timer if it has one) by passing its handle."""
-        if handle in self.callbacks:
-            self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
-            del self.callbacks[handle]
+        if handle in self.__callbacks:
+            self.__controller.cancel_timer(self.__callbacks[handle]["timer_handle"])
+            del self.__callbacks[handle]
