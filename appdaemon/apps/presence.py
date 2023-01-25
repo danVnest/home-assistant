@@ -30,14 +30,14 @@ class Presence(app.App):
             self.rooms[room] = Room(
                 room, f"binary_sensor.{room}_multisensor_motion", self
             )
-        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing_sensor")
-        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_motion_sensor")
-        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_sensor")
+        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing")
+        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_motion")
+        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
         self.listen_state(self.__handle_presence_change, "person")
         self.listen_state(
-            self.__handle_doorbell, "binary_sensor.doorbell_ringing_sensor", new="True"
+            self.__handle_doorbell, "binary_sensor.doorbell_ringing", new="True"
         )
 
     def anyone_home(self, **kwargs) -> bool:

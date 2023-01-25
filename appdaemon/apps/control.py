@@ -51,6 +51,7 @@ class Control(app.App):
         self.listen_event(self.__button, "zwave_js_value_notification")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
+            "doorbell_battery_level",
             "door_lock_battery_level",
             "kitchen_door_sensor_battery_level",
             "entryway_multisensor_battery_level",

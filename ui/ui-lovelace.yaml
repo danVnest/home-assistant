@@ -21,9 +21,9 @@ views:
           state_color: true
         conditions:
           - entity: input_boolean.climate_control
-            state: 'on'
+            state: "on"
           - entity: binary_sensor.display_day_card
-            state: 'on'
+            state: "on"
         type: conditional
       - card:
           entities:
@@ -35,9 +35,9 @@ views:
           state_color: true
         conditions:
           - entity: input_boolean.climate_control
-            state: 'on'
+            state: "on"
           - entity: binary_sensor.display_day_card
-            state: 'off'
+            state: "off"
         type: conditional
       - card:
           entities:
@@ -49,9 +49,9 @@ views:
           state_color: true
         conditions:
           - entity: sensor.any_climate_control
-            state: 'True'
+            state: "True"
           - entity: binary_sensor.display_day_card
-            state: 'on'
+            state: "on"
         type: conditional
       - card:
           entities:
@@ -63,9 +63,9 @@ views:
           state_color: true
         conditions:
           - entity: sensor.any_climate_control
-            state: 'True'
+            state: "True"
           - entity: binary_sensor.display_day_card
-            state: 'off'
+            state: "off"
         type: conditional
       - card:
           entities:
@@ -142,7 +142,7 @@ views:
               make sure to disable automatic climate control beforehand.
             type: markdown
         type: vertical-stack
-      - aspect_ratio: '2'
+      - aspect_ratio: "2"
         dark_mode: true
         default_zoom: 12
         entities:
@@ -154,7 +154,7 @@ views:
     title: Control & Status
   - title: Instructions
     path: instructions
-    icon: ''
+    icon: ""
     badges: []
     cards:
       - content: >-
@@ -364,6 +364,7 @@ views:
         title: Warnings & Errors
         type: history-graph
       - entities:
+          - entity: sensor.doorbell_battery_level
           - entity: sensor.door_lock_battery_level
           - entity: sensor.entryway_multisensor_battery_level
           - entity: sensor.kitchen_multisensor_battery_level

@@ -24,6 +24,21 @@ class Safety(app.App):
         super().initialize()
         for sensor_id in self.__smoke_sensors:
             self.__smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
+        self.listen_state(
+            self.__handle_camera_motion, "binary_sensor.doorbell_motion", new="True"
+        )
+
+    def __handle_camera_motion(
+        self, entity, attribute, old, new, kwargs
+    ):  # pylint: disable=too-many-arguments
+        """Send notification if motion detected when no one is home."""
+        self.log("Person detected by doorbell camera")
+        if not self.control.apps["presence"].anyone_home():
+            self.notify(
+                "Person detected at the front door (currently "
+                f"{self.entities.lock.door_lock.state})",
+                title="Person Detected",
+            )
 
 
 class SmokeSensor:  # pylint: disable=too-few-public-methods
