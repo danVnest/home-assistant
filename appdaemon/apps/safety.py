@@ -24,7 +24,7 @@ class Safety(app.App):
         for sensor_id in self.__smoke_sensors:
             self.__smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
         self.listen_state(
-            self.__handle_camera_motion, "binary_sensor.doorbell_motion", new="True"
+            self.__handle_camera_motion, "binary_sensor.doorbell_motion", new="on"
         )
 
     def __handle_camera_motion(
