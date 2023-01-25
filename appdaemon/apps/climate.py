@@ -47,7 +47,7 @@ class Climate(app.App):
             float(self.entities.input_number.aircon_door_check_delay.state) * 60
         )
         self.listen_state(
-            self.__handle_door_change, "binary_sensor.kitchen_door_sensor", new="off"
+            self.__handle_door_change, "binary_sensor.kitchen_door", new="off"
         )
 
     @property
@@ -128,7 +128,7 @@ class Climate(app.App):
             self.cancel_listen_state(self.__door_open_listener)
         self.__door_open_listener = self.listen_state(
             self.__handle_door_change,
-            "binary_sensor.kitchen_door_sensor",
+            "binary_sensor.kitchen_door",
             new="on",
             duration=minutes * 60,
         )
@@ -187,11 +187,11 @@ class Climate(app.App):
                 f"({self.__temperature_monitor.inside_temperature})º), consider"
             )
             if self.climate_control:
-                if self.get_state("binary_sensor.kitchen_door_sensor") == "off":
+                if self.get_state("binary_sensor.kitchen_door") == "off":
                     self.__turn_aircon_on_after_delay()
                     self.__suggest(f"{message_beginning} opening up the house")
             else:
-                if self.get_state("binary_sensor.kitchen_door_sensor") == "off":
+                if self.get_state("binary_sensor.kitchen_door") == "off":
                     message_beginning += " opening up the house and/or"
                 self.__suggest(f"{message_beginning} enabling climate control")
 
@@ -201,12 +201,12 @@ class Climate(app.App):
                 "inside right now, consider"
             )
             if self.climate_control:
-                if self.get_state("binary_sensor.kitchen_door_sensor") == "off":
+                if self.get_state("binary_sensor.kitchen_door") == "off":
                     self.__turn_aircon_on_after_delay()
                 else:
                     self.__suggest(f"{message_beginning} closing up the house")
             else:
-                if self.get_state("binary_sensor.kitchen_door_sensor") == "on":
+                if self.get_state("binary_sensor.kitchen_door") == "on":
                     message_beginning += "closing up the house and "
                 self.__suggest(f"{message_beginning} enabling climate control")
 
