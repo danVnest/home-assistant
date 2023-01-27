@@ -47,7 +47,11 @@ class Control(app.App):
             "input_number",
             "input_select",
         ]:
-            self.listen_state(self.__handle_settings_change, setting)
+            self.listen_state(
+                self.__handle_settings_change,
+                setting,
+                duration=self.args["settings_change_delay"],
+            )
         self.listen_event(self.__button, "zwave_js_value_notification")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
         for battery in [
