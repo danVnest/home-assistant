@@ -71,6 +71,7 @@ views:
           entities:
             - entity: sensor.apparent_inside_temperature_numeric
               name: Inside
+              icon: mdi:thermometer
             - entity: sensor.dark_sky_apparent_temperature
               name: Outside
           show_name: true
