@@ -460,7 +460,7 @@ class TemperatureMonitor:
     def __init__(self, controller: Climate):
         """Initialise with Climate controller and create sensor objects."""
         self.controller = controller
-        self.inside_temperature = (
+        self.__inside_temperature = (
             self.controller.entities.climate.bedroom.attributes.current_temperature
         )
         self.__sensors = {
@@ -479,12 +479,13 @@ class TemperatureMonitor:
 
     @property
     def inside_temperature(self) -> float:
-        """Get the calculated inside temperature as saved to Home Assistant."""
-        return float(self.controller.entities.sensor.apparent_inside_temperature.state)
+        """Get the calculated inside temperature that has been synced to Home Assistant."""
+        return self.__inside_temperature
 
     @inside_temperature.setter
     def inside_temperature(self, temperature: float):
-        """Store the calculated inside temperature in Home Assistant."""
+        """Sync the calculated inside temperature to Home Assistant."""
+        self.__inside_temperature = temperature
         self.controller.set_state(
             "sensor.apparent_inside_temperature", state=temperature
         )
@@ -591,9 +592,13 @@ class TemperatureMonitor:
                 and (self.is_too_hot_or_cold() and not too_hot_or_cold_outside),
             ]
         ):
-            self.controller.log(f"Outside temperature is nicer than inside {vs_str}")
+            self.controller.log(
+                f"Outside temperature is nicer than inside {vs_str}", level="DEBUG"
+            )
             return True
-        self.controller.log(f"Outside temperature is not better than inside {vs_str}")
+        self.controller.log(
+            f"Outside temperature is not better than inside {vs_str}", level="DEBUG"
+        )
         return False
 
     def is_too_hot_or_cold(self) -> bool:
@@ -605,7 +610,8 @@ class TemperatureMonitor:
         ):
             return False
         self.controller.log(
-            f"It's too hot or cold inside ({self.inside_temperature} degrees)"
+            f"It's too hot or cold inside ({self.inside_temperature} degrees)",
+            level="DEBUG",
         )
         return True
 
