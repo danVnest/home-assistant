@@ -44,10 +44,13 @@ class Climate(app.App):
         }
         self.__climate_control_history["before_away"] = self.climate_control
         self.set_door_check_delay(
-            float(self.entities.input_number.aircon_door_check_delay.state) * 60
+            float(self.entities.input_number.aircon_door_check_delay.state)
         )
         self.listen_state(
-            self.__handle_door_change, "binary_sensor.kitchen_door", new="off"
+            self.__handle_door_change,
+            "binary_sensor.kitchen_door",
+            new="off",
+            immediate=True,
         )
 
     @property
@@ -131,6 +134,7 @@ class Climate(app.App):
             "binary_sensor.kitchen_door",
             new="on",
             duration=minutes * 60,
+            immediate=True,
         )
 
     def transition_between_scenes(self, new_scene: str, old_scene: str):
@@ -194,7 +198,6 @@ class Climate(app.App):
                 if self.get_state("binary_sensor.kitchen_door") == "off":
                     message_beginning += " opening up the house and/or"
                 self.__suggest(f"{message_beginning} enabling climate control")
-
         else:
             message_beginning = (
                 f"It's {self.__temperature_monitor.inside_temperature}º "
@@ -207,7 +210,7 @@ class Climate(app.App):
                     self.__suggest(f"{message_beginning} closing up the house")
             else:
                 if self.get_state("binary_sensor.kitchen_door") == "on":
-                    message_beginning += "closing up the house and "
+                    message_beginning += " closing up the house and"
                 self.__suggest(f"{message_beginning} enabling climate control")
 
     def __suggest_if_trigger_forecast(self):
