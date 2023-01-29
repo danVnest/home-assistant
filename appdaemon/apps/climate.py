@@ -99,7 +99,7 @@ class Climate(app.App):
 
     @aircon.setter
     def aircon(self, state: bool):
-        """Turn on/off aircan and sync state to Home Assistant UI."""
+        """Turn on/off aircon and sync state to Home Assistant UI."""
         if self.aircon == state:
             self.log(f"Ensuring aircon is {'on' if state else 'off'}")
         else:
@@ -158,7 +158,7 @@ class Climate(app.App):
         if self.climate_control or not self.__suggested:
             self.handle_temperatures()
         if self.aircon:
-            self.__turn_aircon_on()
+            self.aircon = True
         elif self.climate_control is False and any(
             [
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
@@ -178,7 +178,7 @@ class Climate(app.App):
                     "turning aircon on for the pets",
                     title="Climate Control",
                 )
-                self.__turn_aircon_on()
+                self.aircon = True
         else:
             self.climate_control = True
             self.notify(
