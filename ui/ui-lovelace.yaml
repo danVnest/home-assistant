@@ -377,9 +377,9 @@ views:
           - entity: sensor.bedroom_multisensor_battery_level
           - entity: sensor.kitchen_button_battery_level
           - entity: sensor.bedroom_button_battery_level
-          - entity: sensor.entryway_protect_battery_health_state
-          - entity: sensor.living_room_protect_battery_health_state
-          - entity: sensor.garage_protect_battery_health_state
+          - entity: sensor.nest_protect_entryway_battery_level
+          - entity: sensor.nest_protect_living_room_battery_level
+          - entity: sensor.nest_protect_garage_battery_level
         hours_to_show: 72
         refresh_interval: 0
         title: Battery Levels
