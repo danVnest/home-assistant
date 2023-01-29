@@ -64,9 +64,9 @@ class Control(app.App):
             "bedroom_multisensor_battery_level",
             "kitchen_button_battery_level",
             "bedroom_button_battery_level",
-            "entryway_protect_battery_health_state",
-            "living_room_protect_battery_health_state",
-            "garage_protect_battery_health_state",
+            "nest_protect_entryway_battery_level",
+            "nest_protect_living_room_battery_level",
+            "nest_protect_garage_battery_level",
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
         self.__set_timer("morning_time")
