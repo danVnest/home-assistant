@@ -36,6 +36,10 @@ class Climate(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        self.__climate_control = (
+            self.entities.input_boolean.climate_control.state == "on"
+        )
+        self.__aircon = self.entities.input_boolean.aircon.state == "on"
         self.__temperature_monitor = TemperatureMonitor(self)
         self.__temperature_monitor.configure_sensors()
         self.__aircons = {
@@ -55,8 +59,8 @@ class Climate(app.App):
 
     @property
     def climate_control(self) -> bool:
-        """Climate control setting is stored in Home Assistant as an input_boolean."""
-        return self.entities.input_boolean.climate_control.state == "on"
+        """Get climate control setting that has been synced to Home Assistant."""
+        return self.__climate_control
 
     @climate_control.setter
     def climate_control(self, state: bool):
@@ -82,6 +86,7 @@ class Climate(app.App):
             > 10
         ):
             self.__climate_control_history["overridden"] = False
+        self.__climate_control = state
         self.call_service(
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.climate_control",
@@ -89,13 +94,16 @@ class Climate(app.App):
 
     @property
     def aircon(self) -> bool:
-        """Aircon setting is stored in Home Assistant as an input_boolean."""
-        return self.entities.input_boolean.aircon.state == "on"
+        """Get aircon setting that has been synced to Home Assistant."""
+        return self.__aircon
 
     @aircon.setter
     def aircon(self, state: bool):
-        """Turn on/off aircan and reflect state in UI."""
-        self.log(f"Turning aircon {'on' if state else 'off'}")
+        """Turn on/off aircan and sync state to Home Assistant UI."""
+        if self.aircon == state:
+            self.log(f"Ensuring aircon is {'on' if state else 'off'}")
+        else:
+            self.log(f"Turning aircon {'on' if state else 'off'}")
         if self.__aircon_trigger_timer is not None:
             self.cancel_timer(self.__aircon_trigger_timer)
             self.__aircon_trigger_timer = None
@@ -108,6 +116,7 @@ class Climate(app.App):
         else:
             self.__disable_climate_control_if_would_trigger_on()
             self.__turn_aircon_off()
+        self.__aircon = state
         self.call_service(
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.aircon",
@@ -269,14 +278,14 @@ class Climate(app.App):
         else:
             for aircon in self.__aircons.values():
                 aircon.turn_on(mode, "auto")
-        self.log(f"Turned aircon on to '{mode}' mode")
+        self.log(f"Aircon is set to '{mode}' mode")
         self.__allow_suggestion()
 
     def __turn_aircon_off(self):
         """Turn all aircon units off and allow suggestions again."""
         for aircon in self.__aircons.values():
             aircon.turn_off()
-        self.log("Turned aircon off")
+        self.log("Aircon is off")
         self.__allow_suggestion()
 
     def __disable_climate_control_if_would_trigger_on(self):
