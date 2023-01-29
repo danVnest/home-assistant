@@ -26,6 +26,7 @@ class Presence(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        self.pets_home_alone = self.entities.input_boolean.pets_home_alone.state == "on"
         for room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[room] = Room(
                 room, f"binary_sensor.{room}_multisensor_motion", self
@@ -56,6 +57,7 @@ class Presence(app.App):
         if new == "home":
             self.call_service("lock/unlock", entity_id="lock.door_lock")
             if "Away" in self.scene:
+                self.pets_home_alone = False
                 self.control.reset_scene()
         else:
             if old == "home":
@@ -109,7 +111,9 @@ class Room:
             vacant = self.__controller.get_state(sensor_id) == "off"
             last_changed = self.__controller.convert_utc(
                 self.__controller.get_state(sensor_id, attribute="last_changed")
-            ).replace(tzinfo=None) + timedelta(minutes=self.__controller.get_tz_offset())
+            ).replace(tzinfo=None) + timedelta(
+                minutes=self.__controller.get_tz_offset()
+            )
         except ValueError:
             self.__controller.notify(
                 f"Sensor in {room_id} is {self.__controller.get_state(sensor_id)}",
@@ -163,6 +167,12 @@ class Room:
             self.__last_vacated = self.__controller.datetime()
         else:
             self.__last_entered = self.__controller.datetime()
+            if (
+                not self.__controller.pets_home_alone
+                and "Away" in self.__controller.scene
+            ):
+                self.__controller.pets_home_alone = True
+                self.__controller.apps["climate"].handle_pets_home_alone()
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:

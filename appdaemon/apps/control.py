@@ -273,6 +273,8 @@ class Control(app.App):
                 self.scene = new
         else:
             self.log(f"UI setting '{setting}' changed to {new} from {old}")
+            if setting == "pets_home_alone":
+                self.apps["climate"].handle_pets_home_alone()
             if input_type == "input_boolean":
                 setattr(self.apps["climate"], setting, new == "on")
         elif setting.startswith("circadian"):

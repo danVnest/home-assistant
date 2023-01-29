@@ -42,6 +42,8 @@ input_boolean:
     name: "Automatic climate control"
   aircon:
     name: "Aircon"
+  pets_home_alone:
+    name: "Pets home alone"
 
 input_datetime:
   morning_time:

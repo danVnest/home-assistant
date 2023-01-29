@@ -6,6 +6,7 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
+          - entity: input_boolean.pets_home_alone
           - entity: lock.door_lock
         show_header_toggle: false
         title: Control
@@ -172,8 +173,10 @@ views:
 
           **Automatic climate control** will control all aircon units based on
           the current scene and the temperature throughout the house as well as
-          outside. **Aircon** can also be manually turned on and off. These
-          settings can be controlled by telling Siri/Google:
+          outside. If the pets are home alone (or are going to be soon), you can
+          manually specify this or wait for their movement to be detected to
+          trigger climate control. **Aircon** can also be manually turned on and
+          off. These settings can be controlled by telling Siri/Google:
 
           - **"climate control on"** or **"climate control off"**
 

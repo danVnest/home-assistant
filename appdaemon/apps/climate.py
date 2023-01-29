@@ -39,14 +39,14 @@ class Climate(app.App):
         self.__climate_control = (
             self.entities.input_boolean.climate_control.state == "on"
         )
+        self.__climate_control_history["before_away"] = self.climate_control
         self.__aircon = self.entities.input_boolean.aircon.state == "on"
-        self.__temperature_monitor = TemperatureMonitor(self)
-        self.__temperature_monitor.configure_sensors()
         self.__aircons = {
             aircon: Aircon(f"climate.{aircon}", self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
-        self.__climate_control_history["before_away"] = self.climate_control
+        self.__temperature_monitor = TemperatureMonitor(self)
+        self.__temperature_monitor.configure_sensors()
         self.set_door_check_delay(
             float(self.entities.input_number.aircon_door_check_delay.state)
         )
@@ -66,6 +66,7 @@ class Climate(app.App):
     def climate_control(self, state: bool):
         """Enable/disable climate control and reflect state in UI."""
         self.log(f"{'En' if state else 'Dis'}abling climate control")
+        self.__climate_control = state
         if state:
             self.handle_temperatures()
         else:
@@ -86,7 +87,6 @@ class Climate(app.App):
             > 10
         ):
             self.__climate_control_history["overridden"] = False
-        self.__climate_control = state
         self.call_service(
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.climate_control",
@@ -164,9 +164,27 @@ class Climate(app.App):
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
                 new_scene == "Night" and old_scene == "Day",
                 "Away" not in new_scene and "Away" in old_scene,
+                self.control.apps["presence"].pets_home_alone,
             ]
         ):
             self.__suggest_if_trigger_forecast()
+
+    def handle_pets_home_alone(self):
+        """Turn aircon on if temperatures require or enable climate control for the pets."""
+        if self.climate_control:
+            if self.aircon is False and self.__temperature_monitor.is_too_hot_or_cold():
+                self.notify(
+                    f"It is {self.__temperature_monitor.inside_temperature}º inside at home, "
+                    "turning aircon on for the pets",
+                    title="Climate Control",
+                )
+                self.__turn_aircon_on()
+        else:
+            self.climate_control = True
+            self.notify(
+                "Pets alone at home, climate control is now enabled",
+                title="Climate Control",
+            )
 
     def handle_temperatures(self, *args):
         """Control aircon or suggest based on changes in inside temperature."""
@@ -193,6 +211,9 @@ class Climate(app.App):
 
     def __handle_too_hot_or_cold(self):
         """Handle each case (house open, outside nicer, climate control status)."""
+        if self.control.apps["presence"].pets_home_alone:
+            self.handle_pets_home_alone()
+            return
         if self.__temperature_monitor.is_outside_temperature_nicer():
             message_beginning = (
                 f"Outside ({self.__temperature_monitor.outside_temperature}º) "
