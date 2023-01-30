@@ -7,4 +7,11 @@ Control:
   heartbeat_timeout: 15
   heartbeat_max_fail_count: 5
   heartbeat_period: 60
+  mobiles:
+    dan:
+      name: mobile_app_daniels_phone
+      type: iOS
+    rachel:
+      name: mobile_app_rachel_s_phone
+      type: Android
   priority: 1

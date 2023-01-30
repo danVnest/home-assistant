@@ -70,4 +70,5 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
         self.__controller.notify(
             f"{sensor_type} detected in {self.__sensor_id.replace('_', ' ')}",
             title="Smoke Alarm",
+            critical=True,
         )

@@ -47,16 +47,33 @@ class App(hass.Hass):
                     targets == person,
                 ]
             ):
-                if person == "dan":
-                    mobile_name = "mobile_app_daniels_phone"
-                    data = {"apns_headers": {"apns-collapse-id": kwargs["title"]}}
-                else:
-                    mobile_name = "mobile_app_rachel_s_phone"
-                    data = {"tag": kwargs["title"]}
+                data = {"tag": kwargs["title"]}
+                if "critical" in kwargs:
+                    if self.control.args["mobiles"][person]["type"] == "iOS":
+                        data.update(
+                            {
+                                "push": {
+                                    "sound": {
+                                        "name": "default",
+                                        "critical": 1,
+                                        "volume": 1.0,
+                                    }
+                                }
+                            }
+                        )
+                    else:
+                        data.update(
+                            {
+                                "ttl": 0,
+                                "priority": "high",
+                                "media_stream": "alarm_stream_max",
+                                "tts_text": message,
+                            }
+                        )
                 super().notify(
                     message,
                     title=kwargs["title"],
-                    name=mobile_name,
+                    name=self.control.args["mobiles"][person]["name"],
                     data=data,
                 )
                 self.log(f"Notified {targets}: {kwargs['title']}: {message}")
