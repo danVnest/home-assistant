@@ -172,7 +172,7 @@ class Room:
                 and "Away" in self.__controller.scene
             ):
                 self.__controller.pets_home_alone = True
-                self.__controller.apps["climate"].handle_pets_home_alone()
+                self.__controller.control.apps["climate"].handle_pets_home_alone()
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:
