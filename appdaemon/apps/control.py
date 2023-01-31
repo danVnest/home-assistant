@@ -318,10 +318,9 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Notify if a device's battery is low."""
         del attribute, old, kwargs
-        if "protect" in entity:
-            if new != "Ok":
-                self.notify(f"{entity} is low", title="Low Battery", targets="dan")
-        elif float(new) <= 20:
+        if new == "unavailable":
+            self.log(f"{entity} is unavailable", level="WARNING")
+        elif float(new) <= self.args["notify_battery_level"]:
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
     def __heartbeat(self, kwargs: dict):
