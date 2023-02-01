@@ -148,9 +148,10 @@ views:
       - aspect_ratio: "2"
         dark_mode: true
         default_zoom: 12
+        auto_fit: true
         entities:
-          - entity: person.dan
-          - entity: person.rachel
+          - person.dan
+          - person.rachel
         hours_to_show: 1
         type: map
     path: default_view
