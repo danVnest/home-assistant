@@ -180,7 +180,7 @@ class Control(app.App):
         if self.scene == "Sleep":
             self.scene = "Morning"
         else:
-            self.log(f"Scene was not changed as it was {self.scene}, not Morning.")
+            self.log(f"Scene was not changed as it was {self.scene}, not Morning")
 
     def __bed_time(self, kwargs: dict):
         """Adjust climate control when approaching bed time (callback for daily timer)."""
@@ -269,15 +269,26 @@ class Control(app.App):
         (input_type, setting) = entity.split(".")
         if setting == "scene":
             if new != self.scene:
-                self.log(f"UI scene selection changed to {new} from {old}")
+                self.log(f"self.scene == {self.scene}")
+                self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
                 self.scene = new
-        else:
-            self.log(f"UI setting '{setting}' changed to {new} from {old}")
-            if setting == "pets_home_alone":
-                self.apps["climate"].handle_pets_home_alone()
-            if input_type == "input_boolean":
+        if setting in ["aircon", "climate_control"]:
+            if new != getattr(self.apps["climate"], setting):
+                self.log(f"self.{setting} == {getattr(self.apps['climate'], setting)}")
+                self.log(f"UI setting '{setting}' changed to '{new}'")
                 setattr(self.apps["climate"], setting, new == "on")
-        elif setting.startswith("circadian"):
+        elif setting == "pets_home_alone":
+            if new != self.apps["presence"].pets_home_alone:
+                self.log(f"UI setting '{setting}' changed to '{new}'")
+                if new:
+                    self.apps["presence"].pets_home_alone = True
+                    self.apps["climate"].handle_pets_home_alone()
+                else:
+                    self.apps["presence"].pets_home_alone = False
+                    self.apps["climate"].reset()
+        else:
+            self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
+            if setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
             except ValueError:

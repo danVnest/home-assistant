@@ -150,9 +150,10 @@ class Climate(app.App):
         """Adjust aircon & temperature triggers, plus suggest climate control if appropriate."""
         self.__temperature_monitor.configure_sensors()
         if "Away" in new_scene and "Away" not in old_scene:
-            self.__climate_control_history["before_away"] = self.climate_control
-            self.climate_control = False
-            self.aircon = False
+            if not self.control.apps["presence"].pets_home_alone:
+                self.__climate_control_history["before_away"] = self.climate_control
+                self.climate_control = False
+                self.aircon = False
         elif "Away" not in new_scene and "Away" in old_scene:
             self.climate_control = self.__climate_control_history["before_away"]
         if self.climate_control or not self.__suggested:

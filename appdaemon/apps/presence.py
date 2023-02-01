@@ -17,6 +17,7 @@ class Presence(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
+        self.pets_home_alone = None
         self.rooms = {}
         self.__last_device_date = None
 
