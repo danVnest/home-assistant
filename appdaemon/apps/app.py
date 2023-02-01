@@ -21,16 +21,6 @@ class App(hass.Hass):
         """Allow easy access to control app (which has access to all other apps)."""
         self.control = self.get_app("Control")
 
-    @property
-    def scene(self) -> str:
-        """Scene is stored in the control app and synced with Home Assistant."""
-        return self.control.scene
-
-    @scene.setter
-    def scene(self, new_scene: str):
-        """Use the control app to change the scene and sync with Home Assistant."""
-        self.control.scene = new_scene
-
     def cancel_timer(self, handle):
         """Cancel timer after checking it is valid and running."""
         if self.timer_running(handle):

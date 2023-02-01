@@ -370,7 +370,8 @@ class Lights(app.App):
             f"Circadian redated to start at {start_time.time()} with "
             f"time step of {time_step.total_seconds() / 60} minutes"
         )
-        if self.scene == "Night":
+        self.log(f"Scene is {self.control.scene}")
+        if self.control.scene == "Night":
             self.__start_circadian()
 
     def is_lighting_sufficient(self, room: str = "kitchen") -> bool:
@@ -394,19 +395,19 @@ class Lights(app.App):
     ):  # pylint: disable=too-many-arguments
         """Change scene to day or night based on luminance levels."""
         del entity, attribute, old, kwargs
-        if "Day" in self.scene:
+        if "Day" in self.control.scene:
             if (
                 float(new) - self.__lighting_luminance()
                 <= self.args["day_min_luminance"]
             ):
                 self.log(f"Light levels are low ({new}%) transitioning to night scene")
                 if self.control.apps["media"].is_playing:
-                    self.scene = "TV"
+                    self.control.scene = "TV"
                 elif self.control.apps["presence"].anyone_home():
-                    self.scene = "Night"
+                    self.control.scene = "Night"
                 else:
-                    self.scene = "Away (Night)"
-        elif self.scene == "Morning":
+                    self.control.scene = "Away (Night)"
+        elif self.control.scene == "Morning":
             if (
                 float(new) - self.__lighting_luminance()
                 >= self.args["night_max_luminance"]
@@ -442,13 +443,13 @@ class Lights(app.App):
                             "morning_vacating_delay"
                         ),
                     )
-        elif self.scene not in ("Bright", "Sleep"):
+        elif self.control.scene not in ("Bright", "Sleep"):
             if (
                 float(new) - self.__lighting_luminance()
                 >= self.args["night_max_luminance"]
             ):
                 self.log(f"Light levels are high ({new}%), transitioning to day scene")
-                self.scene = (
+                self.control.scene = (
                     "Day"
                     if self.control.apps["presence"].anyone_home()
                     else "Away (Day)"
@@ -459,13 +460,13 @@ class Lights(app.App):
     ):  # pylint: disable=too-many-arguments
         """Detect when to change scene from morning to day and set automatic lighting."""
         del entity, attribute, old, kwargs
-        if self.scene == "Morning":
+        if self.control.scene == "Morning":
             if float(new) >= self.args["morning_max_luminance"]:
                 self.log(
                     f"Bedroom light levels are high ({new}%), transitioning to day scene"
                 )
-                self.scene = "Day"
-        elif self.scene == "Day":
+                self.control.scene = "Day"
+        elif self.control.scene == "Day":
             if (
                 float(new) - self.__lighting_luminance("bedroom")
                 >= self.args["morning_max_luminance"]
@@ -549,7 +550,9 @@ class Light:
         """Return closest valid value for brightness."""
         validated_value = value
         if value < self.__controller.args["min_brightness"]:
-            validated_value = self.__controller.args["min_brightness"] if value > 0 else 0
+            validated_value = (
+                self.__controller.args["min_brightness"] if value > 0 else 0
+            )
         elif value > self.__controller.args["max_brightness"]:
             validated_value = self.__controller.args["max_brightness"]
         if validated_value != value:
@@ -612,7 +615,9 @@ class Light:
                 f"(from {self.brightness} & {self.kelvin}K)",
                 level="DEBUG",
             )
-            self.__controller.turn_on(self.__light_id, brightness=brightness, kelvin=kelvin)
+            self.__controller.turn_on(
+                self.__light_id, brightness=brightness, kelvin=kelvin
+            )
 
     def adjust_to_max(self):
         """Adjust light brightness and kelvin at the same time to maximum values."""

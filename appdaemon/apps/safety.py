@@ -59,7 +59,7 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
     ):  # pylint: disable=too-many-arguments
         """React when high smoke level detected."""
         del attribute, new, old, kwargs
-        self.__controller.scene = "Bright"
+        self.__controller.control.scene = "Bright"
         self.__controller.apps["media"].pause()
         if "smoke" in entity:
             sensor_type = "Smoke"

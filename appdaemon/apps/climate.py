@@ -124,7 +124,7 @@ class Climate(app.App):
 
     def get_setting(self, setting_name) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
-        if self.scene == "Sleep" or self.control.is_bed_time():
+        if self.control.scene == "Sleep" or self.control.is_bed_time():
             setting_name = f"sleep_{setting_name}"
         return float(self.get_state(f"input_number.{setting_name}"))
 
@@ -287,11 +287,11 @@ class Climate(app.App):
             f"degrees) is {'above' if mode == 'cool' else 'below'} the target ("
             f"{self.get_state(f'input_number.{mode}ing_target_temperature')} degrees)"
         )
-        if self.scene == "Sleep" or self.control.is_bed_time():
+        if self.control.scene == "Sleep" or self.control.is_bed_time():
             self.__aircons["bedroom"].turn_on(mode, "low")
             for room in ["living_room", "dining_room"]:
                 self.__aircons[room].turn_off()
-        elif self.scene == "Morning":
+        elif self.control.scene == "Morning":
             for aircon in self.__aircons.keys():
                 self.__aircons[aircon].turn_on(
                     mode, "low" if aircon == "bedroom" else "auto"
@@ -529,7 +529,10 @@ class TemperatureMonitor:
 
     def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
-        bed = self.controller.scene == "Sleep" or self.controller.control.is_bed_time()
+        bed = (
+            self.controller.control.scene == "Sleep"
+            or self.controller.control.is_bed_time()
+        )
         for sensor in self.__sensors.values():
             if bed and sensor.location == "inside":
                 sensor.disable()

@@ -56,14 +56,14 @@ class Presence(app.App):
         self.log(f"{entity} is {new}")
         if new == "home":
             self.call_service("lock/unlock", entity_id="lock.door_lock")
-            if "Away" in self.scene:
+            if "Away" in self.control.scene:
                 self.pets_home_alone = False
                 self.control.reset_scene()
         else:
             if old == "home":
                 self.call_service("lock/lock", entity_id="lock.door_lock")
             if (
-                "Away" not in self.scene
+                "Away" not in self.control.scene
                 and self.get_state(
                     f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
                 )
@@ -74,13 +74,13 @@ class Presence(app.App):
                     if self.control.apps["lights"].is_lighting_sufficient()
                     else "Night"
                 )
-                self.scene = f"Away ({away_scene})"
+                self.control.scene = f"Away ({away_scene})"
 
     def __handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""
         del event_name
         self.log(f"New device added: {data}, {kwargs}")
-        if "Away" in self.scene:
+        if "Away" in self.control.scene:
             if self.__last_device_date < self.date() - timedelta(hours=3):
                 self.notify(
                     f'A guest has added a device: "{data["host_name"]}"',
@@ -96,8 +96,8 @@ class Presence(app.App):
         self.log("Doorbell rung")
         if self.control.apps["media"].is_playing:
             self.control.apps["media"].pause()
-        if self.scene in ("TV", "Sleep"):
-            self.scene = "Night"
+        if self.control.scene in ("TV", "Sleep"):
+            self.control.scene = "Night"
 
 
 class Room:
@@ -169,7 +169,7 @@ class Room:
             self.__last_entered = self.__controller.datetime()
             if (
                 not self.__controller.pets_home_alone
-                and "Away" in self.__controller.scene
+                and "Away" in self.__controller.control.scene
             ):
                 self.__controller.pets_home_alone = True
                 self.__controller.control.apps["climate"].handle_pets_home_alone()

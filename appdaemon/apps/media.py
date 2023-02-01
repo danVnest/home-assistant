@@ -91,10 +91,10 @@ class Media(app.App):
                 source="PC" if self.is_pc_on else self.__last_source,
                 entity_id=self.__entity_id,
             )
-        if self.scene == "Night" and self.is_playing and not self.is_muted:
-            self.scene = "TV"
-        elif self.scene == "TV" and (not self.is_playing or self.is_muted):
-            self.scene = "Night"
+        if self.control.scene == "Night" and self.is_playing and not self.is_muted:
+            self.control.scene = "TV"
+        elif self.control.scene == "TV" and (not self.is_playing or self.is_muted):
+            self.control.scene = "Night"
 
     def __source_change(
         self, entity, attribute, old, new, kwargs
