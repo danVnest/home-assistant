@@ -266,13 +266,13 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
-        (input_type, setting) = entity.split(".")
+        setting = entity.split(".")[1]
         if setting == "scene":
             if new != self.scene:
                 self.log(f"self.scene == {self.scene}")
                 self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
                 self.scene = new
-        if setting in ["aircon", "climate_control"]:
+        elif setting in ["aircon", "climate_control"]:
             if new != getattr(self.apps["climate"], setting):
                 self.log(f"self.{setting} == {getattr(self.apps['climate'], setting)}")
                 self.log(f"UI setting '{setting}' changed to '{new}'")
@@ -287,17 +287,23 @@ class Control(app.App):
                     self.apps["presence"].pets_home_alone = False
                     self.apps["climate"].reset()
         else:
+            self.__handle_simple_settings_change(setting, new, old)
+
+    def __handle_simple_settings_change(
+        self, setting: str, new, old, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Act on changes to settings that can only be made by the user through the UI."""
             self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
             if setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
             except ValueError:
-                    self.__revert_setting(entity, old)
+                self.__revert_setting(f"input_datetime.{setting}", old)
         elif setting.endswith("_time"):
             if self.__are_time_settings_valid():
                 self.__set_timer(setting)
             else:
-                    self.__revert_setting(entity, old)
+                self.__revert_setting(f"input_datetime.{setting}", old)
         elif "temperature" in setting:
             self.apps["climate"].reset()
         elif "door" in setting:

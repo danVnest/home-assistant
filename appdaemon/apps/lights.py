@@ -43,7 +43,7 @@ class Lights(app.App):
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
-            self.__handle_luminance_change,
+            self.__handle_kitchen_luminance_change,
             "sensor.kitchen_multisensor_luminance",
         )
         self.listen_state(
@@ -390,10 +390,10 @@ class Lights(app.App):
             * self.args["lighting_luminance_factor"]
         )
 
-    def __handle_luminance_change(
-        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+    def __handle_kitchen_luminance_change(
+        self, entity: str, attribute: str, old, new: bool, kwargs: dict
     ):  # pylint: disable=too-many-arguments
-        """Change scene to day or night based on luminance levels."""
+        """Change scene to day or night based on kitchen luminance levels."""
         del entity, attribute, old, kwargs
         if "Day" in self.control.scene:
             if (
@@ -408,41 +408,7 @@ class Lights(app.App):
                 else:
                     self.control.scene = "Away (Night)"
         elif self.control.scene == "Morning":
-            if (
-                float(new) - self.__lighting_luminance()
-                >= self.args["night_max_luminance"]
-            ):
-                if self.lights["kitchen"].is_on_when_vacant():
-                    self.log(
-                        f"Kitchen light levels are high ({new}%) during morning scene, "
-                        "disabling kitchen vacancy light"
-                    )
-                    self.lights["kitchen"].set_presence_adjustments(
-                        occupied=(
-                            self.args["max_brightness"],
-                            self.control.get_setting("morning_kelvin"),
-                        ),
-                        vacating_delay=self.control.get_setting(
-                            "morning_vacating_delay"
-                        ),
-                    )
-            elif (
-                float(new) - self.__lighting_luminance()
-                <= self.args["day_min_luminance"]
-            ):
-                if not self.lights["kitchen"].is_on_when_vacant():
-                    self.log(
-                        f"Kitchen light levels are low ({new}%) during morning scene, "
-                        "enabling kitchen vacancy light"
-                    )
-                    kelvin = self.control.get_setting("morning_kelvin")
-                    self.lights["kitchen"].set_presence_adjustments(
-                        vacant=(self.control.get_setting("morning_brightness"), kelvin),
-                        occupied=(self.args["max_brightness"], kelvin),
-                        vacating_delay=self.control.get_setting(
-                            "morning_vacating_delay"
-                        ),
-                    )
+            self.__handle_kitchen_luminance_change_in_morning(new)
         elif self.control.scene not in ("Bright", "Sleep"):
             if (
                 float(new) - self.__lighting_luminance()
@@ -453,6 +419,42 @@ class Lights(app.App):
                     "Day"
                     if self.control.apps["presence"].anyone_home()
                     else "Away (Day)"
+                )
+
+    def __handle_kitchen_luminance_change_in_morning(
+        self, luminance: str
+    ):  # pylint: disable=too-many-arguments
+        """Change kitchen vacancy lighting based on luminance levels."""
+        if (
+            float(luminance) - self.__lighting_luminance()
+            >= self.args["night_max_luminance"]
+        ):
+                if self.lights["kitchen"].is_on_when_vacant():
+                    self.log(
+                    f"Kitchen light levels are high ({luminance}%) during morning scene, "
+                        "disabling kitchen vacancy light"
+                    )
+                    self.lights["kitchen"].set_presence_adjustments(
+                        occupied=(
+                            self.args["max_brightness"],
+                            self.control.get_setting("morning_kelvin"),
+                        ),
+                    vacating_delay=self.control.get_setting("morning_vacating_delay"),
+                    )
+            elif (
+            float(luminance) - self.__lighting_luminance()
+                <= self.args["day_min_luminance"]
+            ):
+                if not self.lights["kitchen"].is_on_when_vacant():
+                    self.log(
+                    f"Kitchen light levels are low ({luminance}%) during morning scene, "
+                        "enabling kitchen vacancy light"
+                    )
+                    kelvin = self.control.get_setting("morning_kelvin")
+                    self.lights["kitchen"].set_presence_adjustments(
+                        vacant=(self.control.get_setting("morning_brightness"), kelvin),
+                        occupied=(self.args["max_brightness"], kelvin),
+                    vacating_delay=self.control.get_setting("morning_vacating_delay"),
                 )
 
     def __handle_bedroom_luminance_change(
