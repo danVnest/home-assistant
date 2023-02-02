@@ -81,7 +81,7 @@ class Media(app.App):
         self.log("TV media is now paused", level="DEBUG")
 
     def __state_change(
-        self, entity, attribute, old, new, kwargs
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Handle TV events at night and change the scene."""
         del entity, attribute, old, kwargs
@@ -97,7 +97,7 @@ class Media(app.App):
             self.control.scene = "Night"
 
     def __source_change(
-        self, entity, attribute, old, new, kwargs
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Remember TV source before standby so it can be restored when turned on."""
         del entity, attribute, old, kwargs

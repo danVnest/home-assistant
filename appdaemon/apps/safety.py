@@ -28,9 +28,10 @@ class Safety(app.App):
         )
 
     def __handle_camera_motion(
-        self, entity, attribute, old, new, kwargs
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Send notification if motion detected when no one is home."""
+        del entity, attribute, old, new, kwargs
         self.log("Person detected by doorbell camera")
         if not self.control.apps["presence"].anyone_home():
             self.notify(
@@ -55,7 +56,7 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
             )
 
     def __handle_smoke(
-        self, entity, attribute, old, new, kwargs
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """React when high smoke level detected."""
         del attribute, new, old, kwargs

@@ -122,7 +122,7 @@ class Climate(app.App):
             entity_id="input_boolean.aircon",
         )
 
-    def get_setting(self, setting_name) -> float:
+    def get_setting(self, setting_name: str) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
         if self.control.scene == "Sleep" or self.control.is_bed_time():
             setting_name = f"sleep_{setting_name}"
@@ -134,7 +134,7 @@ class Climate(app.App):
         self.aircon = self.aircon
         self.handle_temperatures()
 
-    def set_door_check_delay(self, minutes):
+    def set_door_check_delay(self, minutes: float):
         """Configure listener for door opening, overwriting existing listener."""
         if self.__door_open_listener is not None:
             self.cancel_listen_state(self.__door_open_listener)
@@ -429,7 +429,7 @@ class Sensor:
 class ClimateSensor(Sensor):
     """Capture temperature and humidity data from climate.x entities."""
 
-    def get_measure(self, measure) -> float:
+    def get_measure(self, measure: str) -> float:
         """Get latest value from the sensor in Home Assistant."""
         return self.validate_measure(
             self.monitor.controller.get_state(
@@ -452,7 +452,7 @@ class ClimateSensor(Sensor):
 class MultiSensor(Sensor):
     """Capture temperature and humidity data from multisensor entities."""
 
-    def get_measure(self, measure) -> float:
+    def get_measure(self, measure: str) -> float:
         """Get latest value from the sensor in Home Assistant."""
         return self.validate_measure(
             self.monitor.controller.get_state(f"{self.sensor_id}_{measure}")

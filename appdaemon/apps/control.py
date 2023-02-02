@@ -262,7 +262,7 @@ class Control(app.App):
         return int(float(self.get_state(f"input_number.{setting_name}")))
 
     def __handle_settings_change(
-        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+        self, entity: str, attribute: str, old, new, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
@@ -287,11 +287,11 @@ class Control(app.App):
             self.__handle_simple_settings_change(setting, new, old)
 
     def __handle_simple_settings_change(
-        self, setting: str, new, old, kwargs: dict
+        self, setting: str, new: str, old: str
     ):  # pylint: disable=too-many-arguments
         """Act on changes to settings that can only be made by the user through the UI."""
-            self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
-            if setting.startswith("circadian"):
+        self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
+        if setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
             except ValueError:
@@ -304,7 +304,7 @@ class Control(app.App):
         elif "temperature" in setting:
             self.apps["climate"].reset()
         elif "door" in setting:
-                self.apps["climate"].set_door_check_delay(float(new))
+            self.apps["climate"].set_door_check_delay(float(new))
         else:
             self.apps["lights"].transition_to_scene(self.scene)
 
@@ -328,7 +328,7 @@ class Control(app.App):
         )
 
     def __handle_battery_level_change(
-        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Notify if a device's battery is low."""
         del attribute, old, kwargs

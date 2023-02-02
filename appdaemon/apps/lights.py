@@ -391,7 +391,7 @@ class Lights(app.App):
         )
 
     def __handle_kitchen_luminance_change(
-        self, entity: str, attribute: str, old, new: bool, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Change scene to day or night based on kitchen luminance levels."""
         del entity, attribute, old, kwargs
@@ -458,7 +458,7 @@ class Lights(app.App):
                 )
 
     def __handle_bedroom_luminance_change(
-        self, entity: str, attribute: str, old: bool, new: bool, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Detect when to change scene from morning to day and set automatic lighting."""
         del entity, attribute, old, kwargs

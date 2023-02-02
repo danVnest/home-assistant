@@ -50,7 +50,7 @@ class Presence(app.App):
         )
 
     def __handle_presence_change(
-        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, kwargs
@@ -90,7 +90,7 @@ class Presence(app.App):
                 self.__last_device_date = self.date()
 
     def __handle_doorbell(
-        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Handle doorbell when it rings."""
         del entity, attribute, old, new, kwargs
@@ -155,7 +155,7 @@ class Room:
         ).total_seconds()
 
     def __handle_presence_change(
-        self, entity: str, attribute: str, old: int, new: int, kwargs: dict
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """If room presence changes, trigger all registered callbacks."""
         del entity, attribute, old, kwargs
@@ -172,6 +172,7 @@ class Room:
                 not self.__controller.pets_home_alone
                 and "Away" in self.__controller.control.scene
             ):
+                self.__controller.log("Pet movement detected while home alone")
                 self.__controller.pets_home_alone = True
                 self.__controller.control.apps["climate"].handle_pets_home_alone()
         for handle, callback in list(self.__callbacks.items()):
