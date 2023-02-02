@@ -273,12 +273,12 @@ class Control(app.App):
                 self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
                 self.scene = new
         elif setting in ["aircon", "climate_control"]:
-            if new != getattr(self.apps["climate"], setting):
+            if (new == "on") != getattr(self.apps["climate"], setting):
                 self.log(f"self.{setting} == {getattr(self.apps['climate'], setting)}")
                 self.log(f"UI setting '{setting}' changed to '{new}'")
                 setattr(self.apps["climate"], setting, new == "on")
         elif setting == "pets_home_alone":
-            if new != self.apps["presence"].pets_home_alone:
+            if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")
                 if new:
                     self.apps["presence"].pets_home_alone = True
