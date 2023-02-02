@@ -269,22 +269,19 @@ class Control(app.App):
         setting = entity.split(".")[1]
         if setting == "scene":
             if new != self.scene:
-                self.log(f"self.scene == {self.scene}")
                 self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
                 self.scene = new
         elif setting in ["aircon", "climate_control"]:
             if (new == "on") != getattr(self.apps["climate"], setting):
-                self.log(f"self.{setting} == {getattr(self.apps['climate'], setting)}")
                 self.log(f"UI setting '{setting}' changed to '{new}'")
                 setattr(self.apps["climate"], setting, new == "on")
         elif setting == "pets_home_alone":
             if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")
-                if new:
-                    self.apps["presence"].pets_home_alone = True
+                self.apps["presence"].pets_home_alone = new == "on"
+                if new == "on":
                     self.apps["climate"].handle_pets_home_alone()
                 else:
-                    self.apps["presence"].pets_home_alone = False
                     self.apps["climate"].reset()
         else:
             self.__handle_simple_settings_change(setting, new, old)
