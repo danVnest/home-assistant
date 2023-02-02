@@ -429,31 +429,31 @@ class Lights(app.App):
             float(luminance) - self.__lighting_luminance()
             >= self.args["night_max_luminance"]
         ):
-                if self.lights["kitchen"].is_on_when_vacant():
-                    self.log(
+            if self.lights["kitchen"].is_on_when_vacant():
+                self.log(
                     f"Kitchen light levels are high ({luminance}%) during morning scene, "
-                        "disabling kitchen vacancy light"
-                    )
-                    self.lights["kitchen"].set_presence_adjustments(
-                        occupied=(
-                            self.args["max_brightness"],
-                            self.control.get_setting("morning_kelvin"),
-                        ),
+                    "disabling kitchen vacancy light"
+                )
+                self.lights["kitchen"].set_presence_adjustments(
+                    occupied=(
+                        self.args["max_brightness"],
+                        self.control.get_setting("morning_kelvin"),
+                    ),
                     vacating_delay=self.control.get_setting("morning_vacating_delay"),
-                    )
-            elif (
+                )
+        elif (
             float(luminance) - self.__lighting_luminance()
-                <= self.args["day_min_luminance"]
-            ):
-                if not self.lights["kitchen"].is_on_when_vacant():
-                    self.log(
+            <= self.args["day_min_luminance"]
+        ):
+            if not self.lights["kitchen"].is_on_when_vacant():
+                self.log(
                     f"Kitchen light levels are low ({luminance}%) during morning scene, "
-                        "enabling kitchen vacancy light"
-                    )
-                    kelvin = self.control.get_setting("morning_kelvin")
-                    self.lights["kitchen"].set_presence_adjustments(
-                        vacant=(self.control.get_setting("morning_brightness"), kelvin),
-                        occupied=(self.args["max_brightness"], kelvin),
+                    "enabling kitchen vacancy light"
+                )
+                kelvin = self.control.get_setting("morning_kelvin")
+                self.lights["kitchen"].set_presence_adjustments(
+                    vacant=(self.control.get_setting("morning_brightness"), kelvin),
+                    occupied=(self.args["max_brightness"], kelvin),
                     vacating_delay=self.control.get_setting("morning_vacating_delay"),
                 )
 
