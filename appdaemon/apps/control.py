@@ -366,12 +366,17 @@ class Control(app.App):
                 >= self.args["heartbeat_max_fail_count"]
             ):
                 self.__online = False
-                self.error("Heartbeat timed out")
+                self.log("Heartbeat timed out", level="WARNING")
         else:
             if not self.__online:
                 self.__online = True
-                self.__timers["heartbeat_fail_count"] = 0
                 self.log("Heartbeat sent and received")
+                if (
+                    self.__timers["heartbeat_fail_count"]
+                    >= self.args["heartbeat_max_fail_count"]
+                ):
+                    self.log("Restarting Home Assistant to fix any broken entities")
+                    self.call_service("homeassistant/restart")
 
     def __handle_log(
         self,
