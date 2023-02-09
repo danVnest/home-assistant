@@ -350,9 +350,28 @@ views:
           - entity: input_number.aircon_door_check_delay
             icon: mdi:timer
         title: Aircon Door Check Delay
-  - badges:
-      - entity: binary_sensor.home_assistant_versions_update_available
-      - entity: sensor.hacs
+  - path: system
+    title: System
+    visible:
+      - user: 15ff7a86d4ae4d38a60003ad4064ff78
+      - user: d678a59ca9604e2ba14c3ac3705ba943
+    badges:
+      - type: entity-filter
+        state_filter:
+          - "on"
+        entities:
+          - entity: update.home_assistant_core_update
+            name: Core
+          - entity: update.home_assistant_supervisor_update
+            name: Supervisor
+          - entity: update.home_assistant_operating_system_update
+            name: Operating System
+      - type: entity-filter
+        state_filter:
+          - operator: ">"
+            value: 0
+        entities:
+          - entity: sensor.hacs
     cards:
       - entities:
           - entity: input_select.scene
@@ -385,8 +404,3 @@ views:
         refresh_interval: 0
         title: Battery Levels
         type: history-graph
-    path: system
-    title: System
-    visible:
-      - user: 15ff7a86d4ae4d38a60003ad4064ff78
-      - user: d678a59ca9604e2ba14c3ac3705ba943

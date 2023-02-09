@@ -76,6 +76,19 @@ class Control(app.App):
             "now",
             self.args["heartbeat_period"],
         )
+        for system_component in [
+            "update.home_assistant_core_update",
+            "update.home_assistant_supervisor_update",
+            "update.home_assistant_operating_system_update",
+        ]:
+            self.listen_state(
+                self.__handle_system_update_available,
+                system_component,
+                attribute="latest_version",
+            )
+        self.listen_state(
+            self.__handle_hacs_update_available, "sensor.hacs", attribute="repositories"
+        )
         self.listen_event(self.__all_initialized, "appd_started")
         self.__timers["init_delay"] = self.run_in(
             self.__assume_all_initialised, self.args["init_delay"]
@@ -378,4 +391,28 @@ class Control(app.App):
         if level in ("WARNING", "ERROR"):
             self.call_service(
                 "counter/increment", entity_id=f"counter.{level.lower()}s"
+            )
+
+    def __handle_system_update_available(
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Notify when a system update is available."""
+        del attribute, old, kwargs
+        self.notify(
+            f"{self.get_state(entity, attribute='title')} update available",
+            title="System Update Available",
+            targets="dan",
+        )
+
+    def __handle_hacs_update_available(
+        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
+    ):  # pylint: disable=too-many-arguments
+        """Notify when a HACS update is available."""
+        del entity, attribute, old, new, kwargs
+        count = int(self.get_state("sensor.hacs"))
+        if count != 0:
+            self.notify(
+                f"{count} HACS update{'s' if count != 1 else ''} available",
+                title="System Update Available",
+                targets="dan",
             )
