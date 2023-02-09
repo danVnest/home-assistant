@@ -24,7 +24,6 @@ class Climate(app.App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.__suggested = False
-        self.__aircon_trigger_timer = None
         self.__temperature_monitor = None
         self.__aircons = None
         self.__door_open_listener = None
@@ -70,9 +69,6 @@ class Climate(app.App):
         if state:
             self.handle_temperatures()
         else:
-            if self.__aircon_trigger_timer is not None:
-                self.cancel_timer(self.__aircon_trigger_timer)
-                self.__aircon_trigger_timer = None
             self.__allow_suggestion()
         if (
             self.__climate_control_history["overridden"]
@@ -104,12 +100,6 @@ class Climate(app.App):
             self.log(f"Ensuring aircon is {'on' if state else 'off'}")
         else:
             self.log(f"Turning aircon {'on' if state else 'off'}")
-        if self.__aircon_trigger_timer is not None:
-            self.cancel_timer(self.__aircon_trigger_timer)
-            self.__aircon_trigger_timer = None
-        if self.__climate_control_history["overridden"]:
-            self.log("Re-enabling climate control")
-            self.climate_control = True
         if state:
             self.__disable_climate_control_if_would_trigger_off()
             self.__turn_aircon_on()
@@ -121,6 +111,9 @@ class Climate(app.App):
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.aircon",
         )
+        if self.__climate_control_history["overridden"]:
+            self.log("Re-enabling climate control")
+            self.climate_control = True
 
     def get_setting(self, setting_name: str) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
@@ -223,7 +216,7 @@ class Climate(app.App):
             )
             if self.climate_control:
                 if self.get_state("binary_sensor.kitchen_door") == "off":
-                    self.__turn_aircon_on_after_delay()
+                    self.aircon = True
                     self.__suggest(f"{message_beginning} opening up the house")
             else:
                 if self.get_state("binary_sensor.kitchen_door") == "off":
@@ -236,7 +229,7 @@ class Climate(app.App):
             )
             if self.climate_control:
                 if self.get_state("binary_sensor.kitchen_door") == "off":
-                    self.__turn_aircon_on_after_delay()
+                    self.aircon = True
                 else:
                     self.__suggest(f"{message_beginning} closing up the house")
             else:
@@ -252,28 +245,6 @@ class Climate(app.App):
             self.__suggest(
                 f"It's forecast to reach {forecast}º, consider enabling climate control"
             )
-
-    def __turn_aircon_on_after_delay(self):
-        """Start a timer to turn aircon on soon, and notify user."""
-        if self.__aircon_trigger_timer is None:
-            self.__aircon_trigger_timer = self.run_in(
-                self.__aircon_trigger_timer_up,
-                self.args["aircon_trigger_delay"] * 60,
-            )
-            self.notify(
-                f"Temperature inside is {self.__temperature_monitor.inside_temperature}º, "
-                f"aircon will be turned on in {self.args['aircon_trigger_delay']} "
-                "minutes (unless you disable climate control or change temperature settings)",
-                title="Climate Control",
-                targets="anyone_home"
-                if self.control.apps["presence"].anyone_home()
-                else "all",
-            )
-
-    def __aircon_trigger_timer_up(self, kwargs: dict):
-        """Timer callback which triggers __turn_aircon_on."""
-        del kwargs
-        self.aircon = True
 
     def __turn_aircon_on(self):
         """Turn aircon on, calculating mode, handling Sleep/Morning scenes and bed time."""
@@ -365,6 +336,7 @@ class Climate(app.App):
     ):  # pylint: disable=too-many-arguments
         """If the kitchen door status changes, check if aircon needs to change."""
         del entity, attribute, old, kwargs
+        self.log(f"Kitchen door is now {'open' if new == 'on' else 'closed'}")
         if new == "off":
             self.handle_temperatures()
         elif self.aircon and self.get_state("climate.living_room") != "off":
