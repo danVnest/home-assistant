@@ -16,7 +16,6 @@ class Media(app.App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.__entity_id = "media_player.tv"
-        self.__last_source = None
 
     def initialize(self):
         """Start listening to TV states.
@@ -24,22 +23,15 @@ class Media(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.__last_source = self.get_state(self.__entity_id, attribute="source")
-        if self.__last_source is None:
-            self.__last_source = self.args["default_source"]
         self.listen_state(self.__state_change, self.__entity_id)
-        self.listen_state(
-            self.__state_change,
-            self.__entity_id,
-            attribute="is_volume_muted",
-        )
-        # TODO: add duration=self.args["steady_state_delay"] when play/pause detectable
-        self.listen_state(
-            self.__source_change,
-            self.__entity_id,
-            attribute="source",
-            duration=self.args["steady_state_delay"],
-        )
+        for is_muted in [True, False]:
+            self.listen_state(
+                self.__state_change,
+                self.__entity_id,
+                attribute="is_volume_muted",
+                old=not is_muted,
+                new=is_muted,
+            )
 
     @property
     def is_on(self) -> bool:
@@ -55,7 +47,7 @@ class Media(app.App):
     @property
     def is_muted(self) -> bool:
         """Check if the TV is currently muted or not."""
-        return self.get_state(self.__entity_id, attribute="is_volume_muted")
+        return self.get_state(self.__entity_id, attribute="is_volume_muted") is True
 
     @property
     def is_pc_on(self) -> bool:
@@ -84,24 +76,11 @@ class Media(app.App):
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Handle TV events at night and change the scene."""
-        del entity, attribute, old, kwargs
-        if new == "on":
-            self.call_service(
-                "media_player/select_source",
-                source="PC" if self.is_pc_on else self.__last_source,
-                entity_id=self.__entity_id,
-            )
+        del entity, old, kwargs
+        self.log(
+            f"TV is now {'muted: ' if attribute == 'is_volume_muted' else ''}{new}"
+        )
         if self.control.scene == "Night" and self.is_playing and not self.is_muted:
             self.control.scene = "TV"
         elif self.control.scene == "TV" and (not self.is_playing or self.is_muted):
             self.control.scene = "Night"
-
-    def __source_change(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
-        """Remember TV source before standby so it can be restored when turned on."""
-        del entity, attribute, old, kwargs
-        if new is not None:
-            if new != "PC":
-                self.__last_source = new
-            self.log(f"TV source changed to {self.__last_source}", level="DEBUG")
