@@ -231,7 +231,10 @@ class Climate(app.App):
                 if self.get_state("binary_sensor.kitchen_door") == "off":
                     self.aircon = True
                 else:
-                    self.__suggest(f"{message_beginning} closing up the house")
+                    self.__suggest(
+                        f"{message_beginning}"
+                        "closing up the house so airconditioning can turn on"
+                    )
             else:
                 if self.get_state("binary_sensor.kitchen_door") == "on":
                     message_beginning += " closing up the house and"
