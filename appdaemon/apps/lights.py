@@ -370,7 +370,6 @@ class Lights(app.App):
             f"Circadian redated to start at {start_time.time()} with "
             f"time step of {time_step.total_seconds() / 60} minutes"
         )
-        self.log(f"Scene is {self.control.scene}")
         if self.control.scene == "Night":
             self.__start_circadian()
 
