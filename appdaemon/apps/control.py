@@ -35,12 +35,12 @@ class Control(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        self.listen_log(self.__handle_log)
         self.__scene = self.entities.input_select.scene.state
         for app_name in self.apps:
             self.apps[app_name] = self.get_app(app_name.capitalize())
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
-        self.listen_log(self.__handle_log)
         for setting in [
             "input_boolean",
             "input_datetime",
@@ -376,7 +376,9 @@ class Control(app.App):
                     >= self.args["heartbeat_max_fail_count"]
                 ):
                     self.log("Restarting Home Assistant to fix any broken entities")
+                    self.cancel_listen_log(self.__handle_log)
                     self.call_service("homeassistant/restart")
+            self.__timers["heartbeat_fail_count"] = 0
 
     def __handle_log(
         self,
