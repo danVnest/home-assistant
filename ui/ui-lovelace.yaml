@@ -381,6 +381,9 @@ views:
         refresh_interval: 0
         title: Control History
         type: history-graph
+      - type: entities
+        entities:
+          - input_boolean.development_mode
       - entities:
           - entity: sensor.warnings_numeric
           - entity: sensor.errors_numeric

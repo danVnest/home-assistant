@@ -47,6 +47,9 @@ input_boolean:
   pets_home_alone:
     name: "Pets home alone"
     icon: mdi:dog-side
+  development_mode:
+    name: "Development Mode"
+    icon: mdi:dev-to
 
 input_datetime:
   morning_time:

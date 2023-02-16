@@ -36,6 +36,9 @@ class Control(app.App):
         """
         super().initialize()
         self.listen_log(self.__handle_log)
+        self.set_production_mode(
+            self.entities.input_boolean.development_mode.state == "off"
+        )
         self.__scene = self.entities.input_select.scene.state
         for app_name in self.apps:
             self.apps[app_name] = self.get_app(app_name.capitalize())
@@ -304,7 +307,9 @@ class Control(app.App):
     ):  # pylint: disable=too-many-arguments
         """Act on changes to settings that can only be made by the user through the UI."""
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
-        if setting.startswith("circadian"):
+        if setting == "development_mode":
+            self.set_production_mode(new == "off")
+        elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
             except ValueError:
