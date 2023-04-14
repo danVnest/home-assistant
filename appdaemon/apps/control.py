@@ -398,9 +398,13 @@ class Control(app.App):
                 self.__online = False
                 self.log("Heartbeat timed out", level="WARNING")
         else:
+            if self.__timers["heartbeat_fail_count"] > 0:
+                self.log(
+                    "Heartbeat sent and recieved after "
+                    f"{self.__timers['heartbeat_fail_count']} timeout(s)"
+                )
             if not self.__online:
                 self.__online = True
-                self.log("Heartbeat sent and received")
                 if (
                     self.__timers["heartbeat_fail_count"]
                     >= self.args["heartbeat_max_fail_count"]
