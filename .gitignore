@@ -26,5 +26,7 @@ __pycache__
 pyozw.sqlite
 .storage
 tts
+.vscode
 webostv.conf
+www
 zwcfg_*
