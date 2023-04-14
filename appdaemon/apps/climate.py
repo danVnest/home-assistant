@@ -445,7 +445,7 @@ class MultiSensor(Sensor):
 
 
 class WeatherSensor(Sensor):
-    """Capture temperature data from a Bureau of Meteorology sensor."""
+    """Capture temperature data from a WeatherFlow Tempest weather station."""
 
     def __init__(self, sensor_id: str, monitor: TemperatureMonitor):
         """Keep only the temperature listener as methods change monitor's attribute."""
@@ -642,7 +642,7 @@ class TemperatureMonitor:
         forecasts = [
             float(
                 self.controller.get_state(
-                    f"sensor.dark_sky_apparent_temperature_{hour}h"
+                    f"sensor.sensor.outside_apparent_temperature_{hour}h_forecast"
                 )
             )
             for hour in ["2", "4", "6", "8"]

@@ -73,7 +73,7 @@ views:
             - entity: sensor.apparent_inside_temperature_numeric
               name: Inside
               icon: mdi:home-thermometer
-            - entity: sensor.dark_sky_apparent_temperature
+            - entity: sensor.apparent_outside_temperature
               name: Outside
               icon: mdi:sun-thermometer
           show_name: true
