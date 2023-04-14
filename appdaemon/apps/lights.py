@@ -212,6 +212,9 @@ class Lights(app.App):
             for light_name in ["kitchen_strip", "tv", "hall", "bedroom"]:
                 self.lights[light_name].ignore_presence()
                 self.lights[light_name].turn_off()
+        elif scene == "Custom":
+            for light in self.lights.values():
+                light.ignore_presence()
         self.log(f"Light scene changed to '{scene}'")
 
     def __start_circadian(self):

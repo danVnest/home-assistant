@@ -38,6 +38,9 @@ ifttt:
   key: !secret ifttt_key
 
 input_boolean:
+  custom_lighting:
+    name: "Custom lighting"
+    icon: mdi:knob
   climate_control:
     name: "Automatic climate control"
     icon: mdi:home-thermometer
@@ -278,14 +281,15 @@ input_select:
   scene:
     name: Scene
     options:
-    - Day
-    - Night
-    - Bright
-    - Sleep
-    - Morning
-    - TV
-    - Away (Day)
-    - Away (Night)
+      - Custom
+      - Day
+      - Night
+      - Bright
+      - Sleep
+      - Morning
+      - TV
+      - Away (Day)
+      - Away (Night)
     icon: mdi:home-lightbulb
 
 logbook:

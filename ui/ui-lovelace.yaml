@@ -97,9 +97,15 @@ views:
             title: Lights
             type: glance
             state_color: true
+          - type: entities
+            entities:
+              - entity: input_boolean.custom_lighting
+            show_header_toggle: false
+            state_color: true
           - content: >-
-              To manually control lighting above, you should first set the scene
-              to anything except "Night".
+              Enabling **custom lighting** will prevent automatic adjustments.
+              This is most useful at night when you want to override automatic
+              circadian rhythm dimming and colour adjustments.
             type: markdown
         type: vertical-stack
       - entity: media_player.tv

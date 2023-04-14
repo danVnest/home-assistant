@@ -287,6 +287,14 @@ class Control(app.App):
             if new != self.scene:
                 self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
                 self.scene = new
+            if (
+                old == "Custom"
+                and self.entities.input_boolean.custom_lighting.state == "on"
+            ):
+                self.log("Turning custom lighting UI switch off")
+                self.call_service(
+                    "input_boolean/turn_off", entity_id="input_boolean.custom_lighting"
+                )
         elif setting in ["aircon", "climate_control"]:
             if (new == "on") != getattr(self.apps["climate"], setting):
                 self.log(f"UI setting '{setting}' changed to '{new}'")
@@ -309,6 +317,11 @@ class Control(app.App):
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "development_mode":
             self.set_production_mode(new == "off")
+        elif setting == "custom_lighting":
+            if new == "on":
+                self.scene = "Custom"
+            else:
+                self.reset_scene()
         elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
