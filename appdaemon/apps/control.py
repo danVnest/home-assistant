@@ -28,6 +28,7 @@ class Control(app.App):
         }
         self.__is_all_initialised = False
         self.__scene = None
+        self.pre_sleep_scene = False
 
     def initialize(self):
         """Monitor logs, listen for user input, monitor batteries and set timers.
@@ -238,7 +239,7 @@ class Control(app.App):
                 self.apps["lights"].lights["bedroom"].adjust_to_max()
                 self.log("Bedroom light turned on")
             elif self.scene == "Night":
-                self.apps["lights"].alternative_scene = True
+                self.pre_sleep_scene = True
                 self.scene = "Sleep"
             elif (
                 self.scene == "Sleep"

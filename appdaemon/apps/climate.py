@@ -262,8 +262,20 @@ class Climate(app.App):
             f"degrees) is {'above' if mode == 'cool' else 'below'} the target ("
             f"{self.get_state(f'input_number.{mode}ing_target_temperature')} degrees)"
         )
-        if self.control.scene == "Sleep" or self.control.is_bed_time():
-            self.__aircons["bedroom"].turn_on(mode, "low")
+        if (
+            self.control.scene == "Sleep"
+            or self.control.is_bed_time()
+            or (
+                self.control.apps["presence"].pets_home_alone
+                and not self.control.apps["presence"].anyone_home()
+            )
+        ):
+            self.__aircons["bedroom"].turn_on(
+                mode,
+                "high"
+                if self.control.pre_sleep_scene or self.control.scene != "Sleep"
+                else "low",
+            )
             for room in ["living_room", "dining_room"]:
                 self.__aircons[room].turn_off()
         elif self.control.scene == "Morning":

@@ -119,9 +119,9 @@ views:
             type: entities
             state_color: true
           - content: >-
-              Specify the time for which the Morning scene and pre-sleep climate
-              control will trigger. More information in the **Instructions**
-              tab.
+              Specify the time for which the ***Morning*** scene and pre-sleep
+              climate control will trigger. More information in the
+              **Instructions** tab.
             type: markdown
         type: vertical-stack
       - entities:
