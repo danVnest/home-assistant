@@ -21,6 +21,7 @@ class Control(app.App):
         self.__online = False
         self.__timers = {
             "morning_time": None,
+            "day_time": None,
             "bed_time": None,
             "heartbeat": None,
             "heartbeat_fail_count": 0,
@@ -74,6 +75,7 @@ class Control(app.App):
         ]:
             self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
         self.__set_timer("morning_time")
+        self.run_daily(self.__day_time, self.args["day_time"])
         self.__set_timer("bed_time")
         self.__timers["heartbeat"] = self.run_every(
             self.__heartbeat,
@@ -167,7 +169,7 @@ class Control(app.App):
                 if (
                     self.parse_time(self.get_setting("morning_time"))
                     < self.time()
-                    < self.parse_time("12:00:00")
+                    < self.parse_time(self.args["day_time"])
                 )
                 else "Sleep"
             )
@@ -186,7 +188,7 @@ class Control(app.App):
         """Check if morning and bed times are appropriate."""
         return (
             self.parse_time(self.get_setting("morning_time"))
-            < self.parse_time("12:00:00")
+            < self.parse_time(self.args["day_time"])
             < self.parse_time(self.get_setting("bed_time"))
         )
 
@@ -197,7 +199,16 @@ class Control(app.App):
         if self.scene == "Sleep":
             self.scene = "Morning"
         else:
-            self.log(f"Scene was not changed as it was {self.scene}, not Morning")
+            self.log(f"Scene not changed to Morning from Night (scene is {self.scene})")
+
+    def __day_time(self, kwargs: dict):
+        """Transition from Morning to Day scene (callback for daily timer)."""
+        del kwargs
+        self.log("Day timer triggered")
+        if self.scene == "Morning":
+            self.scene = "Day"
+        else:
+            self.log(f"Scene not changed to Day from Morning (scene is {self.scene})")
 
     def __bed_time(self, kwargs: dict):
         """Adjust climate control when approaching bed time (callback for daily timer)."""
