@@ -490,7 +490,7 @@ class TemperatureMonitor:
                 "sensor.kitchen_multisensor",
                 "sensor.office_multisensor",
                 "sensor.bedroom_multisensor",
-                "sensor.outside_temperature_feels_like",
+                "sensor.outside_apparent_temperature",
             ]
         }
         self.__last_inside_temperature = None
@@ -505,15 +505,13 @@ class TemperatureMonitor:
         """Sync the calculated inside temperature to Home Assistant."""
         self.__inside_temperature = temperature
         self.controller.set_state(
-            "sensor.apparent_inside_temperature", state=temperature
+            "sensor.inside_apparent_temperature", state=temperature
         )
 
     @property
     def outside_temperature(self) -> float:
         """Get the calculated outside temperature from Home Assistant."""
-        return float(
-            self.controller.entities.sensor.outside_temperature_feels_like.state
-        )
+        return float(self.controller.entities.sensor.outside_apparent_temperature.state)
 
     def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
@@ -537,7 +535,7 @@ class TemperatureMonitor:
             self.calculate_inside_temperature()
 
     def calculate_inside_temperature(self):
-        """Use stored sensor values to calculate the 'feels like' temperature inside."""
+        """Use stored sensor values to calculate the apparent temperature inside."""
         self.__last_inside_temperature = self.inside_temperature
         temperatures = []
         humidities = []
@@ -654,7 +652,7 @@ class TemperatureMonitor:
         forecasts = [
             float(
                 self.controller.get_state(
-                    f"sensor.sensor.outside_apparent_temperature_{hour}h_forecast"
+                    f"sensor.outside_apparent_temperature_{hour}h_forecast"
                 )
             )
             for hour in ["2", "4", "6", "8"]

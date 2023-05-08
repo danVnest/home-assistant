@@ -307,10 +307,10 @@ sensor:
     sensors:
       any_climate_control:
         value_template: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
-      apparent_inside_temperature_numeric:
-        friendly_name: "Apparent inside temperature"
+      inside_apparent_temperature_numeric:
+        friendly_name: "Inside apparent temperature"
         unit_of_measurement: "°C"
-        value_template: "{{ states('sensor.apparent_inside_temperature') }}"
+        value_template: "{{ states('sensor.inside_apparent_temperature') }}"
       warnings_numeric:
         friendly_name: "Warnings"
         unit_of_measurement: "#"
