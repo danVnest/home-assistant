@@ -14,6 +14,28 @@ views:
         state_color: true
       - card:
           entities:
+            - entity: sensor.washer_completion_time
+              name: Washing will finish
+          show_header_toggle: false
+          type: entities
+          state_color: true
+        conditions:
+          - entity: switch.washer
+            state: "on"
+        type: conditional
+      - card:
+          entities:
+            - entity: sensor.dryer_completion_time
+              name: Drying will finish
+          show_header_toggle: false
+          type: entities
+          state_color: true
+        conditions:
+          - entity: switch.dryer
+            state: "on"
+        type: conditional
+      - card:
+          entities:
             - entity: input_number.high_temperature_trigger
             - entity: input_number.low_temperature_trigger
           show_header_toggle: false
