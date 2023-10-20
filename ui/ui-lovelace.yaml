@@ -184,7 +184,7 @@ views:
         auto_fit: true
         entities:
           - device_tracker.daniels_phone
-          - device_tracker.rachel_s_phone_2
+          - device_tracker.rachels_phone
         hours_to_show: 1
         type: map
     path: default_view
