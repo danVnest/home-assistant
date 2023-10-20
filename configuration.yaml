@@ -319,7 +319,15 @@ sensor:
         friendly_name: "Errors"
         unit_of_measurement: "#"
         value_template: "{{ states('counter.errors') }}"
-
+      nest_protect_entryway_battery_level:
+        unit_of_measurement: "%"
+        value_template: "{{ 90 if states('binary_sensor.nest_protect_entryway_battery_health') == 'off' else 10 }}"
+      nest_protect_living_room_battery_level:
+        unit_of_measurement: "%"
+        value_template: "{{ 90 if states('binary_sensor.nest_protect_living_room_battery_health') == 'off' else 10 }}"
+      nest_protect_garage_battery_level:
+        unit_of_measurement: "%"
+        value_template: "{{ 90 if states('binary_sensor.nest_protect_garage_battery_health') == 'off' else 10 }}"
 sun:
 
 system_health:
