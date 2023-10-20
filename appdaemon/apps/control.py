@@ -67,7 +67,7 @@ class Control(app.App):
             "kitchen_multisensor_battery_level",
             "office_multisensor_battery_level",
             "bedroom_multisensor_battery_level",
-            "sensor.kitchen_door_sensor_battery_level",
+            "kitchen_door_sensor_battery_level",
             "kitchen_button_battery_level",
             "bedroom_button_battery_level",
             "nest_protect_entryway_battery_level",
