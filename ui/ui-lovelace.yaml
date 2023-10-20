@@ -148,11 +148,16 @@ views:
         type: vertical-stack
       - entities:
           - entity: sensor.inside_apparent_temperature_numeric
+            name: Inside (feels like)
           - entity: sensor.outside_apparent_temperature
-          - entity: climate.living_room
-          - entity: climate.dining_room
-          - entity: climate.bedroom
+            name: Outside (feels like)
+          - entity: sensor.living_room_temperature_feels_like
+            name: Living room
+          - entity: sensor.dining_room_temperature_feels_like
+            name: Dining room
           - entity: sensor.office_multisensor_temperature
+            name: Office
+          - entity: climate.bedroom
         hours_to_show: 24
         refresh_interval: 0
         title: Temperatures
@@ -425,23 +430,25 @@ views:
           - entity: sensor.door_lock_battery_level
             name: Lock
           - entity: sensor.entryway_multisensor_battery_level
-            name: Entryway Multisensor
+            name: Entryway multisensor
           - entity: sensor.kitchen_multisensor_battery_level
-            name: Kitchen Multisensor
+            name: Kitchen multisensor
           - entity: sensor.office_multisensor_battery_level
-            name: Office Multisensor
+            name: Office multisensor
           - entity: sensor.bedroom_multisensor_battery_level
-            name: Bedroom Multisensor
+            name: Bedroom multisensor
+          - entity: sensor.kitchen_door_sensor_battery_level
+            name: Kitchen door
           - entity: sensor.kitchen_button_battery_level
-            name: Kitchen Button
+            name: Kitchen button
           - entity: sensor.bedroom_button_battery_level
-            name: Bedroom Button
+            name: Bedroom button
           - entity: sensor.nest_protect_entryway_battery_level
-            name: Entryway Smoke Alarm
+            name: Entryway smoke alarm
           - entity: sensor.nest_protect_living_room_battery_level
-            name: Living Room Smoke Alarm
+            name: Living room smoke alarm
           - entity: sensor.nest_protect_garage_battery_level
-            name: Garage Smoke Alarm
+            name: Garage smoke alarm
         hours_to_show: 72
         refresh_interval: 0
         title: Battery Levels
