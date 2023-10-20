@@ -28,6 +28,9 @@ group: !include groups.yaml
 
 history:
 
+homeassistant:
+  customize: !include customize.yaml
+
 http:
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem

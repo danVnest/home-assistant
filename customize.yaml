@@ -1,0 +1,7 @@
+zone.home:
+  radius: 300
+
+device_tracker.daniels_phone:
+  entity_picture: /local/dan.png
+device_tracker.rachels_phone:
+  entity_picture: /local/rachel.png
