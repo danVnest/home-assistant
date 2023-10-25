@@ -27,6 +27,8 @@ history:
 homeassistant:
   customize: !include customize.yaml
 
+homeassistant_alerts:
+
 http:
   ssl_certificate: /ssl/fullchain.pem
   ssl_key: /ssl/privkey.pem
@@ -295,11 +297,17 @@ logbook:
 
 map:
 
-media_player:
-
 mobile_app:
 
+my:
+
+network:
+
 person:
+
+sun:
+
+system_health:
 
 template:
   - binary_sensor:
