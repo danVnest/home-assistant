@@ -106,13 +106,21 @@ views:
       - cards:
           - entities:
               - entity: group.all_lights
+                name: Any / all
               - entity: group.entryway_lights
+                name: Entryway
               - entity: group.kitchen_lights
+                name: Kitchen
               - entity: group.tv_lights
+                name: TV
               - entity: group.dining_lights
+                name: Dining
               - entity: light.hall
+                name: Hall
               - entity: light.bedroom
+                name: Bedroom
               - entity: light.office
+                name: Office
             show_icon: true
             show_name: true
             show_state: true
@@ -183,7 +191,7 @@ views:
       - content: >-
           **Lighting** and **climate settings** (if enabled) are automatically
           adjusted between different scenes. You can also manually select a
-          preferred scene here, or tell Siri/Google:
+          preferred scene in this app, or tell Siri/Google:
 
           - **"lights on"** or **"lights off"** for the *Night* and *Day* scenes
 
@@ -194,10 +202,12 @@ views:
 
           **Automatic climate control** will control all aircon units based on
           the current scene and the temperature throughout the house as well as
-          outside. If the pets are home alone (or are going to be soon), you can
-          manually specify this or wait for their movement to be detected to
-          trigger climate control. **Aircon** can also be manually turned on and
-          off. These settings can be controlled by telling Siri/Google:
+          outside. If the **pets are home alone** (or are going to be soon), you
+          can manually specify this or wait for their movement to be detected to
+          trigger climate control. Only the bedroom aircon will be controlled
+          when pets are home alone or after the specified bed time, regardless
+          of the scene. **Aircon** can also be manually turned on and off. These
+          settings can be controlled by telling Siri/Google:
 
           - **"climate control on"** or **"climate control off"**
 
@@ -250,10 +260,6 @@ views:
           disabled as soon as the ***Sleep*** scene starts, only enabling again
           when the bedroom **button** is clicked or after luminance levels peak
           (i.e. after blinds are first opened in the morning).
-
-
-          Only the bedroom aircon will be controlled after the specified bed
-          time, regardless of the scene.
 
 
           In order to use Siri, you will need to add the following Siri
@@ -410,6 +416,7 @@ views:
           - entity: input_select.scene
           - entity: input_boolean.climate_control
           - entity: input_boolean.aircon
+          - entity: input_boolean.pets_home_alone
         hours_to_show: 36
         refresh_interval: 0
         title: Control History
