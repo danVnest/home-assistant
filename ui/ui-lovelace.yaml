@@ -215,10 +215,10 @@ views:
           - ***Day*** is triggered when ambient lighting in the house is
           sufficient, and thus turns off all lighting.
 
-          - ***Night*** is triggered when there is insufficent lighting, turning
-          on the main lights in the house. The brightness and colour temperature
-          of all lighting adjusts as the night goes on, getting dimmer and
-          warmer so as to reduce the impact to your circadian rhythm.
+          - ***Night*** is triggered when there is insufficient lighting,
+          turning on the main lights in the house. The brightness and colour
+          temperature of all lighting adjusts as the night goes on, getting
+          dimmer and warmer so as to reduce the impact to your circadian rhythm.
 
           - ***Sleep*** turns off all lighting in the house. If climate control
           is enabled, only the bedroom is monitored and controlled. This scene
@@ -300,8 +300,8 @@ views:
             type: entities
             state_color: false
           - content: >-
-              Lighting at night will gradually transition between the intial and
-              final brightness and colour values specified here.
+              Lighting at night will gradually transition between the initial
+              and final brightness and colour values specified here.
 
 
               Initial circadian settings occur after sunset (specified in hours
