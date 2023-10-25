@@ -1,5 +1,5 @@
 automation:
-  - alias: "Turn TV On"
+  - alias: Turn TV On
     trigger:
       - platform: webostv.turn_on
         entity_id: media_player.tv
@@ -38,19 +38,19 @@ ifttt:
 
 input_boolean:
   custom_lighting:
-    name: "Custom lighting"
+    name: Custom lighting
     icon: mdi:knob
   climate_control:
-    name: "Automatic climate control"
+    name: Automatic climate control
     icon: mdi:home-thermometer
   aircon:
-    name: "Aircon"
+    name: Aircon
     icon: mdi:air-conditioner
   pets_home_alone:
-    name: "Pets home alone"
+    name: Pets home alone
     icon: mdi:dog-side
   development_mode:
-    name: "Development Mode"
+    name: Development Mode
     icon: mdi:dev-to
 
 input_datetime:
@@ -69,72 +69,72 @@ input_datetime:
 
 input_number:
   cooling_target_temperature:
-    name: "Cool down to"
+    name: Cool down to
     min: 15
     max: 25
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-chevron-down
   heating_target_temperature:
-    name: "Heat up to"
+    name: Heat up to
     min: 15
     max: 25
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-chevron-up
   sleep_cooling_target_temperature:
-    name: "Cool down to"
+    name: Cool down to
     min: 15
     max: 25
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-chevron-down
   sleep_heating_target_temperature:
-    name: "Heat up to"
+    name: Heat up to
     min: 15
     max: 25
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-chevron-up
   high_temperature_trigger:
-    name: "Cool when above"
+    name: Cool when above
     min: 20
     max: 40
     step: 0.5
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-high
   low_temperature_trigger:
-    name: "Heat when below"
+    name: Heat when below
     min: 0
     max: 20
     step: 0.5
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-low
   sleep_high_temperature_trigger:
-    name: "Cool when above"
+    name: Cool when above
     min: 20
     max: 40
     step: 0.5
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-high
   sleep_low_temperature_trigger:
-    name: "Heat when below"
+    name: Heat when below
     min: 0
     max: 20
     step: 0.5
-    unit_of_measurement: "°C"
-    mode: "box"
+    unit_of_measurement: °C
+    mode: box
     icon: mdi:thermometer-low
   aircon_door_check_delay:
-    name: "Delay"
+    name: Delay
     min: 1
     max: 10
     step: 1
-    unit_of_measurement: "min"
-    mode: "box"
+    unit_of_measurement: min
+    mode: box
     icon: mdi:timer
   initial_circadian_brightness:
     name: Initial brightness
