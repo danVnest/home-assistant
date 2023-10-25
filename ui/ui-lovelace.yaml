@@ -132,20 +132,6 @@ views:
         type: vertical-stack
       - entity: media_player.tv
         type: media-control
-      - cards:
-          - entities:
-              - entity: input_datetime.morning_time
-              - entity: input_datetime.bed_time
-            show_header_toggle: false
-            title: Times
-            type: entities
-            state_color: true
-          - content: >-
-              Specify the time for which the ***Morning*** scene and pre-sleep
-              climate control will trigger. More information in the
-              **Instructions** tab.
-            type: markdown
-        type: vertical-stack
       - entities:
           - entity: sensor.inside_apparent_temperature
             name: Inside (feels like)
@@ -321,6 +307,20 @@ views:
               Initial circadian settings occur after sunset (specified in hours
               by *initial sunset offset*) and reaches the final values at *end
               time*.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - entities:
+              - entity: input_datetime.morning_time
+              - entity: input_datetime.bed_time
+            show_header_toggle: false
+            title: Times
+            type: entities
+            state_color: true
+          - content: >-
+              Specify the time for which the ***Morning*** scene and pre-sleep
+              climate control will trigger. More information in the
+              **Instructions** tab.
             type: markdown
         type: vertical-stack
       - cards:
