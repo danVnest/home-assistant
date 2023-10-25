@@ -317,8 +317,8 @@ template:
         state: "{{ states('input_select.scene') != 'Sleep' and today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now() }}"
   - sensor:
       - name: Inside apparent temperature
-        unit_of_measurement: °C
         state: "{{ None }}"
+        unit_of_measurement: °C
         state_class: measurement
       - name: Nest Protect entryway battery level
         state: "{{ 90 if states('binary_sensor.nest_protect_entryway_battery_health') == 'off' else 10 }}"
