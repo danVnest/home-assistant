@@ -92,7 +92,7 @@ views:
         type: conditional
       - card:
           entities:
-            - entity: sensor.inside_apparent_temperature_numeric
+            - entity: sensor.inside_apparent_temperature
               name: Inside
               icon: mdi:home-thermometer
             - entity: sensor.outside_apparent_temperature
@@ -147,7 +147,7 @@ views:
             type: markdown
         type: vertical-stack
       - entities:
-          - entity: sensor.inside_apparent_temperature_numeric
+          - entity: sensor.inside_apparent_temperature
             name: Inside (feels like)
           - entity: sensor.outside_apparent_temperature
             name: Outside (feels like)
@@ -418,8 +418,8 @@ views:
         entities:
           - input_boolean.development_mode
       - entities:
-          - entity: sensor.warnings_numeric
-          - entity: sensor.errors_numeric
+          - entity: counter.warnings
+          - entity: counter.errors
         hours_to_show: 72
         refresh_interval: 0
         title: Warnings & Errors

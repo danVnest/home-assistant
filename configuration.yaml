@@ -8,19 +8,15 @@ automation:
         data:
           mac: !secret tv_mac
 
-binary_sensor:
-  - platform: template
-    sensors:
-      display_day_card:
-        value_template: >
-          {% set time = now() %}
-          {{ states.input_select.scene.state != "Sleep" and states.input_datetime.bed_time.attributes.timestamp > (time - time.replace(hour=0,minute=0,second=0,microsecond=0)).total_seconds() }}
-
 config:
 
 counter:
   warnings:
+    name: Warnings
+    restore: false
   errors:
+    name: Errors
+    restore: false
 
 frontend:
 
@@ -305,38 +301,29 @@ mobile_app:
 
 person:
 
-sensor:
-  - platform: template
-    sensors:
-      any_climate_control:
-        value_template: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
-      inside_apparent_temperature_numeric:
-        friendly_name: "Inside apparent temperature"
-        unit_of_measurement: "°C"
-        value_template: "{{ states('sensor.inside_apparent_temperature') }}"
-      warnings_numeric:
-        friendly_name: "Warnings"
-        unit_of_measurement: "#"
-        value_template: "{{ states('counter.warnings') }}"
-      errors_numeric:
-        friendly_name: "Errors"
-        unit_of_measurement: "#"
-        value_template: "{{ states('counter.errors') }}"
-      nest_protect_entryway_battery_level:
+template:
+  - binary_sensor:
+      - name: Any climate control
+        state: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
+      - name: Display day card
+        state: "{{ states('input_select.scene') != 'Sleep' and today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now() }}"
+  - sensor:
+      - name: Inside apparent temperature
+        unit_of_measurement: °C
+        state: "{{ None }}"
+        state_class: measurement
+      - name: Nest Protect entryway battery level
+        state: "{{ 90 if states('binary_sensor.nest_protect_entryway_battery_health') == 'off' else 10 }}"
         unit_of_measurement: "%"
-        value_template: "{{ 90 if states('binary_sensor.nest_protect_entryway_battery_health') == 'off' else 10 }}"
-      nest_protect_living_room_battery_level:
+        state_class: measurement
+      - name: Nest Protect living room battery level
+        state: "{{ 90 if states('binary_sensor.nest_protect_living_room_battery_health') == 'off' else 10 }}"
         unit_of_measurement: "%"
-        value_template: "{{ 90 if states('binary_sensor.nest_protect_living_room_battery_health') == 'off' else 10 }}"
-      nest_protect_garage_battery_level:
+        state_class: measurement
+      - name: Nest Protect garage battery level
+        state: "{{ 90 if states('binary_sensor.nest_protect_garage_battery_health') == 'off' else 10 }}"
         unit_of_measurement: "%"
-        value_template: "{{ 90 if states('binary_sensor.nest_protect_garage_battery_health') == 'off' else 10 }}"
-sun:
-
-system_health:
-
-tts:
-  platform: google_translate
+        state_class: measurement
 
 wake_on_lan:
 
