@@ -2,7 +2,6 @@
 
 # Sensitive information
 ip_bans.yaml
-known_devices.yaml
 secrets.yaml
 
 # Custom components (don't need details, except manifest.json)
@@ -19,14 +18,10 @@ blueprints
 *.db
 *.db-shm
 *.db-wal
-.homekit.state
 image
-options.xml
 __pycache__
-pyozw.sqlite
 .storage
 tts
 .vscode
 webostv.conf
 www
-zwcfg_*
