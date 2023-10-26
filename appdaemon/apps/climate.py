@@ -676,18 +676,16 @@ class Aircon:
 
     def turn_on(self, mode: str, fan: str = None):
         """Turn on the aircon unit with the specified mode and configured temperature."""
-        if mode == "cool":
-            target_temperature = self.controller.get_setting(
-                "cooling_target_temperature"
-            )
-        elif mode == "heat":
-            target_temperature = self.controller.get_setting(
-                "heating_target_temperature"
-            )
         if self.controller.get_state(self.aircon_id) != mode:
             self.controller.call_service(
-                "climate/set_hvac_mode", entity_id=self.aircon_id, hvac_mode=mode
+                "climate/set_hvac_mode",
+                entity_id=self.aircon_id,
+                hvac_mode=mode,
+                return_result=True,
             )
+        target_temperature = self.controller.get_setting(
+            mode + "ing_target_temperature"
+        )
         if (
             self.controller.get_state(self.aircon_id, attribute="temperature")
             != target_temperature
@@ -696,6 +694,7 @@ class Aircon:
                 "climate/set_temperature",
                 entity_id=self.aircon_id,
                 temperature=target_temperature,
+                return_result=True,
             )
         if fan:
             self.set_fan_mode(fan)
@@ -703,11 +702,16 @@ class Aircon:
     def turn_off(self):
         """Turn off the aircon unit if it's on."""
         if self.controller.get_state(self.aircon_id) != "off":
-            self.controller.call_service("climate/turn_off", entity_id=self.aircon_id)
+            self.controller.call_service(
+                "climate/turn_off", entity_id=self.aircon_id, return_result=True
+            )
 
     def set_fan_mode(self, fan_mode: str):
         """Set the fan mode to the specified level (main options: 'low', 'auto')."""
         if self.controller.get_state(self.aircon_id, attribute="fan_mode") != fan_mode:
             self.controller.call_service(
-                "climate/set_fan_mode", entity_id=self.aircon_id, fan_mode=fan_mode
+                "climate/set_fan_mode",
+                entity_id=self.aircon_id,
+                fan_mode=fan_mode,
+                return_result=True,
             )
