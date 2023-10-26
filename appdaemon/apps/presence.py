@@ -158,7 +158,14 @@ class Room:
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """If room presence changes, trigger all registered callbacks."""
-        del entity, attribute, old, kwargs
+        del entity, attribute, kwargs
+        if "unavailable" in (new, old):
+            self.__controller.log(
+                f"Ignoring {'current' if new == 'unavailable' else 'previous'} "
+                "unavailable {self.__room_id} sensor state",
+                level="WARNING",
+            )
+            return
         is_vacant = new == "off"
         self.__controller.log(
             f"The {self.__room_id} is now {'vacant' if is_vacant else 'occupied'}",
