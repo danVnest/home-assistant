@@ -406,7 +406,7 @@ class Sensor:
         """Return numerical value of measure, warning if invalid."""
         try:
             return float(value)
-        except TypeError:
+        except ValueError:
             self.monitor.controller.log(
                 f"{self.sensor_id} could not get measure", level="WARNING"
             )
