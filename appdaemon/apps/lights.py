@@ -22,7 +22,6 @@ class Lights(app.App):
         self.lights = {}
         self.constants["brightness_per_step"] = 2.55
         self.constants["kelvin_per_step"] = 20
-        self.constants["mired_kelvin_reciprocal"] = 1e6
         self.constants["max_steps_per_second"] = 2
 
     def initialize(self):
@@ -503,16 +502,8 @@ class Light:
         self.__light_id = light_id
         self.__controller = controller
         self.kelvin_limits = {
-            "max": round(
-                self.__controller.constants["mired_kelvin_reciprocal"]
-                / float(self.__get_attribute("min_mireds")),
-                -1,
-            ),
-            "min": round(
-                self.__controller.constants["mired_kelvin_reciprocal"]
-                / float(self.__get_attribute("max_mireds")),
-                -1,
-            ),
+            "max": float(self.__get_attribute("max_color_temp_kelvin")),
+            "min": float(self.__get_attribute("min_color_temp_kelvin")),
         }
         self.__kelvin_before_off = (
             self.__controller.args["max_brightness"]
@@ -568,17 +559,8 @@ class Light:
     @property
     def kelvin(self) -> int:
         """Get the colour warmth value of the light from Home Assistant."""
-        mired = self.__get_attribute("color_temp")
-        return (
-            self.__controller.constants["kelvin_per_step"]
-            * round(
-                self.__controller.constants["mired_kelvin_reciprocal"]
-                / self.__controller.constants["kelvin_per_step"]
-                / mired
-            )
-            if mired not in (None, 0)
-            else self.__kelvin_before_off
-        )
+        kelvin = self.__get_attribute("color_temp_kelvin")
+        return kelvin if kelvin is not None else self.__kelvin_before_off
 
     @kelvin.setter
     def kelvin(self, value: int):
