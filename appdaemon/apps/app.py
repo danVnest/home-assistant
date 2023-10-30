@@ -66,4 +66,4 @@ class App(hass.Hass):
                     name=self.control.args["mobiles"][person]["name"],
                     data=data,
                 )
-                self.log(f"Notified {targets}: \"{kwargs['title']}: {message}\"")
+                self.log(f"Notified '{targets}': \"{kwargs['title']}: {message}\"")

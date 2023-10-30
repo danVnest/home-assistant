@@ -126,7 +126,7 @@ class Control(app.App):
         """Re-link the app and set a timer to initialise it."""
         del event_name, kwargs
         self.apps[data["app"].lower()] = self.get_app(data["app"])
-        self.log(f"App added: {data['app']}")
+        self.log(f"App added: '{data['app']}'")
         self.reset_scene()
 
     @property
@@ -200,7 +200,7 @@ class Control(app.App):
         if self.scene == "Sleep":
             self.scene = "Morning"
         else:
-            self.log(f"Scene not changed to Morning from Night (scene is {self.scene})")
+            self.log(f"Ignoring morning timer (scene is '{self.scene}', not 'Sleep')")
 
     def __day_time(self, kwargs: dict):
         """Transition from Morning to Day scene (callback for daily timer)."""
@@ -209,7 +209,7 @@ class Control(app.App):
         if self.scene == "Morning":
             self.scene = "Day"
         else:
-            self.log(f"Scene not changed to Day from Morning (scene is {self.scene})")
+            self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Day')")
 
     def __bed_time(self, kwargs: dict):
         """Adjust climate control when approaching bed time (callback for daily timer)."""
@@ -265,7 +265,7 @@ class Control(app.App):
     def __ifttt(self, event_name: str, data: dict, kwargs: dict):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
-        self.log(f"Received {data} from IFTTT: ")
+        self.log(f"Received '{data}' from IFTTT")
         if "lights" in data:
             self.scene = "Night" if self.scene == "Day" else "Day"
         elif "bright" in data:
@@ -298,7 +298,7 @@ class Control(app.App):
         setting = entity.split(".")[1]
         if setting == "scene":
             if new != self.scene:
-                self.log(f"UI 'scene' selection changed to '{new}' from '{old}'")
+                self.log(f"UI scene selection changed to '{new}' from '{old}'")
                 self.scene = new
             if (
                 old == "Custom"
@@ -377,7 +377,7 @@ class Control(app.App):
         """Notify if a device's battery is low."""
         del attribute, old, kwargs
         if new == "unavailable":
-            self.log(f"{entity} is unavailable", level="WARNING")
+            self.log(f"'{entity}' is unavailable", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"]:
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 

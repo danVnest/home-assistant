@@ -54,7 +54,7 @@ class Presence(app.App):
     ):  # pylint: disable=too-many-arguments
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, kwargs
-        self.log(f"{entity} is {new}")
+        self.log(f"'{entity}' is '{new}'")
         if new == "home":
             self.call_service("lock/unlock", entity_id="lock.door_lock")
             if "Away" in self.control.scene:
@@ -80,7 +80,7 @@ class Presence(app.App):
     def __handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""
         del event_name
-        self.log(f"New device added: {data}, {kwargs}")
+        self.log(f"New device added: ;{data}', '{kwargs}'")
         if "Away" in self.control.scene:
             if self.__last_device_date < self.date() - timedelta(hours=3):
                 self.notify(
@@ -122,7 +122,7 @@ class Room:
                 targets="dan",
             )
             self.__controller.log(
-                f"Initialising room {room_id} with default state", level="WARNING"
+                f"Initialising room '{room_id}' with default state", level="WARNING"
             )
             vacant = True
             last_changed = self.__controller.datetime()
@@ -131,7 +131,7 @@ class Room:
         self.__callbacks = {}
         self.__controller.listen_state(self.__handle_presence_change, sensor_id)
         self.__controller.log(
-            f"Room '{room_id}' initialised as last {'vacat' if vacant else 'enter'}ed at "
+            f"Room '{room_id}' initialised as last '{'vacat' if vacant else 'enter'}ed' at "
             f"{self.__last_vacated if vacant else self.__last_entered}",
             level="DEBUG",
         )
@@ -161,14 +161,14 @@ class Room:
         del entity, attribute, kwargs
         if "unavailable" in (new, old):
             self.__controller.log(
-                f"Ignoring {'current' if new == 'unavailable' else 'previous'} "
-                "unavailable {self.__room_id} sensor state",
+                f"Ignoring '{'current' if new == 'unavailable' else 'previous'}' "
+                f"unavailable '{self.__room_id}' sensor state",
                 level="WARNING",
             )
             return
         is_vacant = new == "off"
         self.__controller.log(
-            f"The {self.__room_id} is now {'vacant' if is_vacant else 'occupied'}",
+            f"The '{self.__room_id}' is now '{'vacant' if is_vacant else 'occupied'}'",
             level="DEBUG",
         )
         if is_vacant:
@@ -186,7 +186,9 @@ class Room:
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:
                 callback["callback"](is_vacant=is_vacant)
-                self.__controller.log(f"Called callback: {callback}", level="DEBUG")
+                self.__controller.log(
+                    f"Callback {handle} triggered by '{entity}'", level="DEBUG"
+                )
             else:
                 self.__callbacks[handle]["timer_handle"] = self.__controller.run_in(
                     callback["callback"],
@@ -194,7 +196,7 @@ class Room:
                     is_vacant=True,
                 )
                 self.__controller.log(
-                    f"Set vacation timer for callback: {callback}", level="DEBUG"
+                    f"Set vacation timer for callback: {handle}", level="DEBUG"
                 )
 
     def add_sensor(self, sensor_id: str):
@@ -216,7 +218,10 @@ class Room:
                 is_vacant=True,
             )
 
-        self.__controller.log(f"Registered callback: {callback}", level="DEBUG")
+        self.__controller.log(
+            f"Registered callback for '{self.__room_id}' with handle: {handle}",
+            level="DEBUG",
+        )
         return handle
 
     def cancel_callback(self, handle):

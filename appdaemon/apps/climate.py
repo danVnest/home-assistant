@@ -64,7 +64,7 @@ class Climate(app.App):
     @climate_control.setter
     def climate_control(self, state: bool):
         """Enable/disable climate control and reflect state in UI."""
-        self.log(f"{'En' if state else 'Dis'}abling climate control")
+        self.log(f"'{'En' if state else 'Dis'}abling' climate control")
         self.__climate_control = state
         if state:
             self.handle_temperatures()
@@ -97,9 +97,9 @@ class Climate(app.App):
     def aircon(self, state: bool):
         """Turn on/off aircon and sync state to Home Assistant UI."""
         if self.aircon == state:
-            self.log(f"Ensuring aircon is {'on' if state else 'off'}")
+            self.log(f"Ensuring aircon is '{'on' if state else 'off'}'")
         else:
-            self.log(f"Turning aircon {'on' if state else 'off'}")
+            self.log(f"Turning aircon '{'on' if state else 'off'}'")
         if state:
             self.__disable_climate_control_if_would_trigger_off()
             self.__turn_aircon_on()
@@ -259,7 +259,7 @@ class Climate(app.App):
             mode = self.__temperature_monitor.closer_to_heat_or_cool()
         self.log(
             f"The temperature inside ({self.__temperature_monitor.inside_temperature} "
-            f"degrees) is {'above' if mode == 'cool' else 'below'} the target ("
+            f"degrees) is '{'above' if mode == 'cool' else 'below'}' the target ("
             f"{self.get_state(f'input_number.{mode}ing_target_temperature')} degrees)"
         )
         if (
@@ -351,7 +351,7 @@ class Climate(app.App):
     ):  # pylint: disable=too-many-arguments
         """If the kitchen door status changes, check if aircon needs to change."""
         del entity, attribute, old, kwargs
-        self.log(f"Kitchen door is now {'open' if new == 'on' else 'closed'}")
+        self.log(f"Kitchen door is now '{'open' if new == 'on' else 'closed'}'")
         if new == "off":
             self.handle_temperatures()
         elif self.aircon and self.get_state("climate.living_room") != "off":
@@ -408,7 +408,7 @@ class Sensor:
             return float(value)
         except ValueError:
             self.monitor.controller.log(
-                f"{self.sensor_id} could not get measure", level="WARNING"
+                f"'{self.sensor_id}' could not get measure", level="WARNING"
             )
             return None
 

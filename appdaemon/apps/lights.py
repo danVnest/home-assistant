@@ -285,7 +285,11 @@ class Lights(app.App):
             occupied=(brightness, kelvin),
             vacating_delay=self.control.get_setting("night_vacating_delay"),
         )
-        self.log("Adjusted lighting based on circadian progression", level="DEBUG")
+        self.log(
+            "Adjusted lighting based on circadian progression to "
+            f"brightness: {brightness} and kelvin: {kelvin}",
+            level="DEBUG",
+        )
 
     def __calculate_circadian_progress(self) -> float:
         """Calculate how far through the circadian rhythm we should be right now."""
@@ -533,7 +537,7 @@ class Light:
             value = self.__validate_brightness(value)
             if value != 0:
                 self.__controller.log(
-                    f"Setting {self.__light_id}'s brightness to {value} (from {self.brightness})",
+                    f"Setting '{self.__light_id}' brightness to {value} (from {self.brightness})",
                     level="DEBUG",
                 )
                 self.__controller.turn_on(self.__light_id, brightness=value)
@@ -552,7 +556,7 @@ class Light:
         if validated_value != value:
             self.__controller.log(
                 f"Brightness ({value}) out of bounds for '{self.__light_id}'",
-                level="DEBUG",
+                level="WARNING",
             )
         return validated_value
 
@@ -596,8 +600,8 @@ class Light:
             brightness = self.__validate_brightness(brightness)
             kelvin = self.__validate_kelvin(kelvin)
             self.__controller.log(
-                f"Adjusting {self.__light_id} to {brightness} & {kelvin}K "
-                f"(from {self.brightness} & {self.kelvin}K)",
+                f"Adjusting '{self.__light_id}' to brightness {brightness} and kelvin {kelvin} "
+                f"(from {self.brightness} and {self.kelvin}K)",
                 level="DEBUG",
             )
             self.__controller.turn_on(
@@ -613,8 +617,8 @@ class Light:
         if self.brightness != 0:
             self.__kelvin_before_off = self.kelvin
             self.__controller.log(
-                f"Turning {self.__light_id}'s off "
-                f"(previously at {self.brightness} brightness, {self.kelvin} kelvin)",
+                f"Turning '{self.__light_id}' off "
+                f"(previously at {self.brightness} brightness and {self.kelvin} kelvin)",
                 level="DEBUG",
             )
             self.__controller.turn_off(self.__light_id)
@@ -674,7 +678,7 @@ class Light:
                     )
         elif transition_period != 0 or entered != (0, 0):
             self.__controller.log(
-                f"{self.__light_id} set to transition with invalid parameters",
+                f"'{self.__light_id}' set to transition with invalid parameters",
                 level="WARNING",
             )
         if presence != "entered":
@@ -692,7 +696,7 @@ class Light:
                 .register_callback(self.__handle_presence_change, vacating_delay)
             )
         self.__controller.log(
-            f"Configured {self.__light_id}'s with presence '{presence}' and "
+            f"Configured '{self.__light_id}' with presence '{presence}' and "
             f"presence adjustments: {self.__presence_adjustments}",
             level="DEBUG",
         )
@@ -741,7 +745,9 @@ class Light:
             self.__presence_adjustments[presence]["brightness"],
             self.__presence_adjustments[presence]["kelvin"],
         )
-        self.__controller.log(f"Presence changed to {presence}", level="DEBUG")
+        self.__controller.log(
+            f"Lighting adjusted now the '{self.room_name}' is '{presence}'"
+        )
 
     def __start_transition_towards_occupied(self, completion: float = 0):
         """Calculate the light change required and start the transition."""
@@ -794,7 +800,7 @@ class Light:
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining <= 0:
             self.__controller.log(
-                f"Transition to occupied complete for {self.__light_id}",
+                f"Transition to occupied complete for '{self.__light_id}'",
                 level="DEBUG",
             )
             self.__transition_timer = None
@@ -803,6 +809,10 @@ class Light:
                 self.__presence_adjustments["occupied"]["kelvin"],
             )
         else:
+            self.__controller.log(
+                f"Stepping towards occupied lighting for '{self.__light_id}'",
+                level="DEBUG",
+            )
             self.adjust(
                 self.__presence_adjustments["occupied"]["brightness"]
                 - kwargs["brightness_step"] * steps_remaining,
