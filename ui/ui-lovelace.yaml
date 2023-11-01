@@ -67,12 +67,12 @@ views:
             - entity: input_number.cooling_target_temperature
             - entity: input_number.heating_target_temperature
           show_header_toggle: false
-          title: Aircon Temperatures
+          title: Aircon Settings - Night
           type: entities
           state_color: true
         conditions:
-          - entity: sensor.any_climate_control
-            state: "True"
+          - entity: binary_sensor.any_climate_control
+            state: "on"
           - entity: binary_sensor.display_day_card
             state: "on"
         type: conditional
@@ -81,12 +81,12 @@ views:
             - entity: input_number.sleep_cooling_target_temperature
             - entity: input_number.sleep_heating_target_temperature
           show_header_toggle: false
-          title: Aircon Temperatures
+          title: Aircon Settings - Day
           type: entities
           state_color: true
         conditions:
-          - entity: sensor.any_climate_control
-            state: "True"
+          - entity: binary_sensor.any_climate_control
+            state: "on"
           - entity: binary_sensor.display_day_card
             state: "off"
         type: conditional
