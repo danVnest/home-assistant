@@ -33,8 +33,9 @@ class Presence(app.App):
                 room, f"binary_sensor.{room}_multisensor_motion", self
             )
         self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing")
-        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_motion")
-        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door")
+        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_person_detected")
+        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
+        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
         self.listen_state(self.__handle_presence_change, "person")
@@ -80,7 +81,7 @@ class Presence(app.App):
     def __handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""
         del event_name
-        self.log(f"New device added: ;{data}', '{kwargs}'")
+        self.log(f"New device added: '{data}', '{kwargs}'")
         if "Away" in self.control.scene:
             if self.__last_device_date < self.date() - timedelta(hours=3):
                 self.notify(
@@ -107,6 +108,7 @@ class Room:
     def __init__(self, room_id: str, sensor_id: str, controller: Presence):
         """Initialise room presence and start listening for presence change."""
         self.__room_id = room_id
+        self.__sensors = [sensor_id]
         self.__controller = controller
         try:
             vacant = self.__controller.get_state(sensor_id) == "off"
@@ -158,7 +160,7 @@ class Room:
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """If room presence changes, trigger all registered callbacks."""
-        del entity, attribute, kwargs
+        del attribute, kwargs
         if "unavailable" in (new, old):
             self.__controller.log(
                 f"Ignoring '{'current' if new == 'unavailable' else 'previous'}' "
@@ -167,6 +169,17 @@ class Room:
             )
             return
         is_vacant = new == "off"
+        if is_vacant and any(
+            self.__controller.get_state(sensor) == "on"
+            for sensor in self.__sensors
+            if sensor != entity
+        ):
+            self.__controller.log(
+                f"Sensor '{entity}' reports no presence "
+                "but at least one other sensor in the room indicates presence",
+                level="DEBUG",
+            )
+            return
         self.__controller.log(
             f"The '{self.__room_id}' is now '{'vacant' if is_vacant else 'occupied'}'",
             level="DEBUG",
@@ -178,6 +191,7 @@ class Room:
             if (
                 not self.__controller.pets_home_alone
                 and "Away" in self.__controller.control.scene
+                and "doorbell" not in entity
             ):
                 self.__controller.log("Pet movement detected while home alone")
                 self.__controller.pets_home_alone = True
@@ -201,6 +215,7 @@ class Room:
 
     def add_sensor(self, sensor_id: str):
         """Add additional sensor to room."""
+        self.__sensors.append(sensor_id)
         self.__controller.listen_state(self.__handle_presence_change, sensor_id)
 
     def register_callback(self, callback, vacating_delay: int = 0) -> uuid.UUID:
