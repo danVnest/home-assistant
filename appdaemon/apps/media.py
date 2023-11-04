@@ -6,6 +6,7 @@ User defined variables are configued in media.yaml
 """
 
 import subprocess
+
 import app
 
 
@@ -16,6 +17,8 @@ class Media(app.App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.__entity_id = "media_player.tv"
+        self.__play_state_sensor = "sensor.webostvservice_play_state"
+        self.__last_play_state = None
 
     def initialize(self):
         """Start listening to TV states.
@@ -24,6 +27,11 @@ class Media(app.App):
         """
         super().initialize()
         self.listen_state(self.__state_change, self.__entity_id)
+        self.listen_state(
+            self.__state_change,
+            self.__play_state_sensor,
+            duration=self.args["state_change_delay"],
+        )
         for is_muted in [True, False]:
             self.listen_state(
                 self.__state_change,
@@ -31,6 +39,7 @@ class Media(app.App):
                 attribute="is_volume_muted",
                 old=not is_muted,
                 new=is_muted,
+                duration=self.args["state_change_delay"],
             )
 
     @property
@@ -41,8 +50,10 @@ class Media(app.App):
     @property
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        return self.get_state(self.__entity_id) == "on"
-        # TODO: update when LG webos supports more than on or off
+        if self.get_state(self.__play_state_sensor) == "unavailable":
+            return self.__last_play_state == "playing"
+        else:
+            return self.get_state(self.__play_state_sensor) == "playing"
 
     @property
     def is_muted(self) -> bool:
@@ -67,20 +78,46 @@ class Media(app.App):
     def pause(self):
         """Pause media being played on the TV."""
         self.call_service("media_player/media_pause", entity_id=self.__entity_id)
-        self.call_service(
-            "media_player/volume_mute", is_volume_muted=True, entity_id=self.__entity_id
-        )
         self.log("TV media is now paused", level="DEBUG")
+
+    def __setup_play_state_sensor(self, kwargs: dict):
+        """Starts the MQTT app on the TV, enabling play/pause state detection."""
+        del kwargs
+        if not self.is_on:
+            self.log(
+                "TV was turned off before state sensor setup completed",
+                level="DEBUG",
+            )
+            return
+        elif self.get_state(self.__play_state_sensor) in ("unavailable", "unknown"):
+            if self.get_state(self.__entity_id, attribute="source") != "LG 2 MQTT":
+                self.call_service(
+                    "media_player/select_source",
+                    source="LG 2 MQTT",
+                    entity_id=self.__entity_id,
+                )
+            self.run_in(self.__setup_play_state_sensor, self.args["setup_check_delay"])
+            self.log("Loading app on TV to setup state sensor", level="DEBUG")
+        else:
+            self.log("Play state sensor setup complete", level="DEBUG")
 
     def __state_change(
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
     ):  # pylint: disable=too-many-arguments
         """Handle TV events at night and change the scene."""
-        del entity, old, kwargs
-        self.log(
-            f"TV is now {'muted: ' if attribute == 'is_volume_muted' else ''}{new}"
-        )
-        if self.control.scene == "Night" and self.is_playing and not self.is_muted:
-            self.control.scene = "TV"
-        elif self.control.scene == "TV" and (not self.is_playing or self.is_muted):
+        del kwargs
+        if entity == self.__entity_id and attribute == "state" and new == "on":
+            self.__setup_play_state_sensor(None)
+        elif entity == self.__play_state_sensor:
+            if new != "unavailable":
+                self.__last_play_state = new
+                if old == "unavailable":
+                    old = self.__last_play_state
+            else:
+                return
+        self.log(f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')")
+        if self.is_on and self.is_playing and not self.is_muted:
+            if self.control.scene == "Night":
+                self.control.scene = "TV"
+        elif self.control.scene == "TV":
             self.control.scene = "Night"

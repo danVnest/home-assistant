@@ -1,5 +1,6 @@
 automation:
-  - alias: Turn TV On
+  - alias: Turn TV on if not already on
+    description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
     trigger:
       - platform: webostv.turn_on
         entity_id: media_player.tv
