@@ -316,16 +316,10 @@ class Control(app.App):
             if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")
                 self.apps["presence"].pets_home_alone = new == "on"
-                if new == "on":
-                    self.apps["climate"].handle_pets_home_alone()
-                else:
-                    self.apps["climate"].reset()
         else:
             self.__handle_simple_settings_change(setting, new, old)
 
-    def __handle_simple_settings_change(
-        self, setting: str, new: str, old: str
-    ):  # pylint: disable=too-many-arguments
+    def __handle_simple_settings_change(self, setting: str, new: str, old: str):  # pylint: disable=too-many-arguments
         """Act on changes to settings that can only be made by the user through the UI."""
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "development_mode":

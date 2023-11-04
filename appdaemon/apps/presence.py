@@ -17,8 +17,8 @@ class Presence(app.App):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.pets_home_alone = None
         self.rooms = {}
+        self.__pets_home_alone = None
         self.__last_device_date = None
 
     def initialize(self):
@@ -27,14 +27,15 @@ class Presence(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.pets_home_alone = self.entities.input_boolean.pets_home_alone.state == "on"
+        self.__pets_home_alone = (
+            self.entities.input_boolean.pets_home_alone.state == "on"
+        )
         for room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[room] = Room(
                 room, f"binary_sensor.{room}_multisensor_motion", self
             )
         self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing")
         self.rooms["entryway"].add_sensor("binary_sensor.doorbell_person_detected")
-        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
         self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
@@ -49,6 +50,23 @@ class Presence(app.App):
         return any(
             person["state"] == "home" for person in self.entities.person.values()
         )
+
+    @property
+    def pets_home_alone(self) -> bool:
+        """Get pets home alone setting that has been synced to Home Assistant."""
+        return self.__pets_home_alone
+
+    @pets_home_alone.setter
+    def pets_home_alone(self, state: bool):
+        """Enable/disable pets home alone mode and reflect state in UI."""
+        self.log(f"'{'En' if state else 'Dis'}abling' pets home alone mode")
+        self.__pets_home_alone = state
+        self.call_service(
+            f"input_boolean/turn_{'on' if state else 'off'}",
+            entity_id="input_boolean.pets_home_alone",
+        )
+        if state:
+            self.control.apps["climate"].climate_control = True
 
     def __handle_presence_change(
         self, entity: str, attribute: str, old: str, new: str, kwargs: dict
@@ -193,9 +211,11 @@ class Room:
                 and "Away" in self.__controller.control.scene
                 and "doorbell" not in entity
             ):
-                self.__controller.log("Pet movement detected while home alone")
+                self.notify(
+                    "Pets detected as home alone, enabling climate control",
+                    title="Climate Control",
+                )
                 self.__controller.pets_home_alone = True
-                self.__controller.control.apps["climate"].handle_pets_home_alone()
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:

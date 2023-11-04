@@ -12,9 +12,8 @@ from __future__ import annotations
 
 from typing import Type
 
-from meteocalc import Temp, heat_index
-
 import app
+from meteocalc import Temp, heat_index
 
 
 class Climate(app.App):
@@ -70,6 +69,9 @@ class Climate(app.App):
             self.handle_temperatures()
         else:
             self.__allow_suggestion()
+            if self.control.apps["presence"].pets_home_alone:
+                self.log("Turning pets_home_alone mode off as it needs climate control")
+                self.control.apps["presence"].pets_home_alone = False
         if (
             self.__climate_control_history["overridden"]
             and (
@@ -163,23 +165,6 @@ class Climate(app.App):
         ):
             self.__suggest_if_trigger_forecast()
 
-    def handle_pets_home_alone(self):
-        """Turn aircon on if temperatures require or enable climate control for the pets."""
-        if self.climate_control:
-            if self.aircon is False and self.__temperature_monitor.is_too_hot_or_cold():
-                self.notify(
-                    f"It is {self.__temperature_monitor.inside_temperature}º inside at home, "
-                    "turning aircon on for the pets",
-                    title="Climate Control",
-                )
-                self.aircon = True
-        else:
-            self.climate_control = True
-            self.notify(
-                "Pets alone at home, climate control is now enabled",
-                title="Climate Control",
-            )
-
     def handle_temperatures(self, *args):
         """Control aircon or suggest based on changes in inside temperature."""
         del args  # args required for listen_state callback
@@ -206,9 +191,13 @@ class Climate(app.App):
     def __handle_too_hot_or_cold(self):
         """Handle each case (house open, outside nicer, climate control status)."""
         if self.control.apps["presence"].pets_home_alone:
-            self.handle_pets_home_alone()
-            return
-        if self.__temperature_monitor.is_outside_temperature_nicer():
+            self.aircon = True
+            self.notify(
+                f"It is {self.__temperature_monitor.inside_temperature}º inside at home, "
+                "turning bedroom aircon on for the pets",
+                title="Climate Control",
+            )
+        elif self.__temperature_monitor.is_outside_temperature_nicer():
             message_beginning = (
                 f"Outside ({self.__temperature_monitor.outside_temperature}º) "
                 "is a more pleasant temperature than inside "
@@ -232,8 +221,8 @@ class Climate(app.App):
                     self.aircon = True
                 else:
                     self.__suggest(
-                        f"{message_beginning}"
-                        " closing up the house so airconditioning can turn on"
+                        f"{message_beginning} closing up the house"
+                        f"{' so airconditioning can turn on' if not self.aircon else ''}"
                     )
             else:
                 if self.get_state("binary_sensor.kitchen_door") == "on":
