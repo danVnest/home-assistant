@@ -192,9 +192,14 @@ class Climate(app.App):
         """Handle each case (house open, outside nicer, climate control status)."""
         if self.control.apps["presence"].pets_home_alone:
             self.aircon = True
+            door_open_message = (
+                " in the bedroom only (kitchen door is open)"
+                if self.control.apps["presence"].is_kitchen_door_open()
+                else ""
+            )
             self.notify(
                 f"It is {self.__temperature_monitor.inside_temperature}º inside at home, "
-                "turning bedroom aircon on for the pets",
+                "turning aircon on for the pets" + door_open_message,
                 title="Climate Control",
             )
         elif self.__temperature_monitor.is_outside_temperature_nicer():
@@ -204,11 +209,11 @@ class Climate(app.App):
                 f"({self.__temperature_monitor.inside_temperature})º), consider"
             )
             if self.climate_control:
-                if self.get_state("binary_sensor.kitchen_door") == "off":
+                if not self.control.apps["presence"].is_kitchen_door_open():
                     self.aircon = True
                     self.__suggest(f"{message_beginning} opening up the house")
             else:
-                if self.get_state("binary_sensor.kitchen_door") == "off":
+                if not self.control.apps["presence"].is_kitchen_door_open():
                     message_beginning += " opening up the house and/or"
                 self.__suggest(f"{message_beginning} enabling climate control")
         else:
@@ -217,7 +222,7 @@ class Climate(app.App):
                 "inside right now, consider"
             )
             if self.climate_control:
-                if self.get_state("binary_sensor.kitchen_door") == "off":
+                if not self.control.apps["presence"].is_kitchen_door_open():
                     self.aircon = True
                 else:
                     self.__suggest(
@@ -225,7 +230,7 @@ class Climate(app.App):
                         f"{' so airconditioning can turn on' if not self.aircon else ''}"
                     )
             else:
-                if self.get_state("binary_sensor.kitchen_door") == "on":
+                if self.control.apps["presence"].is_kitchen_door_open():
                     message_beginning += " closing up the house and"
                 self.__suggest(f"{message_beginning} enabling climate control")
 
@@ -257,6 +262,7 @@ class Climate(app.App):
             or (
                 self.control.apps["presence"].pets_home_alone
                 and not self.control.apps["presence"].anyone_home()
+                and self.control.apps["presence"].is_kitchen_door_open()
             )
         ):
             self.__aircons["bedroom"].turn_on(
@@ -507,6 +513,10 @@ class TemperatureMonitor:
         bed = (
             self.controller.control.scene == "Sleep"
             or self.controller.control.is_bed_time()
+            or (
+                self.controller.control.apps["presence"].pets_home_alone
+                and self.controller.control.apps["presence"].is_kitchen_door_open()
+            )
         )
         for sensor in self.__sensors.values():
             if bed and sensor.location == "inside":
