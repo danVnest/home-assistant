@@ -5,7 +5,6 @@ Schedules scene changes, reacts to user input, reports errors & low batteries.
 User defined variables are configued in control.yaml
 """
 import datetime
-import socket
 import urllib.request
 
 import app
@@ -39,7 +38,7 @@ class Control(app.App):
         super().initialize()
         self.listen_log(self.__handle_log)
         self.set_production_mode(
-            self.entities.input_boolean.development_mode.state == "off"
+            self.entities.input_boolean.development_mode.state == "off",
         )
         self.__scene = self.entities.input_select.scene.state
         for app_name in self.apps:
@@ -94,11 +93,14 @@ class Control(app.App):
                 attribute="latest_version",
             )
         self.listen_state(
-            self.__handle_hacs_update_available, "sensor.hacs", attribute="repositories"
+            self.__handle_hacs_update_available,
+            "sensor.hacs",
+            attribute="repositories",
         )
         self.listen_event(self.__all_initialized, "appd_started")
         self.__timers["init_delay"] = self.run_in(
-            self.__assume_all_initialised, self.args["init_delay"]
+            self.__assume_all_initialised,
+            self.args["init_delay"],
         )
 
     def __all_initialized(self, event_name: str, data: dict, kwargs: dict):
@@ -110,7 +112,9 @@ class Control(app.App):
             self.apps[app_name] = self.get_app(app_name.capitalize())
         self.reset_scene()
         self.listen_event(
-            self.__handle_app_reloaded, "app_initialized", namespace="admin"
+            self.__handle_app_reloaded,
+            "app_initialized",
+            namespace="admin",
         )
 
     def __assume_all_initialised(self, kwargs: dict):
@@ -118,7 +122,8 @@ class Control(app.App):
         del kwargs
         if not self.__is_all_initialised:
             self.log(
-                f"Assuming initialisation complete after {self.args['init_delay']} seconds"
+                "Assuming initialisation complete after "
+                f"{self.args['init_delay']} seconds",
             )
             self.__all_initialized(event_name=None, data=None, kwargs=None)
 
@@ -131,7 +136,7 @@ class Control(app.App):
 
     @property
     def scene(self) -> str:
-        """Scene setting is retrieved by all apps from here rather than Home Assistant."""
+        """Access scene setting (all apps) from here rather than Home Assistant."""
         return self.__scene
 
     @scene.setter
@@ -159,7 +164,11 @@ class Control(app.App):
         if self.scene == "Bright":
             self.scene = "Bright"
         elif not self.apps["presence"].anyone_home():
-            self.scene = f"Away ({'Day' if self.apps['lights'].is_lighting_sufficient() else 'Night'})"
+            self.scene = (
+                "Away (Day)"
+                if self.apps["lights"].is_lighting_sufficient()
+                else "Away (Night)"
+            )
         elif self.apps["lights"].is_lighting_sufficient():
             self.scene = "Day"
         elif self.apps["media"].is_playing:
@@ -212,7 +221,7 @@ class Control(app.App):
             self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Day')")
 
     def __bed_time(self, kwargs: dict):
-        """Adjust climate control when approaching bed time (callback for daily timer)."""
+        """Adjust climate control when nearing bed time (callback for daily timer)."""
         del kwargs
         self.log("Bed timer triggered")
         self.apps["climate"].reset()
@@ -225,7 +234,11 @@ class Control(app.App):
     def __button(self, event_name: str, data: dict, kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
-        room = "bedroom" if data["node_id"] == 4 else "kitchen"
+        room = (
+            "bedroom"
+            if data["node_id"] == self.args["bedroom_button_node_id"]
+            else "kitchen"
+        )
         if data["value"] == "KeyPressed":
             self.__button_clicked(room)
         elif data["value"] == "KeyHeldDown":
@@ -291,8 +304,13 @@ class Control(app.App):
         return int(float(self.get_state(f"input_number.{setting_name}")))
 
     def __handle_settings_change(
-        self, entity: str, attribute: str, old, new, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old,
+        new,
+        kwargs: dict,
+    ):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
         setting = entity.split(".")[1]
@@ -306,7 +324,8 @@ class Control(app.App):
             ):
                 self.log("Turning custom lighting UI switch off")
                 self.call_service(
-                    "input_boolean/turn_off", entity_id="input_boolean.custom_lighting"
+                    "input_boolean/turn_off",
+                    entity_id="input_boolean.custom_lighting",
                 )
         elif setting in ["aircon", "climate_control"]:
             if (new == "on") != getattr(self.apps["climate"], setting):
@@ -319,8 +338,8 @@ class Control(app.App):
         else:
             self.__handle_simple_settings_change(setting, new, old)
 
-    def __handle_simple_settings_change(self, setting: str, new: str, old: str):  # pylint: disable=too-many-arguments
-        """Act on changes to settings that can only be made by the user through the UI."""
+    def __handle_simple_settings_change(self, setting: str, new: str, old: str):  # noqa: PLR0912
+        """Act on changes to settings that can only be made through the UI."""
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "development_mode":
             self.set_production_mode(new == "off")
@@ -366,8 +385,13 @@ class Control(app.App):
         )
 
     def __handle_battery_level_change(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Notify if a device's battery is low."""
         del attribute, old, kwargs
         if new == "unavailable":
@@ -379,11 +403,11 @@ class Control(app.App):
         """Send a heartbeat then handle if it is received or not."""
         del kwargs
         try:
-            urllib.request.urlopen(
+            urllib.request.urlopen(  # noqa: S310
                 self.args["heartbeat_url"],
                 timeout=self.args["heartbeat_timeout"],
             )
-        except socket.error:
+        except OSError:
             self.__timers["heartbeat_fail_count"] += 1
             if (
                 self.__online
@@ -396,7 +420,7 @@ class Control(app.App):
             if self.__timers["heartbeat_fail_count"] > 0:
                 self.log(
                     "Heartbeat sent and recieved after "
-                    f"{self.__timers['heartbeat_fail_count']} timeout(s)"
+                    f"{self.__timers['heartbeat_fail_count']} timeout(s)",
                 )
             if not self.__online:
                 self.__online = True
@@ -409,7 +433,7 @@ class Control(app.App):
                     self.call_service("homeassistant/restart")
             self.__timers["heartbeat_fail_count"] = 0
 
-    def __handle_log(
+    def __handle_log(  # noqa: PLR0913
         self,
         app_name: str,
         timestamp: datetime.datetime,
@@ -417,7 +441,7 @@ class Control(app.App):
         log_type: str,
         message: str,
         kwargs: dict,
-    ):  # pylint: disable=too-many-arguments
+    ):
         """Increment counters if logged message is a WARNING or ERROR."""
         del app_name, timestamp, kwargs
         if log_type == "error_log":
@@ -426,14 +450,20 @@ class Control(app.App):
             level = None
         if level in ("WARNING", "ERROR"):
             self.call_service(
-                "counter/increment", entity_id=f"counter.{level.lower()}s"
+                "counter/increment",
+                entity_id=f"counter.{level.lower()}s",
             )
 
     def __handle_system_update_available(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Notify when a system update is available."""
-        del attribute, old, kwargs
+        del attribute, old, new, kwargs
         self.notify(
             f"{self.get_state(entity, attribute='title')} update available",
             title="System Update Available",
@@ -441,8 +471,13 @@ class Control(app.App):
         )
 
     def __handle_hacs_update_available(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Notify when a HACS update is available."""
         del entity, attribute, old, new, kwargs
         count = int(self.get_state("sensor.hacs"))

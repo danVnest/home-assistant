@@ -1,0 +1,10 @@
+[tool.ruff]
+namespace-packages = ["appdaemon/apps"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["ANN", "TD"]
+# TODO: consider removing ignores and addressing corresponding issues
+
+[tool.ruff.lint.pylint]
+max-args = 6  # increased to handle many unchangeable appdaemon super methods

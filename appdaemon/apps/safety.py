@@ -24,12 +24,19 @@ class Safety(app.App):
         for sensor_id in self.__smoke_sensors:
             self.__smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
         self.listen_state(
-            self.__handle_camera_motion, "binary_sensor.doorbell_motion", new="on"
+            self.__handle_camera_motion,
+            "binary_sensor.doorbell_motion",
+            new="on",
         )
 
     def __handle_camera_motion(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Send notification if motion detected when no one is home."""
         del entity, attribute, old, new, kwargs
         self.log("Person detected by doorbell camera")
@@ -41,7 +48,7 @@ class Safety(app.App):
             )
 
 
-class SmokeSensor:  # pylint: disable=too-few-public-methods
+class SmokeSensor:
     """Monitors smoke and carbon monoxide alarms from a sensor."""
 
     def __init__(self, sensor_id: str, controller: Safety):
@@ -56,8 +63,13 @@ class SmokeSensor:  # pylint: disable=too-few-public-methods
             )
 
     def __handle_smoke(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """React when high smoke level detected."""
         del attribute, new, old, kwargs
         self.__controller.control.scene = "Bright"

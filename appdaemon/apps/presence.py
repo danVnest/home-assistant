@@ -32,7 +32,9 @@ class Presence(app.App):
         )
         for room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[room] = Room(
-                room, f"binary_sensor.{room}_multisensor_motion", self
+                room,
+                f"binary_sensor.{room}_multisensor_motion",
+                self,
             )
         self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing")
         self.rooms["entryway"].add_sensor("binary_sensor.doorbell_person_detected")
@@ -41,7 +43,9 @@ class Presence(app.App):
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
         self.listen_state(self.__handle_presence_change, "person")
         self.listen_state(
-            self.__handle_doorbell, "binary_sensor.doorbell_ringing", new="True"
+            self.__handle_doorbell,
+            "binary_sensor.doorbell_ringing",
+            new="True",
         )
 
     def anyone_home(self, **kwargs) -> bool:
@@ -68,9 +72,18 @@ class Presence(app.App):
         if state:
             self.control.apps["climate"].climate_control = True
 
+    def is_kitchen_door_open(self) -> bool:
+        """Check if the kitchen door is open."""
+        return self.get_state("binary_sensor.kitchen_door") == "on"
+
     def __handle_presence_change(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, kwargs
         self.log(f"'{entity}' is '{new}'")
@@ -85,7 +98,7 @@ class Presence(app.App):
             if (
                 "Away" not in self.control.scene
                 and self.get_state(
-                    f"person.{'rachel' if entity.endswith('dan') else 'dan'}"
+                    f"person.{'rachel' if entity.endswith('dan') else 'dan'}",
                 )
                 != "home"
             ):
@@ -100,17 +113,27 @@ class Presence(app.App):
         """If not home and someone adds a device, notify."""
         del event_name
         self.log(f"New device added: '{data}', '{kwargs}'")
-        if "Away" in self.control.scene:
-            if self.__last_device_date < self.date() - timedelta(hours=3):
-                self.notify(
-                    f'A guest has added a device: "{data["host_name"]}"',
-                    title="Guest Device",
-                )
-                self.__last_device_date = self.date()
+        if (
+            "Away" in self.control.scene
+            and self.date() - self.__last_device_date
+            > timedelta(
+                hours=self.args["new_device_notification_delay"],
+            )
+        ):
+            self.notify(
+                f'A guest has added a device: "{data["host_name"]}"',
+                title="Guest Device",
+            )
+            self.__last_device_date = self.date()
 
     def __handle_doorbell(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Handle doorbell when it rings."""
         del entity, attribute, old, new, kwargs
         self.log("Doorbell rung")
@@ -131,9 +154,9 @@ class Room:
         try:
             vacant = self.__controller.get_state(sensor_id) == "off"
             last_changed = self.__controller.convert_utc(
-                self.__controller.get_state(sensor_id, attribute="last_changed")
+                self.__controller.get_state(sensor_id, attribute="last_changed"),
             ).replace(tzinfo=None) + timedelta(
-                minutes=self.__controller.get_tz_offset()
+                minutes=self.__controller.get_tz_offset(),
             )
         except ValueError:
             self.__controller.notify(
@@ -142,7 +165,8 @@ class Room:
                 targets="dan",
             )
             self.__controller.log(
-                f"Initialising room '{room_id}' with default state", level="WARNING"
+                f"Initialising room '{room_id}' with default state",
+                level="WARNING",
             )
             vacant = True
             last_changed = self.__controller.datetime()
@@ -150,14 +174,15 @@ class Room:
         self.__last_entered = last_changed - timedelta(hours=2 if vacant else 0)
         self.__callbacks = {}
         self.__controller.listen_state(self.__handle_presence_change, sensor_id)
+        presence_message = "vacated" if vacant else "entered"
         self.__controller.log(
-            f"Room '{room_id}' initialised as last '{'vacat' if vacant else 'enter'}ed' at "
+            f"Room '{room_id}' initialised as last '{presence_message}' at "
             f"{self.__last_vacated if vacant else self.__last_entered}",
             level="DEBUG",
         )
 
     def is_vacant(self, vacating_delay: int = 0) -> bool:
-        """Check if vacant based on last time vacated and entered, with optional delay."""
+        """Check if vacant based on last time vacated/entered, with optional delay."""
         return (
             self.__last_entered
             < self.__last_vacated
@@ -175,8 +200,13 @@ class Room:
         ).total_seconds()
 
     def __handle_presence_change(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """If room presence changes, trigger all registered callbacks."""
         del attribute, kwargs
         if "unavailable" in (new, old):
@@ -221,7 +251,8 @@ class Room:
             if not is_vacant or callback["vacating_delay"] == 0:
                 callback["callback"](is_vacant=is_vacant)
                 self.__controller.log(
-                    f"Callback {handle} triggered by '{entity}'", level="DEBUG"
+                    f"Callback {handle} triggered by '{entity}'",
+                    level="DEBUG",
                 )
             else:
                 self.__callbacks[handle]["timer_handle"] = self.__controller.run_in(
@@ -230,7 +261,8 @@ class Room:
                     is_vacant=True,
                 )
                 self.__controller.log(
-                    f"Set vacation timer for callback: {handle}", level="DEBUG"
+                    f"Set vacation timer for callback: {handle}",
+                    level="DEBUG",
                 )
 
     def add_sensor(self, sensor_id: str):
@@ -239,7 +271,7 @@ class Room:
         self.__controller.listen_state(self.__handle_presence_change, sensor_id)
 
     def register_callback(self, callback, vacating_delay: int = 0) -> uuid.UUID:
-        """Register a callback for when presence changes, including an optional delay."""
+        """Register a callback for when presence changes, with an optional delay."""
         handle = uuid.uuid4().hex
         self.__callbacks[handle] = {
             "callback": callback,

@@ -8,6 +8,7 @@ Control:
   heartbeat_timeout: 10
   heartbeat_max_fail_count: 10
   heartbeat_period: 60
+  bedroom_button_node_id: 4
   notify_battery_level: 30
   mobiles:
     dan:

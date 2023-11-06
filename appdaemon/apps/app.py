@@ -35,7 +35,7 @@ class App(hass.Hass):
                     targets == "all",
                     targets == "anyone_home" and info["state"] == "home",
                     targets == person,
-                ]
+                ],
             ):
                 data = {"tag": kwargs["title"]}
                 if "critical" in kwargs:
@@ -47,9 +47,9 @@ class App(hass.Hass):
                                         "name": "default",
                                         "critical": 1,
                                         "volume": 1.0,
-                                    }
-                                }
-                            }
+                                    },
+                                },
+                            },
                         )
                     else:
                         data.update(
@@ -58,7 +58,7 @@ class App(hass.Hass):
                                 "priority": "high",
                                 "media_stream": "alarm_stream_max",
                                 "tts_text": message,
-                            }
+                            },
                         )
                 super().notify(
                     message,

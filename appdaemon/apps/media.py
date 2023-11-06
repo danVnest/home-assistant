@@ -50,10 +50,10 @@ class Media(app.App):
     @property
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        if self.get_state(self.__play_state_sensor) == "unavailable":
+        play_state = self.get_state(self.__play_state_sensor)
+        if play_state == "unavailable":
             return self.__last_play_state == "playing"
-        else:
-            return self.get_state(self.__play_state_sensor) == "playing"
+        return play_state == "playing"
 
     @property
     def is_muted(self) -> bool:
@@ -63,7 +63,7 @@ class Media(app.App):
     @property
     def is_pc_on(self) -> bool:
         """Check if the PC is currently on or not."""
-        return subprocess.call(["ping", "-c", "1", self.args["pc_ip"]]) == 0
+        return subprocess.call(["ping", "-c", "1", self.args["pc_ip"]]) == 0  # noqa: S603, S607
 
     def standby(self):
         """Turn the TV off."""
@@ -81,7 +81,7 @@ class Media(app.App):
         self.log("TV media is now paused", level="DEBUG")
 
     def __setup_play_state_sensor(self, kwargs: dict):
-        """Starts the MQTT app on the TV, enabling play/pause state detection."""
+        """Start the MQTT app on the TV, enabling play/pause state detection."""
         del kwargs
         if not self.is_on:
             self.log(
@@ -89,7 +89,7 @@ class Media(app.App):
                 level="DEBUG",
             )
             return
-        elif self.get_state(self.__play_state_sensor) in ("unavailable", "unknown"):
+        if self.get_state(self.__play_state_sensor) in ("unavailable", "unknown"):
             if self.get_state(self.__entity_id, attribute="source") != "LG 2 MQTT":
                 self.call_service(
                     "media_player/select_source",
@@ -102,8 +102,13 @@ class Media(app.App):
             self.log("Play state sensor setup complete", level="DEBUG")
 
     def __state_change(
-        self, entity: str, attribute: str, old: str, new: str, kwargs: dict
-    ):  # pylint: disable=too-many-arguments
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
         """Handle TV events at night and change the scene."""
         del kwargs
         if entity == self.__entity_id and attribute == "state" and new == "on":

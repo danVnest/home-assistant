@@ -1,4 +1,5 @@
 Presence:
   module: presence
   class: Presence
+  new_device_notification_delay: 3
   priority: 2
