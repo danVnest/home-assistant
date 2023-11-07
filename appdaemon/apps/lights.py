@@ -461,8 +461,6 @@ class Lights(app.App):
 
     def __handle_kitchen_luminance_change_in_morning(self, luminance: str):
         """Change kitchen vacancy lighting based on luminance levels."""
-        self.log(luminance)
-        self.log(self.__lighting_luminance)
         if (
             float(luminance) - self.__lighting_luminance()
             >= self.args["night_max_luminance"]
