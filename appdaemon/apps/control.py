@@ -58,22 +58,26 @@ class Control(app.App):
             )
         self.listen_event(self.__button, "zwave_js_value_notification")
         self.listen_event(self.__ifttt, "ifttt_webhook_received")
-        for battery in [
-            "doorbell_battery_level",
-            "door_lock_battery_level",
-            "kitchen_door_sensor_battery_level",
-            "entryway_multisensor_battery_level",
-            "kitchen_multisensor_battery_level",
-            "office_multisensor_battery_level",
-            "bedroom_multisensor_battery_level",
-            "kitchen_door_sensor_battery_level",
-            "kitchen_button_battery_level",
-            "bedroom_button_battery_level",
-            "nest_protect_entryway_battery_level",
-            "nest_protect_living_room_battery_level",
-            "nest_protect_garage_battery_level",
-        ]:
-            self.listen_state(self.__handle_battery_level_change, f"sensor.{battery}")
+        for battery in (
+            "doorbell",
+            "door_lock",
+            "kitchen_door_sensor",
+            "entryway_multisensor",
+            "kitchen_multisensor",
+            "office_multisensor",
+            "bedroom_multisensor",
+            "kitchen_door_sensor",
+            "kitchen_button",
+            "bedroom_button",
+            "nest_protect_entryway",
+            "nest_protect_living_room",
+            "nest_protect_garage",
+            "owlet",
+        ):
+            self.listen_state(
+                self.__handle_battery_level_change,
+                f"sensor.{battery}_battery_level",
+            )
         self.__set_timer("morning_time")
         self.run_daily(self.__day_time, self.args["day_time"])
         self.__set_timer("bed_time")
@@ -400,7 +404,7 @@ class Control(app.App):
         """Notify if a device's battery is low."""
         del attribute, old, kwargs
         if new == "unavailable":
-            self.log(f"'{entity}' is unavailable", level="WARNING")
+            self.log(f"'{entity}' is 'unavailable'", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"]:
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 

@@ -1,19 +1,28 @@
 """Implements home safety automations.
 
-Monitors smoke sensors and triggers corresponding alarm routines.
+Monitors cameras, fire sensors, and baby safety sensors,
+triggering corresponding alarm routines when appropriate.
 
-User defined variables are configued in safety.yaml
+User defined variables are configured in safety.yaml
 """
 import app
 
 
 class Safety(app.App):
-    """Set up smoke sensors."""
+    """Set up fire and baby safety sensors."""
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.__smoke_sensors = {"entryway": None, "living_room": None, "garage": None}
+        self.__fire_sensors = {"entryway": None, "living_room": None, "garage": None}
+        self.__owlet_sensors = (
+            "low_heart_rate",
+            "high_heart_rate",
+            "low_oxygen",
+            "high_oxygen",
+        )
+        self.__owlet_sensor_prefix = "binary_sensor.owlet_"
+        self.__owlet_sensor_suffix = "_alert"
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -21,13 +30,18 @@ class Safety(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        for sensor_id in self.__smoke_sensors:
-            self.__smoke_sensors[sensor_id] = SmokeSensor(sensor_id, self)
+        for sensor_id in self.__fire_sensors:
+            self.__fire_sensors[sensor_id] = FireSensor(sensor_id, self)
         self.listen_state(
             self.__handle_camera_motion,
-            "binary_sensor.doorbell_motion",
+            "binary_sensor.doorbell_person_detected",
             new="on",
         )
+        for owlet_sensor in self.__owlet_sensors:
+            self.listen_state(
+                self.__handle_owlet_alert,
+                f"{self.__owlet_sensor_prefix}{owlet_sensor}{self.__owlet_sensor_suffix}",
+            )
 
     def __handle_camera_motion(
         self,
@@ -47,22 +61,7 @@ class Safety(app.App):
                 title="Person Detected",
             )
 
-
-class SmokeSensor:
-    """Monitors smoke and carbon monoxide alarms from a sensor."""
-
-    def __init__(self, sensor_id: str, controller: Safety):
-        """Start listening to smoke and co status."""
-        self.__sensor_id = sensor_id
-        self.__controller = controller
-        for sensor_type in ["smoke", "co", "heat"]:
-            self.__controller.listen_state(
-                self.__handle_smoke,
-                f"binary_sensor.nest_protect_{sensor_id}_{sensor_type}_status",
-                new="on",
-            )
-
-    def __handle_smoke(
+    def __handle_owlet_alert(
         self,
         entity: str,
         attribute: str,
@@ -70,18 +69,64 @@ class SmokeSensor:
         new: str,
         kwargs: dict,
     ):
-        """React when high smoke level detected."""
-        del attribute, new, old, kwargs
-        self.__controller.control.scene = "Bright"
-        self.__controller.apps["media"].pause()
-        if "smoke" in entity:
-            sensor_type = "Smoke"
-        elif "heat" in entity:
-            sensor_type = "Heat"
+        """React when an Owlet alert is triggered or ends."""
+        del attribute, old, kwargs
+        if new == "on":
+            self.control.scene = "Bright"
+            self.apps["media"].pause()
+            alert_type = (
+                entity.removeprefix(self.__owlet_sensor_prefix)
+                .removesuffix(self.__owlet_sensor_suffix)
+                .replace("_", " ")
+            )
+            self.notify(
+                f"Check Wren - {alert_type} detected",
+                title="Owlet Alarm",
+                critical=True,
+            )
         else:
-            sensor_type = "Carbon monoxide"
-        self.__controller.notify(
-            f"{sensor_type} detected in {self.__sensor_id.replace('_', ' ')}",
-            title="Smoke Alarm",
-            critical=True,
-        )
+            self.__controller.control.reset_scene()
+
+
+class FireSensor:
+    """Monitors smoke, carbon monoxide and heat alarms from a fire sensor."""
+
+    def __init__(self, sensor_id: str, controller: Safety):
+        """Start listening to smoke, co and heat status."""
+        self.__sensor_id = sensor_id
+        self.__sensor_types = ["smoke", "co", "heat"]
+        self.__sensor_prefix = "binary_sensor.nest_protect_"
+        self.__sensor_suffix = "_status"
+        self.__controller = controller
+        for sensor_type in self.__sensor_types:
+            self.__controller.listen_state(
+                self.__handle_fire,
+                f"{self.__sensor_prefix}{sensor_id}_{sensor_type}{self.__sensor_suffix}",
+            )
+
+    def __handle_fire(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
+        """React when potential fire detected."""
+        del attribute, old, kwargs
+        if new == "on":
+            self.__controller.control.scene = "Bright"
+            self.__controller.apps["media"].pause()
+            alert_type = (
+                entity.removeprefix(f"{self.__sensor_prefix}{self.__sensor_id}_")
+                .removesuffix(self.__sensor_suffix)
+                .replace("_", " ")
+                .capitalize()
+            )
+            self.__controller.notify(
+                f"{alert_type} detected in the {self.__sensor_id.replace('_', ' ')}",
+                title="Fire Alarm",
+                critical=True,
+            )
+        else:
+            self.__controller.control.reset_scene()
