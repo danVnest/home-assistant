@@ -149,7 +149,12 @@ class Control(app.App):
         self.apps["climate"].transition_between_scenes(new_scene, old_scene)
         if new_scene == "Sleep" or "Away" in new_scene:
             self.call_service("lock/lock", entity_id="lock.door_lock")
-            self.apps["media"].standby()
+            if "Away" in new_scene:
+                self.notify(
+                    f"Home set to {new_scene} mode",
+                    title="Door Locked",
+                )
+                self.apps["media"].turn_off()
         elif new_scene == "TV":
             self.apps["media"].turn_on()
         self.call_service(

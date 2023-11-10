@@ -65,10 +65,10 @@ class Media(app.App):
         """Check if the PC is currently on or not."""
         return subprocess.call(["ping", "-c", "1", self.args["pc_ip"]]) == 0  # noqa: S603, S607
 
-    def standby(self):
+    def turn_off(self):
         """Turn the TV off."""
         self.call_service("media_player/turn_off", entity_id=self.__entity_id)
-        self.log("TV is now on standby", level="DEBUG")
+        self.log("TV is now off", level="DEBUG")
 
     def turn_on(self):
         """Turn the TV on."""
