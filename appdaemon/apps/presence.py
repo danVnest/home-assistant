@@ -241,7 +241,7 @@ class Room:
                 and "Away" in self.__controller.control.scene
                 and "doorbell" not in entity
             ):
-                self.notify(
+                self.__controller.notify(
                     "Pets detected as home alone, enabling climate control",
                     title="Climate Control",
                 )
