@@ -70,7 +70,7 @@ class Safety(app.App):
         kwargs: dict,
     ):
         """React when an Owlet alert is triggered or ends."""
-        del attribute, old, kwargs
+        del attribute, kwargs
         if new == "on":
             self.control.scene = "Bright"
             self.apps["media"].pause()
@@ -84,8 +84,8 @@ class Safety(app.App):
                 title="Owlet Alarm",
                 critical=True,
             )
-        else:
-            self.__controller.control.reset_scene()
+        elif new == "off" and old != "unavailable":
+            self.control.reset_scene()
 
 
 class FireSensor:
@@ -113,7 +113,7 @@ class FireSensor:
         kwargs: dict,
     ):
         """React when potential fire detected."""
-        del attribute, old, kwargs
+        del attribute, kwargs
         if new == "on":
             self.__controller.control.scene = "Bright"
             self.__controller.apps["media"].pause()
@@ -128,5 +128,5 @@ class FireSensor:
                 title="Fire Alarm",
                 critical=True,
             )
-        else:
+        elif new == "off" and old != "unavailable":
             self.__controller.control.reset_scene()
