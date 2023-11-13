@@ -51,6 +51,11 @@ class Media(app.App):
     def is_playing(self) -> bool:
         """Check if the TV is currently playing or not."""
         play_state = self.get_state(self.__play_state_sensor)
+        if (
+            self.get_state(self.__entity_id, attribute="source") == "PC"
+            and self.is_pc_on
+        ):
+            return True
         if play_state == "unavailable":
             return self.__last_play_state == "playing"
         return play_state == "playing"
