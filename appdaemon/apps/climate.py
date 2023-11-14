@@ -208,7 +208,7 @@ class Climate(app.App):
                 if not self.control.apps["presence"].is_kitchen_door_open():
                     self.aircon = True
                     self.__suggest(f"{message_beginning} opening up the house")
-            else:
+            elif self.control.apps["presence"].anyone_home():
                 if not self.control.apps["presence"].is_kitchen_door_open():
                     message_beginning += " opening up the house and/or"
                 self.__suggest(f"{message_beginning} enabling climate control")
