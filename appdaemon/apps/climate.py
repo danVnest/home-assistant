@@ -179,9 +179,7 @@ class Climate(app.App):
                 self.notify(
                     f"{message} turning aircon off",
                     title="Climate Control",
-                    targets="anyone_home"
-                    if self.control.apps["presence"].anyone_home()
-                    else "all",
+                    targets="anyone_home_else_all",
                 )
             else:
                 self.__suggest(f"{message} consider enabling climate control")
@@ -304,9 +302,7 @@ class Climate(app.App):
                 "trigger aircon on again - "
                 "climate control is now disabled to prevent this",
                 title="Climate Control",
-                targets="anyone_home"
-                if self.control.apps["presence"].anyone_home()
-                else "all",
+                targets="anyone_home_else_all",
             )
 
     def __disable_climate_control_if_would_trigger_off(self):
@@ -322,9 +318,7 @@ class Climate(app.App):
                 " climate control is now disabled"
                 " (you'll need to manually turn aircon off)",
                 title="Climate Control",
-                targets="anyone_home"
-                if self.control.apps["presence"].anyone_home()
-                else "all",
+                targets="anyone_home_else_all",
             )
 
     def __suggest(self, message: str):
@@ -334,9 +328,7 @@ class Climate(app.App):
             self.notify(
                 message,
                 title="Climate Control",
-                targets="anyone_home"
-                if self.control.apps["presence"].anyone_home()
-                else "all",
+                targets="anyone_home_else_all",
             )
 
     def __allow_suggestion(self):
@@ -522,7 +514,7 @@ class TemperatureMonitor:
 
     def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
-        bed = (
+        enable_bedroom_only = (
             self.controller.control.scene == "Sleep"
             or self.controller.control.is_bed_time()
             or (
@@ -531,7 +523,7 @@ class TemperatureMonitor:
             )
         )
         for sensor in self.__sensors.values():
-            if bed and sensor.location == "inside":
+            if enable_bedroom_only and sensor.location == "inside":
                 sensor.disable()
             else:
                 sensor.enable()
