@@ -227,7 +227,7 @@ class Control(app.App):
         if self.scene == "Morning":
             self.scene = "Day"
         else:
-            self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Day')")
+            self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Morning')")
 
     def __bed_time(self, kwargs: dict):
         """Adjust climate control when nearing bed time (callback for daily timer)."""
