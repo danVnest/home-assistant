@@ -323,18 +323,6 @@ template:
         state: "{{ None }}"
         unit_of_measurement: °C
         state_class: measurement
-      - name: Nest Protect entryway battery level
-        state: "{{ 90 if states('binary_sensor.nest_protect_entryway_battery_health') == 'off' else 10 }}"
-        unit_of_measurement: "%"
-        state_class: measurement
-      - name: Nest Protect living room battery level
-        state: "{{ 90 if states('binary_sensor.nest_protect_living_room_battery_health') == 'off' else 10 }}"
-        unit_of_measurement: "%"
-        state_class: measurement
-      - name: Nest Protect garage battery level
-        state: "{{ 90 if states('binary_sensor.nest_protect_garage_battery_health') == 'off' else 10 }}"
-        unit_of_measurement: "%"
-        state_class: measurement
 
 wake_on_lan:
 
