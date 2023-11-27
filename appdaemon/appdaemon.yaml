@@ -1,13 +1,14 @@
-secrets: /config/secrets.yaml
+secrets: /homeassistant/secrets.yaml
 logs:
   main_log:
-    filename: /config/appdaemon/logs/main.log
+    filename: /config/logs/main.log
+    log_generations: 10
   error_log:
-    filename: /config/appdaemon/logs/errors.log
+    filename: /config/logs/errors.log
   diag_log:
-    filename: /config/appdaemon/logs/diag.log
+    filename: /config/logs/diag.log
   access_log:
-    filename: /config/appdaemon/logs/access.log
+    filename: /config/logs/access.log
 appdaemon:
   latitude: !secret location_latitude
   longitude: !secret location_longitude
