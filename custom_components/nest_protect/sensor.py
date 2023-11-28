@@ -31,7 +31,13 @@ SENSOR_DESCRIPTIONS: list[SensorEntityDescription] = [
     NestProtectSensorDescription(
         key="battery_level",
         name="Battery Level",
-        value_fn=lambda state: state if state <= 100 else None,
+        ### UPDATE ###
+        # Fix by adding conversion to percentage.
+        # State is supplied as a voltage (mV), which for 3 Energizer L91's in series
+        # is expected to range from ≈4200 to ≈5400.
+        # Original assumed state was already a percentage:
+        # value_fn=lambda state: state if state <= 100 else None,
+        value_fn=lambda state: round(100 * (state - 4200) / (5400 - 4200)) if state >= 4200 else 0,
         device_class=SensorDeviceClass.BATTERY,
         native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.DIAGNOSTIC,
