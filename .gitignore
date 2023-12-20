@@ -4,10 +4,9 @@
 ip_bans.yaml
 secrets.yaml
 
-# Custom components (don't need details, except manifest.json)
+# Custom components (only manifests, for reference)
 custom_components/*/*
 !custom_components/*/manifest.json
-!custom_components/nest_protect/sensor.py
 
 # Logs
 home-assistant.log*

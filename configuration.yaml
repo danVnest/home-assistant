@@ -323,21 +323,6 @@ template:
         state: "{{ None }}"
         unit_of_measurement: °C
         state_class: measurement
-  - sensor:
-      - name: Nest Protect entryway battery level
-        state: "{{ max(0, min(100, (100 * (float(states('sensor.nest_protect_entryway_battery_voltage')) - 4.2) / (5.4 - 4.2)) | round(2))) }}"
-        unit_of_measurement: "%"
-        state_class: measurement
-  - sensor:
-      - name: Nest Protect living room battery level
-        state: "{{ max(0, min(100, (100 * (float(states('sensor.nest_protect_living_room_battery_voltage')) - 4.2) / (5.4 - 4.2)) | round(2))) }}"
-        unit_of_measurement: "%"
-        state_class: measurement
-  - sensor:
-      - name: Nest Protect garage battery level
-        state: "{{ max(0, min(100, (100 * (float(states('sensor.nest_protect_garage_battery_voltage')) - 4.2) / (5.4 - 4.2)) | round(2))) }}"
-        unit_of_measurement: "%"
-        state_class: measurement
 
 wake_on_lan:
 
