@@ -321,7 +321,7 @@ template:
   - sensor:
       - name: Inside apparent temperature
         state: "{{ None }}"
-        unit_of_measurement: °C
+        unit_of_measurement: "°C"
         state_class: measurement
 
 wake_on_lan:
