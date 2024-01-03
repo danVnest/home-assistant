@@ -73,6 +73,14 @@ class Control(app.App):
             "nest_protect_living_room",
             "nest_protect_garage",
             "owlet",
+            "soil_sensor_vegetable_garden_sun",
+            "soil_sensor_vegetable_garden_shade",
+            "soil_sensor_front_deck",
+            "soil_sensor_back_deck",
+            "soil_sensor_carport_pots",
+            "soil_sensor_dining_room",
+            "soil_sensor_living_room",
+            "soil_sensor_office",
         ):
             self.listen_state(
                 self.__handle_battery_level_change,

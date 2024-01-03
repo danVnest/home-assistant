@@ -181,6 +181,28 @@ views:
           - device_tracker.rachels_phone
         hours_to_show: 1
         type: map
+      - entities:
+          - entity: sensor.soil_moisture_vegetable_garden_sun
+            name: Vegetable garden (sun)
+          - entity: sensor.soil_moisture_vegetable_garden_shade
+            name: Vegetable garden (shade)
+          - entity: sensor.soil_moisture_front_deck
+            name: Front deck
+          - entity: sensor.soil_moisture_back_deck
+            name: Back deck
+          - entity: sensor.soil_moisture_carport_pots
+            name: Carport pots
+          - entity: sensor.soil_moisture_dining_room
+            name: Dining room
+          - entity: sensor.soil_moisture_living_room
+            name: Living room
+          - entity: sensor.soil_moisture_office
+            name: Office
+        hours_to_show: 336
+        refresh_interval: 0
+        type: history-graph
+        title: Soil moisture
+        logarithmic_scale: false
     path: default_view
     title: Control & Status
   - title: Instructions
@@ -453,10 +475,25 @@ views:
           - entity: sensor.nest_protect_entryway_battery_level
             name: Entryway fire alarm
           - entity: sensor.nest_protect_living_room_battery_level
-            name: Living fire smoke alarm
+            name: Living room fire alarm
           - entity: sensor.nest_protect_garage_battery_level
             name: Garage fire alarm
-        hours_to_show: 72
+          - entity: sensor.soil_sensor_vegetable_garden_sun_battery_level
+            name: Vegetable garden (sun) soil sensor
+          - entity: sensor.soil_sensor_vegetable_garden_shade_battery_level
+            name: Vegetable garden (shade) soil sensor
+          - entity: sensor.soil_sensor_front_deck_battery_level
+            name: Front deck soil sensor
+          - entity: sensor.soil_sensor_back_deck_battery_level
+            name: Back deck soil sensor
+          - entity: sensor.soil_sensor_carport_pots_battery_level
+            name: Carport pots soil sensor
+          - entity: sensor.soil_sensor_dining_room_battery_level
+            name: Dining room soil sensor
+          - entity: sensor.soil_sensor_living_room_battery_level
+            name: Living room soil sensor
+          - entity: sensor.soil_sensor_office_battery_level
+            name: Office soil sensor
         refresh_interval: 0
         title: Battery Levels
         type: history-graph

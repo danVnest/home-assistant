@@ -323,6 +323,46 @@ template:
         state: "{{ None }}"
         unit_of_measurement: "°C"
         state_class: measurement
+  - sensor:
+      - name: Soil sensor vegetable garden sun battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_vegetable_garden_sun')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor vegetable garden shade battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_vegetable_garden_shade')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor front deck battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_front_deck')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor back deck battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_back_deck')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor carport pots battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_carport_pots')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor dining room battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_dining_room')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor living room battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_living_room')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+  - sensor:
+      - name: Soil sensor office battery level
+        state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_office')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
+        unit_of_measurement: "%"
+        state_class: measurement
 
 wake_on_lan:
 
