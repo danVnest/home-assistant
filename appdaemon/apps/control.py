@@ -73,6 +73,7 @@ class Control(app.App):
             "nest_protect_living_room",
             "nest_protect_garage",
             "owlet",
+            "toothbrush",
             "soil_sensor_vegetable_garden_sun",
             "soil_sensor_vegetable_garden_shade",
             "soil_sensor_front_deck",

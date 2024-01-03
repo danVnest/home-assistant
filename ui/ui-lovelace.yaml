@@ -67,7 +67,7 @@ views:
             - entity: input_number.cooling_target_temperature
             - entity: input_number.heating_target_temperature
           show_header_toggle: false
-          title: Aircon Settings - Night
+          title: Aircon Settings - Day
           type: entities
           state_color: true
         conditions:
@@ -81,7 +81,7 @@ views:
             - entity: input_number.sleep_cooling_target_temperature
             - entity: input_number.sleep_heating_target_temperature
           show_header_toggle: false
-          title: Aircon Settings - Day
+          title: Aircon Settings - Night
           type: entities
           state_color: true
         conditions:
@@ -478,6 +478,8 @@ views:
             name: Living room fire alarm
           - entity: sensor.nest_protect_garage_battery_level
             name: Garage fire alarm
+          - entity: sensor.toothbrush_battery_level
+            name: Toothbrush
           - entity: sensor.soil_sensor_vegetable_garden_sun_battery_level
             name: Vegetable garden (sun) soil sensor
           - entity: sensor.soil_sensor_vegetable_garden_shade_battery_level
@@ -494,6 +496,8 @@ views:
             name: Living room soil sensor
           - entity: sensor.soil_sensor_office_battery_level
             name: Office soil sensor
+        hours_to_show: 730
         refresh_interval: 0
         title: Battery Levels
         type: history-graph
+        logarithmic_scale: false
