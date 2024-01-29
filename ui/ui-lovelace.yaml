@@ -454,8 +454,12 @@ views:
         title: Warnings & Errors
         type: history-graph
       - entities:
-          - entity: sensor.doorbell_battery_level
-            name: Doorbell
+          - entity: sensor.front_door_battery_level
+            name: Front door camera
+          - entity: sensor.back_door_battery_level
+            name: Back door camera
+          - entity: sensor.entryway_door_battery_level
+            name: Entryway camera
           - entity: sensor.door_lock_battery_level
             name: Lock
           - entity: sensor.entryway_multisensor_battery_level

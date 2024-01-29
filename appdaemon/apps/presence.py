@@ -30,14 +30,37 @@ class Presence(app.App):
         self.__pets_home_alone = (
             self.entities.input_boolean.pets_home_alone.state == "on"
         )
-        for room in ["entryway", "kitchen", "bedroom", "office"]:
-            self.rooms[room] = Room(
-                room,
-                f"binary_sensor.{room}_multisensor_motion",
+        for multisensor_room in ["entryway", "kitchen", "bedroom", "office"]:
+            self.rooms[multisensor_room] = Room(
+                multisensor_room,
+                f"binary_sensor.{multisensor_room}_multisensor_motion",
                 self,
             )
-        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_ringing")
-        self.rooms["entryway"].add_sensor("binary_sensor.doorbell_person_detected")
+        for camera_room in [
+            "front_door",
+            "living_room",
+            "back_deck",
+            "back_door",
+            "garage",
+        ]:
+            self.rooms[camera_room] = Room(
+                camera_room,
+                f"binary_sensor.{camera_room}_person_detected",
+                self,
+            )
+            for motion_type in [
+                "motion_detected",
+                "pet_detected",
+            ]:
+                if self.entity_exists(f"binary_sensor.{camera_room}_{motion_type}"):
+                    self.rooms[camera_room].add_sensor(
+                        f"binary_sensor.{camera_room}_{motion_type}",
+                    )
+        self.rooms["front_door"].add_sensor(
+            "binary_sensor.doorbell_ringing",
+        )
+        self.rooms["entryway"].add_sensor("binary_sensor.entryway_person_detected")
+        self.rooms["entryway"].add_sensor("binary_sensor.entryway_motion_detected")
         self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
         self.__last_device_date = self.date()
         self.listen_event(self.__handle_new_device, "device_tracker_new_device")
@@ -45,8 +68,11 @@ class Presence(app.App):
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
-            new="True",
+            new="on",
         )
+        self.listen_state(self.__handle_presence_change, "person")
+        self.__last_device_date = self.date()
+        self.listen_event(self.__handle_new_device, "device_tracker_new_device")
 
     def anyone_home(self, **kwargs) -> bool:
         """Check if anyone is home."""
@@ -136,7 +162,11 @@ class Presence(app.App):
     ):
         """Handle doorbell when it rings."""
         del entity, attribute, old, new, kwargs
-        self.log("Doorbell rung")
+        self.notify(
+            f"Someone rung the doorbell "
+            f"(door is {self.entities.lock.door_lock.state})",
+            title="Doorbell",
+        )
         if self.control.apps["media"].is_playing:
             self.control.apps["media"].pause()
         if self.control.scene in ("TV", "Sleep"):
@@ -236,6 +266,18 @@ class Room:
             self.__last_vacated = self.__controller.datetime()
         else:
             self.__last_entered = self.__controller.datetime()
+            if "Away" in self.__controller.control.scene:
+                if "_person_detected" in entity:
+                    self.__controller.notify(
+                        f"Person detected at the {self.__room_id} (front door is "
+                        f"{self.__controller.entities.lock.door_lock.state})",
+                        title="Person Detected",
+                    )
+                elif (
+                    not self.__controller.pets_home_alone and "doorbell" not in entity
+                ):
+                    self.__controller.notify(
+                        "Pets detected as home alone, enabling climate control",
             if (
                 not self.__controller.pets_home_alone
                 and "Away" in self.__controller.control.scene
@@ -246,6 +288,9 @@ class Room:
                     title="Climate Control",
                 )
                 self.__controller.pets_home_alone = True
+                        title="Climate Control",
+                    )
+                    self.__controller.pets_home_alone = True
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:

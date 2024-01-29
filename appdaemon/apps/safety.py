@@ -25,40 +25,17 @@ class Safety(app.App):
         self.__owlet_sensor_suffix = "_alert"
 
     def initialize(self):
-        """Initialise TemperatureMonitor, Aircon units, and event listening.
+        """Initialise listeners for fire and baby sensors.
 
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
         for sensor_id in self.__fire_sensors:
             self.__fire_sensors[sensor_id] = FireSensor(sensor_id, self)
-        self.listen_state(
-            self.__handle_camera_motion,
-            "binary_sensor.doorbell_person_detected",
-            new="on",
-        )
         for owlet_sensor in self.__owlet_sensors:
             self.listen_state(
                 self.__handle_owlet_alert,
                 f"{self.__owlet_sensor_prefix}{owlet_sensor}{self.__owlet_sensor_suffix}",
-            )
-
-    def __handle_camera_motion(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        kwargs: dict,
-    ):
-        """Send notification if motion detected when no one is home."""
-        del entity, attribute, old, new, kwargs
-        self.log("Person detected by doorbell camera")
-        if not self.control.apps["presence"].anyone_home():
-            self.notify(
-                "Person detected at the front door (currently "
-                f"{self.entities.lock.door_lock.state})",
-                title="Person Detected",
             )
 
     def __handle_owlet_alert(
