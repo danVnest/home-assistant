@@ -14,14 +14,15 @@ logs
 *.log
 
 # System files
-blueprints
 *.db
 *.db-shm
 *.db-wal
-image
-__pycache__
+.ruff_cache
 .storage
-tts
 .vscode
-webostv.conf
+__pycache__
+blueprints
+image
+tts
 www
+webostv.conf
