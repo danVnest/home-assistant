@@ -62,9 +62,7 @@ class Presence(app.App):
         self.rooms["entryway"].add_sensor("binary_sensor.entryway_person_detected")
         self.rooms["entryway"].add_sensor("binary_sensor.entryway_motion_detected")
         self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
-        self.__last_device_date = self.date()
-        self.listen_event(self.__handle_new_device, "device_tracker_new_device")
-        self.listen_state(self.__handle_presence_change, "person")
+        self.rooms["office"].add_sensor("binary_sensor.daniels_macbook_active_at_home")
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
