@@ -323,7 +323,6 @@ template:
         state: "{{ None }}"
         unit_of_measurement: "°C"
         state_class: measurement
-  - sensor:
       - name: Soil sensor vegetable garden sun battery level
         state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_vegetable_garden_sun')) - 1.0) / (1.6 - 1.0)) | round(2))) }}"
         unit_of_measurement: "%"
