@@ -288,7 +288,7 @@ class Climate(app.App):
         """Turn all aircon units off and allow suggestions again."""
         for aircon in self.__aircons.values():
             aircon.turn_off()
-        self.log("Aircon is off")
+        self.log("Aircon is 'off'")
         self.__allow_suggestion()
 
     def __disable_climate_control_if_would_trigger_on(self):
