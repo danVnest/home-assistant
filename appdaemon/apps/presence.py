@@ -272,20 +272,12 @@ class Room:
                         title="Person Detected",
                     )
                 elif (
-                    not self.__controller.pets_home_alone and "doorbell" not in entity
+                    not self.__controller.pets_home_alone
+                    and "Away" in self.__controller.control.scene
+                    and "doorbell" not in entity
                 ):
                     self.__controller.notify(
                         "Pets detected as home alone, enabling climate control",
-            if (
-                not self.__controller.pets_home_alone
-                and "Away" in self.__controller.control.scene
-                and "doorbell" not in entity
-            ):
-                self.__controller.notify(
-                    "Pets detected as home alone, enabling climate control",
-                    title="Climate Control",
-                )
-                self.__controller.pets_home_alone = True
                         title="Climate Control",
                     )
                     self.__controller.pets_home_alone = True
