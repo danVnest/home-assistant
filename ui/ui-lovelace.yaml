@@ -152,10 +152,11 @@ views:
           - entity: sensor.office_multisensor_temperature
             name: Office
           - entity: climate.bedroom
-        hours_to_show: 24
         refresh_interval: 0
         title: Temperatures
         type: history-graph
+        hours_to_show: 12
+        logarithmic_scale: false
       - cards:
           - type: glance
             entities:
@@ -454,6 +455,12 @@ views:
         title: Warnings & Errors
         type: history-graph
       - entities:
+          - entity: sensor.daniels_phone_battery_level
+            name: Daniel's phone
+          - entity: sensor.rachels_phone_battery_level
+            name: Rachel's phone
+          - entity: sensor.daniels_macbook_battery_level
+            name: Daniel's MacBook
           - entity: sensor.front_door_camera_battery_level
             name: Front door camera
           - entity: sensor.back_door_camera_battery_level
@@ -500,7 +507,7 @@ views:
             name: Living room soil sensor
           - entity: sensor.soil_sensor_office_battery_level
             name: Office soil sensor
-        hours_to_show: 730
+        hours_to_show: 240
         refresh_interval: 0
         title: Battery Levels
         type: history-graph

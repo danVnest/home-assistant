@@ -61,6 +61,7 @@ class Control(app.App):
         for battery in (
             "daniels_phone",
             "rachels_phone",
+            "daniels_macbook",
             "front_door_camera",
             "back_door_camera",
             "entryway_camera",
@@ -415,10 +416,12 @@ class Control(app.App):
         kwargs: dict,
     ):
         """Notify if a device's battery is low."""
-        del attribute, old, kwargs
+        del attribute, kwargs
         if new == "unavailable":
             self.log(f"'{entity}' is 'unavailable'", level="WARNING")
-        elif float(new) <= self.args["notify_battery_level"]:
+        elif float(new) <= self.args["notify_battery_level"] and (
+            old == "unavailable" or float(old) >= self.args["notify_battery_level"]
+        ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
     def __heartbeat(self, kwargs: dict):
