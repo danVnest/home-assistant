@@ -33,7 +33,7 @@ class Presence(app.App):
         for multisensor_room in ["entryway", "kitchen", "bedroom", "office"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
-                f"binary_sensor.{multisensor_room}_multisensor_motion",
+                f"{multisensor_room}_multisensor_motion",
                 self,
             )
         for camera_room in [
@@ -45,7 +45,7 @@ class Presence(app.App):
         ]:
             self.rooms[camera_room] = Room(
                 camera_room,
-                f"binary_sensor.{camera_room}_person_detected",
+                f"{camera_room}_person_detected",
                 self,
             )
             for motion_type in [
@@ -54,15 +54,16 @@ class Presence(app.App):
             ]:
                 if self.entity_exists(f"binary_sensor.{camera_room}_{motion_type}"):
                     self.rooms[camera_room].add_sensor(
-                        f"binary_sensor.{camera_room}_{motion_type}",
+                        f"{camera_room}_{motion_type}",
                     )
         self.rooms["front_door"].add_sensor(
-            "binary_sensor.doorbell_ringing",
+            "doorbell_ringing",
         )
-        self.rooms["entryway"].add_sensor("binary_sensor.entryway_person_detected")
-        self.rooms["entryway"].add_sensor("binary_sensor.entryway_motion_detected")
-        self.rooms["kitchen"].add_sensor("binary_sensor.kitchen_door_motion")
-        self.rooms["office"].add_sensor("binary_sensor.daniels_macbook_active_at_home")
+        self.rooms["entryway"].add_sensor("entryway_person_detected")
+        self.rooms["entryway"].add_sensor("entryway_motion_detected")
+        self.rooms["kitchen"].add_sensor("kitchen_door_motion")
+        self.rooms["living_room"].add_sensor("tv_playing")
+        self.rooms["office"].add_sensor("daniels_macbook_active_at_home")
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
@@ -177,6 +178,7 @@ class Room:
     def __init__(self, room_id: str, sensor_id: str, controller: Presence):
         """Initialise room presence and start listening for presence change."""
         self.__room_id = room_id
+        sensor_id = f"binary_sensor.{sensor_id}"
         self.__sensors = [sensor_id]
         self.__controller = controller
         try:
@@ -301,7 +303,8 @@ class Room:
                 )
 
     def add_sensor(self, sensor_id: str):
-        """Add additional sensor to room."""
+        """Add additional binary presence sensor to room."""
+        sensor_id = f"binary_sensor.{sensor_id}"
         self.__sensors.append(sensor_id)
         self.__controller.listen_state(self.__handle_presence_change, sensor_id)
 

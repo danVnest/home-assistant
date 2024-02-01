@@ -320,6 +320,8 @@ template:
         state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
       - name: Daniels MacBook active at home
         state: "{{ states('binary_sensor.daniels_macbook_active') == 'on' and states('device_tracker.daniels_macbook') == 'home' }}"
+      - name: TV playing
+        state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
   - sensor:
       - name: Inside apparent temperature
         state: "{{ None }}"
