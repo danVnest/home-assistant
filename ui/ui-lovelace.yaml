@@ -121,6 +121,8 @@ views:
                 name: Bedroom
               - entity: light.office
                 name: Office
+              - entity: light.nursery
+                name: Nursery
             show_icon: true
             show_name: true
             show_state: true
@@ -168,9 +170,19 @@ views:
             show_state: true
             state_color: true
             title: Manual Aircon Control
+          - type: glance
+            entities:
+              - entity: fan.nursery
+              - entity: fan.office
+              - entity: fan.bedroom
+            show_name: true
+            show_icon: true
+            show_state: true
+            state_color: true
+            title: Manual Fan Control
           - content: >-
-              To manually control the individual airconditioning units above,
-              make sure to disable automatic climate control beforehand.
+              To manually control the individual units above, make sure to
+              disable automatic climate control beforehand.
             type: markdown
         type: vertical-stack
       - aspect_ratio: "2"

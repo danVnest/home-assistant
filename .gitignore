@@ -7,6 +7,7 @@ secrets.yaml
 # Custom components (only manifests, for reference)
 custom_components/*/*
 !custom_components/*/manifest.json
+!custom_components/tuya_local/devices/hunter_pacific_evolve_ceiling_fan_and_light.yaml
 
 # Logs
 home-assistant.log*

@@ -42,4 +42,5 @@ all_lights:
     - light.hall
     - light.bedroom
     - light.office
+    - light.nursery
   icon: mdi:lightbulb-group

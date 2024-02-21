@@ -29,6 +29,7 @@ This home automation system is comprised of the following devices:
 - [WiZ G95 filament bulbs](https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793)
 - [WiZ C35 filament bulb](https://www.wizconnected.com/en-au/p/filament-bulb-filament-candle-amber-25w-c35-e14/8718699787257)
 - [Kogan SmarterHome RGB + cool & warm white LED strip](https://www.kogan.com/au/buy/kogan-smarterhometm-ip68-colour-whites-smart-led-light-strip-5m-kogan)
+- [Hunter Pacific Evolve ceiling fans](https://www.hunterpacificinternational.com/smart-wifi-module)
 - [Sensibo Sky aircon controllers](https://sensibo.com/products/sensibo-sky)
 - [LG C1 TV](https://www.lg.com/au/tvs/lg-oled65c1ptb)
 - [Eufy doorbell](https://myeufy.com.au/eufy-video-doorbell-battery-powered.html)

@@ -39,6 +39,7 @@ class Lights(app.App):
         self.lights["hall"] = Light("light.hall", self)
         self.lights["office"] = Light("light.office", self)
         self.lights["bedroom"] = Light("light.bedroom", self)
+        self.lights["nursery"] = Light("light.nursery", self)
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
@@ -104,6 +105,7 @@ class Lights(app.App):
             "tv",
             "dining",
             "hall",
+            "nursery",
         ]:
             self.lights[light_name].ignore_presence()
             self.lights[light_name].turn_off()
@@ -147,7 +149,8 @@ class Lights(app.App):
                 self.control.get_setting("tv_brightness"),
                 kelvin,
             )
-        self.lights["dining"].turn_off()
+        for light_name in ["dining", "nursery"]:
+            self.lights[light_name].turn_off()
         brightness, kelvin = self.calculate_circadian_brightness_kelvin()
         self.lights["office"].set_presence_adjustments(
             occupied=(
@@ -189,7 +192,7 @@ class Lights(app.App):
             ),
             vacating_delay=self.control.get_setting("office_vacating_delay"),
         )
-        for light_name in ["kitchen_strip", "tv", "dining", "hall"]:
+        for light_name in ["kitchen_strip", "tv", "dining", "hall", "nursery"]:
             self.lights[light_name].ignore_presence()
             self.lights[light_name].turn_off()
         self.lights["bedroom"].ignore_presence()
@@ -221,7 +224,7 @@ class Lights(app.App):
             occupied=(brightness, kelvin),
             vacating_delay=self.control.get_setting("office_vacating_delay"),
         )
-        for light_name in ["tv", "dining", "hall", "bedroom"]:
+        for light_name in ["tv", "dining", "hall", "bedroom", "nursery"]:
             self.lights[light_name].turn_off()
         self.lights["bedroom"].ignore_presence()
 
@@ -236,7 +239,7 @@ class Lights(app.App):
                 vacating_delay=60,
             )
         self.lights["dining"].adjust_to_max()
-        for light_name in ["kitchen_strip", "tv", "hall", "bedroom"]:
+        for light_name in ["kitchen_strip", "tv", "hall", "bedroom", "nursery"]:
             self.lights[light_name].ignore_presence()
             self.lights[light_name].turn_off()
 

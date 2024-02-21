@@ -173,8 +173,10 @@ class Control(app.App):
                     title="Door Locked",
                 )
                 self.apps["media"].turn_off()
-        elif new_scene == "TV":
-            self.apps["media"].turn_on()
+                self.turn_off("fan.nursery")
+                if not self.apps["presence"].pets_home_alone:
+                    for fan_name in ["bedroom", "office"]:
+                        self.turn_off(f"fan.{fan_name}")
         self.call_service(
             "input_select/select_option",
             entity_id="input_select.scene",
