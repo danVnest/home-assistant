@@ -167,6 +167,8 @@ class Control(app.App):
         self.apps["climate"].transition_between_scenes(new_scene, old_scene)
         if new_scene == "Sleep" or "Away" in new_scene:
             self.call_service("lock/lock", entity_id="lock.door_lock")
+            self.turn_on("switch.entryway_camera_enabled")
+            self.turn_on("switch.back_door_camera_enabled")
             if "Away" in new_scene:
                 self.notify(
                     f"Home set to {new_scene} mode",
@@ -177,6 +179,9 @@ class Control(app.App):
                 if not self.apps["presence"].pets_home_alone:
                     for fan_name in ["bedroom", "office"]:
                         self.turn_off(f"fan.{fan_name}")
+        else:
+            self.turn_off("switch.entryway_camera_enabled")
+            self.turn_off("switch.back_door_camera_enabled")
         self.call_service(
             "input_select/select_option",
             entity_id="input_select.scene",
