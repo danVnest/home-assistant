@@ -2,11 +2,16 @@ secrets: /homeassistant/secrets.yaml
 logs:
   main_log:
     filename: /config/logs/main.log
-    log_generations: 10
+    log_generations: 1
+    log_size: 10000000
+    filter_threshold: 5
   error_log:
     filename: /config/logs/errors.log
+    log_generations: 1
+    log_size: 10000000
   diag_log:
     filename: /config/logs/diag.log
+    log_generations: 1
   access_log:
     filename: /config/logs/access.log
 appdaemon:
@@ -17,6 +22,7 @@ appdaemon:
   internal_function_timeout: 30
   thread_duration_warning_threshold: 15
   missing_app_warnings: false
+  uvloop: true
   plugins:
     HASS:
       type: hass
