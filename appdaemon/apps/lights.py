@@ -31,8 +31,16 @@ class Lights(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.lights["entryway"] = Light("group.entryway_lights", self)
-        self.lights["kitchen"] = Light("light.kitchen", self)
+        self.lights["entryway"] = Light(
+            "group.entryway_lights",
+            self,
+            linked_rooms=["front_door"],
+        )
+        self.lights["kitchen"] = Light(
+            "light.kitchen",
+            self,
+            linked_rooms=["back_deck"],
+        )
         self.lights["kitchen_strip"] = Light("light.kitchen_strip", self, "kitchen")
         self.lights["tv"] = Light("group.tv_lights", self)
         self.lights["dining"] = Light("group.dining_lights", self)
@@ -543,18 +551,21 @@ class Lights(app.App):
 class Light:
     """Control an individual light (or a pre-configured group)."""
 
-    def __init__(self, light_id: str, controller: Lights, room_name: str | None = None):
-        """Initialise with attributes for light parameters, and a Light controller."""
+    def __init__(
+        self,
+        light_id: str,
+        controller: Lights,
+        room_name: str | None = None,
+        linked_rooms: list[str] | None = None,
+    ):
+        """Initialise with light parameters and rooms for presence adjustments."""
         self.__light_id = light_id
         self.__controller = controller
         self.kelvin_limits = {
-            "max": float(self.__get_attribute("max_color_temp_kelvin")),
-            "min": float(self.__get_attribute("min_color_temp_kelvin")),
+            "max": self.__get_attribute("max_color_temp_kelvin"),
+            "min": self.__get_attribute("min_color_temp_kelvin"),
         }
-        self.__kelvin_before_off = (
-            self.__controller.args["max_brightness"]
-            - self.__controller.args["min_brightness"]
-        ) / 2
+        self.__kelvin_before_off = self.kelvin_limits["min"]
         self.room_name = (
             room_name
             if room_name is not None
@@ -564,7 +575,8 @@ class Light:
                 else light_id.replace("group.", "").replace("_lights", "")
             )
         )
-        self.__presence_adjustments = {"handle": None}
+        self.__linked_rooms = linked_rooms if linked_rooms is not None else []
+        self.__presence_adjustments = {"callbacks": []}
         self.__transition_timer = None
 
     @property
@@ -613,14 +625,18 @@ class Light:
     def kelvin(self, value: int):
         """Set and validate light's warmth of colour."""
         value = self.__validate_kelvin(value)
+        if value is None:
+            return
         self.__controller.log(
             f"Setting {self.__light_id}'s kelvin to {value} (from {self.kelvin})",
             level="DEBUG",
         )
         self.__controller.turn_on(self.__light_id, kelvin=value)
 
-    def __validate_kelvin(self, value: int) -> int:
+    def __validate_kelvin(self, value: int) -> int | None:
         """Return closest valid value for kelvin."""
+        if self.kelvin_limits["min"] is None:
+            return None
         validated_value = value
         if validated_value < self.kelvin_limits["min"]:
             validated_value = self.kelvin_limits["min"]
@@ -637,10 +653,10 @@ class Light:
 
     def adjust(self, brightness: int, kelvin: int):
         """Adjust light brightness and kelvin at the same time."""
+        brightness = self.__validate_brightness(brightness)
         if brightness == 0:
             self.turn_off()
         else:
-            brightness = self.__validate_brightness(brightness)
             kelvin = self.__validate_kelvin(kelvin)
             self.__controller.log(
                 f"Adjusting '{self.__light_id}' to "
@@ -648,11 +664,14 @@ class Light:
                 f"(from {self.brightness} and {self.kelvin})",
                 level="DEBUG",
             )
-            self.__controller.turn_on(
-                self.__light_id,
-                brightness=brightness,
-                kelvin=kelvin,
-            )
+            if kelvin is None:
+                self.__controller.turn_on(self.__light_id, brightness=brightness)
+            else:
+                self.__controller.turn_on(
+                    self.__light_id,
+                    brightness=brightness,
+                    kelvin=kelvin,
+                )
 
     def adjust_to_max(self):
         """Adjust light brightness and kelvin at the same time to maximum values."""
@@ -676,9 +695,8 @@ class Light:
             if not self.__light_id.startswith("group")
             else self.__controller.get_state(self.__light_id, attribute="entity_id")[0],
             attribute=attribute,
-            default=default,
         )
-        return int(value) if value is not None else None
+        return int(value) if value is not None else default
 
     def set_presence_adjustments(
         self,
@@ -735,12 +753,13 @@ class Light:
         if self.__presence_adjustments.get("vacating_delay") != vacating_delay:
             self.ignore_presence()
             self.__presence_adjustments["vacating_delay"] = vacating_delay
-        if self.__presence_adjustments.get("handle") is None:
-            self.__presence_adjustments["handle"] = (
-                self.__controller.control.apps["presence"]
-                .rooms[self.room_name]
-                .register_callback(self.__handle_presence_change, vacating_delay)
-            )
+        if self.is_ignoring_presence():
+            for room in [self.room_name, *self.__linked_rooms]:
+                self.__presence_adjustments["callbacks"].append(
+                    self.__controller.control.apps["presence"]
+                    .rooms[room]
+                    .register_callback(self.__handle_presence_change, vacating_delay),
+                )
         self.__controller.log(
             f"Configured '{self.__light_id}' with presence '{presence}' and "
             f"presence adjustments: {self.__presence_adjustments}",
@@ -749,32 +768,23 @@ class Light:
 
     def ignore_presence(self):
         """Set light to ignore presence by cancelling its presence callback."""
-        if self.__presence_adjustments.get("handle") is not None:
-            self.__controller.control.apps["presence"].rooms[
-                self.room_name
-            ].cancel_callback(
-                self.__presence_adjustments["handle"],
-            )
-            self.__presence_adjustments["handle"] = None
+        if not self.is_ignoring_presence():
+            for room in [self.room_name, *self.__linked_rooms]:
+                for callback in self.__presence_adjustments.get("callbacks"):
+                    self.__controller.control.apps["presence"].rooms[
+                        room
+                    ].cancel_callback(callback)
+            self.__presence_adjustments["callbacks"] = []
 
     def is_ignoring_presence(self) -> bool:
         """Check if the light is ignoring presence in the room or not."""
-        return self.__presence_adjustments["handle"] is None
+        return not bool(self.__presence_adjustments["callbacks"])
 
     def is_on_when_vacant(self) -> bool:
         """Check if the light is on when vacant."""
         if self.is_ignoring_presence():
             return self.brightness > 0
         return self.__presence_adjustments["vacant"]["brightness"] > 0
-
-    def toggle_presence_adjustments(self, **adjustments: dict) -> bool:
-        """Toggle between adjusting lighting based on presence and staying off."""
-        if self.is_ignoring_presence():
-            self.set_presence_adjustments(**adjustments)
-            return True
-        self.ignore_presence()
-        self.turn_off()
-        return False
 
     def __handle_presence_change(self, is_vacant: bool):  # noqa: FBT001
         """Adjust lighting based on presence in the room."""
