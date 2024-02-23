@@ -1,6 +1,9 @@
 title: Smart Nest
 views:
-  - badges: []
+  - path: control_and_status
+    title: Control & Status
+    icon: mdi:home-assistant
+    badges: []
     cards:
       - entities:
           - entity: input_select.scene
@@ -37,58 +40,18 @@ views:
       - card:
           entities:
             - entity: input_number.high_temperature_trigger
-            - entity: input_number.low_temperature_trigger
-          show_header_toggle: false
-          title: Climate Control Triggers
-          type: entities
-          state_color: true
-        conditions:
-          - entity: input_boolean.climate_control
-            state: "on"
-          - entity: binary_sensor.display_day_card
-            state: "on"
-        type: conditional
-      - card:
-          entities:
-            - entity: input_number.sleep_high_temperature_trigger
-            - entity: input_number.sleep_low_temperature_trigger
-          show_header_toggle: false
-          title: Climate Control Triggers
-          type: entities
-          state_color: true
-        conditions:
-          - entity: input_boolean.climate_control
-            state: "on"
-          - entity: binary_sensor.display_day_card
-            state: "off"
-        type: conditional
-      - card:
-          entities:
             - entity: input_number.cooling_target_temperature
+            - entity: input_number.low_temperature_trigger
             - entity: input_number.heating_target_temperature
           show_header_toggle: false
-          title: Aircon Settings - Day
+          title: Climate Control Settings
           type: entities
           state_color: true
         conditions:
-          - entity: binary_sensor.any_climate_control
+          - entity: input_boolean.climate_control
             state: "on"
           - entity: binary_sensor.display_day_card
             state: "on"
-        type: conditional
-      - card:
-          entities:
-            - entity: input_number.sleep_cooling_target_temperature
-            - entity: input_number.sleep_heating_target_temperature
-          show_header_toggle: false
-          title: Aircon Settings - Night
-          type: entities
-          state_color: true
-        conditions:
-          - entity: binary_sensor.any_climate_control
-            state: "on"
-          - entity: binary_sensor.display_day_card
-            state: "off"
         type: conditional
       - card:
           entities:
@@ -140,25 +103,6 @@ views:
               circadian rhythm dimming and colour adjustments.
             type: markdown
         type: vertical-stack
-      - entity: media_player.tv
-        type: media-control
-      - entities:
-          - entity: sensor.inside_apparent_temperature
-            name: Inside (feels like)
-          - entity: sensor.outside_apparent_temperature
-            name: Outside (feels like)
-          - entity: sensor.living_room_temperature_feels_like
-            name: Living room
-          - entity: sensor.dining_room_temperature_feels_like
-            name: Dining room
-          - entity: sensor.office_multisensor_temperature
-            name: Office
-          - entity: climate.bedroom
-        refresh_interval: 0
-        title: Temperatures
-        type: history-graph
-        hours_to_show: 12
-        logarithmic_scale: false
       - cards:
           - type: glance
             entities:
@@ -185,42 +129,35 @@ views:
               disable automatic climate control beforehand.
             type: markdown
         type: vertical-stack
-      - aspect_ratio: "2"
-        dark_mode: true
-        default_zoom: 12
-        auto_fit: true
+      - card:
+          entities:
+            - entity: input_number.sleep_high_temperature_trigger
+            - entity: input_number.sleep_cooling_target_temperature
+            - entity: input_number.sleep_low_temperature_trigger
+            - entity: input_number.sleep_heating_target_temperature
+          show_header_toggle: false
+          title: Climate Control Settings (Night)
+          type: entities
+          state_color: true
+        conditions:
+          - entity: input_boolean.climate_control
+            state: "on"
+          - condition: state
+            entity: binary_sensor.display_day_card
+            state: "off"
+        type: conditional
+      - type: entities
         entities:
-          - device_tracker.daniels_phone
-          - device_tracker.rachels_phone
-        hours_to_show: 1
-        type: map
-      - entities:
-          - entity: sensor.soil_moisture_vegetable_garden_sun
-            name: Vegetable garden (sun)
-          - entity: sensor.soil_moisture_vegetable_garden_shade
-            name: Vegetable garden (shade)
-          - entity: sensor.soil_moisture_front_deck
-            name: Front deck
-          - entity: sensor.soil_moisture_back_deck
-            name: Back deck
-          - entity: sensor.soil_moisture_carport_pots
-            name: Carport pots
-          - entity: sensor.soil_moisture_dining_room
-            name: Dining room
-          - entity: sensor.soil_moisture_living_room
-            name: Living room
-          - entity: sensor.soil_moisture_office
-            name: Office
-        hours_to_show: 336
-        refresh_interval: 0
-        type: history-graph
-        title: Soil moisture
-        logarithmic_scale: false
-    path: default_view
-    title: Control & Status
+          - entity: input_number.aircon_door_check_delay
+            name: Aircon off if door open
+            icon: mdi:timer
+          - entity: input_number.fan_vacating_delay
+            name: Fan off if room empty
+            icon: mdi:timer
+        title: Climate Control Delays
   - title: Instructions
     path: instructions
-    icon: ""
+    icon: mdi:text-box
     badges: []
     cards:
       - content: >-
@@ -325,8 +262,123 @@ views:
           to IFTTT and add applets with webhooks to Home Assistant corresponding
           to each command.
         type: markdown
-  - path: lights
-    title: Settings
+  - title: Presence
+    path: presence
+    icon: mdi:cctv
+    badges: []
+    cards:
+      - aspect_ratio: "2"
+        dark_mode: true
+        default_zoom: 12
+        auto_fit: true
+        entities:
+          - device_tracker.daniels_phone
+          - device_tracker.rachels_phone
+        hours_to_show: 1
+        type: map
+      - type: custom:webrtc-camera
+        entity: camera.front_door
+        poster: image.front_door_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.front_door
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.front_door
+      - type: custom:webrtc-camera
+        entity: camera.entryway
+        poster: image.entryway_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.entryway
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.entryway
+      - type: custom:webrtc-camera
+        entity: camera.living_room
+        poster: image.living_room_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.living_room
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.living_room
+      - type: custom:webrtc-camera
+        entity: camera.back_deck
+        poster: image.back_deck_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.back_deck
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.back_deck
+      - type: custom:webrtc-camera
+        entity: camera.back_door
+        poster: image.back_door_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.back_door
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.back_door
+      - type: custom:webrtc-camera
+        entity: camera.garage
+        poster: image.garage_event_image
+        ui: true
+        shortcuts:
+          - name: Play
+            icon: mdi:play
+            service: camera.turn_on
+            service_data:
+              entity_id: camera.garage
+          - name: Stop
+            icon: mdi:stop
+            service: camera.turn_off
+            service_data:
+              entity_id: camera.garage
+      - type: history-graph
+        entities:
+          - entity: binary_sensor.entryway_multisensor_motion
+          - entity: binary_sensor.kitchen_multisensor_motion
+          - entity: binary_sensor.bedroom_multisensor_motion
+          - entity: binary_sensor.office_multisensor_motion
+          - entity: binary_sensor.kitchen_door_motion
+          - entity: lock.door_lock
+        title: Motion
+        hours_to_show: 24
+  - path: light-settings
+    title: Light Settings
+    icon: mdi:globe-light
     badges: []
     cards:
       - cards:
@@ -382,8 +434,8 @@ views:
 
 
               If a *transition period* is available the light will smoothly
-              change over that period to or from the motion brightness and
-              kelvin specified or implied.
+              change over that period to the motion brightness and kelvin
+              specified or implied.
             type: markdown
           - entities:
               - entity: input_number.night_motion_brightness
@@ -419,16 +471,12 @@ views:
           - entity: input_number.bedroom_vacating_delay
         title: Room Vacating Delays
         type: entities
-      - type: entities
-        entities:
-          - entity: input_number.aircon_door_check_delay
-            icon: mdi:timer
-        title: Aircon Door Check Delay
-  - path: system
-    title: System
+  - path: development
+    title: Development
     visible:
       - user: 15ff7a86d4ae4d38a60003ad4064ff78
       - user: d678a59ca9604e2ba14c3ac3705ba943
+    icon: mdi:cog
     badges:
       - type: entity-filter
         state_filter:
@@ -519,8 +567,49 @@ views:
             name: Living room soil sensor
           - entity: sensor.soil_sensor_office_battery_level
             name: Office soil sensor
-        hours_to_show: 240
         refresh_interval: 0
         title: Battery Levels
         type: history-graph
         logarithmic_scale: false
+        hours_to_show: 240
+      - entities:
+          - entity: sensor.inside_apparent_temperature
+            name: Inside (feels like)
+          - entity: sensor.outside_apparent_temperature
+            name: Outside (feels like)
+          - entity: sensor.living_room_temperature_feels_like
+            name: Living room
+          - entity: sensor.dining_room_temperature_feels_like
+            name: Dining room
+          - entity: sensor.office_multisensor_temperature
+            name: Office
+          - entity: climate.bedroom
+        refresh_interval: 0
+        title: Temperatures
+        type: history-graph
+        hours_to_show: 12
+        logarithmic_scale: false
+      - entities:
+          - entity: sensor.soil_moisture_vegetable_garden_sun
+            name: Vegetable garden (sun)
+          - entity: sensor.soil_moisture_vegetable_garden_shade
+            name: Vegetable garden (shade)
+          - entity: sensor.soil_moisture_front_deck
+            name: Front deck
+          - entity: sensor.soil_moisture_back_deck
+            name: Back deck
+          - entity: sensor.soil_moisture_carport_pots
+            name: Carport pots
+          - entity: sensor.soil_moisture_dining_room
+            name: Dining room
+          - entity: sensor.soil_moisture_living_room
+            name: Living room
+          - entity: sensor.soil_moisture_office
+            name: Office
+        hours_to_show: 240
+        refresh_interval: 0
+        type: history-graph
+        title: Soil moisture
+        logarithmic_scale: false
+      - entity: media_player.tv
+        type: media-control

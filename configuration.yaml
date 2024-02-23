@@ -132,7 +132,15 @@ input_number:
     mode: box
     icon: mdi:thermometer-low
   aircon_door_check_delay:
-    name: Delay
+    name: Aircon off if door open
+    min: 1
+    max: 10
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer
+  fan_vacating_delay:
+    name: Fan off if room empty
     min: 1
     max: 10
     step: 1
@@ -322,6 +330,8 @@ template:
         state: "{{ states('binary_sensor.daniels_macbook_active') == 'on' and states('device_tracker.daniels_macbook') == 'home' }}"
       - name: TV playing
         state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
+      - name: Owlet attached
+        state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
   - sensor:
       - name: Inside apparent temperature
         state: "{{ None }}"

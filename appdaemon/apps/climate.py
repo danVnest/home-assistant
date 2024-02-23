@@ -10,6 +10,8 @@ User defined variables are configued in climate.yaml
 """
 from __future__ import annotations
 
+from math import ceil
+
 import app
 from meteocalc import Temp, heat_index
 
@@ -22,7 +24,8 @@ class Climate(app.App):
         super().__init__(*args, **kwargs)
         self.__suggested = False
         self.__temperature_monitor = None
-        self.__aircons = None
+        self.__aircons = {}
+        self.__fans = {}
         self.__door_open_listener = None
         self.__climate_control_history = {"overridden": False, "before_away": None}
 
@@ -38,9 +41,10 @@ class Climate(app.App):
         self.__climate_control_history["before_away"] = self.climate_control
         self.__aircon = self.entities.input_boolean.aircon.state == "on"
         self.__aircons = {
-            aircon: Aircon(f"climate.{aircon}", self)
+            aircon: Aircon(aircon, self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
+        self.__fans = {fan: Fan(fan, self) for fan in ["bedroom", "office", "nursery"]}
         self.__temperature_monitor = TemperatureMonitor(self)
         self.__temperature_monitor.configure_sensors()
         self.set_door_check_delay(
@@ -83,6 +87,12 @@ class Climate(app.App):
             > self.args["override_threshold"]
         ):
             self.__climate_control_history["overridden"] = False
+        self.__fans["bedroom"].ignore_vacancy(
+            self.__should_bedroom_fan_ignore_vacancy(),
+        )
+        self.__fans["office"].ignore_vacancy(
+            self.control.apps["presence"].pets_home_alone,
+        )
         self.call_service(
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.climate_control",
@@ -107,6 +117,9 @@ class Climate(app.App):
             self.__disable_climate_control_if_would_trigger_on()
             self.__turn_aircon_off()
         self.__aircon = state
+        self.__fans["bedroom"].ignore_vacancy(
+            self.__should_bedroom_fan_ignore_vacancy(),
+        )
         self.call_service(
             f"input_boolean/turn_{'on' if state else 'off'}",
             entity_id="input_boolean.aircon",
@@ -139,6 +152,11 @@ class Climate(app.App):
             immediate=True,
         )
 
+    def recheck_fan_room_vacating_delay(self):
+        """Update room vacating delay for each fan."""
+        for fan in self.__fans.values():
+            fan.configure_presence_adjustments()
+
     def transition_between_scenes(self, new_scene: str, old_scene: str):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
         self.__temperature_monitor.configure_sensors()
@@ -162,10 +180,47 @@ class Climate(app.App):
             ],
         ):
             self.__suggest_if_trigger_forecast()
+        self.__fans["bedroom"].ignore_vacancy(
+            self.__should_bedroom_fan_ignore_vacancy(),
+        )
 
     def handle_temperatures(self, *args):
         """Control aircon or suggest based on changes in inside temperature."""
         del args  # args required for listen_state callback
+        if not self.__temperature_monitor.is_within_target_temperatures():
+            is_hot = self.__temperature_monitor.is_above_target_temperature()
+            min_temperature = self.get_setting(
+                f"{'cool' if is_hot else 'heat'}ing_target_temperature",
+            )
+            speed = min(
+                int(
+                    ceil(
+                        9
+                        * (
+                            self.__temperature_monitor.inside_temperature
+                            - min_temperature
+                        )
+                        / (
+                            self.get_setting(
+                                f"{'high' if is_hot else 'low'}_temperature_trigger",
+                            )
+                            - min_temperature
+                        ),
+                    )
+                    * 100
+                    / 9,
+                ),
+                100,
+            )
+            self.log(
+                f"A desired fan speed of '{speed}' was set",
+                level="DEBUG",
+            )
+            for fan in self.__fans.values():
+                fan.settings_when_on(speed, is_hot)
+        else:
+            for fan in self.__fans.values():
+                fan.turn_off()
         if self.aircon is False:
             if self.__temperature_monitor.is_too_hot_or_cold():
                 self.__handle_too_hot_or_cold()
@@ -356,6 +411,22 @@ class Climate(app.App):
                 title="Climate Control",
                 targets="anyone_home",
             )
+
+    def __should_bedroom_fan_ignore_vacancy(self) -> bool:
+        """Check all conditions for which the bedroom fan should ignore vacancy."""
+        return (
+            self.aircon
+            or self.control.scene in ["Sleep", "Morning"]
+            or self.control.apps["presence"].pets_home_alone
+        )
+
+    def terminate(self):
+        """Cancel presence callbacks before termination.
+
+        Appdaemon defined function called before termination.
+        """
+        for fan in self.__fans.values():
+            fan.cancel_presence_callback()
 
 
 class Sensor:
@@ -681,28 +752,28 @@ class Aircon:
 
     def __init__(self, aircon_id: str, controller: Climate):
         """Initialise with an aircon's entity_id and the Climate controller."""
-        self.aircon_id = aircon_id
-        self.controller = controller
+        self.__aircon_id = f"climate.{aircon_id}"
+        self.__controller = controller
 
     def turn_on(self, mode: str, fan: str | None = None):
         """Set the aircon unit to heat or cool at the preconfigured temperature."""
-        if self.controller.get_state(self.aircon_id) != mode:
-            self.controller.call_service(
+        if self.__controller.get_state(self.__aircon_id) != mode:
+            self.__controller.call_service(
                 "climate/set_hvac_mode",
-                entity_id=self.aircon_id,
+                entity_id=self.__aircon_id,
                 hvac_mode=mode,
                 return_result=True,
             )
-        target_temperature = self.controller.get_setting(
+        target_temperature = self.__controller.get_setting(
             mode + "ing_target_temperature",
         )
         if (
-            self.controller.get_state(self.aircon_id, attribute="temperature")
+            self.__controller.get_state(self.__aircon_id, attribute="temperature")
             != target_temperature
         ):
-            self.controller.call_service(
+            self.__controller.call_service(
                 "climate/set_temperature",
-                entity_id=self.aircon_id,
+                entity_id=self.__aircon_id,
                 temperature=target_temperature,
                 return_result=True,
             )
@@ -711,19 +782,127 @@ class Aircon:
 
     def turn_off(self):
         """Turn off the aircon unit if it's on."""
-        if self.controller.get_state(self.aircon_id) != "off":
-            self.controller.call_service(
+        if self.__controller.get_state(self.__aircon_id) != "off":
+            self.__controller.call_service(
                 "climate/turn_off",
-                entity_id=self.aircon_id,
+                entity_id=self.__aircon_id,
                 return_result=True,
             )
 
     def set_fan_mode(self, fan_mode: str):
         """Set the fan mode to the specified level (main options: 'low', 'auto')."""
-        if self.controller.get_state(self.aircon_id, attribute="fan_mode") != fan_mode:
-            self.controller.call_service(
+        if (
+            self.__controller.get_state(self.__aircon_id, attribute="fan_mode")
+            != fan_mode
+        ):
+            self.__controller.call_service(
                 "climate/set_fan_mode",
-                entity_id=self.aircon_id,
+                entity_id=self.__aircon_id,
                 fan_mode=fan_mode,
                 return_result=True,
+            )
+
+
+class Fan:
+    """Control a specific ceiling fan."""
+
+    def __init__(self, fan_id: str, controller: Climate):
+        """Initialise with a fan's entity_id and the Climate controller."""
+        self.__fan_id = f"fan.{fan_id}"
+        self.__room = fan_id
+        self.__controller = controller
+        self.__speed = 0
+        self.__is_cooling_direction = True
+        self.__is_ignoring_vacancy = False
+        self.__vacating_delay = None
+        self.__presence = None
+        self.__presence_callback = None
+        self.configure_presence_adjustments()
+
+    def turn_off(self):
+        """Turn the fan off if required."""
+        self.__speed = 0
+        self.__adjust()
+
+    def __adjust(self):
+        """Check if actual fan operation matches settings and update if not."""
+        if not self.__controller.climate_control:
+            return
+        if self.__speed > 0 and (self.__is_ignoring_vacancy or self.__presence):
+            if (
+                self.__controller.get_state(self.__fan_id, attribute="direction")
+                == "forward"
+            ) != self.__is_cooling_direction:
+                self.__controller.call_service(
+                    "fan/set_direction",
+                    entity_id=self.__fan_id,
+                    direction="forward" if self.__is_cooling_direction else "reverse",
+                )
+            if self.__controller.get_state(self.__fan_id) == "on":
+                if (
+                    int(
+                        self.__controller.get_state(
+                            self.__fan_id,
+                            attribute="percentage",
+                        ),
+                    )
+                    != self.__speed
+                ):
+                    self.__controller.call_service(
+                        "fan/set_percentage",
+                        entity_id=self.__fan_id,
+                        percentage=self.__speed,
+                    )
+            else:
+                self.__controller.call_service(
+                    "fan/turn_on",
+                    entity_id=self.__fan_id,
+                    percentage=self.__speed,
+                )
+        elif self.__controller.get_state(self.__fan_id) != "off":
+            self.__controller.call_service("fan/turn_off", entity_id=self.__fan_id)
+
+    def settings_when_on(self, speed: int, is_cooling_direction: bool):  # noqa: FBT001
+        """Set the desired speed and direction of the fan for when it should be on."""
+        self.__speed = speed
+        self.__is_cooling_direction = is_cooling_direction
+        self.__adjust()
+
+    def ignore_vacancy(self, ignore: bool):  # noqa: FBT001
+        """Configure the fan to operate even when vacant (or not)."""
+        self.__is_ignoring_vacancy = ignore
+        self.__adjust()
+
+    def configure_presence_adjustments(self):
+        """Set vacating delay, current presence and a callback for when it changes."""
+        self.cancel_presence_callback()
+        self.__vacating_delay = float(
+            self.__controller.entities.input_number.fan_vacating_delay.state,
+        )
+        self.__presence = (
+            not self.__controller.control.apps["presence"]
+            .rooms[self.__room]
+            .is_vacant(self.__vacating_delay)
+        )
+        self.__presence_callback = (
+            self.__controller.control.apps["presence"]
+            .rooms[self.__room]
+            .register_callback(
+                self.__handle_presence_change,
+                self.__vacating_delay,
+            )
+        )
+
+    def __handle_presence_change(self, is_vacant: bool):  # noqa: FBT001
+        """Adjust lighting based on presence in the room."""
+        self.__presence = not is_vacant
+        self.__adjust()
+
+    def cancel_presence_callback(self):
+        """Cancel the presence callback."""
+        if self.__presence_callback:
+            self.__controller.control.apps["presence"].rooms[
+                self.__room
+            ].cancel_callback(
+                self.__presence_callback,
             )

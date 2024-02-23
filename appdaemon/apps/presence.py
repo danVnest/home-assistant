@@ -64,6 +64,7 @@ class Presence(app.App):
         self.rooms["kitchen"].add_sensor("kitchen_door_motion")
         self.rooms["living_room"].add_sensor("tv_playing")
         self.rooms["office"].add_sensor("daniels_macbook_active_at_home")
+        self.rooms["nursery"] = Room("nursery", "owlet_attached", self)
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
