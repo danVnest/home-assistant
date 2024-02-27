@@ -187,40 +187,37 @@ class Climate(app.App):
     def handle_temperatures(self, *args):
         """Control aircon or suggest based on changes in inside temperature."""
         del args  # args required for listen_state callback
-        if not self.__temperature_monitor.is_within_target_temperatures():
-            is_hot = self.__temperature_monitor.is_above_target_temperature()
-            min_temperature = self.get_setting(
-                f"{'cool' if is_hot else 'heat'}ing_target_temperature",
-            )
-            speed = min(
-                int(
-                    ceil(
-                        9
-                        * (
+        if self.climate_control:
+            if not self.__temperature_monitor.is_within_target_temperatures():
+                speed_per_step = 100 / self.args["fan_speed_settings"]
+                is_hot = self.__temperature_monitor.is_above_target_temperature()
+                if is_hot:
+                    speed = speed_per_step * min(
+                        self.args["fan_speed_settings"],
+                        ceil(
                             self.__temperature_monitor.inside_temperature
-                            - min_temperature
-                        )
-                        / (
-                            self.get_setting(
-                                f"{'high' if is_hot else 'low'}_temperature_trigger",
-                            )
-                            - min_temperature
+                            - self.get_setting("cooling_target_temperature"),
                         ),
                     )
-                    * 100
-                    / 9,
-                ),
-                100,
-            )
-            self.log(
-                f"A desired fan speed of '{speed}' was set",
-                level="DEBUG",
-            )
-            for fan in self.__fans.values():
-                fan.settings_when_on(speed, is_hot)
-        else:
-            for fan in self.__fans.values():
-                fan.turn_off()
+                elif self.aircon:
+                    speed = speed_per_step * min(
+                        self.args["fan_speed_settings"],
+                        ceil(
+                            self.get_setting("heating_target_temperature")
+                            - self.__temperature_monitor.inside_temperature,
+                        ),
+                    )
+                else:
+                    speed = speed_per_step * 1
+                self.log(
+                    f"A desired fan speed of '{speed}' was set",
+                    level="DEBUG",
+                )
+                for fan in self.__fans.values():
+                    fan.settings_when_on(speed, is_hot)
+            else:
+                for fan in self.__fans.values():
+                    fan.turn_off()
         if self.aircon is False:
             if self.__temperature_monitor.is_too_hot_or_cold():
                 self.__handle_too_hot_or_cold()
@@ -290,7 +287,7 @@ class Climate(app.App):
     def __suggest_if_trigger_forecast(self):
         """Suggest user enables control if extreme's forecast."""
         self.__allow_suggestion()
-        forecast = self.__temperature_monitor.get_forecast_if_will_trigger()
+        forecast = self.__temperature_monitor.get_forecast_if_will_trigger_aircon()
         if forecast is not None:
             self.__suggest(
                 f"It's forecast to reach {forecast}º, "
@@ -677,9 +674,9 @@ class TemperatureMonitor:
             > self.outside_temperature + self.controller.args["inside_outside_trigger"]
         )
         too_hot_or_cold_outside = (
-            not self.controller.get_setting("low_temperature_trigger")
+            not self.controller.get_setting("low_temperature_aircon_trigger")
             <= self.outside_temperature
-            <= self.controller.get_setting("high_temperature_trigger")
+            <= self.controller.get_setting("high_temperature_aircon_trigger")
         )
         vs_str = f"({self.outside_temperature} vs {self.inside_temperature} degrees)"
         if any(
@@ -704,9 +701,9 @@ class TemperatureMonitor:
     def is_too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
         if (
-            self.controller.get_setting("low_temperature_trigger")
+            self.controller.get_setting("low_temperature_aircon_trigger")
             < self.inside_temperature
-            < self.controller.get_setting("high_temperature_trigger")
+            < self.controller.get_setting("high_temperature_aircon_trigger")
         ):
             return False
         self.controller.log(
@@ -728,7 +725,7 @@ class TemperatureMonitor:
             return "cool"
         return "heat"
 
-    def get_forecast_if_will_trigger(self) -> float:
+    def get_forecast_if_will_trigger_aircon(self) -> float:
         """Return the forecasted temperature if it exceeds thresholds."""
         forecasts = [
             float(
@@ -739,10 +736,14 @@ class TemperatureMonitor:
             for hour in ["2", "4", "6", "8"]
         ]
         max_forecast = max(forecasts)
-        if max_forecast >= self.controller.get_setting("high_temperature_trigger"):
+        if max_forecast >= self.controller.get_setting(
+            "high_temperature_aircon_trigger",
+        ):
             return max_forecast
         min_forecast = min(forecasts)
-        if min_forecast <= self.controller.get_setting("low_temperature_trigger"):
+        if min_forecast <= self.controller.get_setting(
+            "low_temperature_aircon_trigger",
+        ):
             return min_forecast
         return None
 

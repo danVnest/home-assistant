@@ -39,10 +39,10 @@ views:
         type: conditional
       - card:
           entities:
-            - entity: input_number.high_temperature_trigger
             - entity: input_number.cooling_target_temperature
-            - entity: input_number.low_temperature_trigger
             - entity: input_number.heating_target_temperature
+            - entity: input_number.high_temperature_aircon_trigger
+            - entity: input_number.low_temperature_aircon_trigger
           show_header_toggle: false
           title: Climate Control Settings
           type: entities
@@ -125,16 +125,16 @@ views:
             state_color: true
             title: Manual Fan Control
           - content: >-
-              To manually control the individual units above, make sure to
-              disable automatic climate control beforehand.
+              To manually control the individual aircon and fan units above,
+              make sure to disable automatic climate control beforehand.
             type: markdown
         type: vertical-stack
       - card:
           entities:
-            - entity: input_number.sleep_high_temperature_trigger
             - entity: input_number.sleep_cooling_target_temperature
-            - entity: input_number.sleep_low_temperature_trigger
             - entity: input_number.sleep_heating_target_temperature
+            - entity: input_number.sleep_high_temperature_aircon_trigger
+            - entity: input_number.sleep_low_temperature_aircon_trigger
           show_header_toggle: false
           title: Climate Control Settings (Night)
           type: entities
@@ -172,14 +172,15 @@ views:
           - **"sleep time"** for the *Sleep* scene
 
 
-          **Automatic climate control** will control all aircon units based on
-          the current scene and the temperature throughout the house as well as
-          outside. If the **pets are home alone** (or are going to be soon), you
-          can manually specify this or wait for their movement to be detected to
-          trigger climate control. Only the bedroom aircon will be controlled
-          when pets are home alone or after the specified bed time, regardless
-          of the scene. **Aircon** can also be manually turned on and off. These
-          settings can be controlled by telling Siri/Google:
+          **Automatic climate control** will control all aircon and fan units
+          based on the temperature throughout the house. Fans will only turn on
+          if aircon is on in the room or it is occupied. If the **pets are home
+          alone** (or are going to be soon), you can manually specify this or
+          wait for their movement to be detected to trigger climate control.
+          Only the bedroom aircon will be controlled when **pets are home
+          alone** (bedroom and office fans will be on as well) or after the
+          specified bed time. **Aircon** can also be manually turned on and off.
+          These settings can be controlled by telling Siri/Google:
 
           - **"climate control on"** or **"climate control off"**
 
