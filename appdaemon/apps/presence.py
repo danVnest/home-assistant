@@ -248,24 +248,22 @@ class Room:
             )
             return
         is_vacant = new == "off"
-        if is_vacant and any(
-            self.__controller.get_state(sensor) == "on"
-            for sensor in self.__sensors
-            if sensor != entity
-        ):
-            self.__controller.log(
-                f"Sensor '{entity}' reports no presence "
-                "but at least one other sensor in the room indicates presence",
-                level="DEBUG",
-            )
-            return
-        self.__controller.log(
-            f"The '{self.__room_id}' is now '{'vacant' if is_vacant else 'occupied'}'",
-            level="DEBUG",
-        )
+        is_reentry = False
         if is_vacant:
+            if any(
+                self.__controller.get_state(sensor) == "on"
+                for sensor in self.__sensors
+                if sensor != entity
+            ):
+                self.__controller.log(
+                    f"Sensor '{entity}' reports no presence "
+                    "but at least one other sensor in the room indicates presence",
+                    level="DEBUG",
+                )
+                return
             self.__last_vacated = self.__controller.datetime()
         else:
+            is_reentry = self.__last_entered > self.__last_vacated
             self.__last_entered = self.__controller.datetime()
             if "Away" in self.__controller.control.scene:
                 if "_person_detected" in entity:
@@ -284,6 +282,15 @@ class Room:
                         title="Climate Control",
                     )
                     self.__controller.pets_home_alone = True
+        if is_reentry:
+            self.__controller.log(
+                f"The '{self.__room_id}' was re-entered - no callbacks called",
+                level="DEBUG",
+            )
+            return
+        self.__controller.log(
+            f"The '{self.__room_id}' is now '{'vacant' if is_vacant else 'occupied'}'",
+        )
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
             if not is_vacant or callback["vacating_delay"] == 0:

@@ -3,3 +3,4 @@ Presence:
   class: Presence
   new_device_notification_delay: 3
   priority: 2
+  # log_level: DEBUG
