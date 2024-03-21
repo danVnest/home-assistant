@@ -225,7 +225,7 @@ class Climate(app.App):
             message_beginning = (
                 f"Outside ({self.__temperature_monitor.outside_temperature}º) "
                 "is a more pleasant temperature than inside "
-                f"({self.__temperature_monitor.inside_temperature})º), consider"
+                f"({self.__temperature_monitor.inside_temperature}º), consider"
             )
             if self.climate_control:
                 if not self.control.apps["presence"].is_kitchen_door_open():
