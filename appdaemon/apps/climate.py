@@ -898,7 +898,7 @@ class Fan:
     def configure_presence_adjustments(self):
         """Set vacating delay, current presence and a callback for when it changes."""
         self.cancel_presence_callback()
-        self.__vacating_delay = float(
+        self.__vacating_delay = 60 * float(
             self.__controller.entities.input_number.fan_vacating_delay.state,
         )
         self.__presence = (
