@@ -188,36 +188,7 @@ class Climate(app.App):
         """Control aircon or suggest based on changes in inside temperature."""
         del args  # args required for listen_state callback
         if self.climate_control:
-            if not self.__temperature_monitor.is_within_target_temperatures():
-                speed_per_step = 100 / self.args["fan_speed_settings"]
-                is_hot = self.__temperature_monitor.is_above_target_temperature()
-                if is_hot:
-                    speed = speed_per_step * min(
-                        self.args["fan_speed_settings"],
-                        ceil(
-                            self.__temperature_monitor.inside_temperature
-                            - self.get_setting("cooling_target_temperature"),
-                        ),
-                    )
-                elif self.aircon:
-                    speed = speed_per_step * min(
-                        self.args["fan_speed_settings"],
-                        ceil(
-                            self.get_setting("heating_target_temperature")
-                            - self.__temperature_monitor.inside_temperature,
-                        ),
-                    )
-                else:
-                    speed = speed_per_step * 1
-                self.log(
-                    f"A desired fan speed of '{speed}' was set",
-                    level="DEBUG",
-                )
-                for fan in self.__fans.values():
-                    fan.settings_when_on(speed, is_hot)
-            else:
-                for fan in self.__fans.values():
-                    fan.turn_off()
+            self.__configure_fans_optimally()
         if self.aircon is False:
             if self.__temperature_monitor.is_too_hot_or_cold():
                 self.__handle_too_hot_or_cold()
@@ -342,6 +313,37 @@ class Climate(app.App):
             aircon.turn_off()
         self.log("Aircon is 'off'")
         self.__allow_suggestion()
+
+    def __configure_fans_optimally(self):
+        """Calculate best fan speed for the current temperature and set accordingly."""
+        if not self.__temperature_monitor.is_within_target_temperatures():
+            speed_per_step = float(
+                self.get_state(
+                    "fan.bedroom",
+                    "percentage_step",
+                ),
+            )
+            fan_speed_levels = round(100 / speed_per_step)
+            is_hot = self.__temperature_monitor.is_above_target_temperature()
+            if is_hot:
+                speed = speed_per_step * min(
+                    fan_speed_levels,
+                    ceil(
+                        self.__temperature_monitor.inside_temperature
+                        - self.get_setting("cooling_target_temperature"),
+                    ),
+                )
+            elif self.aircon:
+                speed = speed_per_step * 1
+            self.log(
+                f"A desired fan speed of '{speed}' was set",
+                level="DEBUG",
+            )
+            for fan in self.__fans.values():
+                fan.settings_when_on(speed, is_hot)
+        else:
+            for fan in self.__fans.values():
+                fan.turn_off()
 
     def __disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
@@ -816,6 +818,8 @@ class Fan:
         self.__is_cooling_direction = True
         self.__is_ignoring_vacancy = False
         self.__vacating_delay = None
+        self.__last_adjustment = self.__controller.get_now_ts()
+        self.__adjustment_timer = None
         self.__presence = None
         self.__presence_callback = None
         self.configure_presence_adjustments()
@@ -828,6 +832,17 @@ class Fan:
     def __adjust(self):
         """Check if actual fan operation matches settings and update if not."""
         if not self.__controller.climate_control:
+            return
+        if self.__adjustment_timer is None and (
+            self.__controller.get_now_ts() - self.__last_adjustment
+            < self.__controller.args["fan_adjustment_interval"]
+        ):
+            self.__adjustment_timer = self.__controller.run_in(
+                self.__adjust_after_delay,
+                self.__last_adjustment
+                + self.__controller.args["fan_adjustment_interval"]
+                - self.__controller.get_now_ts(),
+            )
             return
         if self.__speed > 0 and (self.__is_ignoring_vacancy or self.__presence):
             if (
@@ -862,6 +877,12 @@ class Fan:
                 )
         elif self.__controller.get_state(self.__fan_id) != "off":
             self.__controller.call_service("fan/turn_off", entity_id=self.__fan_id)
+
+    def __adjust_after_delay(self, kwargs: dict):
+        """Delayed adjustment from timers initiated in __adjust()."""
+        del kwargs
+        self.__adjustment_timer = None
+        self.__adjust()
 
     def settings_when_on(self, speed: int, is_cooling_direction: bool):  # noqa: FBT001
         """Set the desired speed and direction of the fan for when it should be on."""

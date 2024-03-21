@@ -4,6 +4,6 @@ Climate:
   inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
   target_trigger_buffer: -0.5 # difference between inside and target temperatures which triggers aircon off
   aircon_trigger_delay: 2 # delay by this many minutes when climate control thresholds trigger aircon activation and user notification
-  fan_speed_settings: 9 # how many fan speed settings there are
+  fan_adjustment_interval: 300 # minimum number of seconds delay between seqential fan adjustments (per fan)
   override_threshold: 10 # maximum seconds for a climate control change to be considered an override
   # log_level: DEBUG
