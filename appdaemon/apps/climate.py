@@ -166,6 +166,12 @@ class Climate(app.App):
                 self.climate_control = False
                 self.aircon = False
         elif "Away" not in new_scene and "Away" in old_scene:
+            if (
+                self.climate_control
+                and self.aircon
+                and self.control.apps["presence"].is_kitchen_door_open()
+            ):
+                self.aircon = False
             self.climate_control = self.__climate_control_history["before_away"]
         if self.climate_control or not self.__suggested:
             self.handle_temperatures()
