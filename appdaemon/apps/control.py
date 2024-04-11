@@ -174,11 +174,6 @@ class Control(app.App):
                     f"Home set to {new_scene} mode",
                     title="Door Locked",
                 )
-                self.apps["media"].turn_off()
-                self.turn_off("fan.nursery")
-                if not self.apps["presence"].pets_home_alone:
-                    for fan_name in ["bedroom", "office"]:
-                        self.turn_off(f"fan.{fan_name}")
         else:
             self.turn_off("switch.entryway_camera_enabled")
             self.turn_off("switch.back_door_camera_enabled")

@@ -165,6 +165,10 @@ class Climate(app.App):
                 self.__climate_control_history["before_away"] = self.climate_control
                 self.climate_control = False
                 self.aircon = False
+                for fan in self.__fans.values():
+                    fan.turn_off()
+            else:
+                self.__fans["nursery"].turn_off()
         elif "Away" not in new_scene and "Away" in old_scene:
             if (
                 self.climate_control
