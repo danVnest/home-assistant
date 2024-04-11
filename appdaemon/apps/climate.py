@@ -335,6 +335,8 @@ class Climate(app.App):
                 )
             elif self.aircon:
                 speed = speed_per_step * 1
+            else:
+                speed = 0
             self.log(
                 f"A desired fan speed of '{speed}' was set",
                 level="DEBUG",
