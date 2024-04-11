@@ -322,6 +322,8 @@ class Climate(app.App):
 
     def __configure_fans_optimally(self):
         """Calculate best fan speed for the current temperature and set accordingly."""
+        speed = 0
+        is_hot = False
         if not self.__temperature_monitor.is_within_target_temperatures():
             speed_per_step = float(
                 self.get_state(
@@ -341,17 +343,12 @@ class Climate(app.App):
                 )
             elif self.aircon:
                 speed = speed_per_step * 1
-            else:
-                speed = 0
             self.log(
                 f"A desired fan speed of '{speed}' was set",
                 level="DEBUG",
             )
-            for fan in self.__fans.values():
-                fan.settings_when_on(speed, is_hot)
-        else:
-            for fan in self.__fans.values():
-                fan.turn_off()
+        for fan in self.__fans.values():
+            fan.settings_when_on(speed, is_hot)
 
     def __disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
