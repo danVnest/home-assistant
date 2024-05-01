@@ -430,10 +430,12 @@ class Control(app.App):
     ):
         """Notify if a device's battery is low."""
         del attribute, kwargs
-        if new == "unavailable":
-            self.log(f"'{entity}' is 'unavailable'", level="WARNING")
+        if new in ("unavailable", None):
+            self.log(f"'{entity}' is '{new}'", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"] and (
-            old == "unavailable" or float(old) >= self.args["notify_battery_level"]
+            old == "unavailable"
+            or old is None
+            or float(old) >= self.args["notify_battery_level"]
         ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
