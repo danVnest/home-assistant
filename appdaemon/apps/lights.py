@@ -207,7 +207,6 @@ class Lights(app.App):
         if not self.control.pre_sleep_scene:
             self.lights["bedroom"].turn_off()
         else:
-            self.log("Kept bedroom light on")
             self.control.pre_sleep_scene = False
 
     def __transition_to_morning_scene(self):

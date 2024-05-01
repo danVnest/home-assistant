@@ -288,12 +288,17 @@ class Control(app.App):
             elif self.scene == "Night":
                 self.pre_sleep_scene = True
                 self.scene = "Sleep"
+                self.log("Bedroom light kept on (pre-sleep)")
             elif (
                 self.scene == "Sleep"
                 and self.apps["lights"].lights["bedroom"].brightness != 0
             ):
                 self.apps["lights"].lights["bedroom"].turn_off()
-                self.log("Bedroom light turned off")
+                self.log("Pre-sleep transitioned to Sleep - bedroom light turned off")
+            elif self.scene == "TV":
+                self.apps["lights"].lights["bedroom"].ignore_presence()
+                self.apps["lights"].lights["bedroom"].turn_off()
+                self.log("TV is on - bedroom light turned off but scene remains 'TV'")
             else:
                 self.scene = "Night"
 
