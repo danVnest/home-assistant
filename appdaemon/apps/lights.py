@@ -445,6 +445,9 @@ class Lights(app.App):
     ):
         """Change scene to day or night based on kitchen luminance levels."""
         del entity, attribute, old, kwargs
+        if new == "unavailable":
+            self.log("'Kitchen' luminance is 'unavailable'", level="WARNING")
+            return
         if "Day" in self.control.scene:
             if (
                 float(new) - self.__lighting_luminance()
@@ -513,6 +516,9 @@ class Lights(app.App):
     ):
         """Detect when to change scene from morning to day & set automatic lighting."""
         del entity, attribute, old, kwargs
+        if new == "unavailable":
+            self.log("'Bedroom' luminance is 'unavailable'", level="WARNING")
+            return
         if self.control.scene == "Morning":
             if float(new) >= self.args["morning_max_luminance"]:
                 self.log(
@@ -807,6 +813,7 @@ class Light:
         )
         self.__controller.log(
             f"Lighting adjusted now the '{self.room_name}' is '{presence}'",
+            level="DEBUG",
         )
 
     def __start_transition_towards_occupied(self, completion: float = 0):
