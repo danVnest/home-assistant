@@ -4,3 +4,4 @@ Media:
   pc_ip: !secret pc_ip
   state_change_delay: 3 # number of seconds delay before handling a change in state
   setup_check_delay: 3 # number of seconds delay before checking if play state sensor is set up
+  # log_level: DEBUG

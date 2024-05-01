@@ -18,3 +18,4 @@ Control:
       name: mobile_app_rachel_s_phone
       type: Android
   priority: 1
+  # log_level: DEBUG

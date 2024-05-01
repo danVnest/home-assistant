@@ -1,3 +1,4 @@
 Safety:
   module: safety
   class: Safety
+  # log_level: DEBUG
