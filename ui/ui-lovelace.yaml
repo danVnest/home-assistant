@@ -516,12 +516,6 @@ views:
         title: Warnings & Errors
         type: history-graph
       - entities:
-          - entity: sensor.daniels_phone_battery_level
-            name: Daniel's phone
-          - entity: sensor.rachels_phone_battery_level
-            name: Rachel's phone
-          - entity: sensor.daniels_macbook_battery_level
-            name: Daniel's MacBook
           - entity: sensor.front_door_camera_battery_level
             name: Front door camera
           - entity: sensor.back_door_camera_battery_level
