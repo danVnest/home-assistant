@@ -393,7 +393,7 @@ class Control(app.App):
             else:
                 self.__revert_setting(f"input_datetime.{setting}", old)
         elif "temperature" in setting:
-            self.apps["climate"].reset()
+            self.apps["climate"].validate_target_and_trigger(setting)
         elif "door" in setting:
             self.apps["climate"].set_door_check_delay(float(new))
         elif "fan" in setting:

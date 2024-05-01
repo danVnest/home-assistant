@@ -429,6 +429,42 @@ class Climate(app.App):
             or self.control.apps["presence"].pets_home_alone
         )
 
+    def validate_target_and_trigger(self, target_or_trigger):
+        """Check if a given target/trigger temperature pair is valid, update if not."""
+        sleep = "sleep_" if "sleep" in target_or_trigger else ""
+        if "target" in target_or_trigger:
+            other = (
+                f"input_number.{sleep}"
+                f"{'high' if 'cool' in target_or_trigger else 'low'}"
+                "_temperature_aircon_trigger"
+            )
+            modifier = -1 if "cool" in target_or_trigger else 1
+        else:
+            other = (
+                f"input_number.{sleep}"
+                f"{'cool' if 'high' in target_or_trigger else 'heat'}"
+                "ing_target_temperature"
+            )
+            modifier = -1 if "low" in target_or_trigger else 1
+        if (
+            float(self.get_state(f"input_number.{target_or_trigger}"))
+            - float(self.get_state(other))
+        ) * modifier < 0:
+            valid_other = (
+                float(self.get_state(f"input_number.{target_or_trigger}"))
+            )
+            self.call_service(
+                "input_number/set_value",
+                entity_id=other,
+                value=valid_other,
+            )
+            self.log(
+                f"The '{target_or_trigger}' value is not valid, adjusting "
+                f"the corresponding target/trigger to '{valid_other}º'",
+                level="WARNING",
+            )
+        self.reset()
+
     def terminate(self):
         """Cancel presence callbacks before termination.
 
