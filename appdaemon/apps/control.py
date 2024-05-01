@@ -211,6 +211,13 @@ class Control(app.App):
         else:
             self.scene = "Night"
 
+    def __set_custom_scene(self, is_on: bool):
+        """Set the scene to custom or reset to the most appropriate scene."""
+        if is_on:
+            self.scene = "Custom"
+        else:
+            self.reset_scene()
+
     def __set_timer(self, name: str):
         """Set morning or bed timer as specified by the corresponding settings."""
         self.cancel_timer(self.__timers[name])
@@ -374,10 +381,7 @@ class Control(app.App):
         if setting == "development_mode":
             self.set_production_mode(new == "off")
         elif setting == "custom_lighting":
-            if new == "on":
-                self.scene = "Custom"
-            else:
-                self.reset_scene()
+            self.__set_custom_scene(new == "on")
         elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian(None)
