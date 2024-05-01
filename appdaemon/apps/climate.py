@@ -658,19 +658,15 @@ class TemperatureMonitor:
         )
 
     def is_above_target_temperature(self) -> bool:
-        """Check if temperature is above the target temperature, with a buffer."""
-        return (
-            self.inside_temperature
-            > float(self.controller.get_setting("cooling_target_temperature"))
-            - self.controller.args["target_trigger_buffer"]
+        """Check if temperature is above the target temperature."""
+        return self.inside_temperature > float(
+            self.controller.get_setting("cooling_target_temperature"),
         )
 
     def is_below_target_temperature(self) -> bool:
-        """Check if temperature is below the target temperature, with a buffer."""
-        return (
-            self.inside_temperature
-            < self.controller.get_setting("heating_target_temperature")
-            + self.controller.args["target_trigger_buffer"]
+        """Check if temperature is below the target temperature."""
+        return self.inside_temperature < self.controller.get_setting(
+            "heating_target_temperature",
         )
 
     def is_outside_temperature_nicer(self) -> bool:
@@ -778,7 +774,7 @@ class Aircon:
             )
         target_temperature = self.__controller.get_setting(
             mode + "ing_target_temperature",
-        )
+        ) + self.controller.args["target_buffer"] * (1 if mode == "heat" else -1)
         if (
             self.__controller.get_state(self.__aircon_id, attribute="temperature")
             != target_temperature
