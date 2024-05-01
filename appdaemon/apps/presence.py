@@ -5,6 +5,7 @@ as well as the ability to register callbacks when presence changes.
 
 User defined variables are configued in presence.yaml
 """
+
 import uuid
 from datetime import timedelta
 

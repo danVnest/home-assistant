@@ -8,6 +8,7 @@ current temperatures.
 
 User defined variables are configued in climate.yaml
 """
+
 from __future__ import annotations
 
 from math import ceil
@@ -889,13 +890,13 @@ class Fan:
         self.__adjustment_timer = None
         self.__adjust()
 
-    def settings_when_on(self, speed: int, is_cooling_direction: bool):  # noqa: FBT001
+    def settings_when_on(self, speed: int, is_cooling_direction: bool):
         """Set the desired speed and direction of the fan for when it should be on."""
         self.__speed = speed
         self.__is_cooling_direction = is_cooling_direction
         self.__adjust()
 
-    def ignore_vacancy(self, ignore: bool):  # noqa: FBT001
+    def ignore_vacancy(self, ignore: bool):
         """Configure the fan to operate even when vacant (or not)."""
         self.__is_ignoring_vacancy = ignore
         self.__adjust()
@@ -920,7 +921,7 @@ class Fan:
             )
         )
 
-    def __handle_presence_change(self, is_vacant: bool):  # noqa: FBT001
+    def __handle_presence_change(self, is_vacant: bool):
         """Adjust lighting based on presence in the room."""
         self.__presence = not is_vacant
         self.__adjust()

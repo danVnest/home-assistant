@@ -5,6 +5,7 @@ localised adjustments based on presence callbacks, and luminance monitoring.
 
 User defined variables are configued in lights.yaml
 """
+
 from __future__ import annotations
 
 import datetime
@@ -791,7 +792,7 @@ class Light:
             return self.brightness > 0
         return self.__presence_adjustments["vacant"]["brightness"] > 0
 
-    def __handle_presence_change(self, is_vacant: bool):  # noqa: FBT001
+    def __handle_presence_change(self, is_vacant: bool):
         """Adjust lighting based on presence in the room."""
         self.__transition_timer = None
         presence = "vacant" if is_vacant else "occupied"

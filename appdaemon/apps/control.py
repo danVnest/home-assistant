@@ -4,6 +4,7 @@ Schedules scene changes, reacts to user input, reports errors & low batteries.
 
 User defined variables are configued in control.yaml
 """
+
 import datetime
 import urllib.request
 
@@ -367,7 +368,7 @@ class Control(app.App):
         else:
             self.__handle_simple_settings_change(setting, new, old)
 
-    def __handle_simple_settings_change(self, setting: str, new: str, old: str):  # noqa: PLR0912
+    def __handle_simple_settings_change(self, setting: str, new: str, old: str):
         """Act on changes to settings that can only be made through the UI."""
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "development_mode":

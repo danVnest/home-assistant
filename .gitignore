@@ -4,7 +4,7 @@
 ip_bans.yaml
 secrets.yaml
 
-# Custom components (only manifests, for reference)
+# Custom components (keeping manifests and customisations)
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/tuya_local/devices/hunter_pacific_evolve_ceiling_fan_and_light.yaml
