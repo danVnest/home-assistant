@@ -346,7 +346,7 @@ class Climate(app.App):
                         - self.get_setting("cooling_target_temperature"),
                     ),
                 )
-            elif self.aircon:
+            elif self.aircon and self.scene not in ("Sleep", "Morning"):
                 speed = speed_per_step * 1
             self.log(
                 f"A desired fan speed of '{speed}' was set",
@@ -450,9 +450,7 @@ class Climate(app.App):
             float(self.get_state(f"input_number.{target_or_trigger}"))
             - float(self.get_state(other))
         ) * modifier < 0:
-            valid_other = (
-                float(self.get_state(f"input_number.{target_or_trigger}"))
-            )
+            valid_other = float(self.get_state(f"input_number.{target_or_trigger}"))
             self.call_service(
                 "input_number/set_value",
                 entity_id=other,
