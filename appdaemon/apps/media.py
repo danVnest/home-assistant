@@ -131,8 +131,8 @@ class Media(app.App):
                 self.control.scene = "TV"
         elif self.control.scene == "TV":
             if (
-                self.apps["lights"].lights["bedroom"].brightness == 0
-                and self.apps["lights"].lights["bedroom"].is_ignoring_presence()
+                self.control.apps["lights"].lights["bedroom"].brightness == 0
+                and self.control.apps["lights"].lights["bedroom"].is_ignoring_presence()
             ):
                 self.control.scene = "Sleep"
             else:
