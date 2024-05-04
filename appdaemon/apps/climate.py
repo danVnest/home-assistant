@@ -809,7 +809,7 @@ class Aircon:
             )
         target_temperature = self.__controller.get_setting(
             mode + "ing_target_temperature",
-        ) + self.controller.args["target_buffer"] * (1 if mode == "heat" else -1)
+        ) + self.__controller.args["target_buffer"] * (1 if mode == "heat" else -1)
         if (
             self.__controller.get_state(self.__aircon_id, attribute="temperature")
             != target_temperature
