@@ -464,7 +464,7 @@ class Lights(app.App):
         elif self.control.scene == "Morning":
             self.__handle_kitchen_luminance_change_in_morning(new)
         elif (
-            self.control.scene not in ("Bright", "Sleep")
+            self.control.scene not in ("Bright", "Sleep", "Custom")
             and float(new) - self.__lighting_luminance()
             >= self.args["night_max_luminance"]
         ):
