@@ -1,7 +1,7 @@
 """Coordinates lighting based primarily on scenes.
 
 Includes circadian adjustments to brightness and kelvin settings for ergonomics,
-localised adjustments based on presence callbacks, and luminance monitoring.
+localised adjustments based on presence callbacks, and illuminance monitoring.
 
 User defined variables are configued in lights.yaml
 """
@@ -52,12 +52,12 @@ class Lights(app.App):
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
-            self.__handle_kitchen_luminance_change,
-            "sensor.kitchen_multisensor_luminance",
+            self.__handle_kitchen_illuminance_change,
+            "sensor.kitchen_multisensor_illuminance",
         )
         self.listen_state(
-            self.__handle_bedroom_luminance_change,
-            "sensor.bedroom_multisensor_luminance",
+            self.__handle_bedroom_illuminance_change,
+            "sensor.bedroom_multisensor_illuminance",
         )
 
     def terminate(self):
@@ -423,20 +423,20 @@ class Lights(app.App):
     def is_lighting_sufficient(self, room: str = "kitchen") -> bool:
         """Return if there is enough light to not require further lighting."""
         return (
-            float(self.get_state(f"sensor.{room}_multisensor_luminance"))
-            - self.__lighting_luminance()
-            >= self.args["night_max_luminance"]
+            float(self.get_state(f"sensor.{room}_multisensor_illuminance"))
+            - self.__lighting_illuminance()
+            >= self.args["night_max_illuminance"]
         )
 
-    def __lighting_luminance(self, room: str = "kitchen") -> float:
-        """Return approximate luminance of powered lights affecting light sensors."""
+    def __lighting_illuminance(self, room: str = "kitchen") -> float:
+        """Return approximate illuminance of powered lights affecting light sensors."""
         return (
             self.lights[room].brightness
             / self.args["max_brightness"]
-            * self.args["lighting_luminance_factor"]
+            * self.args["lighting_illuminance_factor"]
         )
 
-    def __handle_kitchen_luminance_change(
+    def __handle_kitchen_illuminance_change(
         self,
         entity: str,
         attribute: str,
@@ -444,15 +444,15 @@ class Lights(app.App):
         new: str,
         kwargs: dict,
     ):
-        """Change scene to day or night based on kitchen luminance levels."""
+        """Change scene to day or night based on kitchen illuminance levels."""
         del entity, attribute, old, kwargs
         if new == "unavailable":
-            self.log("'Kitchen' luminance is 'unavailable'", level="WARNING")
+            self.log("'Kitchen' illuminance is 'unavailable'", level="WARNING")
             return
         if "Day" in self.control.scene:
             if (
-                float(new) - self.__lighting_luminance()
-                <= self.args["day_min_luminance"]
+                float(new) - self.__lighting_illuminance()
+                <= self.args["day_min_illuminance"]
             ):
                 self.log(f"Light levels are low ({new}%) transitioning to night scene")
                 if self.control.apps["media"].is_playing:
@@ -462,26 +462,26 @@ class Lights(app.App):
                 else:
                     self.control.scene = "Away (Night)"
         elif self.control.scene == "Morning":
-            self.__handle_kitchen_luminance_change_in_morning(new)
+            self.__handle_kitchen_illuminance_change_in_morning(new)
         elif (
             self.control.scene not in ("Bright", "Sleep", "Custom")
-            and float(new) - self.__lighting_luminance()
-            >= self.args["night_max_luminance"]
+            and float(new) - self.__lighting_illuminance()
+            >= self.args["night_max_illuminance"]
         ):
             self.log(f"Light levels are high ({new}%), transitioning to day scene")
             self.control.scene = (
                 "Day" if self.control.apps["presence"].anyone_home() else "Away (Day)"
             )
 
-    def __handle_kitchen_luminance_change_in_morning(self, luminance: str):
-        """Change kitchen vacancy lighting based on luminance levels."""
+    def __handle_kitchen_illuminance_change_in_morning(self, illuminance: str):
+        """Change kitchen vacancy lighting based on illuminance levels."""
         if (
-            float(luminance) - self.__lighting_luminance()
-            >= self.args["night_max_luminance"]
+            float(illuminance) - self.__lighting_illuminance()
+            >= self.args["night_max_illuminance"]
         ):
             if self.lights["kitchen"].is_on_when_vacant():
                 self.log(
-                    f"Kitchen light levels are high ({luminance}%) "
+                    f"Kitchen light levels are high ({illuminance}%) "
                     "during morning scene, disabling kitchen vacancy light",
                 )
                 self.lights["kitchen"].set_presence_adjustments(
@@ -492,12 +492,12 @@ class Lights(app.App):
                     vacating_delay=self.control.get_setting("morning_vacating_delay"),
                 )
         elif (
-            float(luminance) - self.__lighting_luminance()
-            <= self.args["day_min_luminance"]
+            float(illuminance) - self.__lighting_illuminance()
+            <= self.args["day_min_illuminance"]
             and not self.lights["kitchen"].is_on_when_vacant()
         ):
             self.log(
-                f"Kitchen light levels are low ({luminance}%) during morning scene, "
+                f"Kitchen light levels are low ({illuminance}%) during morning scene, "
                 "enabling kitchen vacancy light",
             )
             kelvin = self.control.get_setting("morning_kelvin")
@@ -507,7 +507,7 @@ class Lights(app.App):
                 vacating_delay=self.control.get_setting("morning_vacating_delay"),
             )
 
-    def __handle_bedroom_luminance_change(
+    def __handle_bedroom_illuminance_change(
         self,
         entity: str,
         attribute: str,
@@ -518,10 +518,10 @@ class Lights(app.App):
         """Detect when to change scene from morning to day & set automatic lighting."""
         del entity, attribute, old, kwargs
         if new == "unavailable":
-            self.log("'Bedroom' luminance is 'unavailable'", level="WARNING")
+            self.log("'Bedroom' illuminance is 'unavailable'", level="WARNING")
             return
         if self.control.scene == "Morning":
-            if float(new) >= self.args["morning_max_luminance"]:
+            if float(new) >= self.args["morning_max_illuminance"]:
                 self.log(
                     f"Bedroom light levels are high ({new}%), "
                     "transitioning to day scene",
@@ -529,8 +529,8 @@ class Lights(app.App):
                 self.control.scene = "Day"
         elif self.control.scene == "Day":
             if (
-                float(new) - self.__lighting_luminance("bedroom")
-                >= self.args["morning_max_luminance"]
+                float(new) - self.__lighting_illuminance("bedroom")
+                >= self.args["morning_max_illuminance"]
             ):
                 if not self.lights["bedroom"].is_ignoring_presence():
                     self.lights["bedroom"].ignore_presence()

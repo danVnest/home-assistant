@@ -231,7 +231,7 @@ views:
           automatically brighten when someone enters, and dim shortly after they
           leave (depending on scene settings). Automatic bedroom lighting is
           disabled as soon as the ***Sleep*** scene starts, only enabling again
-          when the bedroom **button** is clicked or after luminance levels peak
+          when the bedroom **button** is clicked or after illuminance levels peak
           (i.e. after blinds are first opened in the morning).
 
 
