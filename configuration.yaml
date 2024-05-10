@@ -2,11 +2,14 @@
 counter: !include ./configuration/counters.yaml
 group: !include ./configuration/groups.yaml
 homeassistant: !include ./configuration/customize.yaml
-input_boolean: !include ./configuration/inputs/booleans.yaml
-input_datetime: !include ./configuration/inputs/datetimes.yaml
-input_number: !include ./configuration/inputs/numbers.yaml
-input_select: !include ./configuration/inputs/selects.yaml
-template: !include ./configuration/sensors.yaml
+input_boolean: !include ./configuration/inputs/boolean.yaml
+input_datetime: !include ./configuration/inputs/datetime.yaml
+input_number: !include ./configuration/inputs/number.yaml
+input_select: !include ./configuration/inputs/select.yaml
+sensor: !include ./configuration/sensors/apparent-temperature.yaml
+template:
+  binary_sensor: !include ./configuration/sensors/binary.yaml
+  sensor: !include_dir_merge_list ./configuration/sensors/sensors/
 
 # System
 automation: !include ./configuration/automations.yaml

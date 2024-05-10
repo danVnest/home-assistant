@@ -14,7 +14,6 @@ from __future__ import annotations
 from math import ceil
 
 import app
-from meteocalc import Temp, heat_index
 
 
 class Climate(app.App):
@@ -472,159 +471,31 @@ class Climate(app.App):
             fan.cancel_presence_callback()
 
 
-class Sensor:
-    """Capture temperature and humidity data from generic sensor entities."""
-
-    @staticmethod
-    def detect_type_and_create(sensor_id: str, controller: Climate) -> type[Sensor]:
-        """Detect the sensor type and create an object with the relevant subclass."""
-        if "climate" in sensor_id:
-            sensor_type = ClimateSensor
-        elif "multisensor" in sensor_id:
-            sensor_type = MultiSensor
-        elif "outside" in sensor_id:
-            sensor_type = WeatherSensor
-        else:
-            sensor_type = Sensor
-        return sensor_type(sensor_id, controller)
-
-    def __init__(self, sensor_id: str, monitor: TemperatureMonitor):
-        """Initialise sensor with appropriate variables and a monitor to callback to."""
-        self.sensor_id: str = sensor_id
-        self.monitor: TemperatureMonitor = monitor
-        if "bedroom" in self.sensor_id:
-            self.location = "bedroom"
-        elif "outside" in self.sensor_id:
-            self.location = "outside"
-        else:
-            self.location = "inside"
-        self.listeners = {"temperature": None, "humidity": None}
-
-    def is_enabled(self) -> bool:
-        """Check if the sensor is enabled - matches temperature_listener usage."""
-        return self.listeners["temperature"] is not None
-
-    def disable(self):
-        """Disable the sensor by cancelling its listeners."""
-        for name, listener in self.listeners.items():
-            if listener is not None:
-                self.monitor.controller.cancel_listen_state(listener)
-                self.listeners[name] = None
-
-    def validate_measure(self, value: str) -> float:
-        """Return numerical value of measure, warning if invalid."""
-        try:
-            return float(value)
-        except ValueError:
-            self.monitor.controller.log(
-                f"'{self.sensor_id}' could not get measure",
-                level="WARNING",
-            )
-            return None
-
-
-class ClimateSensor(Sensor):
-    """Capture temperature and humidity data from climate.x entities."""
-
-    def get_measure(self, measure: str) -> float:
-        """Get latest value from the sensor in Home Assistant."""
-        return self.validate_measure(
-            self.monitor.controller.get_state(
-                self.sensor_id,
-                attribute=f"current_{measure}",
-            ),
-        )
-
-    def enable(self):
-        """Initialise sensor values and listen for further updates."""
-        for name, listener in self.listeners.items():
-            if listener is None:
-                self.listeners[name] = self.monitor.controller.listen_state(
-                    self.monitor.handle_sensor_change,
-                    self.sensor_id,
-                    attribute=f"current_{name}",
-                    measure=name,
-                )
-
-
-class MultiSensor(Sensor):
-    """Capture temperature and humidity data from multisensor entities."""
-
-    def get_measure(self, measure: str) -> float:
-        """Get latest value from the sensor in Home Assistant."""
-        return self.validate_measure(
-            self.monitor.controller.get_state(f"{self.sensor_id}_{measure}"),
-        )
-
-    def enable(self):
-        """Initialise sensor values and listen for further updates."""
-        for name, listener in self.listeners.items():
-            if listener is None:
-                self.listeners[name] = self.monitor.controller.listen_state(
-                    self.monitor.handle_sensor_change,
-                    f"{self.sensor_id}_{name}",
-                    measure=name,
-                )
-
-
-class WeatherSensor(Sensor):
-    """Capture temperature data from a WeatherFlow Tempest weather station."""
-
-    def __init__(self, sensor_id: str, monitor: TemperatureMonitor):
-        """Keep only the temperature listener as methods change monitor's attribute."""
-        super().__init__(sensor_id, monitor)
-        del self.listeners["humidity"]
-
-    def enable(self):
-        """Listen for changes in temperature."""
-        if self.listeners["temperature"] is None:
-            self.listeners["temperature"] = self.monitor.controller.listen_state(
-                self.monitor.controller.handle_temperatures,
-                self.sensor_id,
-            )
-
-
 class TemperatureMonitor:
     """Monitor various sensors to provide temperatures in & out, and check triggers."""
 
     def __init__(self, controller: Climate):
         """Initialise with Climate controller and create sensor objects."""
         self.controller = controller
-        self.__inside_temperature = (
-            self.controller.entities.climate.bedroom.attributes.current_temperature
-        )
-        self.__sensors = {
-            sensor_id: Sensor.detect_type_and_create(sensor_id, self)
-            for sensor_id in [
-                "climate.bedroom",
-                "climate.living_room",
-                "climate.dining_room",
-                "sensor.kitchen_multisensor",
-                "sensor.office_multisensor",
-                "sensor.bedroom_multisensor",
-                "sensor.outside_apparent_temperature",
-            ]
-        }
-        self.__last_inside_temperature = None
+        for sensor_id in ("weighted_average_inside", "outside"):
+            self.controller.listen_state(
+                self.handle_sensor_change,
+                f"sensor.{sensor_id}_apparent_temperature",
+            )
 
     @property
     def inside_temperature(self) -> float:
         """Get the calculated inside temperature that's synced with Home Assistant."""
-        return self.__inside_temperature
-
-    @inside_temperature.setter
-    def inside_temperature(self, temperature: float):
-        """Sync the calculated inside temperature to Home Assistant."""
-        self.__inside_temperature = temperature
-        self.controller.set_state(
-            "sensor.inside_apparent_temperature",
-            state=temperature,
+        return float(
+            self.controller.get_state(
+                "sensor.weighted_average_inside_apparent_temperature",
+            )
         )
 
     @property
     def outside_temperature(self) -> float:
         """Get the calculated outside temperature from Home Assistant."""
-        return float(self.controller.entities.sensor.outside_apparent_temperature.state)
+        return float(self.controller.get_state("sensor.outside_apparent_temperature"))
 
     def configure_sensors(self):
         """Get values from appropriate sensors and calculate inside temperature."""
@@ -636,12 +507,6 @@ class TemperatureMonitor:
                 and self.controller.control.apps["presence"].is_kitchen_door_open()
             )
         )
-        for sensor in self.__sensors.values():
-            if enable_bedroom_only and sensor.location == "inside":
-                sensor.disable()
-            else:
-                sensor.enable()
-        self.calculate_inside_temperature()
 
     def handle_sensor_change(
         self,
@@ -654,36 +519,6 @@ class TemperatureMonitor:
         """Calculate inside temperature then get controller to handle if changed."""
         del entity, attribute, old, kwargs
         if new is not None:
-            self.calculate_inside_temperature()
-
-    def calculate_inside_temperature(self):
-        """Use stored sensor values to calculate the apparent temperature inside."""
-        self.__last_inside_temperature = self.inside_temperature
-        temperatures = []
-        humidities = []
-        for sensor in self.__sensors.values():
-            if sensor.is_enabled() and sensor.location != "outside":
-                temperature = sensor.get_measure("temperature")
-                if temperature is not None:
-                    temperatures.append(temperature)
-                humidity = sensor.get_measure("humidity")
-                if humidity is not None:
-                    humidities.append(humidity)
-        self.inside_temperature = round(
-            heat_index(
-                temperature=Temp(
-                    sum(temperatures) / len(temperatures),
-                    "c",
-                ),
-                humidity=sum(humidities) / len(humidities),
-            ).c,
-            1,
-        )
-        if self.__last_inside_temperature != self.inside_temperature:
-            self.controller.log(
-                f"Inside temperature calculated as {self.inside_temperature} degrees",
-                level="DEBUG",
-            )
             self.controller.handle_temperatures()
 
     def is_within_target_temperatures(self) -> bool:
