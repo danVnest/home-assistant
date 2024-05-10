@@ -1,0 +1,13 @@
+scene:
+  name: Scene
+  options:
+    - Custom
+    - Day
+    - Night
+    - Bright
+    - Sleep
+    - Morning
+    - TV
+    - Away (Day)
+    - Away (Night)
+  icon: mdi:home-lightbulb

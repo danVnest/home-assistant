@@ -1,0 +1,215 @@
+cooling_target_temperature:
+  name: Cool down to
+  min: 15
+  max: 25
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-chevron-down
+heating_target_temperature:
+  name: Heat up to
+  min: 15
+  max: 25
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-chevron-up
+sleep_cooling_target_temperature:
+  name: Cool down to
+  min: 15
+  max: 25
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-chevron-down
+sleep_heating_target_temperature:
+  name: Heat up to
+  min: 15
+  max: 25
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-chevron-up
+high_temperature_aircon_trigger:
+  name: Aircon cools once above
+  min: 20
+  max: 40
+  step: 0.5
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-high
+low_temperature_aircon_trigger:
+  name: Aircon heats once below
+  min: 0
+  max: 20
+  step: 0.5
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-low
+sleep_high_temperature_aircon_trigger:
+  name: Aircon cools once above
+  min: 20
+  max: 40
+  step: 0.5
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-high
+sleep_low_temperature_aircon_trigger:
+  name: Aircon heats once below
+  min: 0
+  max: 20
+  step: 0.5
+  unit_of_measurement: °C
+  mode: box
+  icon: mdi:thermometer-low
+aircon_door_check_delay:
+  name: Aircon off if door open
+  min: 1
+  max: 10
+  step: 1
+  unit_of_measurement: min
+  mode: box
+  icon: mdi:timer
+fan_vacating_delay:
+  name: Fan off if room empty
+  min: 1
+  max: 10
+  step: 1
+  unit_of_measurement: min
+  mode: box
+  icon: mdi:timer
+initial_circadian_brightness:
+  name: Initial brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-80
+initial_circadian_kelvin:
+  name: Initial kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant
+final_circadian_brightness:
+  name: Final brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-40
+final_circadian_kelvin:
+  name: Final kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant-outline
+circadian_initial_sunset_offset:
+  name: Initial sunset offset
+  min: -3
+  max: 3
+  step: 0.5
+  mode: box
+  icon: mdi:weather-sunset-down
+night_motion_brightness:
+  name: Motion brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-80
+night_motion_kelvin:
+  name: Motion kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant
+night_transition_period:
+  name: Transition period
+  min: 30
+  max: 300
+  step: 15
+  icon: mdi:timer-cog
+night_vacating_delay:
+  name: Vacating delay
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer
+tv_brightness:
+  name: Brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-40
+tv_motion_brightness:
+  name: Motion brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-80
+tv_kelvin:
+  name: Kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant
+tv_transition_period:
+  name: Transition period
+  min: 30
+  max: 300
+  step: 15
+  icon: mdi:timer-cog
+tv_vacating_delay:
+  name: Vacating delay
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer
+sleep_motion_brightness:
+  name: Motion brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-80
+sleep_motion_kelvin:
+  name: Motion kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant
+sleep_transition_period:
+  name: Transition period
+  min: 30
+  max: 300
+  step: 15
+  icon: mdi:timer-cog
+sleep_vacating_delay:
+  name: Vacating delay
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer
+morning_brightness:
+  name: Brightness
+  min: 25
+  max: 255
+  step: 10
+  icon: mdi:lightbulb-on-80
+morning_kelvin:
+  name: Kelvin
+  min: 2000
+  max: 4500
+  step: 250
+  icon: mdi:lightbulb-variant
+morning_vacating_delay:
+  name: Vacating delay
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer
+office_vacating_delay:
+  name: Office
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer
+bedroom_vacating_delay:
+  name: Bedroom
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer

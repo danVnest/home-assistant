@@ -1,0 +1,15 @@
+custom_lighting:
+  name: Custom lighting
+  icon: mdi:knob
+climate_control:
+  name: Automatic climate control
+  icon: mdi:home-thermometer
+aircon:
+  name: Aircon
+  icon: mdi:air-conditioner
+pets_home_alone:
+  name: Pets home alone
+  icon: mdi:dog-side
+development_mode:
+  name: Development Mode
+  icon: mdi:dev-to

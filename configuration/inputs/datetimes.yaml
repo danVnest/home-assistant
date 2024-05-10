@@ -1,0 +1,12 @@
+morning_time:
+  name: Morning time
+  has_time: true
+  icon: mdi:alarm
+bed_time:
+  name: Bed time
+  has_time: true
+  icon: mdi:bed-clock
+circadian_end_time:
+  name: End time
+  has_time: true
+  icon: mdi:clock-end

@@ -1,0 +1,50 @@
+- binary_sensor:
+    - name: Any climate control
+      state: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
+    - name: Display day card
+      state: "{{ states('input_select.scene') != 'Sleep' and today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now() }}"
+    - name: Kitchen door motion
+      state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
+    - name: Daniels MacBook active at home
+      state: "{{ states('binary_sensor.daniels_macbook_active') == 'on' and states('device_tracker.daniels_macbook') == 'home' }}"
+    - name: TV playing
+      state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
+    - name: Owlet attached
+      state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
+- sensor:
+    - name: Inside apparent temperature
+      state: "{{ None }}"
+      unit_of_measurement: "°C"
+      state_class: measurement
+    - name: Soil sensor vegetable garden sun battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_vegetable_garden_sun')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_vegetable_garden_sun') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor vegetable garden shade battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_vegetable_garden_shade')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_vegetable_garden_shade') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor front deck battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_front_deck')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_front_deck') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor back deck battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_back_deck')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_back_deck') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor carport pots battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_carport_pots')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_carport_pots') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor dining room battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_dining_room')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_dining_room') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor living room battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_living_room')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_living_room') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
+    - name: Soil sensor office battery level
+      state: "{{ max(0, min(100, (100 * (float(states('sensor.soil_battery_voltage_office')) - 1.0) / (1.6 - 1.0)) | round(2))) if has_value('sensor.soil_battery_voltage_office') else 'unavailable' }}"
+      unit_of_measurement: "%"
+      state_class: measurement
