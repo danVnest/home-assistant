@@ -7,7 +7,7 @@
     states('sensor.entryway_apparent_temperature') | float +
     states('sensor.kitchen_apparent_temperature') | float +
     4 * states('sensor.living_room_apparent_temperature') | float +
-    2 * states('sensor.nursery_temperature') | float +
+    2 * states('sensor.nursery_apparent_temperature') | float +
     states('sensor.office_apparent_temperature') | float
     ) / 14) | round(1) }}
   unit_of_measurement: "°C"
@@ -78,6 +78,10 @@
   state_class: measurement
 
 - name: Nursery temperature
-  state: "{{ state_attr('climate.nursery_heater', 'current_temperature') }}"
+  state: >
+    {{ (
+    state_attr('climate.nursery_heater', 'current_temperature') +
+    states('sensor.nursery_sensor_temperature') | float
+    ) / 2 | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement

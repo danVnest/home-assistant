@@ -34,6 +34,11 @@
     - sensor.bedroom_temperature
     - sensor.bedroom_humidity
 - platform: temperature_feels_like
+  name: Nursery apparent temperature
+  source:
+    - sensor.nursery_temperature
+    - sensor.nursery_sensor_humidity
+- platform: temperature_feels_like
   name: Office apparent temperature
   source:
     - sensor.office_sensor_temperature
