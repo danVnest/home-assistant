@@ -520,9 +520,10 @@ class Control(app.App):
     ):
         """Notify when a HACS update is available."""
         del entity, attribute, kwargs
-        if int(new) != 0 and int(new) > int(old):
+        count = len(new)
+        if count != 0 and count > len(old):
             self.notify(
-                f"{new} HACS update{'s' if int(new) != 1 else ''} available",
+                f"{count} HACS update{'s' if count != 1 else ''} available",
                 title="System Update Available",
                 targets="dan",
             )
