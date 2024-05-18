@@ -1,0 +1,36 @@
+- name: Bedroom airspeed
+  state: >
+    {% from 'custom_templates.jinja' import fan_airspeed, aircon_airspeed %}
+    {{ fan_airspeed('bedroom') + aircon_airspeed('bedroom') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Dining room airspeed
+  state: >
+    {% from 'custom_templates.jinja' import aircon_airspeed %}
+    {{ aircon_airspeed('dining_room') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Kitchen airspeed
+  state: >
+    {% from 'custom_templates.jinja' import aircon_airspeed %}
+    {{ aircon_airspeed('living_room') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Living room airspeed
+  state: >
+    {% from 'custom_templates.jinja' import aircon_airspeed %}
+    {{ float(aircon_airspeed('living_room')) / 3 }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Nursery airspeed
+  state: >
+    {% from 'custom_templates.jinja' import fan_airspeed %}
+    {{ fan_airspeed('nursery') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Office airspeed
+  state: >
+    {% from 'custom_templates.jinja' import fan_airspeed %}
+    {{ fan_airspeed('office') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement

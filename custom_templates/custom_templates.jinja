@@ -1,0 +1,45 @@
+{%- macro soil_sensor_battery(location) -%}
+    {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
+    {%- if has_value(entity_id) -%}
+        {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0)) | round(2))) -}}
+    {%- else -%}
+        unavailable
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro fan_airspeed(room) -%}
+    {%- set entity_id = 'fan.' + room -%}
+    {%- set max_airspeed = 10 if state_attr(entity_id, 'direction') == "forward" else 3 -%}
+    {%- if states(entity_id) == "on" -%}
+        {{- max_airspeed * state_attr(entity_id, 'percentage') / 100 -}}
+    {%- else -%}
+        {{- 0 -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro aircon_airspeed(room) -%}
+    {%- set entity_id = 'climate.' + room -%}
+    {%- if states(entity_id) not in ("off", "heat") -%}
+        {%- set max_airspeed = 5 -%}
+        {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
+        {%- if fan_strength == 'quiet' -%}
+            {%- set fan_strength = 0.1 -%}
+        {%- elif fan_strength == 'low' -%}
+            {%- set fan_strength = 0.25 -%}
+        {%- elif fan_strength == 'medium' -%}
+            {%- set fan_strength = 0.5 -%}
+        {%- elif fan_strength == 'medium_high' -%}
+            {%- set fan_strength = 0.65 -%}
+        {%- elif fan_strength == 'high' -%}
+            {%- set fan_strength = 0.8 -%}
+        {%- elif fan_strength == 'strong' -%}
+            {%- set fan_strength = 1 -%}
+        {%- elif fan_strength == 'auto' -%}
+            {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
+            {%- set fan_strength = max(0.1, min(1, temperature_difference / 5)) -%}
+        {%- endif -%}
+        {{- max_airspeed * fan_strength -}}
+    {%- else -%}
+        {{- 0 -}}
+    {%- endif -%}
+{%- endmacro -%}

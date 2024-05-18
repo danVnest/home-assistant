@@ -1,4 +1,5 @@
 # Entities
+# binary_sensor: !include_dir_merge_list ./configuration/binary_sensors/
 counter: !include ./configuration/counters.yaml
 group: !include ./configuration/groups.yaml
 homeassistant: !include ./configuration/customize.yaml
@@ -6,10 +7,10 @@ input_boolean: !include ./configuration/inputs/boolean.yaml
 input_datetime: !include ./configuration/inputs/datetime.yaml
 input_number: !include ./configuration/inputs/number.yaml
 input_select: !include ./configuration/inputs/select.yaml
-sensor: !include ./configuration/sensors/apparent-temperature.yaml
+sensor: !include_dir_merge_list ./configuration/sensors/
 template:
-  binary_sensor: !include ./configuration/sensors/binary.yaml
-  sensor: !include_dir_merge_list ./configuration/sensors/sensors/
+  binary_sensor: !include ./configuration/templates/binary.yaml
+  sensor: !include_dir_merge_list ./configuration/templates/sensors/
 
 # System
 automation: !include ./configuration/automations.yaml
