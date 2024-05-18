@@ -8,6 +8,7 @@ secrets.yaml
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/tuya_local/devices/hunter_pacific_evolve_ceiling_fan_and_light.yaml
+!custom_components/temperature_feels_like/sensor.py
 
 # Logs
 home-assistant.log*
