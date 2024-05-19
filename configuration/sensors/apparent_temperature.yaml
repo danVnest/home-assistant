@@ -1,49 +1,49 @@
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Bathroom apparent temperature
   source:
     - sensor.bathroom_multisensor_temperature
     - sensor.bathroom_multisensor_humidity
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Bedroom apparent temperature
   source:
     - sensor.bedroom_temperature
     - sensor.bedroom_humidity
     - sensor.bedroom_airspeed
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Dining room apparent temperature
   source:
     - sensor.dining_room_temperature
     - sensor.dining_room_humidity
     - sensor.dining_room_airspeed
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Dog bed area apparent temperature
   source:
     - sensor.dog_bed_area_sensor_temperature
     - sensor.dog_bed_area_sensor_humidity
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Entryway apparent temperature
   source:
     - sensor.entryway_multisensor_temperature
     - sensor.entryway_multisensor_humidity
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Kitchen apparent temperature
   source:
     - sensor.kitchen_temperature
     - sensor.kitchen_humidity
     - sensor.kitchen_airspeed
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Living room apparent temperature
   source:
     - sensor.living_room_temperature
     - sensor.living_room_humidity
     - sensor.living_room_airspeed
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Nursery apparent temperature
   source:
     - sensor.nursery_temperature
     - sensor.nursery_sensor_humidity
     - sensor.nursery_airspeed
-- platform: temperature_feels_like
+- platform: apparent_temperature
   name: Office apparent temperature
   source:
     - sensor.office_sensor_temperature
