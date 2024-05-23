@@ -175,7 +175,7 @@ class Control(app.App):
         else:
             self.turn_off("switch.entryway_camera_enabled")
             self.turn_off("switch.back_door_camera_enabled")
-            if new_scene == "TV" and not self.apps["media"].is_on():
+            if new_scene == "TV" and not self.apps["media"].is_on:
                 self.apps["media"].turn_on()
         self.call_service(
             "input_select/select_option",
