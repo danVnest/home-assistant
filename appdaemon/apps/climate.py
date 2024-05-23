@@ -26,6 +26,7 @@ class Climate(app.App):
         self.__temperature_monitor = None
         self.__aircons = {}
         self.__fans = {}
+        self.__heaters = {}
         self.__door_open_listener = None
         self.__climate_control_history = {"overridden": False, "before_away": None}
 
@@ -44,7 +45,16 @@ class Climate(app.App):
             aircon: Aircon(aircon, self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
-        self.__fans = {fan: Fan(fan, self) for fan in ["bedroom", "office", "nursery"]}
+        self.__heaters = {
+            "nursery": Heater("nursery_heater", self, device="climate"),
+            "office": Heater("office_heater", self, device="switch"),
+            "dog_bed_area": Heater(
+                "dog_bed_area_heater",
+                self,
+                device="switch",
+                should_alert=True,
+            ),
+        }
         self.__temperature_monitor = TemperatureMonitor(self)
         self.__temperature_monitor.configure_sensors()
         self.set_door_check_delay(
@@ -169,6 +179,8 @@ class Climate(app.App):
                     fan.turn_off()
             else:
                 self.__fans["nursery"].turn_off()
+            for heater in self.__heaters.values():
+                heater.turn_off()
         elif "Away" not in new_scene and "Away" in old_scene:
             if (
                 self.climate_control
@@ -198,7 +210,8 @@ class Climate(app.App):
         """Control aircon or suggest based on changes in inside temperature."""
         del args  # args required for listen_state callback
         if self.climate_control:
-            self.__configure_fans_optimally()
+            self.__adjust_fans()
+            self.__adjust_heaters()
         if self.aircon is False:
             if self.__temperature_monitor.is_too_hot_or_cold():
                 self.__handle_too_hot_or_cold()
@@ -324,36 +337,85 @@ class Climate(app.App):
         self.log("Aircon is 'off'")
         self.__allow_suggestion()
 
-    def __configure_fans_optimally(self):
+    def __adjust_fans(self):
         """Calculate best fan speed for the current temperature and set accordingly."""
         speed = 0
         is_hot = False
         if not self.__temperature_monitor.is_within_target_temperatures():
-            speed_per_step = float(
-                self.get_state(
-                    "fan.bedroom",
-                    "percentage_step",
-                ),
-            )
-            fan_speed_levels = round(100 / speed_per_step)
+            speed_per_step = 100 / self.args["fan_speed_levels"]
             is_hot = self.__temperature_monitor.is_above_target_temperature()
             if is_hot:
                 speed = speed_per_step * min(
-                    fan_speed_levels,
+                    self.args["fan_speed_levels"],
                     ceil(
                         self.__temperature_monitor.inside_temperature
                         - self.get_setting("cooling_target_temperature"),
                     ),
                 )
-            elif self.aircon and self.scene not in ("Sleep", "Morning"):
+            elif self.aircon and self.control.scene not in ("Sleep", "Morning"):
                 speed = speed_per_step * 1
-            self.log(
-                f"A desired fan speed of '{speed}' was set",
-                level="DEBUG",
-            )
         for fan in self.__fans.values():
             fan.settings_when_on(speed, is_hot)
+        self.log(
+            f"A desired fan speed of '{speed}' was set",
+            level="DEBUG",
+        )
 
+    def __adjust_heaters(self):
+        """Configure best heater settings for the current temperature in each room."""
+        buffer = 2
+        seconds = 300
+        if "Away" in self.control.scene:
+            for room, heater in self.__heaters.items():
+                if heater.is_on():
+                    heater.turn_off()
+                    self.log(
+                        f"Turning off {room} heater in Away scene "
+                        "- should have already been turned off!",
+                        level="WARNING",
+                    )
+                    return
+
+        conditions = {
+            "nursery": (
+                self.control.is_bed_time()
+                or self.control.scene == "Sleep"
+                or not self.control.apps["presence"].rooms["nursery"].is_vacant(seconds)
+            ),
+            "office": (
+                not self.control.apps["presence"]
+                .rooms["office"]
+                .is_vacant(
+                    seconds,
+                )
+            ),
+            "dog_bed_area": (
+                self.control.is_bed_time() or self.control.scene == "Sleep"
+            ),
+        }
+        for room, heater in self.__heaters.items():
+            temperature = float(
+                self.get_state(f"sensor.{room}_apparent_temperature"),
+            )
+            if not heater.is_on():
+                if (
+                    temperature
+                    < self.get_setting(
+                        "heating_target_temperature",
+                    )
+                    - buffer
+                    and conditions[room]
+                ):
+                    heater.turn_on()
+            elif (
+                temperature
+                > self.get_setting(
+                    "heating_target_temperature",
+                )
+                + buffer
+                or not conditions[room]
+            ):
+                heater.turn_off()
     def __disable_climate_control_if_would_trigger_on(self):
         """Disables climate control only if it would immediately trigger aircon on."""
         if self.climate_control and self.__temperature_monitor.is_too_hot_or_cold():
@@ -489,7 +551,7 @@ class TemperatureMonitor:
         return float(
             self.controller.get_state(
                 "sensor.weighted_average_inside_apparent_temperature",
-            )
+            ),
         )
 
     @property
@@ -803,3 +865,47 @@ class Fan:
             ].cancel_callback(
                 self.__presence_callback,
             )
+class Heater:
+    """Control a specific heater."""
+
+    def __init__(
+        self,
+        heater_id: str,
+        controller: Climate,
+        device,
+        should_alert: bool = False,
+    ):
+        """Initialise with a fan's entity_id and the Climate controller."""
+        self.__heater_id = f"{device}.{heater_id}_heater"
+        self.__room = heater_id
+        self.__controller = controller
+        self.__device = device
+        self.__should_alert = should_alert
+
+    def is_on(self) -> bool:
+        """Check if the heater is on or not."""
+        return self.__controller.get_state(self.__heater_id) == "on"
+
+    def turn_on(self):
+        """Turn the heater on if required."""
+        if not self.is_on():
+            self.__controller.call_service(
+                f"{self.__device}/turn_on",
+                entity_id=self.__heater_id,
+            )
+            if self.__should_alert:
+                self.__controller.notify(
+                    f"The {self.__room.replace('_', ' ')} heater "
+                    "is now on - check surroundings are clear",
+                    title="Climate Control",
+                    targets="anyone_home_else_all",
+                )
+
+    def turn_off(self):
+        """Turn the heater off if required."""
+        if self.is_on():
+            self.__controller.call_service(
+                f"{self.__device}/turn_off",
+                entity_id=self.__heater_id,
+            )
+
