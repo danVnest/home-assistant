@@ -24,7 +24,7 @@ views:
           state_color: true
         conditions:
           - entity: switch.washer
-            state: "on"
+            state: 'on'
         type: conditional
       - card:
           entities:
@@ -35,7 +35,7 @@ views:
           state_color: true
         conditions:
           - entity: switch.dryer
-            state: "on"
+            state: 'on'
         type: conditional
       - card:
           entities:
@@ -49,13 +49,13 @@ views:
           state_color: true
         conditions:
           - entity: input_boolean.climate_control
-            state: "on"
+            state: 'on'
           - entity: binary_sensor.display_day_card
-            state: "on"
+            state: 'on'
         type: conditional
       - card:
           entities:
-            - entity: sensor.inside_apparent_temperature
+            - entity: sensor.weighted_average_inside_apparent_temperature
               name: Inside
               icon: mdi:home-thermometer
             - entity: sensor.outside_apparent_temperature
@@ -86,6 +86,8 @@ views:
                 name: Office
               - entity: light.nursery
                 name: Nursery
+              - entity: light.bathroom
+                name: Bathroom
             show_icon: true
             show_name: true
             show_state: true
@@ -100,12 +102,14 @@ views:
           - content: >-
               Enabling **custom lighting** will prevent automatic adjustments.
               This is most useful at night when you want to override automatic
-              circadian rhythm dimming and colour adjustments.
+              circadian rhythm dimming and changes based on presence.
             type: markdown
         type: vertical-stack
       - cards:
           - type: glance
             entities:
+              - entity: group.all_aircon
+                name: All
               - entity: climate.living_room
               - entity: climate.dining_room
               - entity: climate.bedroom
@@ -113,20 +117,38 @@ views:
             show_icon: true
             show_state: true
             state_color: true
-            title: Manual Aircon Control
+            title: Aircon
           - type: glance
             entities:
+              - entity: group.all_fans
+                name: All
               - entity: fan.nursery
+                name: Nursery
               - entity: fan.office
+                name: Office
               - entity: fan.bedroom
+                name: Bedroom
             show_name: true
             show_icon: true
             show_state: true
             state_color: true
-            title: Manual Fan Control
+            title: Fans
+          - type: glance
+            entities:
+              - entity: group.all_heaters
+                name: All
+              - entity: climate.nursery_heater
+                name: Nursery
+              - entity: switch.office_heater
+                name: Office
+                icon: mdi:radiator
+              - entity: switch.dog_bed_area_heater
+                name: Dog bed area
+                icon: mdi:radiator
+            title: Heaters
           - content: >-
-              To manually control the individual aircon and fan units above,
-              make sure to disable automatic climate control beforehand.
+              To manually control the individual aircon, fan, or heater units
+              above, you should disable automatic climate control beforehand.
             type: markdown
         type: vertical-stack
       - card:
@@ -141,10 +163,10 @@ views:
           state_color: true
         conditions:
           - entity: input_boolean.climate_control
-            state: "on"
+            state: 'on'
           - condition: state
             entity: binary_sensor.display_day_card
-            state: "off"
+            state: 'off'
         type: conditional
       - type: entities
         entities:
@@ -268,7 +290,7 @@ views:
     icon: mdi:cctv
     badges: []
     cards:
-      - aspect_ratio: "2"
+      - aspect_ratio: '2'
         dark_mode: true
         default_zoom: 12
         auto_fit: true
@@ -370,11 +392,15 @@ views:
       - type: history-graph
         entities:
           - entity: binary_sensor.entryway_multisensor_motion
-          - entity: binary_sensor.kitchen_multisensor_motion
-          - entity: binary_sensor.bedroom_multisensor_motion
-          - entity: binary_sensor.office_multisensor_motion
+          - entity: binary_sensor.bathroom_multisensor_motion
+          - entity: binary_sensor.hall_multisensor_motion
+          - entity: binary_sensor.dining_room_multisensor_motion
           - entity: binary_sensor.kitchen_door_motion
           - entity: lock.door_lock
+          - entity: binary_sensor.bedroom_presence_sensor_occupancy
+          - entity: binary_sensor.kitchen_presence_sensor_occupancy
+          - entity: binary_sensor.nursery_presence_sensor_occupancy
+          - entity: binary_sensor.office_presence_sensor_occupancy
         title: Motion
         hours_to_show: 24
   - path: light-settings
@@ -481,7 +507,7 @@ views:
     badges:
       - type: entity-filter
         state_filter:
-          - "on"
+          - 'on'
         entities:
           - entity: update.home_assistant_core_update
             name: Core
@@ -491,7 +517,7 @@ views:
             name: Operating System
       - type: entity-filter
         state_filter:
-          - operator: ">"
+          - operator: '>'
             value: 0
         entities:
           - entity: sensor.hacs
@@ -568,17 +594,28 @@ views:
         logarithmic_scale: false
         hours_to_show: 240
       - entities:
-          - entity: sensor.inside_apparent_temperature
-            name: Inside (feels like)
+          - entity: sensor.weighted_average_inside_apparent_temperature
+            name: Inside
           - entity: sensor.outside_apparent_temperature
-            name: Outside (feels like)
-          - entity: sensor.living_room_temperature_feels_like
-            name: Living room
-          - entity: sensor.dining_room_temperature_feels_like
+            name: Outside
+          - entity: sensor.bathroom_apparent_temperature
+            name: Bathroom
+          - entity: sensor.bedroom_apparent_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_apparent_temperature
             name: Dining room
-          - entity: sensor.office_multisensor_temperature
+          - entity: sensor.dog_bed_area_apparent_temperature
+            name: Dog bed area
+          - entity: sensor.entryway_apparent_temperature
+            name: Entryway
+          - entity: sensor.kitchen_apparent_temperature
+            name: Kitchen
+          - entity: sensor.living_room_apparent_temperature
+            name: Living room
+          - entity: sensor.nursery_apparent_temperature
+            name: Nursery
+          - entity: sensor.office_apparent_temperature
             name: Office
-          - entity: climate.bedroom
         refresh_interval: 0
         title: Temperatures
         type: history-graph
@@ -608,3 +645,73 @@ views:
         logarithmic_scale: false
       - entity: media_player.tv
         type: media-control
+      - type: entities
+        entities:
+          - entity: sensor.weighted_average_inside_apparent_temperature
+            name: Inside
+          - entity: sensor.outside_apparent_temperature
+            name: Outside
+          - entity: sensor.bathroom_apparent_temperature
+            name: Bathroom
+          - entity: sensor.bedroom_apparent_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_apparent_temperature
+            name: Dining room
+          - entity: sensor.dog_bed_area_apparent_temperature
+            name: Dog bed area
+          - entity: sensor.entryway_apparent_temperature
+            name: Entryway
+          - entity: sensor.kitchen_apparent_temperature
+            name: Kitchen
+          - entity: sensor.living_room_apparent_temperature
+            name: Living room
+          - entity: sensor.nursery_apparent_temperature
+            name: Nursery
+          - entity: sensor.office_apparent_temperature
+            name: Office
+        title: Current Apparent Temperatures
+      - type: entities
+        entities:
+          - entity: sensor.bathroom_multisensor_temperature
+            name: Bathroom
+          - entity: sensor.bedroom_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_temperature
+            name: Dining room
+          - entity: sensor.dog_bed_area_sensor_temperature
+            name: Dog bed area
+          - entity: sensor.entryway_multisensor_temperature
+            name: Entryway
+          - entity: sensor.kitchen_temperature
+            name: Kitchen
+          - entity: sensor.living_room_temperature
+            name: Living room
+          - entity: sensor.nursery_temperature
+            name: Nursery
+          - entity: sensor.office_sensor_temperature
+            name: Office
+        title: Current Temperatures
+      - entities:
+          - entity: sensor.bathroom_multisensor_temperature
+            name: Bathroom
+          - entity: sensor.bedroom_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_temperature
+            name: Dining room
+          - entity: sensor.dog_bed_area_sensor_temperature
+            name: Dog bed area
+          - entity: sensor.entryway_multisensor_temperature
+            name: Entryway
+          - entity: sensor.kitchen_temperature
+            name: Kitchen
+          - entity: sensor.living_room_temperature
+            name: Living room
+          - entity: sensor.nursery_temperature
+            name: Nursery
+          - entity: sensor.office_sensor_temperature
+            name: Office
+        refresh_interval: 0
+        title: Temperatures
+        type: history-graph
+        hours_to_show: 12
+        logarithmic_scale: false

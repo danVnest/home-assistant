@@ -1,19 +1,19 @@
 entryway_lights:
-  name: Entryway Lights
+  name: Entryway lights
   entities:
     - light.entryway
     - light.stairway
   icon: mdi:lightbulb-multiple
 
 kitchen_lights:
-  name: Kitchen Lights
+  name: Kitchen lights
   entities:
     - light.kitchen
     - light.kitchen_strip
   icon: mdi:lightbulb-multiple
 
 tv_lights:
-  name: TV Lights
+  name: TV lights
   entities:
     - light.tv_left
     - light.tv_middle
@@ -21,14 +21,14 @@ tv_lights:
   icon: mdi:lightbulb-group
 
 dining_lights:
-  name: Dining Lights
+  name: Dining lights
   entities:
     - light.dining_left
     - light.dining_right
   icon: mdi:lightbulb-multiple
 
 all_lights:
-  name: All Lights
+  name: All lights
   entities:
     - light.entryway
     - light.stairway
@@ -40,7 +40,29 @@ all_lights:
     - light.dining_left
     - light.dining_right
     - light.hall
+    - light.bathroom
     - light.bedroom
     - light.office
     - light.nursery
   icon: mdi:lightbulb-group
+
+all_aircon:
+  name: All aircon units
+  entities:
+  - climate.living_room
+  - climate.dining_room
+  - climate.bedroom
+  
+
+all_fans:
+  name: All fans
+  entities:
+  - fan.bedroom
+  - fan.nursery
+  - fan.office
+
+all_heaters:
+  name: All heaters
+  entities:
+  - climate.nursery_heater
+  - switch.office_heater
