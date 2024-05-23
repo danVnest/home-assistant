@@ -9,7 +9,7 @@
     4 * states('sensor.living_room_apparent_temperature') | float +
     2 * states('sensor.nursery_apparent_temperature') | float +
     states('sensor.office_apparent_temperature') | float
-    ) / 14) | round(1) }}
+    ) / 14 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 
@@ -24,64 +24,64 @@
 
 - name: Dining room temperature
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.dining_room', 'current_temperature') +
     states('sensor.dining_room_multisensor_temperature') | float
-    ) / 2 | round(1) }}
+    ) / 2 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Dining room humidity
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.dining_room', 'current_humidity') +
     states('sensor.dining_room_multisensor_humidity') | float
-    ) / 2 | round(1) }}
+    ) / 2 ) | round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
 - name: Kitchen temperature
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.living_room', 'current_temperature') +
     states('sensor.soil_sensor_hub_indoor_temperature') | float
-    ) / 2 | round(1) }}
+    ) / 2 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Kitchen humidity
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.living_room', 'current_humidity') +
     states('sensor.soil_sensor_hub_indoor_humidity') | float
-    ) / 2 | round(1) }}
+    ) / 2 ) | round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
 - name: Living room temperature
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.dining_room', 'current_temperature') +
     state_attr('climate.living_room', 'current_temperature') +
     states('sensor.hall_multisensor_temperature') | float +
-    states('sensor.dog_bed_area_sensor_temperature')
-    ) / 4 | round(1) }}
+    states('sensor.dog_bed_area_sensor_temperature') | float
+    ) / 4 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Living room humidity
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.dining_room', 'current_humidity') +
     state_attr('climate.living_room', 'current_humidity') +
     states('sensor.hall_multisensor_humidity') | float +
-    states('sensor.dog_bed_area_sensor_humidity')
-    ) / 4 | round(1) }}
+    states('sensor.dog_bed_area_sensor_humidity') | float
+    ) / 4 ) | round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
 - name: Nursery temperature
   state: >
-    {{ (
+    {{ ((
     state_attr('climate.nursery_heater', 'current_temperature') +
     states('sensor.nursery_sensor_temperature') | float
-    ) / 2 | round(1) }}
+    ) / 2 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
