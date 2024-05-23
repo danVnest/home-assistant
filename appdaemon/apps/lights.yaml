@@ -3,8 +3,9 @@ Lights:
   class: Lights
   max_brightness: 255 # maximum brightness value that lighting can reach
   min_brightness: 25 # minimum brightness possible (0 turns off the light, anything higher defaults to minimum)
-  morning_max_illuminance: 60 # maximum ambient luminance to trigger transition to day scene
-  day_min_illuminance: 40 # minimum ambient luminance to trigger transition to night scenes
-  night_max_illuminance: 70 # maximum ambient luminance to trigger transition to day scenes
+  night_to_day_delay: 600 # maximum ambient illuminance to trigger transition to day scene
+  morning_max_illuminance: 60 # maximum ambient illuminance to trigger transition to day scene
+  day_min_illuminance: 40 # minimum ambient illuminance to trigger transition to night scenes
+  night_max_illuminance: 70 # maximum ambient illuminance to trigger transition to day scenes
   lighting_illuminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)
   # log_level: DEBUG

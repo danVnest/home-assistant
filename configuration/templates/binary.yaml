@@ -10,3 +10,5 @@
   state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
 - name: Owlet attached
   state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
+- name: Dark outside
+  state: "{{ states('sensor.weather_station_illuminance') | float < 5000 or states('sun.sun') == 'below_horizon' }}"

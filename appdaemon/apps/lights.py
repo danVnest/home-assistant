@@ -52,12 +52,23 @@ class Lights(app.App):
         self.redate_circadian(None)
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
+            self.__handle_dark_outside,
+            "binary_sensor.dark_outside",
+            new="on",
+        )
+        self.listen_state(
+            self.__handle_bright_outside,
+            "binary_sensor.dark_outside",
+            new="off",
+            duration=self.args["night_to_day_delay"],
+        )
+        self.listen_state(
             self.__handle_kitchen_illuminance_change,
-            "sensor.kitchen_multisensor_illuminance",
+            "sensor.kitchen_presence_sensor_illuminance",
         )
         self.listen_state(
             self.__handle_bedroom_illuminance_change,
-            "sensor.bedroom_multisensor_illuminance",
+            "sensor.bedroom_presence_sensor_illuminance",
         )
 
     def terminate(self):
@@ -423,7 +434,7 @@ class Lights(app.App):
     def is_lighting_sufficient(self, room: str = "kitchen") -> bool:
         """Return if there is enough light to not require further lighting."""
         return (
-            float(self.get_state(f"sensor.{room}_multisensor_illuminance"))
+            float(self.get_state(f"sensor.{room}_presence_sensor_illuminance"))
             - self.__lighting_illuminance()
             >= self.args["night_max_illuminance"]
         )
@@ -436,6 +447,41 @@ class Lights(app.App):
             * self.args["lighting_illuminance_factor"]
         )
 
+    def __handle_dark_outside(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
+        """Change scene appropriately for low outside light levels."""
+        del entity, attribute, old, new, kwargs
+        if "Day" in self.control.scene:
+            self.log("It is now dark outside - changing scene accordingly")
+            if self.control.apps["media"].is_playing:
+                self.control.scene = "TV"
+            elif self.control.apps["presence"].anyone_home():
+                self.control.scene = "Night"
+            else:
+                self.control.scene = "Away (Night)"
+
+    def __handle_bright_outside(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        kwargs: dict,
+    ):
+        """Change scene appropriately for high outside light levels."""
+        del entity, attribute, old, new, kwargs
+        if self.control.scene not in ("Bright", "Sleep", "Custom"):
+            self.log("It is now bright outside - changing scene accordingly")
+            self.control.scene = (
+                "Day" if self.control.apps["presence"].anyone_home() else "Away (Day)"
+            )
+
     def __handle_kitchen_illuminance_change(
         self,
         entity: str,
@@ -444,44 +490,20 @@ class Lights(app.App):
         new: str,
         kwargs: dict,
     ):
-        """Change scene to day or night based on kitchen illuminance levels."""
+        """Change kitchen vacancy lighting based on illuminance levels."""
         del entity, attribute, old, kwargs
         if new == "unavailable":
             self.log("'Kitchen' illuminance is 'unavailable'", level="WARNING")
             return
-        if "Day" in self.control.scene:
-            if (
-                float(new) - self.__lighting_illuminance()
-                <= self.args["day_min_illuminance"]
-            ):
-                self.log(f"Light levels are low ({new}%) transitioning to night scene")
-                if self.control.apps["media"].is_playing:
-                    self.control.scene = "TV"
-                elif self.control.apps["presence"].anyone_home():
-                    self.control.scene = "Night"
-                else:
-                    self.control.scene = "Away (Night)"
-        elif self.control.scene == "Morning":
-            self.__handle_kitchen_illuminance_change_in_morning(new)
-        elif (
-            self.control.scene not in ("Bright", "Sleep", "Custom")
-            and float(new) - self.__lighting_illuminance()
-            >= self.args["night_max_illuminance"]
-        ):
-            self.log(f"Light levels are high ({new}%), transitioning to day scene")
-            self.control.scene = (
-                "Day" if self.control.apps["presence"].anyone_home() else "Away (Day)"
-            )
-
-    def __handle_kitchen_illuminance_change_in_morning(self, illuminance: str):
-        """Change kitchen vacancy lighting based on illuminance levels."""
+        if self.control.scene != "Morning":
+            return
         if (
-            float(illuminance) - self.__lighting_illuminance()
+            float(new) - self.__lighting_illuminance()
             >= self.args["night_max_illuminance"]
         ):
             if self.lights["kitchen"].is_on_when_vacant():
                 self.log(
-                    f"Kitchen light levels are high ({illuminance}%) "
+                    f"Kitchen light levels are high ({new}lx) "
                     "during morning scene, disabling kitchen vacancy light",
                 )
                 self.lights["kitchen"].set_presence_adjustments(
@@ -492,12 +514,12 @@ class Lights(app.App):
                     vacating_delay=self.control.get_setting("morning_vacating_delay"),
                 )
         elif (
-            float(illuminance) - self.__lighting_illuminance()
+            float(new) - self.__lighting_illuminance()
             <= self.args["day_min_illuminance"]
             and not self.lights["kitchen"].is_on_when_vacant()
         ):
             self.log(
-                f"Kitchen light levels are low ({illuminance}%) during morning scene, "
+                f"Kitchen light levels are low ({new}lx) during morning scene, "
                 "enabling kitchen vacancy light",
             )
             kelvin = self.control.get_setting("morning_kelvin")
@@ -523,7 +545,7 @@ class Lights(app.App):
         if self.control.scene == "Morning":
             if float(new) >= self.args["morning_max_illuminance"]:
                 self.log(
-                    f"Bedroom light levels are high ({new}%), "
+                    f"Bedroom light levels are high ({new}lx), "
                     "transitioning to day scene",
                 )
                 self.control.scene = "Day"
@@ -535,7 +557,7 @@ class Lights(app.App):
                 if not self.lights["bedroom"].is_ignoring_presence():
                     self.lights["bedroom"].ignore_presence()
                     self.log(
-                        f"Bedroom light levels are high ({new}%), "
+                        f"Bedroom light levels are high ({new}lx), "
                         "automatic lighting disabled",
                     )
             elif self.lights["bedroom"].is_ignoring_presence():
@@ -549,7 +571,7 @@ class Lights(app.App):
                     ),
                 )
                 self.log(
-                    f"Bedroom light levels are low ({new}%), "
+                    f"Bedroom light levels are low ({new}lx), "
                     "automatic lighting enabled",
                 )
 
