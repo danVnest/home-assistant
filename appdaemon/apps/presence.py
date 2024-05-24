@@ -31,10 +31,16 @@ class Presence(app.App):
         self.__pets_home_alone = (
             self.entities.input_boolean.pets_home_alone.state == "on"
         )
-        for multisensor_room in ["entryway", "kitchen", "bedroom", "office"]:
+        for multisensor_room in ["entryway", "dining_room", "hall", "bathroom"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
                 f"{multisensor_room}_multisensor_motion",
+                self,
+            )
+        for presence_sensor_room in ["kitchen", "bedroom", "nursery", "office"]:
+            self.rooms[presence_sensor_room] = Room(
+                presence_sensor_room,
+                f"{presence_sensor_room}_presence_sensor_occupancy",
                 self,
             )
         for camera_room in [
@@ -65,7 +71,7 @@ class Presence(app.App):
         self.rooms["kitchen"].add_sensor("kitchen_door_motion")
         self.rooms["living_room"].add_sensor("tv_playing")
         self.rooms["office"].add_sensor("daniels_macbook_active_at_home")
-        self.rooms["nursery"] = Room("nursery", "owlet_attached", self)
+        self.rooms["nursery"].add_sensor("owlet_attached")
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
@@ -289,6 +295,7 @@ class Room:
             return
         self.__controller.log(
             f"The '{self.__room_id}' is now '{'vacant' if is_vacant else 'occupied'}'",
+            level="DEBUG",
         )
         for handle, callback in list(self.__callbacks.items()):
             self.__controller.cancel_timer(callback["timer_handle"])
