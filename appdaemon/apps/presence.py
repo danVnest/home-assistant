@@ -130,9 +130,7 @@ class Presence(app.App):
                 != "home"
             ):
                 away_scene = (
-                    "Day"
-                    if self.control.apps["lights"].is_lighting_sufficient()
-                    else "Night"
+                    "Night" if self.get_state("binary_sensor.dark_outside") else "Day"
                 )
                 self.control.scene = f"Away ({away_scene})"
 
