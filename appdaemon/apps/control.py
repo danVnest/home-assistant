@@ -191,10 +191,10 @@ class Control(app.App):
         elif not self.apps["presence"].anyone_home():
             self.scene = (
                 "Away (Night)"
-                if self.get_state("binary_sensor.dark_outside")
+                if self.get_state("binary_sensor.dark_outside") == "on"
                 else "Away (Day)"
             )
-        elif not self.get_state("binary_sensor.dark_outside"):
+        elif self.get_state("binary_sensor.dark_outside") == "off":
             self.scene = "Day"
         elif self.apps["media"].is_playing:
             self.scene = "TV"
@@ -282,7 +282,7 @@ class Control(app.App):
         self.log(f"Button in '{room}' clicked")
         if room == "kitchen":
             if self.scene == "Night":
-                if not self.get_state("binary_sensor.dark_outside"):
+                if self.get_state("binary_sensor.dark_outside") == "off":
                     self.scene = "Day"
                 elif self.apps["media"].is_playing:
                     self.scene = "TV"

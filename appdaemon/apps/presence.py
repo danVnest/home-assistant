@@ -135,10 +135,11 @@ class Presence(app.App):
                 )
                 != "home"
             ):
-                away_scene = (
-                    "Night" if self.get_state("binary_sensor.dark_outside") else "Day"
+                self.control.scene = (
+                    "Away (Night)"
+                    if self.get_state("binary_sensor.dark_outside") == "on"
+                    else "Away (Day)"
                 )
-                self.control.scene = f"Away ({away_scene})"
 
     def __handle_new_device(self, event_name: str, data: dict, kwargs: dict):
         """If not home and someone adds a device, notify."""
