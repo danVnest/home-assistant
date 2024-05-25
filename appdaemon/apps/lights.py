@@ -495,7 +495,7 @@ class Lights(app.App):
     ):
         """Change scene appropriately for high outside light levels."""
         del entity, attribute, old, new, kwargs
-        if self.control.scene not in ("Bright", "Sleep", "Custom"):
+        if self.control.scene not in ("Custom", "Bright", "Sleep", "Morning"):
             self.log("It is now bright outside - changing scene accordingly")
             self.control.scene = (
                 "Day" if self.control.apps["presence"].anyone_home() else "Away (Day)"
