@@ -28,7 +28,7 @@ class App(hass.Hass):
 
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
-        targets = kwargs["targets"] if "targets" in kwargs else "all"
+        targets = kwargs.get("targets", "all")
         if targets == "anyone_home_else_all":
             if self.control.apps["presence"].anyone_home():
                 targets = "anyone_home"
