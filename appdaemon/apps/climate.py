@@ -36,15 +36,14 @@ class Climate(app.App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.__climate_control = (
-            self.entities.input_boolean.climate_control.state == "on"
-        )
+        self.__climate_control = self.entities.group.climate_control.state == "on"
         self.__climate_control_history["before_away"] = self.climate_control
         self.__aircon = self.entities.input_boolean.aircon.state == "on"
         self.__aircons = {
             aircon: Aircon(aircon, self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
+        self.__fans = {fan: Fan(fan, self) for fan in ("bedroom", "office", "nursery")}
         self.__heaters = {
             "nursery": Heater("nursery_heater", self, device="climate"),
             "office": Heater("office_heater", self, device="switch"),
@@ -90,7 +89,7 @@ class Climate(app.App):
                 (
                     self.datetime(aware=True)
                     - self.convert_utc(
-                        self.entities.input_boolean.climate_control.last_changed,
+                        self.entities.group.climate_control.last_changed,
                     )
                 ).total_seconds()
             )
@@ -104,8 +103,8 @@ class Climate(app.App):
             self.control.apps["presence"].pets_home_alone,
         )
         self.call_service(
-            f"input_boolean/turn_{'on' if state else 'off'}",
-            entity_id="input_boolean.climate_control",
+            f"homeassistant/turn_{'on' if state else 'off'}",
+            entity_id="group.climate_control",
         )
 
     @property

@@ -1,5 +1,5 @@
 - name: Any climate control
-  state: "{{ states('input_boolean.aircon') == 'on' or states('input_boolean.climate_control') == 'on' }}"
+  state: "{{ states('input_boolean.aircon') == 'on' or states('group.climate_control') == 'on' }}"
 - name: Display day card
   state: "{{ states('input_select.scene') != 'Sleep' and today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now() }}"
 - name: Kitchen door motion

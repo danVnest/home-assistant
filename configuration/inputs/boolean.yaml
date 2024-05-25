@@ -1,9 +1,6 @@
 custom_lighting:
   name: Custom lighting
   icon: mdi:knob
-climate_control:
-  name: Automatic climate control
-  icon: mdi:home-thermometer
 aircon:
   name: Aircon
   icon: mdi:air-conditioner
@@ -13,3 +10,28 @@ pets_home_alone:
 development_mode:
   name: Development Mode
   icon: mdi:dev-to
+
+climate_control_living_room_aircon:
+  name: Living room aircon
+  icon: mdi:air-conditioner
+climate_control_dining_room_aircon:
+  name: Dining room aircon
+  icon: mdi:air-conditioner
+climate_control_bedroom_aircon:
+  name: Bedroom aircon
+  icon: mdi:air-conditioner
+climate_control_nursery_fan:
+  name: Nursery fan
+  icon: mdi:fan
+climate_control_office_fan:
+  name: Office fan
+  icon: mdi:fan
+climate_control_bedroom_fan:
+  name: Bedroom fan
+  icon: mdi:fan
+climate_control_nursery_heater:
+  name: Nursery heater
+  icon: mdi:radiator
+climate_control_office_heater:
+  name: Office heater
+  icon: mdi:radiator

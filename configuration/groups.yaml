@@ -66,3 +66,16 @@ all_heaters:
   entities:
   - climate.nursery_heater
   - switch.office_heater
+
+climate_control:
+  name: Climate control
+  entities:
+  - input_boolean.climate_control_living_room_aircon
+  - input_boolean.climate_control_dining_room_aircon
+  - input_boolean.climate_control_bedroom_aircon
+  - input_boolean.climate_control_nursery_fan
+  - input_boolean.climate_control_office_fan
+  - input_boolean.climate_control_bedroom_fan
+  - input_boolean.climate_control_nursery_heater
+  - input_boolean.climate_control_office_heater
+  icon: mdi:home-thermometer

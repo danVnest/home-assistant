@@ -7,8 +7,7 @@ views:
     cards:
       - entities:
           - entity: input_select.scene
-          - entity: input_boolean.climate_control
-          - entity: input_boolean.aircon
+          - entity: group.climate_control
           - entity: input_boolean.pets_home_alone
           - entity: lock.door_lock
         show_header_toggle: false
@@ -48,7 +47,7 @@ views:
           type: entities
           state_color: true
         conditions:
-          - entity: input_boolean.climate_control
+          - entity: group.climate_control
             state: 'on'
           - entity: binary_sensor.display_day_card
             state: 'on'
@@ -106,19 +105,22 @@ views:
             type: markdown
         type: vertical-stack
       - cards:
-          - type: glance
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
             entities:
               - entity: group.all_aircon
                 name: All
               - entity: climate.living_room
               - entity: climate.dining_room
               - entity: climate.bedroom
-            show_name: true
-            show_icon: true
-            show_state: true
             state_color: true
             title: Aircon
-          - type: glance
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
             entities:
               - entity: group.all_fans
                 name: All
@@ -128,12 +130,12 @@ views:
                 name: Office
               - entity: fan.bedroom
                 name: Bedroom
-            show_name: true
-            show_icon: true
-            show_state: true
             state_color: true
             title: Fans
-          - type: glance
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
             entities:
               - entity: group.all_heaters
                 name: All
@@ -147,8 +149,9 @@ views:
                 icon: mdi:radiator
             title: Heaters
           - content: >-
-              To manually control the individual aircon, fan, or heater units
-              above, you should disable automatic climate control beforehand.
+              Note that manually controlling the aircon, fans, or heaters above
+              may disable climate control for those devices. You can re-enable
+              climate control by selecting **climate control** above.
             type: markdown
         type: vertical-stack
       - card:
@@ -162,7 +165,7 @@ views:
           type: entities
           state_color: true
         conditions:
-          - entity: input_boolean.climate_control
+          - entity: group.climate_control
             state: 'on'
           - condition: state
             entity: binary_sensor.display_day_card
@@ -253,8 +256,8 @@ views:
           automatically brighten when someone enters, and dim shortly after they
           leave (depending on scene settings). Automatic bedroom lighting is
           disabled as soon as the ***Sleep*** scene starts, only enabling again
-          when the bedroom **button** is clicked or after illuminance levels peak
-          (i.e. after blinds are first opened in the morning).
+          when the bedroom **button** is clicked or after illuminance levels
+          peak (i.e. after blinds are first opened in the morning).
 
 
           In order to use Siri, you will need to add the following Siri
@@ -524,7 +527,7 @@ views:
     cards:
       - entities:
           - entity: input_select.scene
-          - entity: input_boolean.climate_control
+          - entity: group.climate_control
           - entity: input_boolean.aircon
           - entity: input_boolean.pets_home_alone
         hours_to_show: 36
