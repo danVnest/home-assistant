@@ -1,9 +1,6 @@
 custom_lighting:
   name: Custom lighting
   icon: mdi:knob
-aircon:
-  name: Aircon
-  icon: mdi:air-conditioner
 pets_home_alone:
   name: Pets home alone
   icon: mdi:dog-side

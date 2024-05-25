@@ -364,7 +364,7 @@ class Control(app.App):
                     "input_boolean/turn_off",
                     entity_id="input_boolean.custom_lighting",
                 )
-        elif setting in ["aircon", "climate_control"]:
+        elif setting in ["climate_control"]:
             if (new == "on") != getattr(self.apps["climate"], setting):
                 self.log(f"UI setting '{setting}' changed to '{new}'")
                 setattr(self.apps["climate"], setting, new == "on")

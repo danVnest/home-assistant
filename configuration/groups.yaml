@@ -47,12 +47,12 @@ all_lights:
   icon: mdi:lightbulb-group
 
 all_aircon:
-  name: All aircon units
+  name: All aircon
   entities:
   - climate.living_room
   - climate.dining_room
   - climate.bedroom
-  
+  all: true
 
 all_fans:
   name: All fans
@@ -60,12 +60,14 @@ all_fans:
   - fan.bedroom
   - fan.nursery
   - fan.office
+  all: true
 
 all_heaters:
   name: All heaters
   entities:
   - climate.nursery_heater
   - switch.office_heater
+  all: true
 
 climate_control:
   name: Climate control

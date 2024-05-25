@@ -38,7 +38,7 @@ class Climate(app.App):
         super().initialize()
         self.__climate_control = self.entities.group.climate_control.state == "on"
         self.__climate_control_history["before_away"] = self.climate_control
-        self.__aircon = self.entities.input_boolean.aircon.state == "on"
+        self.__aircon = self.entities.group.all_aircon.state == "on"
         self.__aircons = {
             aircon: Aircon(aircon, self)
             for aircon in ["bedroom", "living_room", "dining_room"]
@@ -128,10 +128,6 @@ class Climate(app.App):
         self.__aircon = state
         self.__fans["bedroom"].ignore_vacancy(
             self.__should_bedroom_fan_ignore_vacancy(),
-        )
-        self.call_service(
-            f"input_boolean/turn_{'on' if state else 'off'}",
-            entity_id="input_boolean.aircon",
         )
         if self.__climate_control_history["overridden"]:
             self.log("Re-enabling climate control")

@@ -47,7 +47,8 @@ views:
           type: entities
           state_color: true
         conditions:
-          - entity: group.climate_control
+          - condition: state
+            entity: group.climate_control
             state: 'on'
           - entity: binary_sensor.display_day_card
             state: 'on'
@@ -165,7 +166,8 @@ views:
           type: entities
           state_color: true
         conditions:
-          - entity: group.climate_control
+          - condition: state
+            entity: group.climate_control
             state: 'on'
           - condition: state
             entity: binary_sensor.display_day_card
@@ -528,7 +530,9 @@ views:
       - entities:
           - entity: input_select.scene
           - entity: group.climate_control
-          - entity: input_boolean.aircon
+          - entity: group.all_aircon
+          - entity: group.all_fans
+          - entity: group.all_heaters
           - entity: input_boolean.pets_home_alone
         hours_to_show: 36
         refresh_interval: 0
