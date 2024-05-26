@@ -47,6 +47,7 @@ class Control(app.App):
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         for setting in [
+            "group.climate_control",
             "input_boolean",
             "input_datetime",
             "input_number",
@@ -351,9 +352,9 @@ class Control(app.App):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
         setting = entity.split(".")[1]
+        self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "scene":
             if new != self.scene:
-                self.log(f"UI scene selection changed to '{new}' from '{old}'")
                 self.scene = new
             if (
                 old == "Custom"
@@ -364,9 +365,10 @@ class Control(app.App):
                     "input_boolean/turn_off",
                     entity_id="input_boolean.custom_lighting",
                 )
-        elif setting in ["climate_control"]:
-            if (new == "on") != getattr(self.apps["climate"], setting):
-                self.log(f"UI setting '{setting}' changed to '{new}'")
+        elif "climate_control" in setting:
+            if setting == "climate_control" and (
+                (new == "on") != getattr(self.apps["climate"], setting)
+            ):
                 setattr(self.apps["climate"], setting, new == "on")
         elif setting == "pets_home_alone":
             if (new == "on") != self.apps["presence"].pets_home_alone:
@@ -377,7 +379,6 @@ class Control(app.App):
 
     def __handle_simple_settings_change(self, setting: str, new: str, old: str):
         """Act on changes to settings that can only be made through the UI."""
-        self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "development_mode":
             self.set_production_mode(new == "off")
         elif setting == "custom_lighting":
