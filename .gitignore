@@ -12,7 +12,7 @@ custom_components/*/*
 
 # Logs
 home-assistant.log*
-logs
+appdaemon/logs
 *.log
 
 # System files
@@ -23,8 +23,12 @@ logs
 .storage
 .vscode
 __pycache__
+appdaemon/compiled
+appdaemon/namespaces
 blueprints
+deps
 image
 tts
 www
+go2rtc*
 webostv.conf
