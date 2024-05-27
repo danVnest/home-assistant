@@ -31,6 +31,8 @@ class Presence(app.App):
         self.__pets_home_alone = (
             self.entities.input_boolean.pets_home_alone.state == "on"
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183175547/f
+        # add overide functionality so that if pets home alone mode is manually turned off it doesn't turn on again until after someone comes home and leaves again
         for multisensor_room in ["entryway", "dining_room", "hall", "bathroom"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
@@ -72,6 +74,10 @@ class Presence(app.App):
         self.rooms["living_room"].add_sensor("tv_playing")
         self.rooms["office"].add_sensor("daniels_macbook_active_at_home")
         self.rooms["nursery"].add_sensor("owlet_attached")
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183175551/f
+        # create floorplan for UI, show lighting and presence (combine person and pet?) - create template sensors for room presence or change UI from here
+        # TODO: https://app.asana.com/0/1207020279479204/1165239627642113/f
+        # potentially simplify this code by using the above template sensors that combine all motion detectors in a room
         self.listen_state(
             self.__handle_doorbell,
             "binary_sensor.doorbell_ringing",
@@ -278,10 +284,19 @@ class Room:
                         f"{self.__controller.entities.lock.door_lock.state})",
                         title="Person Detected",
                     )
+                    # TODO: https://app.asana.com/0/1207020279479204/1203851145721574/f
+                    # trigger alarm if not doorbell?
+                    # should I change this message? why would the door not be locked!?
+                # elif (
+                # TODO: https://app.asana.com/0/1207020279479204/1207033183175569/f
+                # when should pets home alone mode not be triggered? Only trigger for living_room, kitchen, entryway
+                # )
                 elif (
                     not self.__controller.pets_home_alone
                     and "Away" in self.__controller.control.scene
                     and "doorbell" not in entity
+                    # TODO: https://app.asana.com/0/1207020279479204/1207033183175569/f
+                    # this seems hacky, fix?
                 ):
                     self.__controller.notify(
                         "Pets detected as home alone, enabling climate control",

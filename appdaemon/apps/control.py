@@ -119,6 +119,8 @@ class Control(app.App):
             self.__assume_all_initialised,
             self.args["init_delay"],
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
+        # test self.notify("test message", targets="dan", title="test title", critical=True)
 
     def __all_initialized(self, event_name: str, data: dict, kwargs: dict):
         """Configure all apps with the current scene."""
@@ -173,6 +175,10 @@ class Control(app.App):
                     f"Home set to {new_scene} mode",
                     title="Door Locked",
                 )
+                # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
+                # clear above notification when not Away?
+                # TODO: https://app.asana.com/0/1207020279479204/1203851145721573/f
+                # media off unless in guest mode
         else:
             self.turn_off("switch.entryway_camera_enabled")
             self.turn_off("switch.back_door_camera_enabled")
@@ -431,7 +437,12 @@ class Control(app.App):
     ):
         """Notify if a device's battery is low."""
         del attribute, kwargs
-        if new in ("unavailable", None):
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115380/f
+        # convert all of these unavailable checks to try float?
+        # TODO: https://app.asana.com/0/1207020279479204/1205753645479424/f
+        # don't just check for battery level, periodically check for last date of any update
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183175577/f
+        # notify of low battery level only once per day and only if different to previous (or unavailable/old date)
             self.log(f"'{entity}' is '{new}'", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"] and (
             old == "unavailable"

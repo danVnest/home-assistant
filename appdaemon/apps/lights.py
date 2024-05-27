@@ -63,6 +63,8 @@ class Lights(app.App):
             new="off",
             duration=self.args["night_to_day_delay"],
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1207351651288716/f
+        # convert the following to for loop? or add to Light definition?
         self.listen_state(
             self.__handle_kitchen_illuminance_change,
             "sensor.kitchen_presence_sensor_illuminance",
@@ -113,6 +115,8 @@ class Lights(app.App):
                 vacating_delay=self.control.get_setting(
                     "bedroom_vacating_delay",
                 ),
+                # TODO: https://app.asana.com/0/1207020279479204/1207237490859329/f
+                # this is always? the same, don't pass as an argument
             )
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(

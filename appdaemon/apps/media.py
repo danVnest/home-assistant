@@ -32,6 +32,8 @@ class Media(app.App):
             self.__play_state_sensor,
             duration=self.args["state_change_delay"],
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
+        # try without state_change_delay, I'd previously removed it!
         for is_muted in [True, False]:
             self.listen_state(
                 self.__state_change,
@@ -123,7 +125,13 @@ class Media(app.App):
                 self.__last_play_state = new
                 if old == "unavailable":
                     old = self.__last_play_state
+                    # self.call_service("media_player/select_source", source="Home Dashboard", entity_id=self.__entity_id)
             else:
+                # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
+                # Firstly, does this matter? Try ignoring as per current setup
+                # if it does matter, mark as setup required and trigger __setup_state_change_sensor when not playing
+                # BETTER IDEA: recreate LG TV dashboard, no logs, have all streaming app icons (wait for sensor before leaving dashboard)
+                # HALT ALL DEVELOPMENT HERE, looks like play state is being released as default functionality
                 return
         self.log(f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')")
         if self.is_on and self.is_playing and not self.is_muted:

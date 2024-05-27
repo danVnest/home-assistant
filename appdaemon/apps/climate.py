@@ -43,7 +43,9 @@ class Climate(app.App):
             aircon: Aircon(aircon, self)
             for aircon in ["bedroom", "living_room", "dining_room"]
         }
-        self.__fans = {fan: Fan(fan, self) for fan in ("bedroom", "office", "nursery")}
+        self.__fans = {fan: Fan(fan, self) for fan in ("bedroom", "office")}
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115368/f
+        # self.__fans = {fan: Fan(fan, self) for fan in ("bedroom", "office", "nursery")}
         self.__heaters = {
             "nursery": Heater("nursery_heater", self, device="climate"),
             "office": Heater("office_heater", self, device="switch"),
@@ -334,6 +336,8 @@ class Climate(app.App):
 
     def __adjust_fans(self):
         """Calculate best fan speed for the current temperature and set accordingly."""
+        # TODO: https://app.asana.com/0/1207020279479204/1207128730253543/f
+        # Configure fans based on individual room temperatures plus aircon/heater status
         speed = 0
         is_hot = False
         if not self.__temperature_monitor.is_within_target_temperatures():
@@ -479,6 +483,8 @@ class Climate(app.App):
 
     def __should_bedroom_fan_ignore_vacancy(self) -> bool:
         """Check all conditions for which the bedroom fan should ignore vacancy."""
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115370/f
+        # change to reliably check if bedroom is occupied
         return (
             self.aircon
             or self.control.scene in ["Sleep", "Morning"]
@@ -487,6 +493,9 @@ class Climate(app.App):
 
     def validate_target_and_trigger(self, target_or_trigger):
         """Check if a given target/trigger temperature pair is valid, update if not."""
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115364/f
+        # what if heating target is below cooling target?
+        # what if aircon high trigger is below aircon low trigger?
         sleep = "sleep_" if "sleep" in target_or_trigger else ""
         if "target" in target_or_trigger:
             other = (
@@ -564,6 +573,8 @@ class TemperatureMonitor:
                 and self.controller.control.apps["presence"].is_kitchen_door_open()
             )
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115370/f
+        # bedroom only is very dependant on the multisensor being functional, check it is!
 
     def handle_sensor_change(
         self,

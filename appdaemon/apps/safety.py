@@ -22,6 +22,8 @@ class Safety(app.App):
             "low_oxygen",
             "high_oxygen",
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1205753645479427/f
+        # add , "low_battery", "lost_power", "sock_disconnected", "sock_off") ?
         self.__owlet_sensor_prefix = "binary_sensor.owlet_"
         self.__owlet_sensor_suffix = "_alert"
 
@@ -62,6 +64,8 @@ class Safety(app.App):
                 title="Owlet Alarm",
                 critical=True,
             )
+            # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
+            # do we want to notify? Maybe not since the app already does. Or is a critical notification here better?
         elif new == "off" and old != "unavailable":
             self.control.reset_scene()
 

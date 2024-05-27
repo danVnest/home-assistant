@@ -8,6 +8,9 @@ The goal of this setup is to require as little input from users as possible - in
 
 The user interface primarily features configuration parameters, but does also provide manual controls and some status indicators. Usage instructions are embedded, as shown below:
 
+# TODO: https://app.asana.com/0/1207020279479204/1203851145721580/f
+# update screenshots once floor plan is added and layout is finalised
+
 ![Control & Status](ui/control-status.png "Control & Status")
 
 ![Instructions](ui/instructions.png "Instructions")
