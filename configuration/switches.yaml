@@ -1,0 +1,12 @@
+- platform: template
+  switches:
+    nursery_heater:
+      value_template: "{{ states('climate.nursery') == 'heat' }}"
+      turn_on:
+        service: climate.turn_on
+        target:
+          entity_id: climate.nursery
+      turn_off:
+        service: climate.turn_off
+        target:
+          entity_id: climate.nursery
