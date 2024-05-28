@@ -177,6 +177,7 @@ class Control(app.App):
                 )
                 # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
                 # clear above notification when not Away?
+                self.apps["media"].turn_off()
                 # TODO: https://app.asana.com/0/1207020279479204/1203851145721573/f
                 # media off unless in guest mode
         else:
@@ -443,10 +444,10 @@ class Control(app.App):
         # don't just check for battery level, periodically check for last date of any update
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175577/f
         # notify of low battery level only once per day and only if different to previous (or unavailable/old date)
+        if new in ("unavailable", "unknown", None):
             self.log(f"'{entity}' is '{new}'", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"] and (
-            old == "unavailable"
-            or old is None
+            old in ("unavailable", "unknown", None)
             or float(old) >= self.args["notify_battery_level"]
         ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
