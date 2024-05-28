@@ -187,7 +187,7 @@ class Lights(app.App):
                 ),
                 vacating_delay=self.control.get_setting(
                     "office_vacating_delay",
-                ),
+                ),  # TODO: update to f"{light_name}_vacating_delay")?
             )
         if not self.lights["bedroom"].is_ignoring_presence():
             self.lights["bedroom"].set_presence_adjustments(
@@ -357,6 +357,14 @@ class Lights(app.App):
             occupied=(brightness, kelvin),
             vacating_delay=self.control.get_setting("night_vacating_delay"),
         )
+        # TODO: https://app.asana.com/0/1207020279479204/1207033183115368/f
+        # temporarily never turn on nursery light
+        # if (
+        #     self.get_state("binary_sensor.owlet_attached") or brightness > 50
+        # ):  # should be > min + 50?
+        #     self.lights["nursery"].adjust(brightness - 50, kelvin)
+        # else:
+        #     self.lights["nursery"].turn_off()
         self.log(
             "Adjusted lighting based on circadian progression to "
             f"brightness: {brightness} and kelvin: {kelvin}",
@@ -461,6 +469,7 @@ class Lights(app.App):
             - self.__lighting_illuminance()
             >= self.args["night_max_illuminance"]
         )
+        # TODO: this is currently not used, remove?
 
     def __lighting_illuminance(self, room: str = "kitchen") -> float:
         """Return approximate illuminance of powered lights affecting light sensors."""
