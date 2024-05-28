@@ -49,13 +49,8 @@ class Climate(app.App):
         self.__heaters = {
             "nursery": Heater("nursery_heater", self, device="climate"),
             "office": Heater("office_heater", self, device="switch"),
-            "dog_bed_area": Heater(
-                "dog_bed_area_heater",
-                self,
-                device="switch",
-                should_alert=True,
-            ),
         }
+        # TODO: rename aircons as living_room_aircon etc. (make consistent across all devices (heater/fan/light))
         self.__temperature_monitor = TemperatureMonitor(self)
         self.__temperature_monitor.configure_sensors()
         self.set_door_check_delay(

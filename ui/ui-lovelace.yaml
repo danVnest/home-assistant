@@ -145,14 +145,11 @@ views:
               - entity: switch.office_heater
                 name: Office
                 icon: mdi:radiator
-              - entity: switch.dog_bed_area_heater
-                name: Dog bed area
-                icon: mdi:radiator
             title: Heaters
           - content: >-
-              Note that manually controlling the aircon, fans, or heaters above
-              may disable climate control for those devices. You can re-enable
-              climate control by selecting **climate control** above.
+              Manually controlling aircon, fans, or heaters may disable climate
+              control for those devices. You can re-enable devices by selecting
+              **climate control** above.
             type: markdown
         type: vertical-stack
       - card:
