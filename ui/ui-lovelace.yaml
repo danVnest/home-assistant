@@ -23,7 +23,7 @@ views:
           state_color: true
         conditions:
           - entity: switch.washer
-            state: 'on'
+            state: "on"
         type: conditional
       - card:
           entities:
@@ -34,7 +34,7 @@ views:
           state_color: true
         conditions:
           - entity: switch.dryer
-            state: 'on'
+            state: "on"
         type: conditional
       - card:
           entities:
@@ -49,9 +49,9 @@ views:
         conditions:
           - condition: state
             entity: group.climate_control
-            state: 'on'
+            state: "on"
           - entity: binary_sensor.display_day_card
-            state: 'on'
+            state: "on"
         type: conditional
       - card:
           entities:
@@ -165,10 +165,10 @@ views:
         conditions:
           - condition: state
             entity: group.climate_control
-            state: 'on'
+            state: "on"
           - condition: state
             entity: binary_sensor.display_day_card
-            state: 'off'
+            state: "off"
         type: conditional
       - type: entities
         entities:
@@ -292,7 +292,7 @@ views:
     icon: mdi:cctv
     badges: []
     cards:
-      - aspect_ratio: '2'
+      - aspect_ratio: "2"
         dark_mode: true
         default_zoom: 12
         auto_fit: true
@@ -509,7 +509,7 @@ views:
     badges:
       - type: entity-filter
         state_filter:
-          - 'on'
+          - "on"
         entities:
           - entity: update.home_assistant_core_update
             name: Core
@@ -519,7 +519,7 @@ views:
             name: Operating System
       - type: entity-filter
         state_filter:
-          - operator: '>'
+          - operator: ">"
             value: 0
         entities:
           - entity: sensor.hacs

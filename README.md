@@ -4,12 +4,12 @@ This home automation setup is based on [Home Assistant](https://www.home-assista
 
 The goal of this setup is to require as little input from users as possible - instead reacting to presence, time, climate and more.
 
-### Usage Instructions & User Interface
+## Usage Instructions & User Interface
 
 The user interface primarily features configuration parameters, but does also provide manual controls and some status indicators. Usage instructions are embedded, as shown below:
 
-# TODO: https://app.asana.com/0/1207020279479204/1203851145721580/f
-# update screenshots once floor plan is added and layout is finalised
+TODO: <https://app.asana.com/0/1207020279479204/1203851145721580/f>
+TODO: update screenshots once floor plan is added and layout is finalised
 
 ![Control & Status](ui/control-status.png "Control & Status")
 
@@ -19,7 +19,7 @@ The user interface primarily features configuration parameters, but does also pr
 
 ![System](ui/system.png "System")
 
-#### Devices
+## Devices
 
 This home automation system is comprised of the following devices:
 
@@ -50,7 +50,7 @@ This home automation system is comprised of the following devices:
 - [Samsung Smart Dryer](https://www.samsung.com/au/washers-and-dryers/dryers/8kg-smart-ai-heat-pump-dryer-dv80t5420aw-dv80t5420aw-sa)
 - [Android](https://play.google.com/store/apps/details?id=io.homeassistant.companion.android), [iPhone and MacBook apps](https://apps.apple.com/us/app/home-assistant/id1099568401) on corresponding devices
 
-#### Notes
+## Notes
 
 The following are elements of this repository which are included for reference:
 
