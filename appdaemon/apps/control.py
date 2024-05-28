@@ -173,6 +173,7 @@ class Control(app.App):
                     f"Home set to {new_scene} mode",
                     title="Door Locked",
                 )
+                self.apps["media"].turn_off()
         else:
             self.turn_off("switch.entryway_camera_enabled")
             self.turn_off("switch.back_door_camera_enabled")
@@ -431,11 +432,10 @@ class Control(app.App):
     ):
         """Notify if a device's battery is low."""
         del attribute, kwargs
-        if new in ("unavailable", None):
+        if new in ("unavailable", "unknown", None):
             self.log(f"'{entity}' is '{new}'", level="WARNING")
         elif float(new) <= self.args["notify_battery_level"] and (
-            old == "unavailable"
-            or old is None
+            old in ("unavailable", "unknown", None)
             or float(old) >= self.args["notify_battery_level"]
         ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
