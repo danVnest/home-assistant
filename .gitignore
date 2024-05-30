@@ -21,7 +21,6 @@ appdaemon/logs
 *.db-wal
 .ruff_cache
 .storage
-.vscode
 __pycache__
 appdaemon/compiled
 appdaemon/namespaces
@@ -32,3 +31,8 @@ tts
 www
 go2rtc*
 webostv.conf
+
+# Visual Studio Code
+.vscode
+appdaemon/apps/appdaemon/*
+!appdaemon/apps/appdaemon/version.py
