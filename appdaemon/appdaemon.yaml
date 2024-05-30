@@ -23,6 +23,8 @@ appdaemon:
   thread_duration_warning_threshold: 15
   missing_app_warnings: false
   uvloop: true
+  exclude_dirs:
+    - appdaemon
   plugins:
     HASS:
       type: hass
