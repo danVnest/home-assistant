@@ -317,7 +317,7 @@ class Room:
         for handle, callback in list(self.callbacks.items()):
             self.controller.cancel_timer(callback["timer_handle"])
             if not vacant or callback["vacating_delay"] == 0:
-                callback["callback"](vacant=vacant)
+                callback["callback"]()
                 self.controller.log(
                     f"Callback {handle} triggered by '{entity}'",
                     level="DEBUG",
