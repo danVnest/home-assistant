@@ -491,7 +491,7 @@ class Climate(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ) -> None:
         """If the kitchen door status changes, check if aircon needs to change."""
         del entity, attribute, old, kwargs
@@ -606,7 +606,7 @@ class TemperatureMonitor:
         attribute: str,
         old: float,
         new: float,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Calculate inside temperature then get controller to handle if changed."""
         del entity, attribute, old, kwargs

@@ -198,8 +198,9 @@ class Device:
         ]
         # TODO: check climate control first?
 
-    def handle_presence_change(self):
+    def handle_presence_change(self, **kwargs):
         """Set device to adjust (with delay if required) when presence changes."""
+        del kwargs
         if self.vacant != self.was_vacant_at_last_check:
             self.was_vacant_at_last_check = self.vacant
             # TODO: adjustment delay doesn't make sense here (vacating_delay does)
@@ -227,7 +228,7 @@ class Device:
     def adjust_for_current_conditions(self):
         """Override this in child class to adjust device settings appropriately."""
 
-    def adjust_for_current_conditions_after_delay(self, kwargs: dict):
+    def adjust_for_current_conditions_after_delay(self, **kwargs: dict):
         """Delayed adjustment from timers initiated when handling presence change."""
         del kwargs
         self.adjustment_timer = None

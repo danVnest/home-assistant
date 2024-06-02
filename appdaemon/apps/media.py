@@ -84,7 +84,7 @@ class Media(App):
         self.call_service("media_player/media_pause", entity_id=self.entity_id)
         self.log("TV media is now paused", level="DEBUG")
 
-    def setup_play_state_sensor(self, kwargs: dict):
+    def setup_play_state_sensor(self, **kwargs: dict):
         """Start the MQTT app on the TV, enabling play/pause state detection."""
         del kwargs
         if not self.on:
@@ -111,7 +111,7 @@ class Media(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Handle TV events at night and change the scene."""
         del kwargs

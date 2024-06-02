@@ -122,7 +122,7 @@ class Presence(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, kwargs
@@ -148,7 +148,7 @@ class Presence(App):
                     else "Away (Day)"
                 )
 
-    def handle_new_device(self, event_name: str, data: dict, kwargs: dict):
+    def handle_new_device(self, event_name: str, data: dict, **kwargs: dict):
         """If not home and someone adds a device, notify."""
         del event_name
         self.log(f"New device added: '{data}', '{kwargs}'")
@@ -165,16 +165,9 @@ class Presence(App):
             )
             self.last_device_date = self.date()
 
-    def handle_doorbell(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        kwargs: dict,
-    ):
+    def handle_doorbell(self, *args: list, **kwargs: dict):
         """Handle doorbell when it rings."""
-        del entity, attribute, old, new, kwargs
+        del args, kwargs
         self.notify(
             f"Someone rung the doorbell "
             f"(door is {self.entities.lock.door_lock.state})",
@@ -249,7 +242,7 @@ class Room:
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """If room presence changes, trigger all registered callbacks."""
         del attribute, kwargs
@@ -326,7 +319,6 @@ class Room:
                 self.callbacks[handle]["timer_handle"] = self.controller.run_in(
                     callback["callback"],
                     callback["vacating_delay"],
-                    vacant=True,
                 )
                 self.controller.log(
                     f"Set vacation timer for callback: {handle}",

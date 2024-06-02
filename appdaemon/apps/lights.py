@@ -51,7 +51,7 @@ class Lights(App):
         self.lights["bedroom"] = Light("light.bedroom", self, "bedroom")
         self.lights["nursery"] = Light("light.nursery", self, "nursery")
         self.lights["bathroom"] = Light("light.bathroom", self, "bathroom")
-        self.redate_circadian(None)
+        self.redate_circadian()
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
             self.handle_dark_outside,
@@ -294,7 +294,7 @@ class Lights(App):
             )
             self.log("Started circadian progression")
 
-    def circadian_progression(self, kwargs: dict):
+    def circadian_progression(self, **kwargs: dict):
         """Calculate appropriate lighting levels and implement."""
         circadian_progress = kwargs.get("circadian_progress")
         if circadian_progress is None:
@@ -421,7 +421,7 @@ class Lights(App):
             ),
         )
 
-    def redate_circadian(self, kwargs: dict):
+    def redate_circadian(self, **kwargs: dict):
         """Configure the start and end times for lighting adjustment for today."""
         del kwargs
         start_time = datetime.datetime.combine(
@@ -480,16 +480,9 @@ class Lights(App):
             * self.args["lighting_illuminance_factor"]
         )
 
-    def handle_dark_outside(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        kwargs: dict,
-    ):
+    def handle_dark_outside(self, *args: list, **kwargs: dict):
         """Change scene appropriately for low outside light levels."""
-        del entity, attribute, old, new, kwargs
+        del args, kwargs
         if "Day" in self.control.scene:
             self.log("It is now dark outside - changing scene accordingly")
             if self.control.apps["media"].playing:
@@ -499,16 +492,9 @@ class Lights(App):
             else:
                 self.control.scene = "Away (Night)"
 
-    def handle_bright_outside(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        kwargs: dict,
-    ):
+    def handle_bright_outside(self, *args: list, **kwargs: dict):
         """Change scene appropriately for high outside light levels."""
-        del entity, attribute, old, new, kwargs
+        del args, kwargs
         if self.control.scene not in ("Custom", "Bright", "Sleep", "Morning"):
             self.log("It is now bright outside - changing scene accordingly")
             self.control.scene = (
@@ -521,7 +507,7 @@ class Lights(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Change kitchen vacancy lighting based on illuminance levels."""
         del entity, attribute, old, kwargs
@@ -567,7 +553,7 @@ class Lights(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Detect when to change scene from morning to day & set automatic lighting."""
         del entity, attribute, old, kwargs
@@ -835,7 +821,7 @@ class Light(Device):
             kelvin_step=kelvin_step,
         )
 
-    def transition_towards_occupied(self, kwargs: dict):
+    def transition_towards_occupied(self, **kwargs: dict):
         """Step towards occupied lighting settings."""
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining > 0:
@@ -845,4 +831,4 @@ class Light(Device):
                 self.presence_adjustments["occupied"]["kelvin"]
                 - kwargs["kelvin_step"] * steps_remaining,
             )
-        super().transition_towards_occupied(kwargs)
+        super().transition_towards_occupied(**kwargs)

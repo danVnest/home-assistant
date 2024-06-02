@@ -121,9 +121,9 @@ class Control(App):
         # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
         # test self.notify("test message", targets="dan", title="test title", critical=True)
 
-    def all_initialized(self, event_name: str, data: dict, kwargs: dict):
+    def all_initialized(self, *args: list, **kwargs: dict):
         """Configure all apps with the current scene."""
-        del event_name, data, kwargs
+        del args, kwargs
         self.log("All apps ready, resetting scene")
         self.is_all_initialised = True
         for app_name in self.apps:
@@ -135,7 +135,7 @@ class Control(App):
             namespace="admin",
         )
 
-    def assume_all_initialised(self, kwargs: dict):
+    def assume_all_initialised(self, **kwargs: dict):
         """Configure all apps if not already done normally."""
         del kwargs
         if not self.is_all_initialised:
@@ -143,9 +143,9 @@ class Control(App):
                 "Assuming initialisation complete after "
                 f"{self.args['init_delay']} seconds",
             )
-            self.all_initialized(event_name=None, data=None, kwargs=None)
+            self.all_initialized()
 
-    def handle_app_reloaded(self, event_name: str, data: dict, kwargs: dict):
+    def handle_app_reloaded(self, event_name: str, data: dict, **kwargs: dict):
         """Re-link the app and set a timer to initialise it."""
         del event_name, kwargs
         self.apps[data["app"].lower()] = self.get_app(data["app"])
@@ -244,7 +244,7 @@ class Control(App):
             < self.parse_time(self.get_setting("bed_time"))
         )
 
-    def handle_morning_time(self, kwargs: dict):
+    def handle_morning_time(self, **kwargs: dict):
         """Change scene to Morning (callback for daily timer)."""
         del kwargs
         self.log("Morning timer triggered")
@@ -253,7 +253,7 @@ class Control(App):
         else:
             self.log(f"Ignoring morning timer (scene is '{self.scene}', not 'Sleep')")
 
-    def handle_day_time(self, kwargs: dict):
+    def handle_day_time(self, **kwargs: dict):
         """Transition from Morning to Day scene (callback for daily timer)."""
         del kwargs
         self.log("Day timer triggered")
@@ -262,7 +262,7 @@ class Control(App):
         else:
             self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Morning')")
 
-    def handle_bed_time(self, kwargs: dict):
+    def handle_bed_time(self, **kwargs: dict):
         """Adjust climate control when nearing bed time (callback for daily timer)."""
         del kwargs
         self.log("Bed timer triggered")
@@ -274,7 +274,7 @@ class Control(App):
         """Return if the time is after bed time (and before midnight)."""
         return self.time() > self.parse_time(self.get_setting("bed_time"))
 
-    def button(self, event_name: str, data: dict, kwargs: dict):
+    def button(self, event_name: str, data: dict, **kwargs: dict):
         """Detect and handle when a button is clicked or held."""
         del event_name, kwargs
         room = (
@@ -323,7 +323,7 @@ class Control(App):
             else:
                 self.scene = "Night"
 
-    def handle_ifttt(self, event_name: str, data: dict, kwargs: dict):
+    def handle_ifttt(self, event_name: str, data: dict, **kwargs: dict):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
         self.log(f"Received '{data}' from IFTTT")
@@ -357,7 +357,7 @@ class Control(App):
         attribute: str,
         old,
         new,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
@@ -437,7 +437,7 @@ class Control(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Notify if a device's battery is low."""
         del attribute, kwargs
@@ -455,7 +455,7 @@ class Control(App):
         ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
-    def heartbeat(self, kwargs: dict):
+    def heartbeat(self, **kwargs: dict):
         """Send a heartbeat then handle if it is received or not."""
         del kwargs
         try:
@@ -489,14 +489,14 @@ class Control(App):
                     self.call_service("homeassistant/restart")
             self.timers["heartbeat_fail_count"] = 0
 
-    def handle_log(  # noqa: PLR0913
+    def handle_log(
         self,
         app_name: str,
         timestamp: datetime.datetime,
         level: str,
         log_type: str,
         message: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Increment counters if logged message is a WARNING or ERROR."""
         del app_name, timestamp, kwargs
@@ -516,7 +516,7 @@ class Control(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Notify when a system update is available."""
         del attribute, old, new, kwargs
@@ -532,7 +532,7 @@ class Control(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """Notify when a HACS update is available."""
         del entity, attribute, kwargs

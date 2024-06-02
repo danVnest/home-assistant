@@ -47,7 +47,7 @@ class Safety(App):
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """React when an Owlet alert is triggered or ends."""
         del attribute, kwargs
@@ -92,7 +92,7 @@ class FireSensor:
         attribute: str,
         old: str,
         new: str,
-        kwargs: dict,
+        **kwargs: dict,
     ):
         """React when potential fire detected."""
         del attribute, kwargs
