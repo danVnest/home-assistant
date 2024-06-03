@@ -480,9 +480,16 @@ class Lights(App):
             * self.args["lighting_illuminance_factor"]
         )
 
-    def handle_dark_outside(self, *args: list, **kwargs: dict):
+    def handle_dark_outside(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
         """Change scene appropriately for low outside light levels."""
-        del args, kwargs
+        del entity, attribute, old, new, kwargs
         if "Day" in self.control.scene:
             self.log("It is now dark outside - changing scene accordingly")
             if self.control.apps["media"].playing:
@@ -492,9 +499,16 @@ class Lights(App):
             else:
                 self.control.scene = "Away (Night)"
 
-    def handle_bright_outside(self, *args: list, **kwargs: dict):
+    def handle_bright_outside(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
         """Change scene appropriately for high outside light levels."""
-        del args, kwargs
+        del entity, attribute, old, new, kwargs
         if self.control.scene not in ("Custom", "Bright", "Sleep", "Morning"):
             self.log("It is now bright outside - changing scene accordingly")
             self.control.scene = (

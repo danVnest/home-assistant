@@ -165,9 +165,16 @@ class Presence(App):
             )
             self.last_device_date = self.date()
 
-    def handle_doorbell(self, *args: list, **kwargs: dict):
+    def handle_doorbell(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
         """Handle doorbell when it rings."""
-        del args, kwargs
+        del entity, attribute, old, new, kwargs
         self.notify(
             f"Someone rung the doorbell "
             f"(door is {self.entities.lock.door_lock.state})",

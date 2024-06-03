@@ -121,9 +121,9 @@ class Control(App):
         # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
         # test self.notify("test message", targets="dan", title="test title", critical=True)
 
-    def all_initialized(self, *args: list, **kwargs: dict):
+    def all_initialized(self, event_name: str, data: dict, **kwargs: dict):
         """Configure all apps with the current scene."""
-        del args, kwargs
+        del event_name, data, kwargs
         self.log("All apps ready, resetting scene")
         self.is_all_initialised = True
         for app_name in self.apps:
@@ -143,7 +143,7 @@ class Control(App):
                 "Assuming initialisation complete after "
                 f"{self.args['init_delay']} seconds",
             )
-            self.all_initialized()
+            self.all_initialized(None, None)
 
     def handle_app_reloaded(self, event_name: str, data: dict, **kwargs: dict):
         """Re-link the app and set a timer to initialise it."""

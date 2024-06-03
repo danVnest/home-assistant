@@ -219,9 +219,8 @@ class Climate(App):
             self.should_bedroom_fan_ignore_vacancy(),
         )
 
-    def handle_temperatures(self, *args):
+    def handle_temperatures(self):
         """Control aircon or suggest based on changes in inside temperature."""
-        del args  # args required for listen_state callback
         if self.climate_control:
             self.adjust_aircon()
             self.adjust_fans()
@@ -594,7 +593,7 @@ class Climate(App):
     ):
         """Calculate inside temperature then get controller to handle if changed."""
         del entity, attribute, old, kwargs
-        if new is not None:
+        if new not in (None, "unavailable"):
             self.handle_temperatures()
 
     @property
