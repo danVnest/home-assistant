@@ -28,11 +28,6 @@ class Climate(App):
         self.fans: dict[str, Fan] = {}
         self.door_open_listener = None
         self.climate_control_history = {"overridden": False, "before_away": None}
-        for temperatures in ("weighted_average_inside", "outside"):
-            self.listen_state(
-                self.handle_temperature_change,
-                f"sensor.{temperatures}_apparent_temperature",
-            )
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -70,6 +65,11 @@ class Climate(App):
                 "office",
             ),
         }
+        for temperatures in ("weighted_average_inside", "outside"):
+            self.listen_state(
+                self.handle_temperature_change,
+                f"sensor.{temperatures}_apparent_temperature",
+            )
         self.set_door_check_delay(
             float(self.entities.input_number.aircon_door_check_delay.state),
         )
