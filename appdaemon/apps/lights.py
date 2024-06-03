@@ -285,7 +285,7 @@ class Lights(App):
     def start_circadian(self):
         """Schedule a timer to periodically set the lighting appropriately."""
         circadian_progress = self.circadian_progress
-        self.circadian_progression({"circadian_progress": circadian_progress})
+        self.circadian_progression(circadian_progress=circadian_progress)
         if circadian_progress not in (0, 1):
             self.circadian["timer"] = self.run_every(
                 self.circadian_progression,
