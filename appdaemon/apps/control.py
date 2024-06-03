@@ -395,7 +395,7 @@ class Control(App):
             self.set_custom_scene(new == "on")
         elif setting.startswith("circadian"):
             try:
-                self.apps["lights"].redate_circadian(None)
+                self.apps["lights"].redate_circadian()
             except ValueError:
                 self.revert_setting(f"input_datetime.{setting}", old)
         elif setting.endswith("_time"):

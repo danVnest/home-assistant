@@ -116,7 +116,7 @@ class Media(App):
         """Handle TV events at night and change the scene."""
         del kwargs
         if entity == self.entity_id and attribute == "state" and new == "on":
-            self.setup_play_state_sensor(None)
+            self.setup_play_state_sensor()
         elif entity == self.play_state_sensor:
             if new != "unavailable":
                 self.last_play_state = new
