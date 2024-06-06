@@ -6,10 +6,12 @@ as well as the ability to register callbacks when presence changes.
 User defined variables are configued in presence.yaml
 """
 
+from __future__ import annotations
+
 import uuid
 from datetime import timedelta
 
-from app import App
+from app import App, Device
 
 
 class Presence(App):
@@ -31,7 +33,7 @@ class Presence(App):
         self.pets_home_alone = self.entities.input_boolean.pets_home_alone.state == "on"
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175547/f
         # add overide functionality so that if pets home alone mode is manually turned off it doesn't turn on again until after someone comes home and leaves again
-        for multisensor_room in ["entryway", "dining_room", "hall", "bathroom"]:
+        for multisensor_room in ["entryway", "dining_room", "bathroom"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
                 f"{multisensor_room}_multisensor_motion",
@@ -70,6 +72,7 @@ class Presence(App):
         self.rooms["entryway"].add_sensor("entryway_motion_detected")
         self.rooms["kitchen"].add_sensor("kitchen_door_motion")
         self.rooms["living_room"].add_sensor("tv_playing")
+        self.rooms["living_room"].add_sensor("hall_multisensor_motion")
         self.rooms["office"].add_sensor("daniels_macbook_active_at_home")
         self.rooms["nursery"].add_sensor("owlet_attached")
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175551/f
@@ -109,12 +112,15 @@ class Presence(App):
             entity_id="input_boolean.pets_home_alone",
         )
         if state:
-            self.control.apps["climate"].climate_control = True
+            self.control.apps["climate"].allow_climate_control = True
+            # TODO: don't do this, create specific self.control.apps["climate"].handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
     @property
     def kitchen_door_open(self) -> bool:
         """Check if the kitchen door is open."""
         return self.entities.binary_sensor.kitchen_door.state == "on"
+
+    # TODO: probably move above to Climate
 
     def handle_presence_change(
         self,
@@ -225,7 +231,7 @@ class Room:
             level="DEBUG",
         )
 
-    def is_vacant(self, vacating_delay: int = 0) -> bool:
+    def is_vacant(self, vacating_delay: float = 0) -> bool:
         """Check if vacant based on last time vacated/entered, with optional delay."""
         return (
             self.last_entered
@@ -233,7 +239,7 @@ class Room:
             < self.controller.datetime() - timedelta(seconds=vacating_delay)
         )
 
-    def seconds_in_room(self, vacating_delay: int = 0) -> int:
+    def seconds_in_room(self, vacating_delay: float = 0) -> float:
         """Return number of seconds room has been occupied (or vacant if negative)."""
         return (
             self.last_vacated
@@ -338,7 +344,7 @@ class Room:
         self.sensors.append(sensor_id)
         self.controller.listen_state(self.handle_presence_change, sensor_id)
 
-    def register_callback(self, callback, vacating_delay: int = 0) -> uuid.UUID:
+    def register_callback(self, callback, vacating_delay: float = 0) -> uuid.UUID:
         """Register a callback for when presence changes, with an optional delay."""
         handle = uuid.uuid4().hex
         self.callbacks[handle] = {
@@ -350,7 +356,6 @@ class Room:
             self.callbacks[handle]["timer_handle"] = self.controller.run_in(
                 callback,
                 vacating_delay + self.seconds_in_room(),
-                vacant=True,
             )
 
         self.controller.log(
@@ -364,3 +369,156 @@ class Room:
         if handle in self.callbacks:
             self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
             del self.callbacks[handle]
+
+
+class PresenceDevice(Device):
+    """Basic device that can be configured to respond to environmental changes."""
+
+    def __init__(
+        self,
+        **kwargs: dict,
+    ):
+        """Initialise with device parameters and prepare for presence adjustments."""
+        super().__init__(**kwargs)
+        self.rooms: list[Room] = [
+            self.controller.control.apps["presence"].rooms[room]
+            for room in (self.room, *self.linked_rooms)
+        ]
+        self.__vacating_delay = 0
+        self.was_vacant_at_last_check = self.vacant
+        self.presence_callbacks = None
+        self.transition_period = 0
+        self.transition_timer = None
+
+    @property
+    def vacant(self) -> bool:
+        """If the room (and any linked rooms) are vacant."""
+        return all(room.is_vacant(self.vacating_delay) for room in self.rooms)
+
+    @property
+    def ignoring_vacancy(self):
+        """Check if the device is ignoring presence changes or not."""
+        return not bool(self.presence_callbacks)
+
+    @property
+    def vacating_delay(self) -> float:
+        """The number of seconds between room vacancy triggering device adjustment."""
+        return self.__vacating_delay
+
+    @vacating_delay.setter
+    def vacating_delay(self, seconds: float):
+        """If monitoring presence then update with new vacating delay."""
+        if self.vacating_delay != seconds:
+            self.__vacating_delay = seconds
+            if not self.ignoring_vacancy:
+                self.ignore_vacancy()
+                self.monitor_presence()
+
+    def ignore_vacancy(self):
+        """Ignore presence changes by cancelling any presence callbacks."""
+        if not self.ignoring_vacancy:
+            for room in self.rooms:
+                for callback in self.presence_callbacks:
+                    room.cancel_callback(callback)
+            self.presence_callbacks = []
+        # TODO: just set self.ignore_vacancy to True and check with constraints
+
+    def monitor_presence(self):
+        """Set callbacks for when presence changes."""
+        if self.ignoring_vacancy:
+            self.presence_callbacks = [
+                room.register_callback(
+                    self.handle_presence_change,
+                    self.vacating_delay,
+                    constraints=self.constraints,
+                )
+                for room in self.rooms
+            ]
+            self.handle_presence_change()
+        # TODO: just set self.ignore_vacancy to False and check with constraints
+
+    def handle_presence_change(self, **kwargs):
+        """Set device to adjust (with delay if required) when presence changes."""
+        del kwargs
+        if self.vacant != self.was_vacant_at_last_check:
+            self.was_vacant_at_last_check = self.vacant
+            self.transition_timer = None
+            if self.should_transition_towards_occupied:
+                self.start_transition_towards_occupied()
+            self.check_conditions_and_adjust()
+
+    def check_conditions_and_adjust(self):
+        """Override this in child class to adjust device settings appropriately."""
+
+    @property
+    def transition_progress(self) -> float:
+        """Progress of transition between presence configurations (from 0 to 1)."""
+        if self.transition_period == 0:
+            return 1
+        seconds_in_room = max(
+            room.seconds_in_room(self.vacating_delay) for room in self.rooms
+        )
+        if not (0 < seconds_in_room < self.transition_period):
+            return 1
+        return seconds_in_room / self.transition_period
+
+    @property
+    def should_transition_towards_occupied(self) -> bool:
+        """Check if the current settings should trigger transition to occupied."""
+        return self.transition_progress < 1
+
+    def start_transition_towards_occupied(
+        self,
+        step_time: float = 0,
+        steps_remaining: int = 0,
+        **kwargs: dict,
+    ):
+        """Help child class to transition deivce slowly from vacant to occupied."""
+        if step_time == 0 or steps_remaining == 0 or kwargs is None:
+            return
+        self.transition_timer = uuid.uuid4().hex
+        self.controller.run_in(
+            self.transition_towards_occupied,
+            step_time,
+            step_time=step_time,
+            steps_remaining=steps_remaining,
+            timer_id=self.transition_timer,
+            constraints=self.constraints,
+            **kwargs,
+        )
+        self.controller.log(
+            "Starting transition from entered state to occupied state with: "
+            f"step_time = {step_time}, steps_remaining = {steps_remaining}, "
+            f"settings = {kwargs}",
+            level="DEBUG",
+        )
+
+    def transition_towards_occupied(self, kwargs: dict):
+        """Scheduling for child to step towards occupied device settings."""
+        if kwargs["timer_id"] != self.transition_timer:
+            return
+        kwargs["steps_remaining"] = kwargs["steps_remaining"] - 1
+        if kwargs["steps_remaining"] <= 0:
+            self.controller.log(
+                f"Transition to occupied complete for '{self.device_id}'",
+                level="DEBUG",
+            )
+            self.transition_timer = None
+            self.check_conditions_and_adjust()
+        else:
+            self.controller.log(
+                f"{kwargs['steps_remaining']} steps until '{self.device_id}' "
+                "transition to occupied state is complete",
+                level="DEBUG",
+            )
+            self.controller.run_in(
+                self.transition_towards_occupied,
+                kwargs["step_time"],
+                **kwargs,
+            )
+
+    # TODO: I think the following should be applied in Device and checked for in subclasses
+    # TODO: ADD CUSTOM LIGHTING CHECK TO DISABLE MONITORING
+    # listen for custom lighting change
+    # listen for climate control change
+    # disable/enable callbacks accordingly

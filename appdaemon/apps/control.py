@@ -266,7 +266,7 @@ class Control(App):
         """Adjust climate control when nearing bed time (callback for daily timer)."""
         del kwargs
         self.log("Bed timer triggered")
-        self.apps["climate"].reset()
+        self.apps["climate"].pre_condition_bedrooms()
         self.call_service("lock/lock", entity_id="lock.door_lock")
 
     @property
@@ -287,6 +287,7 @@ class Control(App):
         elif data["value"] == "KeyHeldDown":
             self.log(f"Button in '{room}' held")
             self.apps["climate"].aircon = not self.apps["climate"].aircon
+            # TODO: fix so only the button's room aircon is turned on/off
 
     def handle_button_click(self, room: str):
         """Handle a button click."""
@@ -327,18 +328,17 @@ class Control(App):
         """Handle commands coming in via IFTTT."""
         del event_name, kwargs
         self.log(f"Received '{data}' from IFTTT")
-        if "lights" in data:
-            self.scene = "Night" if self.scene == "Day" else "Day"
-        elif "bright" in data:
+        if "bright" in data:
             self.scene = "Bright"
         elif "sleep" in data:
             self.scene = "Sleep"
         elif "climate_control" in data:
-            self.apps["climate"].climate_control = not self.apps[
+            self.apps["climate"].allow_climate_control = not self.apps[
                 "climate"
-            ].climate_control
+            ].allow_climate_control
         elif "aircon" in data:
             self.apps["climate"].aircon = not self.apps["climate"].aircon
+            # TODO: how to handle individual aircons?
         elif "lock" in data:
             command = (
                 "unlock" if self.entities.lock.door_lock.state == "locked" else "lock"
@@ -392,7 +392,9 @@ class Control(App):
         if setting == "development_mode":
             self.set_production_mode(new == "off")
         elif setting == "custom_lighting":
-            self.set_custom_scene(new == "on")
+            self.set_custom_scene(
+                new == "on",
+            )  # TODO: remove once per device control implemented
         elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian()
@@ -406,9 +408,13 @@ class Control(App):
         elif "temperature" in setting:
             self.apps["climate"].validate_target_and_trigger(setting)
         elif "door" in setting:
-            self.apps["climate"].set_door_check_delay(float(new))
-        elif "fan" in setting:
-            self.apps["climate"].recheck_fan_room_vacating_delay()
+            self.apps["climate"].update_door_check_delay(float(new))
+        elif setting == "aircon_vacating_delay":
+            self.apps["climate"].update_aircon_vacating_delays(float(new))
+        elif setting == "fan_vacating_delay":
+            self.apps["climate"].update_fan_vacating_delays(float(new))
+        elif setting == "heater_vacating_delay":
+            self.apps["climate"].update_heater_vacating_delays(float(new))
         else:
             self.apps["lights"].transition_to_scene(self.scene)
 

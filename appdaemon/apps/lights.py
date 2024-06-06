@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import datetime
 
-from app import App, Device
+from app import App
+from presence import PresenceDevice
 
 
 class Lights(App):
@@ -31,6 +32,7 @@ class Lights(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        self.register_constraint("constraints")
         self.lights["entryway"] = Light(
             "group.entryway_lights",
             self,
@@ -261,9 +263,9 @@ class Lights(App):
             occupied=(brightness, kelvin),
             vacating_delay=vacating_delay,
         )
+        self.lights["bedroom"].ignore_vacancy()
         for light_name in ("tv", "dining", "hall", "bedroom"):
             self.lights[light_name].turn_off()
-        self.lights["bedroom"].ignore_vacancy()
 
     def transition_to_away_scene(self):
         """Configure lighting for the away scene."""
@@ -588,6 +590,7 @@ class Lights(App):
             ):
                 if not self.lights["bedroom"].ignoring_vacancy:
                     self.lights["bedroom"].ignore_vacancy()
+                    self.lights["bedroom"].turn_off()
                     self.log(
                         f"Bedroom light levels are high ({new}lx), "
                         "automatic lighting disabled",
@@ -607,8 +610,14 @@ class Lights(App):
                     "automatic lighting enabled",
                 )
 
+    def constraints(self, climate_control_id: str | None) -> bool:
+        """Constraint check for Lights to reflect climate control settings?"""
+        # return (
+        #     self.get_state(climate_control_id) == "on" if climate_control_id else True
+        # )
 
-class Light(Device):
+
+class Light(PresenceDevice):
     """Control a light (or a group) and configure responses to environmental changes."""
 
     def __init__(
@@ -620,6 +629,7 @@ class Light(Device):
     ):
         """Initialise with a lights's id, room(s), kelvin limits, and controller."""
         super().__init__(device_id, controller, room, linked_rooms)
+        # self.constraints = self.climate_control_id # TODO:
         self.kelvin_limits = {
             "max": self.get_attribute("max_color_temp_kelvin"),
             "min": self.get_attribute("min_color_temp_kelvin"),
@@ -711,8 +721,10 @@ class Light(Device):
                 f"(from {self.brightness} and {self.kelvin})",
                 level="DEBUG",
             )
-            if kelvin is None:
+            if kelvin is None or kelvin == self.kelvin:
                 self.brightness = brightness
+            elif brightness == self.brightness:
+                self.kelvin = kelvin
             else:
                 self.turn_on(brightness=brightness, kelvin=kelvin)
 
@@ -768,11 +780,8 @@ class Light(Device):
                 self.presence_adjustments[presence]["brightness"],
                 self.presence_adjustments[presence]["kelvin"],
             )
-        if self.vacating_delay != vacating_delay:
-            self.ignore_vacancy()
-            self.vacating_delay = vacating_delay
-        if self.ignoring_vacancy:
-            self.monitor_presence()
+        self.vacating_delay = vacating_delay
+        self.monitor_presence()
         self.controller.log(
             f"Configured '{self.device_id}' with presence '{presence}' and "
             f"presence adjustments: {self.presence_adjustments}",
@@ -786,7 +795,7 @@ class Light(Device):
             return self.brightness > 0
         return self.presence_adjustments["vacant"]["brightness"] > 0
 
-    def adjust_for_current_conditions(self):
+    def check_conditions_and_adjust(self):
         """Adjust to desired light settings for the current presence state."""
         if self.transition_timer:
             presence = "entered"
