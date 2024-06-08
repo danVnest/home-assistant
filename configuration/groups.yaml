@@ -65,7 +65,7 @@ all_fans:
 all_heaters:
   name: All heaters
   entities:
-    - climate.nursery_heater
+    - switch.nursery_heater
     - switch.office_heater
   all: true
 

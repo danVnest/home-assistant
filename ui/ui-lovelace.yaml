@@ -54,21 +54,26 @@ views:
           - entity: binary_sensor.display_day_card
             state: "on"
         type: conditional
-      - card:
-          entities:
-            - entity: sensor.weighted_average_inside_apparent_temperature
-              name: Inside
-              icon: mdi:home-thermometer
-            - entity: sensor.outside_apparent_temperature
-              name: Outside
-              icon: mdi:sun-thermometer
-          show_name: true
-          type: glance
-          state_color: true
-        conditions: []
-        type: conditional
       - cards:
           - entities:
+              - entity: sensor.weighted_average_inside_apparent_temperature
+                name: Inside
+                icon: mdi:home-thermometer
+              - entity: sensor.outside_apparent_temperature
+                name: Outside
+                icon: mdi:sun-thermometer
+            show_name: true
+            type: glance
+          - entities:
+              - entity: sensor.bedroom_apparent_temperature
+                name: Bedroom
+              - entity: sensor.nursery_apparent_temperature
+                name: Nursery
+              - entity: sensor.dining_room_apparent_temperature
+                name: Dog bed area
+            show_name: true
+            type: glance
+        type: vertical-stack
               - entity: group.all_lights
                 name: Any / all
               - entity: group.entryway_lights
@@ -141,8 +146,9 @@ views:
             entities:
               - entity: group.all_heaters
                 name: All
-              - entity: climate.nursery_heater
+              - entity: switch.nursery_heater
                 name: Nursery
+                icon: mdi:radiator
               - entity: switch.office_heater
                 name: Office
                 icon: mdi:radiator

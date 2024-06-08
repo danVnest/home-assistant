@@ -1,7 +1,8 @@
 - platform: template
   switches:
     nursery_heater:
-      value_template: "{{ states('climate.nursery') == 'heat' }}"
+      friendly_name: Nursery heater
+      value_template: "{{ states('climate.nursery_heater') == 'heat' }}"
       turn_on:
         service: climate.turn_on
         target:
