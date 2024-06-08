@@ -191,6 +191,10 @@ class Climate(App):
             self.climate_control_enabled = True
         if new_scene == "Sleep":
             self.end_pre_condition_bedrooms()
+        elif new_scene == "Morning":
+            self.heaters[
+                "nursery"
+            ].monitor_presence()  # TODO: remove when nursery presence is reliable
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if new_scene in ("Sleep", "Morning") else "auto"
         )
@@ -231,7 +235,7 @@ class Climate(App):
     def end_pre_condition_bedrooms(self):
         """Return bedroom and nursery climate control to normal."""
         self.aircons["bedroom"].monitor_presence()
-        self.heaters["nursery"].monitor_presence()
+        # self.heaters["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
 
     def suggest_if_extreme_forecast(self):
         """Suggest user enables control if extreme temperatures are forecast."""
@@ -965,7 +969,8 @@ class Heater(ClimateDevice, PresenceDevice):
                 "target_buffer"
             ] and (self.ignoring_vacancy or not self.vacant):
                 self.turn_on()
-        elif self.room_temperature > self.target_temperature + self.controller.args[
+        elif self.room_temperature > 2 * self.target_temperature + self.controller.args[
             "target_buffer"
         ] or (not self.ignoring_vacancy and self.vacant):
             self.turn_off()
+            # TODO: figure out a better way to manage apparent temperature triggering nursery heater off than 2 *
