@@ -21,7 +21,7 @@ class Presence(App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.rooms = {}
-        self.__pets_home_alone = None
+        self.__pets_home_alone = False
         self.last_device_date = None
 
     def initialize(self):
@@ -106,14 +106,15 @@ class Presence(App):
     def pets_home_alone(self, state: bool):
         """Enable/disable pets home alone mode and reflect state in UI."""
         self.log(f"'{'En' if state else 'Dis'}abling' pets home alone mode")
-        self.__pets_home_alone = state
-        self.call_service(
-            f"input_boolean/turn_{'on' if state else 'off'}",
-            entity_id="input_boolean.pets_home_alone",
-        )
-        if state:
-            self.control.apps["climate"].allow_climate_control = True
-            # TODO: don't do this, create specific self.control.apps["climate"].handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
+        if self.__pets_home_alone != state:
+            self.__pets_home_alone = state
+            self.call_service(
+                f"input_boolean/turn_{'on' if state else 'off'}",
+                entity_id="input_boolean.pets_home_alone",
+            )
+            if state:
+                self.control.apps["climate"].climate_control_enabled = True
+                # TODO: don't do this, create specific self.control.apps["climate"].handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
     @property
     def kitchen_door_open(self) -> bool:
