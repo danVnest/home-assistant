@@ -44,44 +44,44 @@ class Climate(App):
         )
         self.aircons = {
             "bedroom": Aircon(
-                "climate.bedroom_aircon",
-                self,
-                "bedroom",
+                device_id="climate.bedroom",  # _aircon",
+                controller=self,
+                room="bedroom",
                 doors=["bedroom_balcony"],
             ),
             "living_room": Aircon(
-                "climate.living_room_aircon",
-                self,
-                "living_room",
-                ["dining_room", "kitchen"],
-                ["kitchen", "dining_room_balcony"],
+                device_id="climate.living_room",  # _aircon",
+                controller=self,
+                room="living_room",
+                linked_rooms=["dining_room", "kitchen"],
+                doors=["kitchen", "dining_room_balcony"],
             ),
             "dining_room": Aircon(
-                "climate.dining_room_aircon",
-                self,
-                "dining_room",
-                ["living_room", "kitchen"],
-                ["kitchen", "dining_room_balcony"],
+                device_id="climate.dining_room",  # _aircon",
+                controller=self,
+                room="dining_room",
+                linked_rooms=["living_room", "kitchen"],
+                doors=["kitchen", "dining_room_balcony"],
             ),
         }
         self.heaters = {
             "nursery": Heater(
-                "climate.nursery_heater",
-                self,
-                "nursery",
+                device_id="climate.nursery_heater",
+                controller=self,
+                room="nursery",
                 safe_when_vacant=True,
             ),
             "office": Heater(
-                "switch.office_heater",
-                self,
-                "office",
+                device_id="switch.office_heater",
+                controller=self,
+                room="office",
             ),
         }
         self.fans = {
             room: Fan(
-                f"fan.{room}",
-                self,
-                room,
+                device_id=f"fan.{room}",
+                controller=self,
+                room=room,
             )
             for room in ("bedroom", "office")
             # TODO: https://app.asana.com/0/1207020279479204/1207033183115368/f
@@ -113,7 +113,7 @@ class Climate(App):
         self.log(f"'{'En' if enable else 'Dis'}abling' climate control")
         self.__climate_control_enabled = enable
         if enable:
-            for device_group in (self.aircons, self.fan, self.heaters):
+            for device_group in (self.aircons, self.fans, self.heaters):
                 for device in device_group.values():
                     device.climate_control = self.climate_control_history[device]
             self.check_conditions_and_adjust()
@@ -685,6 +685,7 @@ class Aircon(ClimateDevice, PresenceDevice):
     @property
     def fan_mode(self) -> str:
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
+        return self.get_attribute("fan_mode")
 
     @property
     def preferred_fan_mode(self) -> str:
@@ -695,10 +696,16 @@ class Aircon(ClimateDevice, PresenceDevice):
     def preferred_fan_mode(self, fan_mode: str):
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
         self.__preferred_fan_mode = fan_mode
+        if self.on and self.fan_mode != fan_mode:
             self.call_service("set_fan_mode", fan_mode=fan_mode)
 
     def turn_on_for_current_conditions(self):
         """Set the aircon unit to heat or cool at desired settings."""
+        mode = (
+            "cool"
+            if self.above_target_temperature or self.closer_to_hot_than_cold
+            else "heat"
+        )
         if self.device.state != mode:
             self.call_service("set_hvac_mode", hvac_mode=mode)
         target_temperature = self.controller.get_setting(
@@ -711,7 +718,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         if self.fan_mode != self.preferred_fan_mode:
             self.call_service("set_fan_mode", fan_mode=self.preferred_fan_mode)
         self.controller.allow_suggestion()
-
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
         # What about cooling? Fans? Take into account pet presence in each room?
         # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
@@ -823,10 +829,10 @@ class Fan(ClimateDevice, PresenceDevice):
     ):
         """Initialise with a fan's id, room(s), speed, direction, and controller."""
         super().__init__(
-            device_id,
-            controller,
-            room,
-            linked_rooms,
+            device_id=device_id,
+            controller=controller,
+            room=room,
+            linked_rooms=linked_rooms,
         )
         self.speed_per_level = self.get_attribute("percentage_step")
         self.speed_levels = round(100 / self.speed_per_level)
@@ -838,18 +844,19 @@ class Fan(ClimateDevice, PresenceDevice):
 
     @property
     def speed(self) -> bool:
-        """Get the fan's speed (0 is off, 100 is full speed)."""
-        return self.get_attribute("percentage") if self.on else 0
+        """Get the fan's speed if it was on (100 is full speed)."""
+        return self.get_attribute("percentage")
 
     @speed.setter
     def speed(self, new_speed: int):
-        """Set the fan's speed (0 is off, 100 is full speed)."""
-        if self.speed == new_speed:
+        """Set the fan's speed (0 is off, 100 is full speed)?"""
+        if self.speed == new_speed or (new_speed == 0 and not self.on):
             return
-        if new_speed == 0:
-            self.turn_off()
-        elif self.on:
-            self.call_service("set_percentage", percentage=new_speed)
+        if self.on:
+            if new_speed == 0:
+                self.turn_off()
+            else:
+                self.call_service("set_percentage", percentage=new_speed)
         else:
             self.turn_on(percentage=new_speed)
 
@@ -888,7 +895,7 @@ class Fan(ClimateDevice, PresenceDevice):
                     ),
                 )
                 speed = 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
-            elif self.companion_device and self.control.scene not in (
+            elif self.companion_device and self.controller.control.scene not in (
                 "Sleep",
                 "Morning",
             ):
@@ -922,14 +929,16 @@ class Heater(ClimateDevice, PresenceDevice):
         )
         self.safe_when_vacant = safe_when_vacant
         self.vacating_delay = (
-            60 * float(self.entities.input_number.heater_vacating_delay.state)
+            60
+            * float(self.controller.entities.input_number.heater_vacating_delay.state)
             if safe_when_vacant
             else 0
         )
 
     @property
-    def climate_control(self, enabled: bool):
+    def climate_control(self):
         """"""
+        return ClimateDevice.climate_control.fget(self)
 
     @climate_control.setter
     def climate_control(self, enabled: bool):
@@ -940,7 +949,7 @@ class Heater(ClimateDevice, PresenceDevice):
             and not self.controller.control.apps["presence"].anyone_home
         ):
             enabled = False
-        super().climate_control = enabled
+        ClimateDevice.climate_control.fset(self, enabled)
 
     @property
     def target_temperature(self) -> float:

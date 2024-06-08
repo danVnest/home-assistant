@@ -33,25 +33,57 @@ class Lights(App):
         """
         super().initialize()
         self.lights["entryway"] = Light(
-            "group.entryway_lights",
-            self,
-            "entryway",
+            device_id="group.entryway_lights",
+            controller=self,
+            room="entryway",
             linked_rooms=["front_door"],
         )
         self.lights["kitchen"] = Light(
-            "light.kitchen",
-            self,
-            "kitchen",
+            device_id="light.kitchen",
+            controller=self,
+            room="kitchen",
             linked_rooms=["back_deck"],
         )
-        self.lights["kitchen_strip"] = Light("light.kitchen_strip", self, "kitchen")
-        self.lights["tv"] = Light("group.tv_lights", self, "living_room")
-        self.lights["dining"] = Light("group.dining_lights", self, "dining_room")
-        self.lights["hall"] = Light("light.hall", self, "living_room")
-        self.lights["office"] = Light("light.office", self, "office")
-        self.lights["bedroom"] = Light("light.bedroom", self, "bedroom")
-        self.lights["nursery"] = Light("light.nursery", self, "nursery")
-        self.lights["bathroom"] = Light("light.bathroom", self, "bathroom")
+        self.lights["kitchen_strip"] = Light(
+            device_id="light.kitchen_strip",
+            controller=self,
+            room="kitchen",
+        )
+        self.lights["tv"] = Light(
+            device_id="group.tv_lights",
+            controller=self,
+            room="living_room",
+        )
+        self.lights["dining"] = Light(
+            device_id="group.dining_lights",
+            controller=self,
+            room="dining_room",
+        )
+        self.lights["hall"] = Light(
+            device_id="light.hall",
+            controller=self,
+            room="living_room",
+        )
+        self.lights["office"] = Light(
+            device_id="light.office",
+            controller=self,
+            room="office",
+        )
+        self.lights["bedroom"] = Light(
+            device_id="light.bedroom",
+            controller=self,
+            room="bedroom",
+        )
+        self.lights["nursery"] = Light(
+            device_id="light.nursery",
+            controller=self,
+            room="nursery",
+        )
+        self.lights["bathroom"] = Light(
+            device_id="light.bathroom",
+            controller=self,
+            room="bathroom",
+        )
         self.redate_circadian()
         self.run_daily(self.redate_circadian, "00:00:01")
         self.listen_state(
@@ -621,6 +653,12 @@ class Light(PresenceDevice):
         linked_rooms: list[str] = (),
     ):
         """Initialise with a lights's id, room(s), kelvin limits, and controller."""
+        super().__init__(
+            device_id=device_id,
+            controller=controller,
+            room=room,
+            linked_rooms=linked_rooms,
+        )
         self.control_input_boolean = (
             f"input_boolean.light_control_{self.device_id.split('.')[1]}"
         )

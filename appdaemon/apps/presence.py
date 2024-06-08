@@ -501,7 +501,7 @@ class PresenceDevice(Device):
             level="DEBUG",
         )
 
-    def transition_towards_occupied(self, kwargs: dict):
+    def transition_towards_occupied(self, **kwargs: dict):
         """Scheduling for child to step towards occupied device settings."""
         if kwargs["timer_id"] != self.transition_timer:
             return
