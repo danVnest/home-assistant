@@ -28,10 +28,11 @@ class Climate(App):
         self.aircons: dict[str, Aircon] = {}
         self.heaters: dict[str, Heater] = {}
         self.fans: dict[str, Fan] = {}
-        self.door_open_listener = None
         self.climate_control_history = {}
         # TODO: listen to all climate UI changes here, disable climate control for that device if it conflicts
         # TODO: consider adding all self.entities.group.climate_control states to history to restore when back from Away
+        # TODO: think about Away to/from home logic more
+        # TODO: if any climate control changed from UI while away, update history with new value
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -156,12 +157,12 @@ class Climate(App):
 
     def update_door_check_delay(self, seconds: float):
         """Update the delay before registering a door as open for each aircon."""
-        for aircon in self.aircon.values():
+        for aircon in self.aircons.values():
             aircon.door_open_delay = seconds
 
     def update_aircon_vacating_delays(self, seconds: float):
         """Update room vacating delay for each fan."""
-        for aircon in self.aircon.values():
+        for aircon in self.aircons.values():
             aircon.vacating_delay = seconds
 
     def update_fan_vacating_delays(self, seconds: float):
@@ -329,7 +330,7 @@ class Climate(App):
         self.adjust_temperature_targets_and_triggers()
 
     def terminate(self):
-        """Cancel presence callbacks before termination.
+        """Cancel presence callbacks before termination????
 
         Appdaemon defined function called before termination.
         """
@@ -720,7 +721,7 @@ class Aircon(ClimateDevice, PresenceDevice):
     def check_conditions_and_adjust(self):
         """Adjust aircon based on current conditions and target temperatures."""
         if not self.climate_control:
-            return  # TODO: I don't think this guard clause is necessary now that constraints are used
+            return  # TODO: I don't think this guard clause is necessary now that control_input_boolean are used
         # TODO: reset suggestions more often? on any climate UI changes?
         if not self.on:
             if self.too_hot_or_cold and (self.ignoring_vacancy or not self.vacant):
@@ -898,10 +899,11 @@ class Fan(ClimateDevice, PresenceDevice):
                     speed = self.speed_per_level * 1
         self.reverse = not hot
         self.speed = speed
-        self.log(
-            f"A desired fan speed of '{speed}' was set in the '{self.room}'",
-            level="DEBUG",
-        )
+        # TODO: remove all redundant debug logging throughout project, only have where there are complex checks
+        # self.controller.log(
+        #     f"A desired fan speed of '{speed}' was set in the '{self.room}'",
+        #     level="DEBUG",
+        # )
 
 
 class Heater(ClimateDevice, PresenceDevice):
@@ -963,7 +965,7 @@ class Heater(ClimateDevice, PresenceDevice):
     def check_conditions_and_adjust(self):
         """Turn the heater on/off based on current and target temperatures."""
         if not self.climate_control:
-            return
+            return  # TODO: all these guard clauses might be redundant now we have control_input_boolean
         if not self.on:
             if self.room_temperature < self.target_temperature - self.controller.args[
                 "target_buffer"
