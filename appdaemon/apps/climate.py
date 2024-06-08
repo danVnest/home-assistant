@@ -39,8 +39,9 @@ class Climate(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.__allow_climate_control = self.entities.group.climate_control.state == "on"
-        self.register_constraint("constraints")
+        self.__climate_control_enabled = (
+            self.entities.group.climate_control.state == "on"
+        )
         self.aircons = {
             "bedroom": Aircon(
                 "climate.bedroom_aircon",
@@ -100,22 +101,22 @@ class Climate(App):
                 device.monitor_presence()
 
     @property
-    def allow_climate_control(self) -> bool:
+    def climate_control_enabled(self) -> bool:
         """Get climate control setting that has been synced to Home Assistant."""
-        return self.__allow_climate_control
+        return self.__climate_control_enabled
 
-    @allow_climate_control.setter
-    def allow_climate_control(self, allow: bool):
+    @climate_control_enabled.setter
+    def climate_control_enabled(self, enable: bool):
         """Enable/disable climate control and reflect state in UI."""
-        if self.allow_climate_control == allow:
+        if self.climate_control_enabled == enable:
             return
-        self.log(f"'{'A' if allow else 'Disa'}llowing' climate control")
-        self.__allow_climate_control = allow
-        if allow:
+        self.log(f"'{'En' if enable else 'Dis'}abling' climate control")
+        self.__climate_control_enabled = enable
+        if enable:
             for device_group in (self.aircons, self.fan, self.heaters):
                 for device in device_group.values():
                     device.climate_control = self.climate_control_history[device]
-            self.handle_temperatures()
+            self.check_conditions_and_adjust()
         else:
             for device_group in (self.aircons, self.fans, self.heaters):
                 for device in device_group.values():
@@ -147,7 +148,7 @@ class Climate(App):
 
     def adjust_temperature_targets_and_triggers(self):
         """Reset climate control using latest settings?"""
-        self.handle_temperatures()
+        self.check_conditions_and_adjust()
         for device_group in (self.aircons, self.fans, self.heaters):
             for device in device_group.values():
                 device.adjust_temperature_targets_and_triggers()
@@ -178,24 +179,24 @@ class Climate(App):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
         if "Away" in new_scene:
             if not self.control.apps["presence"].pets_home_alone:
-                self.allow_climate_control = False
+                self.climate_control_enabled = False
                 for device_group in (self.aircons, self.fans):
                     for device in device_group.values():
                         device.turn_off()
             else:
-                self.allow_climate_control = True
+                self.climate_control_enabled = True
             for heater in self.heaters.values():
                 heater.turn_off()
         else:
-            self.allow_climate_control = True
+            self.climate_control_enabled = True
         if new_scene == "Sleep":
             self.end_pre_condition_bedrooms()
-        self.aircons["bedroom"].fan = (
+        self.aircons["bedroom"].preferred_fan_mode = (
             "low" if new_scene in ("Sleep", "Morning") else "auto"
         )
-        if self.allow_climate_control or not self.suggested:
-            self.handle_temperatures()
-        elif not self.allow_climate_control and any(
+        if self.climate_control_enabled or not self.suggested:
+            self.check_conditions_and_adjust()
+        elif not self.climate_control_enabled and any(
             [
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
                 new_scene == "Night" and old_scene == "Day",
@@ -205,7 +206,7 @@ class Climate(App):
         ):  # TODO: consider simplifying and removing old_scene?
             self.suggest_if_extreme_forecast()
 
-    def handle_temperatures(self):
+    def check_conditions_and_adjust(self):
         """Control aircon or suggest based on changes in inside temperature."""
         """Handle each case (house open, outside nicer, climate control status)?"""
         # TODO: find each reference to handle_temperatures and ensure the devices are triggered for that condition
@@ -262,7 +263,7 @@ class Climate(App):
         """Disables climate control only if it would immediately trigger aircon on."""
         # TODO: This needs an overhaul
         if self.climate_control and self.too_hot_or_cold:
-            self.allow_climate_control = False
+            self.climate_control_enabled = False
             self.climate_control_history["overridden"] = True
             self.notify(
                 "The current temperature ("
@@ -277,7 +278,7 @@ class Climate(App):
         """Disables climate control only if it would immediately trigger aircon off."""
         # TODO: This needs an overhaul
         if self.climate_control and self.within_target_temperatures:
-            self.allow_climate_control = False
+            self.climate_control_enabled = False
             self.climate_control_history["overridden"] = True
             self.notify(
                 "Inside is already within the desired temperature range,"
@@ -373,7 +374,7 @@ class Climate(App):
         """Calculate inside temperature then get controller to handle if changed."""
         del entity, attribute, old, kwargs
         if new not in (None, "unavailable"):
-            self.handle_temperatures()
+            self.check_conditions_and_adjust()
 
     @property
     def within_target_temperatures(self) -> bool:
@@ -469,19 +470,12 @@ class Climate(App):
             return min_forecast
         return None
 
-    def constraints(self, climate_control_id: str | None) -> bool:
-        """Constraint check for ClimateDevices to reflect climate control settings."""
-        return (
-            self.get_state(climate_control_id) == "on" if climate_control_id else True
-        )
-
 
 class ClimateDevice(Device):
     """Climate device that can be configured to respond to environmental changes?"""
 
     def __init__(
         self,
-        # TODO: add ClimateDevice stuff here
         **kwargs: dict,
     ):
         """Initialise with device parameters and prepare for presence adjustments?"""
@@ -491,16 +485,10 @@ class ClimateDevice(Device):
         )
         if self.device_type == "fan":
             self.climate_control_id += "_fan"
-        self.constraints = self.climate_control_id
-        self.temperature_sensors: list[str] = [
-            f"sensor.{room}_apparent_temperature"
-            for room in (self.room, *self.linked_rooms)
-        ]
-        for temperature_sensor in self.temperature_sensors:
-            self.listen_state(
+        self.control_input_boolean = self.climate_control_id
                 self.handle_temperature_change,
                 temperature_sensor,
-                constraints=self.constraints,
+                constrain_input_boolean=self.control_input_boolean,
             )
         self.adjustment_delay = 0
         self.last_adjustment_time = self.controller.get_now_ts()
@@ -668,7 +656,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         room: str,
         linked_rooms: list[str] = (),
         doors: list[str] = (),
-        default_fan_mode: str = "auto",
     ):
         """Initialise with an aircon's id, room(s), and the Climate controller."""
         super().__init__(
@@ -677,12 +664,13 @@ class Aircon(ClimateDevice, PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
-
+        self.__preferred_fan_mode = self.fan_mode
+        # TODO: set adjustment_delay?
         self.vacating_delay = 60 * float(
             controller.entities.input_number.aircon_vacating_delay.state,
         )
         self.doors = doors
-        self.__door_listeners = []
+        self.door_listeners = []
         self.__door_open_delay = 60 * float(
             controller.entities.input_number.aircon_door_check_delay.state,
         )
@@ -695,18 +683,22 @@ class Aircon(ClimateDevice, PresenceDevice):
             )
 
     @property
-    def fan(self) -> str:
+    def fan_mode(self) -> str:
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
-        self.get_attribute("fan_mode")  # TODO: check if aircon is on?
 
-    @fan.setter
-    def fan(self, fan_mode: str):  # TODO: check if aircon is on?
-        """Set the fan mode to the specified level (main options: 'low', 'auto')."""
-        if self.fan != fan_mode:
+    @property
+    def preferred_fan_mode(self) -> str:
+        """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
+        return self.__preferred_fan_mode
+
+    @preferred_fan_mode.setter
+    def preferred_fan_mode(self, fan_mode: str):
+        """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
+        self.__preferred_fan_mode = fan_mode
             self.call_service("set_fan_mode", fan_mode=fan_mode)
 
-    def turn_on(self, mode: str, fan: str | None = None):
-        """Set the aircon unit to heat or cool at the preconfigured temperature."""
+    def turn_on_for_current_conditions(self):
+        """Set the aircon unit to heat or cool at desired settings."""
         if self.device.state != mode:
             self.call_service("set_hvac_mode", hvac_mode=mode)
         target_temperature = self.controller.get_setting(
@@ -716,18 +708,8 @@ class Aircon(ClimateDevice, PresenceDevice):
         )  # TODO: potentially remove target_buffer?
         if self.get_attribute("temperature") != target_temperature:
             self.call_service("set_temperature", temperature=target_temperature)
-        if fan:
-            self.fan = fan
-
-    def turn_on_for_current_conditions(self):
-        """:"""
-        # TODO: consider moving into check_conditions_and_adjust
-        mode = (
-            "cool"
-            if self.above_target_temperature or self.closer_to_hot_than_cold
-            else "heat"
-        )
-        self.turn_on(mode, self.fan)
+        if self.fan_mode != self.preferred_fan_mode:
+            self.call_service("set_fan_mode", fan_mode=self.preferred_fan_mode)
         self.controller.allow_suggestion()
 
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
@@ -796,11 +778,12 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Set the number of seconds to delay before registering a door as open."""
         if self.door_open_delay != seconds:
             self.__door_open_delay = seconds
-            if self.__door_listeners:
-                for listener in self.__door_listeners:
+            if self.door_listeners:
+                for listener in self.door_listeners:
                     self.controller.cancel_listen_state(listener)
+                self.door_listeners = []
             for door in self.doors:
-                self.__door_listeners.append(
+                self.door_listeners.append(
                     self.controller.listen_state(
                         self.handle_door_change,
                         f"binary_sensor.{door}_door",
@@ -845,6 +828,8 @@ class Fan(ClimateDevice, PresenceDevice):
             room,
             linked_rooms,
         )
+        self.speed_per_level = self.get_attribute("percentage_step")
+        self.speed_levels = round(100 / self.speed_per_level)
         self.companion_device = companion_device
         self.vacating_delay = 60 * float(
             controller.entities.input_number.fan_vacating_delay.state,
@@ -893,11 +878,10 @@ class Fan(ClimateDevice, PresenceDevice):
             and self.vacant
             and not self.within_target_temperatures
         ):
-            speed_per_step = 100 / self.args["fan_speed_levels"]
             hot = self.above_target_temperature
             if hot:
-                speed = speed_per_step * min(
-                    self.args["fan_speed_levels"],
+                speed = self.speed_per_level * min(
+                    self.speed_levels,
                     ceil(
                         self.room_temperature
                         - self.controller.get_setting("cooling_target_temperature"),
@@ -909,7 +893,7 @@ class Fan(ClimateDevice, PresenceDevice):
                 "Morning",
             ):
                 if self.companion_device.on:
-                    speed = speed_per_step * 1
+                    speed = self.speed_per_level * 1
         self.reverse = not hot
         self.speed = speed
         self.log(

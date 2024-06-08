@@ -32,7 +32,6 @@ class Lights(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.register_constraint("constraints")
         self.lights["entryway"] = Light(
             "group.entryway_lights",
             self,
@@ -610,12 +609,6 @@ class Lights(App):
                     "automatic lighting enabled",
                 )
 
-    def constraints(self, climate_control_id: str | None) -> bool:
-        """Constraint check for Lights to reflect climate control settings?"""
-        # return (
-        #     self.get_state(climate_control_id) == "on" if climate_control_id else True
-        # )
-
 
 class Light(PresenceDevice):
     """Control a light (or a group) and configure responses to environmental changes."""
@@ -628,8 +621,9 @@ class Light(PresenceDevice):
         linked_rooms: list[str] = (),
     ):
         """Initialise with a lights's id, room(s), kelvin limits, and controller."""
-        super().__init__(device_id, controller, room, linked_rooms)
-        # self.constraints = self.climate_control_id # TODO:
+        self.control_input_boolean = (
+            f"input_boolean.light_control_{self.device_id.split('.')[1]}"
+        )
         self.kelvin_limits = {
             "max": self.get_attribute("max_color_temp_kelvin"),
             "min": self.get_attribute("min_color_temp_kelvin"),

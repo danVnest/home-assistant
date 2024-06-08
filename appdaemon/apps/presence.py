@@ -332,6 +332,7 @@ class Room:
                 self.callbacks[handle]["timer_handle"] = self.controller.run_in(
                     callback["callback"],
                     callback["vacating_delay"],
+                    constrain_input_boolean=callback["control_input_boolean"],
                 )
                 self.controller.log(
                     f"Set vacation timer for callback: {handle}",
@@ -344,18 +345,25 @@ class Room:
         self.sensors.append(sensor_id)
         self.controller.listen_state(self.handle_presence_change, sensor_id)
 
-    def register_callback(self, callback, vacating_delay: float = 0) -> uuid.UUID:
+    def register_callback(
+        self,
+        callback,
+        vacating_delay: float,
+        control_input_boolean: str,
+    ) -> uuid.UUID:
         """Register a callback for when presence changes, with an optional delay."""
         handle = uuid.uuid4().hex
         self.callbacks[handle] = {
             "callback": callback,
             "vacating_delay": vacating_delay,
             "timer_handle": None,
+            "control_input_boolean": control_input_boolean,
         }
         if 0 < -1 * self.seconds_in_room() < vacating_delay:
             self.callbacks[handle]["timer_handle"] = self.controller.run_in(
                 callback,
                 vacating_delay + self.seconds_in_room(),
+                constrain_input_boolean=control_input_boolean,
             )
 
         self.controller.log(
@@ -421,7 +429,7 @@ class PresenceDevice(Device):
                 for callback in self.presence_callbacks:
                     room.cancel_callback(callback)
             self.presence_callbacks = []
-        # TODO: just set self.ignore_vacancy to True and check with constraints
+        # TODO: just set self.ignore_vacancy to True and check with control_input_boolean
 
     def monitor_presence(self):
         """Set callbacks for when presence changes."""
@@ -430,12 +438,12 @@ class PresenceDevice(Device):
                 room.register_callback(
                     self.handle_presence_change,
                     self.vacating_delay,
-                    constraints=self.constraints,
+                    self.control_input_boolean,
                 )
                 for room in self.rooms
             ]
             self.handle_presence_change()
-        # TODO: just set self.ignore_vacancy to False and check with constraints
+        # TODO: just set self.ignore_vacancy to False and check with control_input_boolean
 
     def handle_presence_change(self, **kwargs):
         """Set device to adjust (with delay if required) when presence changes."""
@@ -483,7 +491,7 @@ class PresenceDevice(Device):
             step_time=step_time,
             steps_remaining=steps_remaining,
             timer_id=self.transition_timer,
-            constraints=self.constraints,
+            constrain_input_boolean=self.control_input_boolean,
             **kwargs,
         )
         self.controller.log(

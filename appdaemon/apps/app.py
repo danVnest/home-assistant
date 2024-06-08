@@ -98,7 +98,7 @@ class Device:
         self.device_type = device_id.split(".")[0]
         self.device = controller.get_entity(device_id)
         self.controller = controller
-        self.constraints = None
+        self.control_input_boolean = None
         self.room = room
         self.linked_rooms = linked_rooms
 

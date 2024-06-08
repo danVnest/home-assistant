@@ -333,9 +333,9 @@ class Control(App):
         elif "sleep" in data:
             self.scene = "Sleep"
         elif "climate_control" in data:
-            self.apps["climate"].allow_climate_control = not self.apps[
+            self.apps["climate"].climate_control_enabled = not self.apps[
                 "climate"
-            ].allow_climate_control
+            ].climate_control_enabled
         elif "aircon" in data:
             self.apps["climate"].aircon = not self.apps["climate"].aircon
             # TODO: how to handle individual aircons?
@@ -377,9 +377,11 @@ class Control(App):
                 )
         elif "climate_control" in setting:
             if setting == "climate_control" and (
-                (new == "on") != getattr(self.apps["climate"], setting)
+                (new == "on") != self.apps["climate"].climate_control_enabled
             ):
-                setattr(self.apps["climate"], setting, new == "on")
+                self.apps["climate"].climate_control_enabled = new == "on"
+            else:
+                self.apps["climate"].check_conditions_and_adjust()
         elif setting == "pets_home_alone":
             if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")

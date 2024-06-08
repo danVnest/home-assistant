@@ -7,6 +7,7 @@ views:
     cards:
       - entities:
           - entity: input_select.scene
+          - entity: group.light_control
           - entity: group.climate_control
           - entity: input_boolean.pets_home_alone
           - entity: lock.door_lock
@@ -80,14 +81,14 @@ views:
                 name: Dining
               - entity: light.hall
                 name: Hall
-              - entity: light.bedroom
-                name: Bedroom
-              - entity: light.office
-                name: Office
-              - entity: light.nursery
-                name: Nursery
               - entity: light.bathroom
                 name: Bathroom
+              - entity: light.bedroom
+                name: Bedroom
+              - entity: light.nursery
+                name: Nursery
+              - entity: light.office
+                name: Office
             show_icon: true
             show_name: true
             show_state: true
@@ -173,11 +174,9 @@ views:
       - type: entities
         entities:
           - entity: input_number.aircon_door_check_delay
-            name: Aircon off if door open
-            icon: mdi:timer
+          - entity: input_number.aircon_vacating_delay
           - entity: input_number.fan_vacating_delay
-            name: Fan off if room empty
-            icon: mdi:timer
+          - entity: input_number.heater_vacating_delay
         title: Climate Control Delays
   - title: Instructions
     path: instructions

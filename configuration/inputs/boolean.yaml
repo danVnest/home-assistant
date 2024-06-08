@@ -32,3 +32,34 @@ climate_control_nursery_heater:
 climate_control_office_heater:
   name: Office heater
   icon: mdi:radiator
+
+light_control_entryway:
+  name: Entryway
+  icon: mdi:lightbulb-multiple
+light_control_kitchen:
+  name: Kitchen
+  icon: mdi:lightbulb-variant
+light_control_kitchen_strip:
+  name: Kitchen strip
+  icon: mdi:wall-sconce-flat
+light_control_tv:
+  name: TV
+  icon: mdi:lightbulb-group
+light_control_dining:
+  name: Dining room
+  icon: mdi:lightbulb-multiple
+light_control_hall:
+  name: Hall
+  icon: mdi:lightbulb-variant
+light_control_office:
+  name: Office
+  icon: mdi:light-recessed
+light_control_bedroom:
+  name: Bedroom
+  icon: mdi:light-recessed
+light_control_nursery:
+  name: Nursery
+  icon: mdi:light-recessed
+light_control_bathroom:
+  name: Bathroom
+  icon: mdi:lightbulb-variant
