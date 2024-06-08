@@ -209,10 +209,11 @@ class Climate(App):
     def check_conditions_and_adjust(self):
         """Control aircon or suggest based on changes in inside temperature."""
         """Handle each case (house open, outside nicer, climate control status)?"""
-        # TODO: find each reference to handle_temperatures and ensure the devices are triggered for that condition
-        if self.suggested or not self.too_hot_or_cold:
-            return
-        if self.control.apps["presence"].pets_home_alone and self.aircon is False:
+        # TODO: find each reference to check_conditions_and_adjust and ensure the devices are triggered for that condition
+        for device_group in (self.aircons, self.fans, self.heaters):
+            for device in device_group.values():
+                device.check_conditions_and_adjust()
+        if self.control.apps["presence"].pets_home_alone and not self.aircon:
             # TODO: notify if no aircon can turn on because of the following:
             # IF (bedroom door closed AND no pet or human presence detected)
             # AND (kitchen OR balcony doors are open)
@@ -220,23 +221,6 @@ class Climate(App):
             # TODO: but don't notify if kitchen or balcony door is open and outdoor temperature is ok
             # TODO: suggest user turns on aircon manually if they are concerned
             pass
-        elif (
-            self.control.apps["presence"].anyone_home and self.outside_temperature_nicer
-        ):
-            message_beginning = (
-                f"Outside ({self.outside_temperature}º) "
-                "is a more pleasant temperature than inside "
-                f"({self.inside_temperature}º), consider"
-            )
-            if self.allow_climate_control:
-                if not self.control.apps["presence"].kitchen_door_open:
-                    # TODO: update to suggest if any doors are closed
-                    self.suggest(f"{message_beginning} opening up the house")
-            else:
-                if not self.control.apps["presence"].kitchen_door_open:
-                    # TODO: update to suggest if any doors are closed
-                    message_beginning += " opening up the house and/or"
-                self.suggest(f"{message_beginning} enabling climate control")
 
     def pre_condition_bedrooms(self):
         """Pre-cool/heat the bedroom and nursery for nice sleeping conditions."""
@@ -486,8 +470,15 @@ class ClimateDevice(Device):
         if self.device_type == "fan":
             self.climate_control_id += "_fan"
         self.control_input_boolean = self.climate_control_id
+        self.temperature_sensors = []
+        for room in (self.room, *self.linked_rooms):
+            temperature_sensor_id = f"sensor.{room}_apparent_temperature"
+            self.temperature_sensors.append(
+                self.controller.get_entity(temperature_sensor_id),
+            )
+            self.controller.listen_state(
                 self.handle_temperature_change,
-                temperature_sensor,
+                temperature_sensor_id,
                 constrain_input_boolean=self.control_input_boolean,
             )
         self.adjustment_delay = 0
@@ -503,7 +494,7 @@ class ClimateDevice(Device):
     def climate_control(self, enabled: bool):
         """"""
         if self.climate_control != enabled:
-            self.call_service(
+            self.controller.call_service(
                 f"input_boolean/turn_{'on' if enabled else 'off'}",
                 entity_id=self.climate_control_id,
             )
