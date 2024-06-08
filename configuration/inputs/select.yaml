@@ -1,7 +1,6 @@
 scene:
   name: Scene
   options:
-    - Custom
     - Day
     - Night
     - Bright

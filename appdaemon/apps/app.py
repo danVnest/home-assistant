@@ -129,8 +129,6 @@ class Device:
                     "homeassistant/turn_off",
                     entity_id=self.device_id,
                 )
-        # TODO: https://app.asana.com/0/1207020279479204/1207387085648282/f
-        # consider adding an optional argument to force off even if custom lighting enabled
 
     def call_service(self, service: str, **kwargs: dict):
         """Call one of the device's services in Home Assistant."""
@@ -154,7 +152,3 @@ class Device:
             return float(value)
         except ValueError:
             return value
-
-    # TODO: ADD CUSTOM LIGHTING CHECK TO DISABLE MONITORING
-    # listen for custom lighting change
-    # disable/enable callbacks accordingly

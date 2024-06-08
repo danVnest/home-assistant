@@ -160,6 +160,8 @@ class Control(App):
     @scene.setter
     def scene(self, new_scene: str):
         """Propagate scene change to other apps and sync scene with Home Assistant."""
+        # TODO: this should check if new_scene is different to old scene
+        # TODO: figure out where scene needs to be reset and why (current reason this isn't checked)
         old_scene = self.__scene
         self.__scene = new_scene
         self.log(f"Setting scene to '{new_scene}' (transitioning from '{old_scene}')")
@@ -217,13 +219,6 @@ class Control(App):
             )
         else:
             self.scene = "Night"
-
-    def set_custom_scene(self, on: bool):
-        """Set the scene to custom or reset to the most appropriate scene."""
-        if on:
-            self.scene = "Custom"
-        else:
-            self.reset_scene()
 
     def set_timer(self, name: str):
         """Set morning or bed timer as specified by the corresponding settings."""
@@ -366,15 +361,6 @@ class Control(App):
         if setting == "scene":
             if new != self.scene:
                 self.scene = new
-            if (
-                old == "Custom"
-                and self.entities.input_boolean.custom_lighting.state == "on"
-            ):
-                self.log("Turning custom lighting UI switch off")
-                self.call_service(
-                    "input_boolean/turn_off",
-                    entity_id="input_boolean.custom_lighting",
-                )
         elif "climate_control" in setting:
             if setting == "climate_control" and (
                 (new == "on") != self.apps["climate"].climate_control_enabled
@@ -393,10 +379,6 @@ class Control(App):
         """Act on changes to settings that can only be made through the UI."""
         if setting == "development_mode":
             self.set_production_mode(new == "off")
-        elif setting == "custom_lighting":
-            self.set_custom_scene(
-                new == "on",
-            )  # TODO: remove once per device control implemented
         elif setting.startswith("circadian"):
             try:
                 self.apps["lights"].redate_circadian()

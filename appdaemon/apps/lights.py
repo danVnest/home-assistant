@@ -133,9 +133,6 @@ class Lights(App):
             self.transition_to_morning_scene()
         elif scene == "Away (Night)":
             self.transition_to_away_scene()
-        elif scene == "Custom":
-            for light in self.lights.values():
-                light.ignore_vacancy()
         self.log(f"Light scene changed to '{scene}'")
 
     def transition_to_day_scene(self):
@@ -542,7 +539,7 @@ class Lights(App):
     ):
         """Change scene appropriately for high outside light levels."""
         del entity, attribute, old, new, kwargs
-        if self.control.scene not in ("Custom", "Bright", "Sleep", "Morning"):
+        if self.control.scene not in ("Bright", "Sleep", "Morning"):
             self.log("It is now bright outside - changing scene accordingly")
             self.control.scene = (
                 "Day" if self.control.apps["presence"].anyone_home else "Away (Day)"

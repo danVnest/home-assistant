@@ -525,9 +525,3 @@ class PresenceDevice(Device):
                 kwargs["step_time"],
                 **kwargs,
             )
-
-    # TODO: I think the following should be applied in Device and checked for in subclasses
-    # TODO: ADD CUSTOM LIGHTING CHECK TO DISABLE MONITORING
-    # listen for custom lighting change
-    # listen for climate control change
-    # disable/enable callbacks accordingly

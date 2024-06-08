@@ -74,43 +74,33 @@ views:
             show_name: true
             type: glance
         type: vertical-stack
-              - entity: group.all_lights
-                name: Any / all
-              - entity: group.entryway_lights
-                name: Entryway
-              - entity: group.kitchen_lights
-                name: Kitchen
-              - entity: group.tv_lights
-                name: TV
-              - entity: group.dining_lights
-                name: Dining
-              - entity: light.hall
-                name: Hall
-              - entity: light.bathroom
-                name: Bathroom
-              - entity: light.bedroom
-                name: Bedroom
-              - entity: light.nursery
-                name: Nursery
-              - entity: light.office
-                name: Office
-            show_icon: true
-            show_name: true
-            show_state: true
-            title: Lights
-            type: glance
-            state_color: true
-          - type: entities
-            entities:
-              - entity: input_boolean.custom_lighting
-            show_header_toggle: false
-            state_color: true
-          - content: >-
-              Enabling **custom lighting** will prevent automatic adjustments.
-              This is most useful at night when you want to override automatic
-              circadian rhythm dimming and changes based on presence.
-            type: markdown
-        type: vertical-stack
+      - type: glance
+        entities:
+          - entity: group.all_lights
+            name: Any / all
+          - entity: group.entryway_lights
+            name: Entryway
+          - entity: group.kitchen_lights
+            name: Kitchen
+          - entity: group.tv_lights
+            name: TV
+          - entity: group.dining_lights
+            name: Dining
+          - entity: light.hall
+            name: Hall
+          - entity: light.bathroom
+            name: Bathroom
+          - entity: light.bedroom
+            name: Bedroom
+          - entity: light.nursery
+            name: Nursery
+          - entity: light.office
+            name: Office
+        show_icon: true
+        show_name: true
+        show_state: true
+        title: Lights
+        state_color: true
       - cards:
           - show_name: true
             show_icon: true
