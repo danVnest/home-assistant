@@ -6,8 +6,8 @@
       turn_on:
         service: climate.turn_on
         target:
-          entity_id: climate.nursery
+          entity_id: climate.nursery_heater
       turn_off:
         service: climate.turn_off
         target:
-          entity_id: climate.nursery
+          entity_id: climate.nursery_heater
