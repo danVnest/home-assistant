@@ -109,9 +109,9 @@ views:
             entities:
               - entity: group.all_aircon
                 name: All
-              - entity: climate.living_room
-              - entity: climate.dining_room
-              - entity: climate.bedroom
+              - entity: climate.living_room_aircon
+              - entity: climate.dining_room_aircon
+              - entity: climate.bedroom_aircon
             state_color: true
             title: Aircon
           - show_name: true

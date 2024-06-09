@@ -49,9 +49,9 @@ all_lights:
 all_aircon:
   name: All aircon
   entities:
-    - climate.living_room
-    - climate.dining_room
-    - climate.bedroom
+    - climate.living_room_aircon
+    - climate.dining_room_aircon
+    - climate.bedroom_aircon
   all: true
 
 all_fans:

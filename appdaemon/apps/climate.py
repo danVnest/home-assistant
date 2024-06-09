@@ -43,22 +43,25 @@ class Climate(App):
         self.__climate_control_enabled = (
             self.entities.group.climate_control.state == "on"
         )
+        for device_group in (self.aircons, self.fans, self.heaters):
+            for device in device_group.values():
+                self.climate_control_history[device] = device.climate_control
         self.aircons = {
             "bedroom": Aircon(
-                device_id="climate.bedroom",  # _aircon",
+                device_id="climate.bedroom_aircon",
                 controller=self,
                 room="bedroom",
                 doors=["bedroom_balcony"],
             ),
             "living_room": Aircon(
-                device_id="climate.living_room",  # _aircon",
+                device_id="climate.living_room_aircon",
                 controller=self,
                 room="living_room",
                 linked_rooms=["dining_room", "kitchen"],
                 doors=["kitchen", "dining_room_balcony"],
             ),
             "dining_room": Aircon(
-                device_id="climate.dining_room",  # _aircon",
+                device_id="climate.dining_room_aircon",
                 controller=self,
                 room="dining_room",
                 linked_rooms=["living_room", "kitchen"],
@@ -91,15 +94,16 @@ class Climate(App):
         self.fans["bedroom"].companion_device = self.aircons["bedroom"]
         self.fans["office"].companion_device = self.heaters["office"]
         # self.fans["nursery"].companion_device=self.heaters["nursery"]
+        for device_group in (self.aircons, self.fans, self.heaters):
+            for device in device_group.values():
+                self.climate_control_history[device] = device.climate_control
+                device.monitor_presence()
+                device.check_conditions_and_adjust()
         for temperatures in ("weighted_average_inside", "outside"):
             self.listen_state(
                 self.handle_temperature_change,
                 f"sensor.{temperatures}_apparent_temperature",
             )
-        for device_group in (self.aircons, self.fans, self.heaters):
-            for device in device_group.values():
-                self.climate_control_history[device] = device.climate_control
-                device.monitor_presence()
 
     @property
     def climate_control_enabled(self) -> bool:
@@ -199,7 +203,7 @@ class Climate(App):
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if new_scene in ("Sleep", "Morning") else "auto"
         )
-        if self.climate_control_enabled or not self.suggested:
+        if self.climate_control_enabled:
             self.check_conditions_and_adjust()
         elif not self.climate_control_enabled and any(
             [
@@ -214,7 +218,6 @@ class Climate(App):
     def check_conditions_and_adjust(self):
         """Control aircon or suggest based on changes in inside temperature."""
         """Handle each case (house open, outside nicer, climate control status)?"""
-        # TODO: find each reference to check_conditions_and_adjust and ensure the devices are triggered for that condition
         for device_group in (self.aircons, self.fans, self.heaters):
             for device in device_group.values():
                 device.check_conditions_and_adjust()
@@ -362,7 +365,9 @@ class Climate(App):
     ):
         """Calculate inside temperature then get controller to handle if changed."""
         del entity, attribute, old, kwargs
-        if new not in (None, "unavailable"):
+        if new not in (None, "unavailable", "unknown"):
+            # TODO: https://app.asana.com/0/1207020279479204/1207217352886591/f
+            # be more resilient towards unavailable/unknown temperatures
             self.check_conditions_and_adjust()
 
     @property
@@ -410,7 +415,7 @@ class Climate(App):
     @property
     def outside_temperature_nicer(self) -> bool:
         """Check if outside is a nicer temperature than inside."""
-        mode = self.entities.climate.bedroom.state
+        mode = self.entities.climate.bedroom_aircon.state
         # TODO: use aircon group state instead?
         return any(
             (
@@ -462,6 +467,8 @@ class Climate(App):
 
 class ClimateDevice(Device):
     """Climate device that can be configured to respond to environmental changes?"""
+
+    # TODO: simpler to just make this a PresenceDevice than do multiple inheritance?
 
     def __init__(
         self,
@@ -588,7 +595,7 @@ class ClimateDevice(Device):
     @property
     def outside_temperature_nicer(self) -> bool:
         """Check if outside is a nicer temperature than inside."""
-        mode = self.entities.climate.bedroom.state
+        mode = self.entities.climate.bedroom_aircon.state
         # TODO: use aircon group state instead?
         return any(
             (
@@ -665,18 +672,21 @@ class Aircon(ClimateDevice, PresenceDevice):
         self.vacating_delay = 60 * float(
             controller.entities.input_number.aircon_vacating_delay.state,
         )
-        self.doors = doors
-        self.door_listeners = []
-        self.__door_open_delay = 60 * float(
-            controller.entities.input_number.aircon_door_check_delay.state,
-        )
-        for door in self.doors:
+        self.doors = []
+        for door in doors:
+            door_id = temperature_sensor_id = f"binary_sensor.{door}_door"
+            self.doors.append(self.controller.get_entity(temperature_sensor_id))
             self.controller.listen_state(
                 self.handle_door_change,
-                f"binary_sensor.{door}_door",
+                door_id,
                 new="off",
-                immediate=True,
+                constrain_input_boolean=self.control_input_boolean,
             )
+        self.door_listeners = []
+        self.__door_open_delay = None
+        self.door_open_delay = 60 * float(
+            controller.entities.input_number.aircon_door_check_delay.state,
+        )
 
     @property
     def fan_mode(self) -> str:
@@ -741,7 +751,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                     not self.outside_temperature_nicer
                     and self.controller.control.apps["presence"].anyone_home
                 ):
-                    self.suggest(
+                    self.controller.suggest(
                         f"It's {self.room_temperature}º in the {self.room} right now, "
                         "consider closing up the house so aircon can turn on",
                     )
@@ -755,7 +765,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.outside_temperature_nicer
             and self.controller.control.apps["presence"].anyone_home
         ):
-            self.suggest(
+            self.controller.suggest(
                 f"Outside ({self.room_temperature}º) "
                 f"is a more pleasant temperature than the {self.room} "
                 f"({self.room_temperature}º), consider opening up the house",
@@ -764,10 +774,7 @@ class Aircon(ClimateDevice, PresenceDevice):
     @property
     def door_open(self) -> bool:
         """Check if any doors are open."""
-        return any(
-            self.controller.get_state(f"binary_sensor.{door}_door") == "on"
-            for door in self.doors
-        )
+        return any(door.state == "on" for door in self.doors)
         # TODO: maybe change all repeated get_state usages to storing the actual entitiy as a variable and getting state from that
 
     @property
@@ -778,22 +785,23 @@ class Aircon(ClimateDevice, PresenceDevice):
     @door_open_delay.setter
     def door_open_delay(self, seconds: float) -> float:
         """Set the number of seconds to delay before registering a door as open."""
-        if self.door_open_delay != seconds:
+        if self.__door_open_delay != seconds:
             self.__door_open_delay = seconds
             if self.door_listeners:
                 for listener in self.door_listeners:
                     self.controller.cancel_listen_state(listener)
                 self.door_listeners = []
-            for door in self.doors:
-                self.door_listeners.append(
-                    self.controller.listen_state(
-                        self.handle_door_change,
-                        f"binary_sensor.{door}_door",
-                        new="on",
-                        duration=seconds,
-                        immediate=True,
-                    ),
-                )
+            if seconds > 0:
+                for door in self.doors:
+                    self.door_listeners.append(
+                        self.controller.listen_state(
+                            self.handle_door_change,
+                            door.entity_id,
+                            new="on",
+                            duration=seconds,
+                        ),
+                    )
+            self.check_conditions_and_adjust()
 
     def handle_door_change(
         self,
