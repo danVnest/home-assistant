@@ -366,8 +366,6 @@ class Control(App):
                 (new == "on") != self.apps["climate"].climate_control_enabled
             ):
                 self.apps["climate"].climate_control_enabled = new == "on"
-            else:
-                self.apps["climate"].check_conditions_and_adjust()
         elif setting == "pets_home_alone":
             if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")

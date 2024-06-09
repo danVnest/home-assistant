@@ -28,11 +28,7 @@ class Climate(App):
         self.aircons: dict[str, Aircon] = {}
         self.heaters: dict[str, Heater] = {}
         self.fans: dict[str, Fan] = {}
-        self.climate_control_history = {}
         # TODO: listen to all climate UI changes here, disable climate control for that device if it conflicts
-        # TODO: consider adding all self.entities.group.climate_control states to history to restore when back from Away
-        # TODO: think about Away to/from home logic more
-        # TODO: if any climate control changed from UI while away, update history with new value
 
     def initialize(self):
         """Initialise TemperatureMonitor, Aircon units, and event listening.
@@ -43,9 +39,6 @@ class Climate(App):
         self.__climate_control_enabled = (
             self.entities.group.climate_control.state == "on"
         )
-        for device_group in (self.aircons, self.fans, self.heaters):
-            for device in device_group.values():
-                self.climate_control_history[device] = device.climate_control
         self.aircons = {
             "bedroom": Aircon(
                 device_id="climate.bedroom_aircon",
@@ -87,16 +80,13 @@ class Climate(App):
                 controller=self,
                 room=room,
             )
-            for room in ("bedroom", "office")
-            # TODO: https://app.asana.com/0/1207020279479204/1207033183115368/f
-            # for room in ("bedroom", "office", "nursery")
+            for room in ("bedroom", "office", "nursery")
         }
         self.fans["bedroom"].companion_device = self.aircons["bedroom"]
         self.fans["office"].companion_device = self.heaters["office"]
-        # self.fans["nursery"].companion_device=self.heaters["nursery"]
+        self.fans["nursery"].companion_device = self.heaters["nursery"]
         for device_group in (self.aircons, self.fans, self.heaters):
             for device in device_group.values():
-                self.climate_control_history[device] = device.climate_control
                 device.monitor_presence()
                 device.check_conditions_and_adjust()
         for temperatures in ("weighted_average_inside", "outside"):
@@ -118,15 +108,8 @@ class Climate(App):
         self.log(f"'{'En' if enable else 'Dis'}abling' climate control")
         self.__climate_control_enabled = enable
         if enable:
-            for device_group in (self.aircons, self.fans, self.heaters):
-                for device in device_group.values():
-                    device.climate_control = self.climate_control_history[device]
             self.check_conditions_and_adjust()
         else:
-            for device_group in (self.aircons, self.fans, self.heaters):
-                for device in device_group.values():
-                    self.climate_control_history[device] = device.climate_control
-                    device.climate_control = False
             self.allow_suggestion()
 
     @property
@@ -476,12 +459,16 @@ class ClimateDevice(Device):
     ):
         """Initialise with device parameters and prepare for presence adjustments?"""
         super().__init__(**kwargs)
-        self.climate_control_id = (
+        control_input_boolean = (
             f"input_boolean.climate_control_{self.device_id.split('.')[1]}"
         )
         if self.device_type == "fan":
-            self.climate_control_id += "_fan"
-        self.control_input_boolean = self.climate_control_id
+            control_input_boolean += "_fan"
+        self.control_input_boolean = control_input_boolean
+        self.controller.listen_state(
+            self.handle_temperature_change,
+            control_input_boolean,
+        )
         self.temperature_sensors = []
         for room in (self.room, *self.linked_rooms):
             temperature_sensor_id = f"sensor.{room}_apparent_temperature"
@@ -500,7 +487,7 @@ class ClimateDevice(Device):
     @property
     def climate_control(self) -> bool:
         """"""
-        return self.controller.get_state(self.climate_control_id) == "on"
+        return self.controller.get_state(self.control_input_boolean) == "on"
 
     @climate_control.setter
     def climate_control(self, enabled: bool):
@@ -508,7 +495,7 @@ class ClimateDevice(Device):
         if self.climate_control != enabled:
             self.controller.call_service(
                 f"input_boolean/turn_{'on' if enabled else 'off'}",
-                entity_id=self.climate_control_id,
+                entity_id=self.control_input_boolean,
             )
             # TODO: does this even occur? maybe if we need to disable due to UI changes
             # TODO: anything else than needs updating?
@@ -730,7 +717,10 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(self):
         """Adjust aircon based on current conditions and target temperatures."""
-        if not self.climate_control:
+        if not self.climate_control or (
+            "Away" in self.controller.control.scene
+            and not self.controller.control.apps["presence"].pets_home_alone
+        ):
             return  # TODO: I don't think this guard clause is necessary now that control_input_boolean are used
         # TODO: reset suggestions more often? on any climate UI changes?
         if not self.on:
@@ -880,7 +870,10 @@ class Fan(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(self):
         """Calculate best fan speed for the current conditions and set accordingly."""
-        if not self.climate_control:
+        if not self.climate_control or (
+            "Away" in self.controller.control.scene
+            and not self.controller.control.apps["presence"].pets_home_alone
+        ):
             return
         speed = 0
         hot = not self.reverse
@@ -972,7 +965,7 @@ class Heater(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(self):
         """Turn the heater on/off based on current and target temperatures."""
-        if not self.climate_control:
+        if not self.climate_control or "Away" in self.controller.control.scene:
             return  # TODO: all these guard clauses might be redundant now we have control_input_boolean
         if not self.on:
             if self.room_temperature < self.target_temperature - self.controller.args[
