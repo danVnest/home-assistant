@@ -1,0 +1,9 @@
+- name: Climate controlled device count
+  state: "{% from 'custom_templates.jinja' import group_on_fraction %}{{ group_on_fraction('climate_control') }}"
+  unit_of_measurement: ""
+  state_class: measurement
+
+- name: Light controlled device count
+  state: "{% from 'custom_templates.jinja' import group_on_fraction %}{{ group_on_fraction('light_control') }}"
+  unit_of_measurement: "%"
+  state_class: measurement
