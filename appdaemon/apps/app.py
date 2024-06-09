@@ -101,6 +101,18 @@ class Device:
         self.control_input_boolean = None
         self.room = room
         self.linked_rooms = linked_rooms
+        # TODO: listen to all climate UI changes here, disable climate control for that device if it conflicts
+        # self.controller.listen_event(
+        #     self.handle_state_change,
+        #     "state_changed",
+        #     entity_id=self.device_id,
+        #     metadata=lambda metadata: metadata["context"]["user_id"] is not None,
+        # )  # TODO: use this version once you're sure there's no key errors
+        self.controller.listen_event(
+            self.handle_state_change,
+            "state_changed",
+            entity_id=self.device_id,
+        )
 
     @property
     def on(self) -> bool:
@@ -152,3 +164,20 @@ class Device:
             return float(value)
         except ValueError:
             return value
+
+    def handle_state_change(self, event_name: str, data: dict, **kwargs: dict):
+        """"""
+        del event_name, kwargs
+        try:
+            if data["metadata"]["context"]["user_id"] is not None:
+                self.controller.log(f"User changed {self.device_id}")
+                self.handle_user_adjustment()
+        except KeyError:
+            self.controller.log(
+                f"KeyError when detecting user initiated state change: {data}",
+                level="WARNING",
+            )
+        # TODO: remove try and if is not None (and use lambda) once you're sure there's no key errors
+
+    def handle_user_adjustment(self):
+        """Override this in child class to adjust device settings appropriately."""
