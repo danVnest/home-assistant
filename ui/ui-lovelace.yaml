@@ -3,12 +3,9 @@ views:
   - path: control_and_status
     title: Control & Status
     icon: mdi:home-assistant
-    badges: []
     cards:
       - entities:
           - entity: input_select.scene
-          - entity: group.light_control
-          - entity: group.climate_control
           - entity: input_boolean.pets_home_alone
           - entity: lock.door_lock
         show_header_toggle: false
@@ -37,23 +34,6 @@ views:
           - entity: switch.dryer
             state: "on"
         type: conditional
-      - card:
-          entities:
-            - entity: input_number.cooling_target_temperature
-            - entity: input_number.heating_target_temperature
-            - entity: input_number.high_temperature_aircon_trigger
-            - entity: input_number.low_temperature_aircon_trigger
-          show_header_toggle: false
-          title: Climate Control Settings
-          type: entities
-          state_color: true
-        conditions:
-          - condition: state
-            entity: group.climate_control
-            state: "on"
-          - entity: binary_sensor.display_day_card
-            state: "on"
-        type: conditional
       - cards:
           - entities:
               - entity: sensor.weighted_average_inside_apparent_temperature
@@ -74,33 +54,8 @@ views:
             show_name: true
             type: glance
         type: vertical-stack
-      - type: glance
-        entities:
-          - entity: group.all_lights
-            name: Any / all
-          - entity: group.entryway_lights
-            name: Entryway
-          - entity: group.kitchen_lights
-            name: Kitchen
-          - entity: group.tv_lights
-            name: TV
-          - entity: group.dining_lights
-            name: Dining
-          - entity: light.hall
-            name: Hall
-          - entity: light.bathroom
-            name: Bathroom
-          - entity: light.bedroom
-            name: Bedroom
-          - entity: light.nursery
-            name: Nursery
-          - entity: light.office
-            name: Office
-        show_icon: true
-        show_name: true
-        show_state: true
-        title: Lights
-        state_color: true
+        view_layout:
+          position: sidebar
       - cards:
           - show_name: true
             show_icon: true
@@ -144,66 +99,117 @@ views:
                 icon: mdi:radiator
             title: Heaters
           - content: >-
-              Manually controlling aircon, fans, or heaters may disable climate
-              control for those devices. You can re-enable devices by selecting
-              **climate control** above.
+              Manually controlling aircon, fans, or heaters may disable
+              **automatic control** for those devices. You can toggle
+              **automatic control** of all/individual devices below.
             type: markdown
-        type: vertical-stack
-      - card:
-          entities:
-            - entity: input_number.sleep_cooling_target_temperature
-            - entity: input_number.sleep_heating_target_temperature
-            - entity: input_number.sleep_high_temperature_aircon_trigger
-            - entity: input_number.sleep_low_temperature_aircon_trigger
-          show_header_toggle: false
-          title: Climate Control Settings (Night)
-          type: entities
-          state_color: true
-        conditions:
-          - condition: state
-            entity: group.climate_control
-            state: "on"
-          - condition: state
-            entity: binary_sensor.display_day_card
-            state: "off"
-        type: conditional
-      - type: entities
-        entities:
-          - entity: input_number.aircon_door_check_delay
-          - entity: input_number.aircon_vacating_delay
-          - entity: input_number.fan_vacating_delay
-          - entity: input_number.heater_vacating_delay
-        title: Climate Control Delays
-  - title: Instructions
-    path: instructions
-    icon: mdi:text-box
-    badges: []
-    cards:
-      - content: >-
-          **Lighting** and **climate settings** (if enabled) are automatically
-          adjusted between different scenes. You can also manually select a
-          preferred scene in this app, or tell Siri/Google:
+          - type: entities
+            title: Automatic climate control
+            entities:
+              - input_boolean.climate_control_living_room_aircon
+              - input_boolean.climate_control_dining_room_aircon
+              - input_boolean.climate_control_bedroom_aircon
+              - input_boolean.climate_control_nursery_fan
+              - input_boolean.climate_control_office_fan
+              - input_boolean.climate_control_bedroom_fan
+              - input_boolean.climate_control_nursery_heater
+              - input_boolean.climate_control_office_heater
+            show_header_toggle: true
+          - type: markdown
+            content: >-
+              **Automatic climate control** will control each aircon, fan, and
+              heater based on room temperature and occupancy.
 
-          - **"lights on"** or **"lights off"** for the *Night* and *Day* scenes
+              If the **pets are home alone** (or are going to be soon), you can
+              manually specify this or wait for their movement to be detected to
+              trigger **climate control**.
+
+              Only the bedroom aircon will be controlled when **pets are home
+              alone** (bedroom and office fans will be on as well) or after the
+              specified bed time. **Aircon** can also be manually turned on and
+              off. These settings can be controlled by telling Siri/Google:
+
+              - **"climate control on"** or **"climate control off"**
+
+              - **"aircon on"** or **"aircon off"**
+
+
+              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
+              CONTROL DISABLED
+        type: vertical-stack
+      - cards:
+          - type: glance
+            entities:
+              - entity: group.all_lights
+                name: Any / all
+              - entity: group.entryway_lights
+                name: Entryway
+              - entity: group.kitchen_lights
+                name: Kitchen
+              - entity: group.tv_lights
+                name: TV
+              - entity: group.dining_lights
+                name: Dining
+              - entity: light.hall
+                name: Hall
+              - entity: light.bathroom
+                name: Bathroom
+              - entity: light.bedroom
+                name: Bedroom
+              - entity: light.nursery
+                name: Nursery
+              - entity: light.office
+                name: Office
+            show_icon: true
+            show_name: true
+            show_state: true
+            title: Lights
+            state_color: true
+          - content: >-
+              Manually controlling lights may disable **automatic control** for
+              those lights. You can toggle **automatic control** of
+              all/individual lights below.
+            type: markdown
+          - type: entities
+            title: Automatic light control
+            entities:
+              - input_boolean.light_control_entryway
+              - input_boolean.light_control_kitchen
+              - input_boolean.light_control_kitchen_strip
+              - input_boolean.light_control_tv
+              - input_boolean.light_control_dining
+              - input_boolean.light_control_hall
+              - input_boolean.light_control_bathroom
+              - input_boolean.light_control_bedroom
+              - input_boolean.light_control_nursery
+              - input_boolean.light_control_office
+            show_header_toggle: true
+          - type: markdown
+            content: >-
+              Lighting in the entryway, kitchen, office and bedroom will
+              automatically brighten when someone enters, and dim shortly after
+              they leave (depending on scene settings). Automatic bedroom
+              lighting is disabled as soon as the ***Sleep*** scene starts, only
+              enabling again when the bedroom **button** is clicked or after
+              illuminance levels peak (i.e. after blinds are first opened in the
+              morning).
+
+
+              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
+              CONTROL DISABLED
+        type: vertical-stack
+      - content: >-
+          **Lighting** and **climate** settings are automatically adjusted based
+          on time, room occupancy, temperatures, illuminance, and various other
+          factors. The system will transition between **scenes** throughout the
+          day - these scenes are general categories for desired functionality.
+          Settings for each scene are available in other tabs. The system will
+          automatically switch between different scenes. You can also manually
+          select a preferred scene in this app, or tell Siri/Google:
 
           - **"lights on bright"** for the *Bright* scene
 
           - **"sleep time"** for the *Sleep* scene
-
-
-          **Automatic climate control** will control all aircon and fan units
-          based on the temperature throughout the house. Fans will only turn on
-          if aircon is on in the room or it is occupied. If the **pets are home
-          alone** (or are going to be soon), you can manually specify this or
-          wait for their movement to be detected to trigger climate control.
-          Only the bedroom aircon will be controlled when **pets are home
-          alone** (bedroom and office fans will be on as well) or after the
-          specified bed time. **Aircon** can also be manually turned on and off.
-          These settings can be controlled by telling Siri/Google:
-
-          - **"climate control on"** or **"climate control off"**
-
-          - **"aircon on"** or **"aircon off"**
 
 
           Each **scene** has a particular purpose:
@@ -244,44 +250,130 @@ views:
           then when clicked again it will turn the bedroom light off (properly
           entering ***Sleep***). Holding either button for a few seconds will
           toggle the aircon.
-
-
-          Lighting in the entryway, kitchen, office and bedroom will
-          automatically brighten when someone enters, and dim shortly after they
-          leave (depending on scene settings). Automatic bedroom lighting is
-          disabled as soon as the ***Sleep*** scene starts, only enabling again
-          when the bedroom **button** is clicked or after illuminance levels
-          peak (i.e. after blinds are first opened in the morning).
-
-
-          In order to use Siri, you will need to add the following Siri
-          shortcuts to your device: [Sleep
-          Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9),
-          [Lights On
-          Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010),
-          [Lights
-          On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd),
-          [Lights
-          Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167),
-          [Aircon
-          On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34),
-          [Aircon
-          Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655),
-          [Enable Climate
-          Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35),
-          [Disable Climate
-          Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706),
-          [Lock The
-          Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1),
-          [Unlock The
-          Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
-          [TV
-          On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
-
-          In order to use Google, you will need to connect your Google Assistant
-          to IFTTT and add applets with webhooks to Home Assistant corresponding
-          to each command.
         type: markdown
+  - title: Climate
+    path: climate
+    icon: mdi:thermometer
+    cards:
+      - entities:
+          - entity: input_number.cooling_target_temperature
+          - entity: input_number.heating_target_temperature
+          - entity: input_number.high_temperature_aircon_trigger
+          - entity: input_number.low_temperature_aircon_trigger
+        show_header_toggle: false
+        title: Day
+        type: entities
+        state_color: true
+      - entities:
+          - entity: input_number.sleep_cooling_target_temperature
+          - entity: input_number.sleep_heating_target_temperature
+          - entity: input_number.sleep_high_temperature_aircon_trigger
+          - entity: input_number.sleep_low_temperature_aircon_trigger
+        show_header_toggle: false
+        title: Night
+        type: entities
+        state_color: true
+      - type: entities
+        entities:
+          - entity: input_number.aircon_door_check_delay
+          - entity: input_number.aircon_vacating_delay
+          - entity: input_number.fan_vacating_delay
+          - entity: input_number.heater_vacating_delay
+        title: Delays
+  - path: lights
+    title: Lights
+    icon: mdi:lightbulb-variant
+    cards:
+      - cards:
+          - entities:
+              - entity: input_number.initial_circadian_brightness
+              - entity: input_number.initial_circadian_kelvin
+              - entity: input_number.final_circadian_brightness
+              - entity: input_number.final_circadian_kelvin
+              - entity: input_number.circadian_initial_sunset_offset
+              - entity: input_datetime.circadian_end_time
+            title: Circadian Rhythm
+            type: entities
+            state_color: false
+          - content: >-
+              Lighting at night will gradually transition between the initial
+              and final brightness and colour values specified here.
+
+
+              Initial circadian settings occur after sunset (specified in hours
+              by *initial sunset offset*) and reaches the final values at *end
+              time*.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - entities:
+              - entity: input_datetime.morning_time
+              - entity: input_datetime.bed_time
+            show_header_toggle: false
+            title: Times
+            type: entities
+            state_color: true
+          - content: >-
+              Specify the time for which the ***Morning*** scene and pre-sleep
+              climate control will trigger. More information in the
+              **Instructions** tab.
+            type: markdown
+        type: vertical-stack
+      - cards:
+          - content: >-
+              Values here specify the *brightness* and colour temperature of
+              lighting in different scenes. Colour temperature ranges from warm
+              white (2000 *kelvin*) to cold white (4500 *kelvin*).
+
+
+              *Motion* indicates the value is specific to when the room is
+              occupied (otherwise defaulting to the normal values specified, the
+              current circadian value, off, or maximum - depending on the
+              scene).
+
+
+              *Vacating delay* specifies how long the light will wait after
+              someone leaves the room before reverting to its previous state.
+
+
+              If a *transition period* is available the light will smoothly
+              change over that period to the motion brightness and kelvin
+              specified or implied.
+            type: markdown
+          - entities:
+              - entity: input_number.night_motion_brightness
+              - entity: input_number.night_motion_kelvin
+              - entity: input_number.night_transition_period
+              - entity: input_number.night_vacating_delay
+            title: Night
+            type: entities
+          - entities:
+              - entity: input_number.tv_brightness
+              - entity: input_number.tv_kelvin
+              - entity: input_number.tv_motion_brightness
+              - entity: input_number.tv_transition_period
+              - entity: input_number.tv_vacating_delay
+            title: TV
+            type: entities
+          - entities:
+              - entity: input_number.sleep_motion_brightness
+              - entity: input_number.sleep_motion_kelvin
+              - entity: input_number.sleep_transition_period
+              - entity: input_number.sleep_vacating_delay
+            title: Sleep
+            type: entities
+          - entities:
+              - entity: input_number.morning_brightness
+              - entity: input_number.morning_kelvin
+              - entity: input_number.morning_vacating_delay
+            title: Morning
+            type: entities
+        type: vertical-stack
+      - entities:
+          - entity: input_number.office_vacating_delay
+          - entity: input_number.bedroom_vacating_delay
+        title: Room Vacating Delays
+        type: entities
   - title: Presence
     path: presence
     icon: mdi:cctv
@@ -400,101 +492,6 @@ views:
           - entity: binary_sensor.office_presence_sensor_occupancy
         title: Motion
         hours_to_show: 24
-  - path: light-settings
-    title: Light Settings
-    icon: mdi:globe-light
-    badges: []
-    cards:
-      - cards:
-          - entities:
-              - entity: input_number.initial_circadian_brightness
-              - entity: input_number.initial_circadian_kelvin
-              - entity: input_number.final_circadian_brightness
-              - entity: input_number.final_circadian_kelvin
-              - entity: input_number.circadian_initial_sunset_offset
-              - entity: input_datetime.circadian_end_time
-            title: Circadian Rhythm
-            type: entities
-            state_color: false
-          - content: >-
-              Lighting at night will gradually transition between the initial
-              and final brightness and colour values specified here.
-
-
-              Initial circadian settings occur after sunset (specified in hours
-              by *initial sunset offset*) and reaches the final values at *end
-              time*.
-            type: markdown
-        type: vertical-stack
-      - cards:
-          - entities:
-              - entity: input_datetime.morning_time
-              - entity: input_datetime.bed_time
-            show_header_toggle: false
-            title: Times
-            type: entities
-            state_color: true
-          - content: >-
-              Specify the time for which the ***Morning*** scene and pre-sleep
-              climate control will trigger. More information in the
-              **Instructions** tab.
-            type: markdown
-        type: vertical-stack
-      - cards:
-          - content: >-
-              Values here specify the *brightness* and colour temperature of
-              lighting in different scenes. Colour temperature ranges from warm
-              white (2000 *kelvin*) to cold white (4500 *kelvin*).
-
-
-              *Motion* indicates the value is specific to when the room is
-              occupied (otherwise defaulting to the normal values specified, the
-              current circadian value, off, or maximum - depending on the
-              scene).
-
-
-              *Vacating delay* specifies how long the light will wait after
-              someone leaves the room before reverting to its previous state.
-
-
-              If a *transition period* is available the light will smoothly
-              change over that period to the motion brightness and kelvin
-              specified or implied.
-            type: markdown
-          - entities:
-              - entity: input_number.night_motion_brightness
-              - entity: input_number.night_motion_kelvin
-              - entity: input_number.night_transition_period
-              - entity: input_number.night_vacating_delay
-            title: Night
-            type: entities
-          - entities:
-              - entity: input_number.tv_brightness
-              - entity: input_number.tv_kelvin
-              - entity: input_number.tv_motion_brightness
-              - entity: input_number.tv_transition_period
-              - entity: input_number.tv_vacating_delay
-            title: TV
-            type: entities
-          - entities:
-              - entity: input_number.sleep_motion_brightness
-              - entity: input_number.sleep_motion_kelvin
-              - entity: input_number.sleep_transition_period
-              - entity: input_number.sleep_vacating_delay
-            title: Sleep
-            type: entities
-          - entities:
-              - entity: input_number.morning_brightness
-              - entity: input_number.morning_kelvin
-              - entity: input_number.morning_vacating_delay
-            title: Morning
-            type: entities
-        type: vertical-stack
-      - entities:
-          - entity: input_number.office_vacating_delay
-          - entity: input_number.bedroom_vacating_delay
-        title: Room Vacating Delays
-        type: entities
   - path: development
     title: Development
     visible:
@@ -714,3 +711,42 @@ views:
         type: history-graph
         hours_to_show: 12
         logarithmic_scale: false
+  - title: Instructions
+    path: instructions
+    icon: mdi:text-box
+    cards:
+      - type: markdown
+        content: >-
+
+          In order to use Siri, you will need to add the following Siri
+          shortcuts to your device: [Sleep
+          Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9),
+          [Lights On
+          Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010),
+          [Lights
+          On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd),
+          [Lights
+          Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167),
+          [Aircon
+          On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34),
+          [Aircon
+          Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655),
+          [Enable Climate
+          Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35),
+          [Disable Climate
+          Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706),
+          [Lock The
+          Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1),
+          [Unlock The
+          Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
+          [TV
+          On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
+
+          In order to use Google, you will need to connect your Google Assistant
+          to IFTTT and add applets with webhooks to Home Assistant corresponding
+          to each command.
+
+
+          CHANGE ABOVE TO LIST OF QUOTES
+        title: Voice control
+    subview: false
