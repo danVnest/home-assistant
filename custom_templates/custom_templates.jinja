@@ -1,15 +1,3 @@
-{%- macro group_count_on(group) -%}
-    {{ expand(state_attr('group.' + group, 'entity_id')) | selectattr('state', 'eq', 'on') | map(attribute='entity_id') | list | count }}
-{%- endmacro -%}
-
-{%- macro group_count(group) -%}
-    {{ state_attr('group.' + group, 'entity_id') | count }}
-{%- endmacro -%}
-
-{%- macro group_on_fraction(group) -%}
-    {{ group_count_on(group) }}/{{ group_count(group) }}
-{%- endmacro -%}
-
 {%- macro soil_sensor_battery(location) -%}
     {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
     {%- if has_value(entity_id) -%}
