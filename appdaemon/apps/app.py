@@ -2,10 +2,19 @@
 
 This class should be the inherited class of every app.
 It inherits methods for interaction with Home Assistant, and includes several useful
-utility functions used by multiple or all apps.
+utility functions used by multiple or all apps. It also includes a basic device class
+that can be inherited for specific device types and easily configured to respond to
+environmental changes.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import appdaemon.plugins.hass.hassapi as hass
+
+if TYPE_CHECKING:
+    from control import Control
 
 
 class App(hass.Hass):
@@ -14,7 +23,7 @@ class App(hass.Hass):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.control = None
+        self.control: Control = None
         self.constants = {}
 
     def initialize(self):
@@ -30,7 +39,7 @@ class App(hass.Hass):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs.get("targets", "all")
         if targets == "anyone_home_else_all":
-            if self.control.apps["presence"].anyone_home():
+            if self.control.apps["presence"].anyone_home:
                 targets = "anyone_home"
             else:
                 targets = "all"
@@ -72,3 +81,98 @@ class App(hass.Hass):
                     data=data,
                 )
         self.log(f"Notified '{targets}': \"{kwargs['title']}: {message}\"")
+
+
+class Device:
+    """Basic device that can be configured to respond to environmental changes."""
+
+    def __init__(
+        self,
+        device_id: str,
+        controller: App,
+        room: str,
+        linked_rooms: list[str] = (),
+    ):
+        """Initialise with device parameters and prepare for presence adjustments."""
+        self.device_id = device_id
+        self.device_type = device_id.split(".")[0]
+        self.device = controller.get_entity(device_id)
+        self.controller = controller
+        self.control_input_boolean = None
+        self.room = room
+        self.linked_rooms = linked_rooms
+        self.controller.listen_state(
+            self.handle_state_change,
+            entity_id=self.device_id,
+            attribute="context",
+            new=lambda new: new["user_id"]
+            not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
+        )
+
+    @property
+    def on(self) -> bool:
+        """Check if the device is currently on or not."""
+        return self.device.state != "off"
+
+    def turn_on(self, **kwargs: dict):
+        """Turn the device on if it's off or adjust with provided parameters."""
+        if not self.on or kwargs:
+            if self.device_type != "group":
+                self.device.turn_on(**kwargs)
+            else:
+                self.controller.call_service(
+                    "homeassistant/turn_on",
+                    entity_id=self.device_id,
+                    **kwargs,
+                )
+
+    def turn_off(self):
+        """Turn the device off if it's on."""
+        if self.on:
+            if self.device_type != "group":
+                self.device.turn_off()
+            else:
+                self.controller.call_service(
+                    "homeassistant/turn_off",
+                    entity_id=self.device_id,
+                )
+
+    def call_service(self, service: str, **kwargs: dict):
+        """Call one of the device's services in Home Assistant."""
+        self.device.call_service(service, **kwargs)
+
+    def get_attribute(
+        self,
+        attribute: str,
+        default: str | float | None = None,
+    ) -> str | float | None:
+        """Get an attribute of the device (or group of synced devices)."""
+        value = self.controller.get_state(
+            self.device_id
+            if self.device_type != "group"
+            else self.controller.get_state(self.device_id, "entity_id")[0],
+            attribute=attribute,
+        )
+        if value is None:
+            return default
+        try:
+            return float(value)
+        except ValueError:
+            return value
+
+    def handle_state_change(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
+        """"""
+        del entity, attribute, old, kwargs
+        user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
+        self.controller.log(f"'{user}' changed {self.device_id} from UI")
+        self.handle_user_adjustment()
+
+    def handle_user_adjustment(self):
+        """Override this in child class to adjust device settings appropriately."""

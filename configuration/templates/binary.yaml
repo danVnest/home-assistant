@@ -1,7 +1,10 @@
-- name: Any climate control
-  state: "{{ states('input_boolean.aircon') == 'on' or states('group.climate_control') == 'on' }}"
+# TODO: Convert all templates to this format
 - name: Display day card
-  state: "{{ states('input_select.scene') != 'Sleep' and today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now() }}"
+  state: >
+    {{
+      states('input_select.scene') != 'Sleep' and
+      today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')) > now()
+    }}
 - name: Kitchen door motion
   state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
 - name: Daniels MacBook active at home

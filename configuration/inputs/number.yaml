@@ -66,10 +66,26 @@ aircon_door_check_delay:
   unit_of_measurement: min
   mode: box
   icon: mdi:timer
+aircon_vacating_delay:
+  name: Aircon off if room empty
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: min
+  mode: box
+  icon: mdi:timer
 fan_vacating_delay:
   name: Fan off if room empty
   min: 1
-  max: 10
+  max: 60
+  step: 1
+  unit_of_measurement: min
+  mode: box
+  icon: mdi:timer
+heater_vacating_delay:
+  name: Heater off if room empty
+  min: 1
+  max: 60
   step: 1
   unit_of_measurement: min
   mode: box

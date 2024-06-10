@@ -2,8 +2,7 @@ Climate:
   module: climate
   class: Climate
   inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
-  target_buffer: 1 # difference between actual aircon target temperature and the temperature which triggers aircon off
-  fan_speed_levels: 9 # number of fan speed settings
-  fan_adjustment_interval: 300 # minimum number of seconds delay between seqential fan adjustments (per fan)
+  target_buffer: 1 # difference between actual device target temperature and the temperature which triggers device off
+  fan_adjustment_delay: 300 # minimum number of seconds delay between seqential fan adjustments (per fan)
   override_threshold: 10 # maximum seconds for a climate control change to be considered an override
   # log_level: DEBUG

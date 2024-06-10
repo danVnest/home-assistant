@@ -8,6 +8,7 @@ input_datetime: !include ./configuration/inputs/datetime.yaml
 input_number: !include ./configuration/inputs/number.yaml
 input_select: !include ./configuration/inputs/select.yaml
 sensor: !include_dir_merge_list ./configuration/sensors/
+switch: !include ./configuration/switches.yaml
 template:
   binary_sensor: !include ./configuration/templates/binary.yaml
   sensor: !include_dir_merge_list ./configuration/templates/sensors/

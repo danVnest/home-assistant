@@ -1,7 +1,6 @@
 scene:
   name: Scene
   options:
-    - Custom
     - Day
     - Night
     - Bright
@@ -10,4 +9,4 @@ scene:
     - TV
     - Away (Day)
     - Away (Night)
-  icon: mdi:home-lightbulb
+  icon: mdi:home-lightning-bolt

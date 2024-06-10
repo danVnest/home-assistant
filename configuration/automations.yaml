@@ -7,3 +7,6 @@
     - service: wake_on_lan.send_magic_packet
       data:
         mac: !secret tv_mac
+# TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
+# Maybe set up homekit here on zwave setup completion? Or maybe do this here:
+# https://app.asana.com/0/1207020279479204/1207033183175579/f
