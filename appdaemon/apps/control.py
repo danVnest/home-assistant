@@ -356,6 +356,7 @@ class Control(App):
     ):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
+        # TODO: use same logic in Device to listen to context and detect user input
         setting = entity.split(".")[1]
         self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
         if setting == "scene":

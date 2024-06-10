@@ -101,17 +101,12 @@ class Device:
         self.control_input_boolean = None
         self.room = room
         self.linked_rooms = linked_rooms
-        # TODO: listen to all climate UI changes here, disable climate control for that device if it conflicts
-        # self.controller.listen_event(
-        #     self.handle_state_change,
-        #     "state_changed",
-        #     entity_id=self.device_id,
-        #     metadata=lambda metadata: metadata["context"]["user_id"] is not None,
-        # )  # TODO: use this version once you're sure there's no key errors
-        self.controller.listen_event(
+        self.controller.listen_state(
             self.handle_state_change,
-            "state_changed",
             entity_id=self.device_id,
+            attribute="context",
+            new=lambda new: new["user_id"]
+            not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
         )
 
     @property
@@ -165,19 +160,19 @@ class Device:
         except ValueError:
             return value
 
-    def handle_state_change(self, event_name: str, data: dict, **kwargs: dict):
+    def handle_state_change(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
         """"""
-        del event_name, kwargs
-        try:
-            if data["metadata"]["context"]["user_id"] is not None:
-                self.controller.log(f"User changed {self.device_id}")
-                self.handle_user_adjustment()
-        except KeyError:
-            self.controller.log(
-                f"KeyError when detecting user initiated state change: {data}",
-                level="WARNING",
-            )
-        # TODO: remove try and if is not None (and use lambda) once you're sure there's no key errors
+        del entity, attribute, old, kwargs
+        user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
+        self.controller.log(f"'{user}' changed {self.device_id} from UI")
+        self.handle_user_adjustment()
 
     def handle_user_adjustment(self):
         """Override this in child class to adjust device settings appropriately."""
