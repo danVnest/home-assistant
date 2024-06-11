@@ -11,3 +11,39 @@
         service: climate.turn_off
         target:
           entity_id: climate.nursery_heater
+
+    living_room_aircon:
+      friendly_name: Living room aircon
+      value_template: "{{ states('climate.living_room_aircon') != 'off' }}"
+      turn_on:
+        service: climate.turn_on
+        target:
+          entity_id: climate.living_room_aircon
+      turn_off:
+        service: climate.turn_off
+        target:
+          entity_id: climate.living_room_aircon
+
+    dining_room_aircon:
+      friendly_name: Dining room aircon
+      value_template: "{{ states('climate.dining_room_aircon') != 'off' }}"
+      turn_on:
+        service: climate.turn_on
+        target:
+          entity_id: climate.dining_room_aircon
+      turn_off:
+        service: climate.turn_off
+        target:
+          entity_id: climate.dining_room_aircon
+
+    bedroom_aircon:
+      friendly_name: Bedroom aircon
+      value_template: "{{ states('climate.bedroom_aircon') != 'off' }}"
+      turn_on:
+        service: climate.turn_on
+        target:
+          entity_id: climate.bedroom_aircon
+      turn_off:
+        service: climate.turn_off
+        target:
+          entity_id: climate.bedroom_aircon
