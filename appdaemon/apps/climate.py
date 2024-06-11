@@ -427,15 +427,11 @@ class ClimateDevice(Device):
 
     def __init__(
         self,
-        control_input_boolean_suffix: str = "",
         **kwargs: dict,
     ):
         """Initialise with device parameters and prepare for presence adjustments?"""
-        if not hasattr(self, "control_input_boolean"):
-            self.control_input_boolean = ()
         super().__init__(
             **kwargs,
-            control_input_boolean=f"input_boolean.climate_control_{self.device_id.split('.')[1]}{control_input_boolean_suffix}",
         )
         self.temperature_sensors = []
         for room in (self.room, *self.linked_rooms):

@@ -54,8 +54,8 @@ class Lights(App):
             controller=self,
             room="living_room",
         )
-        self.lights["dining"] = Light(
-            device_id="group.dining_lights",
+        self.lights["dining_room"] = Light(
+            device_id="group.dining_room_lights",
             controller=self,
             room="dining_room",
         )
@@ -162,7 +162,7 @@ class Lights(App):
             "kitchen",
             "kitchen_strip",
             "tv",
-            "dining",
+            "dining_room",
             "hall",
             "nursery",
         ):
@@ -208,7 +208,7 @@ class Lights(App):
                 self.control.get_setting("tv_brightness"),
                 kelvin,
             )
-        self.lights["dining"].turn_off()  # TODO: adjust with presence
+        self.lights["dining_room"].turn_off()  # TODO: adjust with presence
         brightness, kelvin = self.calculate_circadian_brightness_kelvin()
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
@@ -256,7 +256,7 @@ class Lights(App):
                     "office_vacating_delay",
                 ),  # TODO: update to f"{light_name}_vacating_delay")?
             )
-        for light_name in ("kitchen_strip", "tv", "dining", "hall", "nursery"):
+        for light_name in ("kitchen_strip", "tv", "dining_room", "hall", "nursery"):
             self.lights[light_name].ignore_vacancy()
             self.lights[light_name].turn_off()
         self.lights["bedroom"].ignore_vacancy()
@@ -292,7 +292,7 @@ class Lights(App):
             vacating_delay=vacating_delay,
         )
         self.lights["bedroom"].ignore_vacancy()
-        for light_name in ("tv", "dining", "hall", "bedroom"):
+        for light_name in ("tv", "dining_room", "hall", "bedroom"):
             self.lights[light_name].turn_off()
 
     def transition_to_away_scene(self):
@@ -307,7 +307,7 @@ class Lights(App):
                     self.entities.input_number.night_vacating_delay.state,
                 ),
             )
-        self.lights["dining"].adjust_to_max()
+        self.lights["dining_room"].adjust_to_max()
         for light_name in ("kitchen_strip", "tv", "hall", "bedroom", "nursery"):
             self.lights[light_name].ignore_vacancy()
             self.lights[light_name].turn_off()
@@ -373,7 +373,7 @@ class Lights(App):
             transition_period=self.control.get_setting("night_transition_period"),
             vacating_delay=self.control.get_setting("night_vacating_delay"),
         )
-        for light_name in ("tv", "dining", "hall"):
+        for light_name in ("tv", "dining_room", "hall"):
             self.lights[light_name].adjust(brightness, kelvin)
         self.lights["office"].set_presence_adjustments(
             occupied=(brightness, kelvin),
@@ -650,13 +650,12 @@ class Light(PresenceDevice):
         linked_rooms: list[str] = (),
     ):
         """Initialise with a lights's id, room(s), kelvin limits, and controller."""
-        control_input_boolean = f"input_boolean.light_control_{device_id.split('.')[1]}"
-        if self.device_type == "group":
-            control_input_boolean = control_input_boolean.removesuffix("_lights")
         super().__init__(
             device_id=device_id,
             controller=controller,
-            control_input_boolean=control_input_boolean,
+            control_input_boolean_suffix="_light"
+            if device_id.startswith("light")
+            else "",
             room=room,
             linked_rooms=linked_rooms,
         )

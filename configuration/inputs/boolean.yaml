@@ -5,58 +5,58 @@ development_mode:
   name: Development Mode
   icon: mdi:dev-to
 
-climate_control_living_room_aircon:
+control_living_room_aircon:
   name: Living room aircon
   icon: mdi:air-conditioner
-climate_control_dining_room_aircon:
+control_dining_room_aircon:
   name: Dining room aircon
   icon: mdi:air-conditioner
-climate_control_bedroom_aircon:
+control_bedroom_aircon:
   name: Bedroom aircon
   icon: mdi:air-conditioner
-climate_control_nursery_fan:
+control_nursery_fan:
   name: Nursery fan
   icon: mdi:fan
-climate_control_office_fan:
+control_office_fan:
   name: Office fan
   icon: mdi:fan
-climate_control_bedroom_fan:
+control_bedroom_fan:
   name: Bedroom fan
   icon: mdi:fan
-climate_control_nursery_heater:
+control_nursery_heater:
   name: Nursery heater
   icon: mdi:radiator
-climate_control_office_heater:
+control_office_heater:
   name: Office heater
   icon: mdi:radiator
 
-light_control_entryway:
+control_entryway_lights:
   name: Entryway
   icon: mdi:lightbulb-multiple
-light_control_kitchen:
+control_kitchen_light:
   name: Kitchen
   icon: mdi:lightbulb-variant
-light_control_kitchen_strip:
+control_kitchen_strip_light:
   name: Kitchen strip
   icon: mdi:wall-sconce-flat
-light_control_tv:
+control_tv_lights:
   name: TV
   icon: mdi:lightbulb-group
-light_control_dining:
+control_dining_room_lights:
   name: Dining room
   icon: mdi:lightbulb-multiple
-light_control_hall:
+control_hall_light:
   name: Hall
   icon: mdi:lightbulb-variant
-light_control_office:
+control_office_light:
   name: Office
   icon: mdi:light-recessed
-light_control_bedroom:
+control_bedroom_light:
   name: Bedroom
   icon: mdi:light-recessed
-light_control_nursery:
+control_nursery_light:
   name: Nursery
   icon: mdi:light-recessed
-light_control_bathroom:
+control_bathroom_light:
   name: Bathroom
   icon: mdi:lightbulb-variant

@@ -20,11 +20,11 @@ tv_lights:
     - light.tv_right
   icon: mdi:lightbulb-group
 
-dining_lights:
-  name: Dining lights
+dining_room_lights:
+  name: Dining room lights
   entities:
-    - light.dining_left
-    - light.dining_right
+    - light.dining_room_left
+    - light.dining_room_right
   icon: mdi:lightbulb-multiple
 
 all_lights:
@@ -37,8 +37,8 @@ all_lights:
     - light.tv_left
     - light.tv_middle
     - light.tv_right
-    - light.dining_left
-    - light.dining_right
+    - light.dining_room_left
+    - light.dining_room_right
     - light.hall
     - light.bathroom
     - light.bedroom
@@ -79,57 +79,57 @@ all_heaters:
 any_climate_control:
   name: Climate control
   entities:
-    - input_boolean.climate_control_living_room_aircon
-    - input_boolean.climate_control_dining_room_aircon
-    - input_boolean.climate_control_bedroom_aircon
-    - input_boolean.climate_control_nursery_fan
-    - input_boolean.climate_control_office_fan
-    - input_boolean.climate_control_bedroom_fan
-    - input_boolean.climate_control_nursery_heater
-    - input_boolean.climate_control_office_heater
+    - input_boolean.control_living_room_aircon
+    - input_boolean.control_dining_room_aircon
+    - input_boolean.control_bedroom_aircon
+    - input_boolean.control_nursery_fan
+    - input_boolean.control_office_fan
+    - input_boolean.control_bedroom_fan
+    - input_boolean.control_nursery_heater
+    - input_boolean.control_office_heater
   icon: mdi:home-thermometer
 
 all_climate_control:
   name: Climate control
   entities:
-    - input_boolean.climate_control_living_room_aircon
-    - input_boolean.climate_control_dining_room_aircon
-    - input_boolean.climate_control_bedroom_aircon
-    - input_boolean.climate_control_nursery_fan
-    - input_boolean.climate_control_office_fan
-    - input_boolean.climate_control_bedroom_fan
-    - input_boolean.climate_control_nursery_heater
-    - input_boolean.climate_control_office_heater
+    - input_boolean.control_living_room_aircon
+    - input_boolean.control_dining_room_aircon
+    - input_boolean.control_bedroom_aircon
+    - input_boolean.control_nursery_fan
+    - input_boolean.control_office_fan
+    - input_boolean.control_bedroom_fan
+    - input_boolean.control_nursery_heater
+    - input_boolean.control_office_heater
   icon: mdi:home-thermometer
   all: true
 
 any_light_control:
   name: Light control
   entities:
-    - input_boolean.light_control_entryway
-    - input_boolean.light_control_kitchen
-    - input_boolean.light_control_kitchen_strip
-    - input_boolean.light_control_tv
-    - input_boolean.light_control_dining
-    - input_boolean.light_control_hall
-    - input_boolean.light_control_bathroom
-    - input_boolean.light_control_bedroom
-    - input_boolean.light_control_nursery
-    - input_boolean.light_control_office
+    - input_boolean.control_entryway_light
+    - input_boolean.control_kitchen_light
+    - input_boolean.control_kitchen_strip_light
+    - input_boolean.control_tv_lights
+    - input_boolean.control_dining_room_lights
+    - input_boolean.control_hall_light
+    - input_boolean.control_bathroom_light
+    - input_boolean.control_bedroom_light
+    - input_boolean.control_nursery_light
+    - input_boolean.control_office_light
   icon: mdi:home-lightbulb
 
 all_light_control:
   name: Light control
   entities:
-    - input_boolean.light_control_entryway
-    - input_boolean.light_control_kitchen
-    - input_boolean.light_control_kitchen_strip
-    - input_boolean.light_control_tv
-    - input_boolean.light_control_dining
-    - input_boolean.light_control_hall
-    - input_boolean.light_control_bathroom
-    - input_boolean.light_control_bedroom
-    - input_boolean.light_control_nursery
-    - input_boolean.light_control_office
+    - input_boolean.control_entryway_light
+    - input_boolean.control_kitchen_light
+    - input_boolean.control_kitchen_strip_light
+    - input_boolean.control_tv_lights
+    - input_boolean.control_dining_room_lights
+    - input_boolean.control_hall_light
+    - input_boolean.control_bathroom_light
+    - input_boolean.control_bedroom_light
+    - input_boolean.control_nursery_light
+    - input_boolean.control_office_light
   icon: mdi:home-lightbulb
   all: true

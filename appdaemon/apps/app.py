@@ -90,24 +90,25 @@ class Device:
         self,
         device_id: str,
         controller: App,
-        control_input_boolean: str,
         room: str,
         linked_rooms: list[str] = (),
+        control_input_boolean_suffix: str = "",
     ):
         """Initialise with device parameters and prepare for presence adjustments."""
         self.device_id = device_id
         self.device_type = device_id.split(".")[0]
         self.device = controller.get_entity(device_id)
         self.controller = controller
-        self.control_input_boolean = control_input_boolean
+        self.control_input_boolean = (
+            "input_boolean.control_"
+            + device_id.split(".")[1]
+            + control_input_boolean_suffix
+        )
         self.room = room
         self.linked_rooms = linked_rooms
         devices = [self.device_id]
         if self.device_type == "group":
-            devices.append(
-                subdevice
-                for subdevice in self.controller.get_state(self.device_id, "entity_id")
-            )
+            devices += self.controller.get_state(self.device_id, "entity_id")
         for device in devices:
             self.controller.listen_state(
                 self.__handle_user_adjustment,
