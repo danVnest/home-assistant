@@ -15,3 +15,7 @@
   state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
 - name: Dark outside
   state: "{{ states('sensor.weather_station_illuminance') | float < 5000 or states('sun.sun') == 'below_horizon' }}"
+- name: Washer running
+  state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
+- name: Dryer running
+  state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
