@@ -53,11 +53,11 @@ class Control(App):
             "input_select",
         ]:
             self.listen_state(
-                self.handle_settings_change,
+                self.handle_ui_settings_change,
                 setting,
                 duration=self.args["settings_change_delay"],
             )
-        self.listen_event(self.button, "zwave_js_value_notification")
+        self.listen_event(self.handle_button, "zwave_js_value_notification")
         self.listen_event(self.handle_ifttt, "ifttt_webhook_received")
         for battery in (
             "front_door_camera",
@@ -353,7 +353,7 @@ class Control(App):
             return self.get_state(f"input_datetime.{setting_name}")
         return int(float(self.get_state(f"input_number.{setting_name}")))
 
-    def handle_settings_change(
+    def handle_ui_settings_change(
         self,
         entity: str,
         attribute: str,

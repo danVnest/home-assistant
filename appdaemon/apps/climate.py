@@ -144,14 +144,6 @@ class Climate(App):
             setting_name = f"sleep_{setting_name}"
         return float(self.get_state(f"input_number.{setting_name}"))
 
-    def adjust_temperature_targets_and_triggers(self):
-        """Reset climate control using latest settings?"""
-        self.check_conditions_and_adjust()
-        for device_group in (self.aircons, self.fans, self.heaters):
-            for device in device_group.values():
-                device.adjust_temperature_targets_and_triggers()
-        # TODO: is this needed now?? check where it's called
-
     def update_door_check_delay(self, seconds: float):
         """Update the delay before registering a door as open for each aircon."""
         for aircon in self.aircons.values():
@@ -245,35 +237,6 @@ class Climate(App):
                 "consider enabling climate control",
             )
 
-    def disable_climate_control_if_would_trigger_on(self):
-        """Disables climate control only if it would immediately trigger aircon on."""
-        # TODO: This needs an overhaul
-        if self.climate_control and self.too_hot_or_cold:
-            self.climate_control_enabled = False
-            self.climate_control_history["overridden"] = True
-            self.notify(
-                "The current temperature ("
-                f"{self.inside_temperature}º) will immediately "
-                "trigger aircon on again - "
-                "climate control is now disabled to prevent this",
-                title="Climate Control",
-                targets="anyone_home_else_all",
-            )
-
-    def disable_climate_control_if_would_trigger_off(self):
-        """Disables climate control only if it would immediately trigger aircon off."""
-        # TODO: This needs an overhaul
-        if self.climate_control and self.within_target_temperatures:
-            self.climate_control_enabled = False
-            self.climate_control_history["overridden"] = True
-            self.notify(
-                "Inside is already within the desired temperature range,"
-                " climate control is now disabled"
-                " (you'll need to manually turn aircon off)",
-                title="Climate Control",
-                targets="anyone_home_else_all",
-            )
-
     def suggest(self, message: str):
         """Make a suggestion to the users, but only if one has not already been sent."""
         if not self.suggested:
@@ -324,7 +287,7 @@ class Climate(App):
                 f"the corresponding target/trigger to '{valid_other}º'",
                 level="WARNING",
             )
-        self.adjust_temperature_targets_and_triggers()
+        self.check_conditions_and_adjust()
 
     def terminate(self):
         """Cancel presence callbacks before termination????
@@ -605,13 +568,6 @@ class ClimateDevice(Device):
                 - self.controller.get_now_ts(),
             )
         self.check_conditions_and_adjust()
-
-    def check_conditions_and_adjust(
-        self,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
-        """Override this in child class to adjust device settings appropriately."""
-        del check_if_would_adjust_only
 
     def check_conditions_and_adjust_after_delay(self, **kwargs: dict):
         """Delayed adjustment from timers initiated when handling presence change."""
