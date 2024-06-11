@@ -101,13 +101,20 @@ class Device:
         self.control_input_boolean = None
         self.room = room
         self.linked_rooms = linked_rooms
-        self.controller.listen_state(
-            self.handle_state_change,
-            entity_id=self.device_id,
-            attribute="context",
-            new=lambda new: new["user_id"]
-            not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
-        )
+        devices = [self.device_id]
+        if self.device_type == "group":
+            devices.append(
+                subdevice
+                for subdevice in self.controller.get_state(self.device_id, "entity_id")
+            )
+        for device in devices:
+            self.controller.listen_state(
+                self.handle_state_change,
+                entity_id=device,
+                attribute="context",
+                new=lambda new: new["user_id"]
+                not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
+            )
 
     @property
     def on(self) -> bool:
