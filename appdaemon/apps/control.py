@@ -46,8 +46,8 @@ class Control(App):
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         for setting in [
-            "group.climate_control",
-            "input_boolean",
+            "input_boolean.development_mode",
+            "input_boolean.pets_home_alone",
             "input_datetime",
             "input_number",
             "input_select",
@@ -269,25 +269,33 @@ class Control(App):
         """Return if the time is after bed time (and before midnight)."""
         return self.time() > self.parse_time(self.get_setting("bed_time"))
 
-    def button(self, event_name: str, data: dict, **kwargs: dict):
+    def handle_button(self, event_name: str, data: dict, **kwargs: dict):
         """Detect and handle when a button is clicked or held."""
+        # TODO: add new buttons and rework the following
         del event_name, kwargs
         room = (
             "bedroom"
             if data["node_id"] == self.args["bedroom_button_node_id"]
-            else "kitchen"
+            else "living_room"
         )
         if data["value"] == "KeyPressed":
             self.handle_button_click(room)
         elif data["value"] == "KeyHeldDown":
             self.log(f"Button in '{room}' held")
-            self.apps["climate"].aircon = not self.apps["climate"].aircon
-            # TODO: fix so only the button's room aircon is turned on/off
+            # TODO: for bedroom, if aircon and/or fan is on, turn them off
+            # else turn on aircon and/or fan based on conditions
+            # TODO: for living room, if either aircon on, turn them off
+            # else turn both on based on conditions
+            # (disabling climate control for each option above where required)
+            # self.apps["climate"].toggle_climate_control_in_room(room)
+            self.apps["climate"].toggle_airconditioning(
+                user_initiated=True,
+            )  # TODO: remove once above implemented
 
     def handle_button_click(self, room: str):
         """Handle a button click."""
         self.log(f"Button in '{room}' clicked")
-        if room == "kitchen":
+        if room == "living_room":
             if self.scene == "Night":
                 if self.entities.binary_sensor.dark_outside.state == "off":
                     self.scene = "Day"
@@ -328,12 +336,11 @@ class Control(App):
         elif "sleep" in data:
             self.scene = "Sleep"
         elif "climate_control" in data:
-            self.apps["climate"].climate_control_enabled = not self.apps[
+            self.apps["climate"].all_climate_control_enabled = not self.apps[
                 "climate"
-            ].climate_control_enabled
+            ].all_climate_control_enabled
         elif "aircon" in data:
-            self.apps["climate"].aircon = not self.apps["climate"].aircon
-            # TODO: how to handle individual aircons?
+            self.apps["climate"].toggle_airconditioning(user_initiated=True)
         elif "lock" in data:
             command = (
                 "unlock" if self.entities.lock.door_lock.state == "locked" else "lock"
@@ -362,11 +369,6 @@ class Control(App):
         if setting == "scene":
             if new != self.scene:
                 self.scene = new
-        elif "climate_control" in setting:
-            if setting == "climate_control" and (
-                (new == "on") != self.apps["climate"].climate_control_enabled
-            ):
-                self.apps["climate"].climate_control_enabled = new == "on"
         elif setting == "pets_home_alone":
             if (new == "on") != self.apps["presence"].pets_home_alone:
                 self.log(f"UI setting '{setting}' changed to '{new}'")

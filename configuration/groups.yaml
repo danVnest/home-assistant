@@ -46,6 +46,13 @@ all_lights:
     - light.nursery
   icon: mdi:lightbulb-group
 
+any_aircon:
+  name: All aircon
+  entities:
+    - climate.living_room_aircon
+    - climate.dining_room_aircon
+    - climate.bedroom_aircon
+
 all_aircon:
   name: All aircon
   entities:
@@ -69,7 +76,7 @@ all_heaters:
     - switch.office_heater
   all: true
 
-climate_control:
+any_climate_control:
   name: Climate control
   entities:
     - input_boolean.climate_control_living_room_aircon
@@ -82,7 +89,21 @@ climate_control:
     - input_boolean.climate_control_office_heater
   icon: mdi:home-thermometer
 
-light_control:
+all_climate_control:
+  name: Climate control
+  entities:
+    - input_boolean.climate_control_living_room_aircon
+    - input_boolean.climate_control_dining_room_aircon
+    - input_boolean.climate_control_bedroom_aircon
+    - input_boolean.climate_control_nursery_fan
+    - input_boolean.climate_control_office_fan
+    - input_boolean.climate_control_bedroom_fan
+    - input_boolean.climate_control_nursery_heater
+    - input_boolean.climate_control_office_heater
+  icon: mdi:home-thermometer
+  all: true
+
+any_light_control:
   name: Light control
   entities:
     - input_boolean.light_control_entryway
@@ -96,3 +117,19 @@ light_control:
     - input_boolean.light_control_nursery
     - input_boolean.light_control_office
   icon: mdi:home-lightbulb
+
+all_light_control:
+  name: Light control
+  entities:
+    - input_boolean.light_control_entryway
+    - input_boolean.light_control_kitchen
+    - input_boolean.light_control_kitchen_strip
+    - input_boolean.light_control_tv
+    - input_boolean.light_control_dining
+    - input_boolean.light_control_hall
+    - input_boolean.light_control_bathroom
+    - input_boolean.light_control_bedroom
+    - input_boolean.light_control_nursery
+    - input_boolean.light_control_office
+  icon: mdi:home-lightbulb
+  all: true

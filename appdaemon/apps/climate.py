@@ -35,9 +35,6 @@ class Climate(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.__climate_control_enabled = (
-            self.entities.group.climate_control.state == "on"
-        )
         self.aircons = {
             "bedroom": Aircon(
                 device_id="climate.bedroom_aircon",
@@ -95,27 +92,51 @@ class Climate(App):
             )
 
     @property
-    def climate_control_enabled(self) -> bool:
+    def any_climate_control_enabled(self) -> bool:
         """Get climate control setting that has been synced to Home Assistant."""
-        return self.__climate_control_enabled
+        return self.entities.group.any_climate_control.state == "on"
 
-    @climate_control_enabled.setter
-    def climate_control_enabled(self, enable: bool):
+    @property
+    def all_climate_control_enabled(self) -> bool:
+        """Get climate control setting that has been synced to Home Assistant."""
+        return self.entities.group.any_climate_control.state == "on"
+
+    @all_climate_control_enabled.setter
+    def all_climate_control_enabled(self, enable: bool):
         """Enable/disable climate control and reflect state in UI."""
-        if self.climate_control_enabled == enable:
+        if self.all_climate_control_enabled == enable:
             return
-        self.log(f"'{'En' if enable else 'Dis'}abling' climate control")
-        self.__climate_control_enabled = enable
+        self.log(f"'{'En' if enable else 'Dis'}abling' all climate control")
         if enable:
             self.check_conditions_and_adjust()
         else:
             self.allow_suggestion()
 
     @property
-    def aircon(self) -> bool:
+    def any_aircon_on(self) -> bool:
         """Get aircon setting that has been synced to Home Assistant."""
-        # TODO: consider renaming to all_aircon and creating any_aircon as well (can check self.aircons)
+        return self.entities.group.any_aircon.state != "off"
+
+    @property
+    def all_aircon_on(self) -> bool:
+        """Get aircon setting that has been synced to Home Assistant."""
         return self.entities.group.all_aircon.state != "off"
+
+    @all_aircon_on.setter
+    def all_aircon_on(self, on: bool) -> bool:
+        """Get aircon setting that has been synced to Home Assistant."""
+        for aircon in self.aircons.values():
+            if on:
+                aircon.turn_off()
+            else:
+                aircon.turn_on_for_current_conditions()
+
+    def toggle_airconditioning(self, user_initiated: bool = False) -> None:
+        """Toggle airconditioning on/off."""
+        self.all_aircon_on = not self.all_aircon_on
+        if user_initiated:
+            for aircon in self.aircons.values():
+                aircon.handle_user_adjustment()
 
     def get_setting(self, setting_name: str) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
@@ -156,16 +177,11 @@ class Climate(App):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
         if "Away" in new_scene:
             if not self.control.apps["presence"].pets_home_alone:
-                self.climate_control_enabled = False
                 for device_group in (self.aircons, self.fans):
                     for device in device_group.values():
                         device.turn_off()
-            else:
-                self.climate_control_enabled = True
             for heater in self.heaters.values():
                 heater.turn_off()
-        else:
-            self.climate_control_enabled = True
         if new_scene == "Sleep":
             self.end_pre_condition_bedrooms()
         elif new_scene == "Morning":
@@ -176,9 +192,9 @@ class Climate(App):
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if new_scene in ("Sleep", "Morning") else "auto"
         )
-        if self.climate_control_enabled:
+        if self.any_climate_control_enabled:
             self.check_conditions_and_adjust()
-        elif not self.climate_control_enabled and any(
+        elif any(
             [
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
                 new_scene == "Night" and old_scene == "Day",
@@ -752,7 +768,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 if not self.door_open:
                     if (
                         not check_if_would_adjust_only
-                        and self.controller.entities.group.all_aircon.state == "off"
+                        and not self.controller.any_aircon_on
                         and self.controller.control.apps["presence"].pets_home_alone
                         and not self.controller.control.apps["presence"].anyone_home
                     ):
@@ -979,22 +995,6 @@ class Heater(ClimateDevice, PresenceDevice):
             if safe_when_vacant
             else 0
         )
-
-    @property
-    def climate_control(self):
-        """"""
-        return ClimateDevice.climate_control.fget(self)
-
-    @climate_control.setter
-    def climate_control(self, enabled: bool):
-        """"""
-        if (
-            enabled
-            and not self.safe_when_vacant
-            and not self.controller.control.apps["presence"].anyone_home
-        ):
-            enabled = False
-        ClimateDevice.climate_control.fset(self, enabled)
 
     @property
     def target_temperature(self) -> float:
