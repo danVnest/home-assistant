@@ -462,23 +462,17 @@ class Climate(App):
 class ClimateDevice(Device):
     """Climate device that can be configured to respond to environmental changes?"""
 
-    # TODO: simpler to just make this a PresenceDevice than do multiple inheritance?
-
     def __init__(
         self,
+        control_input_boolean_suffix: str = "",
         **kwargs: dict,
     ):
         """Initialise with device parameters and prepare for presence adjustments?"""
-        super().__init__(**kwargs)
-        control_input_boolean = (
-            f"input_boolean.climate_control_{self.device_id.split('.')[1]}"
-        )
-        if self.device_type == "fan":
-            control_input_boolean += "_fan"
-        self.control_input_boolean = control_input_boolean
-        self.controller.listen_state(
-            self.handle_temperature_change,
-            control_input_boolean,
+        if not hasattr(self, "control_input_boolean"):
+            self.control_input_boolean = ()
+        super().__init__(
+            **kwargs,
+            control_input_boolean=f"input_boolean.climate_control_{self.device_id.split('.')[1]}{control_input_boolean_suffix}",
         )
         self.temperature_sensors = []
         for room in (self.room, *self.linked_rooms):
@@ -494,23 +488,6 @@ class ClimateDevice(Device):
         self.adjustment_delay = 0
         self.last_adjustment_time = self.controller.get_now_ts()
         self.adjustment_timer = None
-
-    @property
-    def climate_control(self) -> bool:
-        """"""
-        return self.controller.get_state(self.control_input_boolean) == "on"
-
-    @climate_control.setter
-    def climate_control(self, enabled: bool):
-        """"""
-        if self.climate_control != enabled:
-            self.controller.call_service(
-                f"input_boolean/turn_{'on' if enabled else 'off'}",
-                entity_id=self.control_input_boolean,
-            )
-        if enabled:
-            self.check_conditions_and_adjust()
-            # TODO: there's nothing that turns it back on currently, remove?
 
     @property
     def room_temperature(self) -> float:
@@ -651,10 +628,10 @@ class ClimateDevice(Device):
 
     def handle_user_adjustment(self):
         """"""
-        if self.climate_control and self.check_conditions_and_adjust(
+        if self.control_enabled and self.check_conditions_and_adjust(
             check_if_would_adjust_only=True,
         ):
-            self.climate_control = False
+            self.control_enabled = False
             self.controller.log(
                 f"Disabling climate control for {self.device_id} "
                 "due to user control confliction",
@@ -757,12 +734,13 @@ class Aircon(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Adjust aircon based on current conditions and target temperatures."""
-        if not self.climate_control or (
+        if not self.control_enabled or (
             "Away" in self.controller.control.scene
             and not self.controller.control.apps["presence"].pets_home_alone
         ):
             return False
         # TODO: reset suggestions more often? on any climate UI changes?
+        # TODO: this is too complex, move parts to another method
         if not self.on:
             if self.too_hot_or_cold and (self.ignoring_vacancy or not self.vacant):
                 if not self.door_open:
@@ -866,6 +844,13 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Call one of the device's services in Home Assistant and wait for response."""
         super().call_service(service, **parameters, return_result=True)
 
+    def handle_user_adjustment(self):
+        """"""
+        if self.on:
+            self.turn_on_for_current_conditions()
+            # TODO: confirm that changing the switch template actually registers as user input for this device
+        super().handle_user_adjustment()
+
 
 class Fan(ClimateDevice, PresenceDevice):
     """Control a fan and configure responses to environmental changes."""
@@ -882,6 +867,7 @@ class Fan(ClimateDevice, PresenceDevice):
         super().__init__(
             device_id=device_id,
             controller=controller,
+            control_input_boolean_suffix="_fan",
             room=room,
             linked_rooms=linked_rooms,
         )
@@ -930,7 +916,7 @@ class Fan(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Calculate best fan speed for the current conditions and set accordingly."""
-        if not self.climate_control or (
+        if not self.control_enabled or (
             "Away" in self.controller.control.scene
             and not self.controller.control.apps["presence"].pets_home_alone
         ):
@@ -1008,14 +994,20 @@ class Heater(ClimateDevice, PresenceDevice):
             and self.get_attribute("temperature") != self.target_temperature
         ):
             self.call_service("set_temperature", temperature=self.target_temperature)
-        super().turn_on()  # TODO: this could require Device.turn_on(), test and find out
+        super().turn_on()
 
     def check_conditions_and_adjust(
         self,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the heater on/off based on current and target temperatures."""
-        if not self.climate_control or "Away" in self.controller.control.scene:
+        if not self.control_enabled or (
+            not self.safe_when_vacant
+            and (
+                not self.controller.control.apps["presence"].anyone_home
+                or "Away" in self.controller.control.scene
+            )
+        ):
             self.controller.log(
                 f"Climate control is off but '{self.room}' heater's ",
                 "check_conditions_and_adjust was triggered",

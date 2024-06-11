@@ -90,6 +90,7 @@ class Device:
         self,
         device_id: str,
         controller: App,
+        control_input_boolean: str,
         room: str,
         linked_rooms: list[str] = (),
     ):
@@ -98,7 +99,7 @@ class Device:
         self.device_type = device_id.split(".")[0]
         self.device = controller.get_entity(device_id)
         self.controller = controller
-        self.control_input_boolean = None
+        self.control_input_boolean = control_input_boolean
         self.room = room
         self.linked_rooms = linked_rooms
         devices = [self.device_id]
@@ -109,17 +110,45 @@ class Device:
             )
         for device in devices:
             self.controller.listen_state(
-                self.handle_state_change,
+                self.__handle_user_adjustment,
                 entity_id=device,
                 attribute="context",
                 new=lambda new: new["user_id"]
                 not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
             )
+        self.controller.listen_state(
+            self.__handle_control_enabled,
+            self.control_input_boolean,
+            new="on",
+        )
 
     @property
     def on(self) -> bool:
         """Check if the device is currently on or not."""
         return self.device.state != "off"
+
+    @property
+    def control_enabled(self) -> bool:
+        """"""
+        return self.controller.get_state(self.control_input_boolean) == "on"
+
+    @control_enabled.setter
+    def control_enabled(self, enabled: bool):
+        """"""
+        if self.control_enabled != enabled:
+            self.controller.call_service(
+                f"input_boolean/turn_{'on' if enabled else 'off'}",
+                entity_id=self.control_input_boolean,
+            )
+        if enabled:
+            self.check_conditions_and_adjust()
+
+    def check_conditions_and_adjust(
+        self,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Override this in child class to adjust device settings appropriately."""
+        del check_if_would_adjust_only
 
     def turn_on(self, **kwargs: dict):
         """Turn the device on if it's off or adjust with provided parameters."""
@@ -167,7 +196,7 @@ class Device:
         except ValueError:
             return value
 
-    def handle_state_change(
+    def __handle_user_adjustment(
         self,
         entity: str,
         attribute: str,
@@ -183,3 +212,15 @@ class Device:
 
     def handle_user_adjustment(self):
         """Override this in child class to adjust device settings appropriately."""
+
+    def __handle_control_enabled(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ):
+        """"""
+        del entity, attribute, old, new, kwargs
+        self.check_conditions_and_adjust()

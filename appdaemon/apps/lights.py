@@ -650,14 +650,15 @@ class Light(PresenceDevice):
         linked_rooms: list[str] = (),
     ):
         """Initialise with a lights's id, room(s), kelvin limits, and controller."""
+        control_input_boolean = f"input_boolean.light_control_{device_id.split('.')[1]}"
+        if self.device_type == "group":
+            control_input_boolean = control_input_boolean.removesuffix("_lights")
         super().__init__(
             device_id=device_id,
             controller=controller,
+            control_input_boolean=control_input_boolean,
             room=room,
             linked_rooms=linked_rooms,
-        )
-        self.control_input_boolean = (
-            f"input_boolean.light_control_{self.device_id.split('.')[1]}"
         )
         self.kelvin_limits = {
             "max": self.get_attribute("max_color_temp_kelvin"),
