@@ -202,14 +202,34 @@ class Climate(App):
         for device_group in (self.aircons, self.fans, self.heaters):
             for device in device_group.values():
                 device.check_conditions_and_adjust()
-        if self.control.apps["presence"].pets_home_alone and not self.aircon:
-            # TODO: notify if no aircon can turn on because of the following:
-            # IF (bedroom door closed AND no pet or human presence detected)
-            # AND (kitchen OR balcony doors are open)
-            # AND climate control enabled for each device?
-            # TODO: but don't notify if kitchen or balcony door is open and outdoor temperature is ok
-            # TODO: suggest user turns on aircon manually if they are concerned
-            pass
+        if (
+            self.presence.pets_home_alone
+            and not self.any_aircon_on
+            and self.too_hot_or_cold
+        ):
+            if all(aircon.door_open for aircon in self.aircons.values()):
+                reason = "the door(s) are open"
+                if self.too_hot_or_cold_outside:
+                    reason += f" (but outside is f{self.outside_temperature}º)"
+                reason += ", consider"
+            elif any(
+                not aircon.control_enabled and not aircon.door_open
+                for aircon in self.aircons.values()
+            ):
+                reason = "climate control is disabled for some or all aircon, "
+                "consider enabling them and/or"
+            else:
+                self.log(
+                    "Aircon isn't on for the pets yet because room temperature "
+                    "is nicer than the average inside temperature",
+                    level="DEBUG",
+                )
+                return
+            self.suggest(
+                f"It is {self.inside_temperature}º inside but aircon won't turn on "
+                f"for the pets because {reason} turning aircon on manually",
+            )
+            # TODO: above doesn't account for the situation where the bedroom door is closed
 
     def pre_condition_bedrooms(self):
         """Pre-cool/heat the bedroom and nursery for nice sleeping conditions."""
