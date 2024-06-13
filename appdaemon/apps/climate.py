@@ -168,7 +168,7 @@ class Climate(App):
     def transition_between_scenes(self, new_scene: str, old_scene: str):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
         if "Away" in new_scene:
-            if not self.control.apps["presence"].pets_home_alone:
+            if not self.presence.pets_home_alone:
                 for device_group in (self.aircons, self.fans):
                     for device in device_group.values():
                         device.turn_off()
@@ -191,7 +191,7 @@ class Climate(App):
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
                 new_scene == "Night" and old_scene == "Day",
                 "Away" not in new_scene and "Away" in old_scene,
-                self.control.apps["presence"].pets_home_alone,
+                self.presence.pets_home_alone,
             ],
         ):  # TODO: consider simplifying and removing old_scene?
             self.suggest_if_extreme_forecast()
@@ -688,7 +688,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Adjust aircon based on current conditions and target temperatures."""
         if not self.control_enabled or (
             "Away" in self.controller.control.scene
-            and not self.controller.control.apps["presence"].pets_home_alone
+            and not self.controller.control.presence.pets_home_alone
         ):
             return False
         # TODO: reset suggestions more often? on any climate UI changes?
@@ -699,8 +699,8 @@ class Aircon(ClimateDevice, PresenceDevice):
                     if (
                         not check_if_would_adjust_only
                         and not self.controller.any_aircon_on
-                        and self.controller.control.apps["presence"].pets_home_alone
-                        and not self.controller.control.apps["presence"].anyone_home
+                        and self.controller.presence.pets_home_alone
+                        and not self.controller.presence.anyone_home
                     ):
                         self.controller.notify(
                             f"It is {self.room_temperature}º in the {self.room}, "
@@ -718,7 +718,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 elif (
                     not check_if_would_adjust_only
                     and not self.outside_temperature_nicer
-                    and self.controller.control.apps["presence"].anyone_home
+                    and self.controller.presence.anyone_home
                 ):
                     self.controller.suggest(
                         f"It's {self.room_temperature}º in the {self.room} right now, "
@@ -735,7 +735,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         elif (
             not check_if_would_adjust_only
             and self.outside_temperature_nicer
-            and self.controller.control.apps["presence"].anyone_home
+            and self.controller.presence.anyone_home
         ):
             self.controller.suggest(
                 f"Outside ({self.room_temperature}º) "
@@ -870,7 +870,7 @@ class Fan(ClimateDevice, PresenceDevice):
         """Calculate best fan speed for the current conditions and set accordingly."""
         if not self.control_enabled or (
             "Away" in self.controller.control.scene
-            and not self.controller.control.apps["presence"].pets_home_alone
+            and not self.controller.presence.pets_home_alone
         ):
             return False
         speed = 0
@@ -956,7 +956,7 @@ class Heater(ClimateDevice, PresenceDevice):
         if not self.control_enabled or (
             not self.safe_when_vacant
             and (
-                not self.controller.control.apps["presence"].anyone_home
+                not self.controller.presence.anyone_home
                 or "Away" in self.controller.control.scene
             )
         ):

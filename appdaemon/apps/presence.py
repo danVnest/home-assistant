@@ -113,8 +113,8 @@ class Presence(App):
                 entity_id="input_boolean.pets_home_alone",
             )
             if state:
-                self.control.apps["climate"].climate_control_enabled = True
-                # TODO: don't do this, create specific self.control.apps["climate"].handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
+                self.climate.climate_control_enabled = True
+                # TODO: don't do this, create specific self.climate.handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
     @property
     def kitchen_door_open(self) -> bool:
@@ -187,8 +187,8 @@ class Presence(App):
             f"(door is {self.entities.lock.door_lock.state})",
             title="Doorbell",
         )
-        if self.control.apps["media"].playing:
-            self.control.apps["media"].pause()
+        if self.media.playing:
+            self.media.pause()
         if self.control.scene in ("TV", "Sleep"):
             self.control.scene = "Night"
 
@@ -390,7 +390,7 @@ class PresenceDevice(Device):
         """Initialise with device parameters and prepare for presence adjustments."""
         super().__init__(**kwargs)
         self.rooms: list[Room] = [
-            self.controller.control.apps["presence"].rooms[room]
+            self.controller.presence.rooms[room]
             for room in (self.room, *self.linked_rooms)
         ]
         self.__vacating_delay = 0

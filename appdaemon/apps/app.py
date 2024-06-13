@@ -14,7 +14,12 @@ from typing import TYPE_CHECKING
 import appdaemon.plugins.hass.hassapi as hass
 
 if TYPE_CHECKING:
+    from climate import Climate
     from control import Control
+    from lights import Lights
+    from media import Media
+    from presence import Presence
+    from safety import Safety
 
 
 class App(hass.Hass):
@@ -23,12 +28,10 @@ class App(hass.Hass):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.control: Control = None
         self.constants = {}
 
     def initialize(self):
-        """Allow easy access to control app (which has access to all other apps)."""
-        self.control = self.get_app("Control")
+        """AppDaemon calls when app is ready."""
 
     def cancel_timer(self, handle):
         """Cancel timer after checking it is valid and running."""
@@ -39,17 +42,14 @@ class App(hass.Hass):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs.get("targets", "all")
         if targets == "anyone_home_else_all":
-            if self.control.apps["presence"].anyone_home:
-                targets = "anyone_home"
-            else:
-                targets = "all"
+            targets = "anyone_home" if self.presence.anyone_home else "all"
         for person, info in self.entities.person.items():
             if any(
-                [
+                (
                     targets == "all",
                     targets == "anyone_home" and info["state"] == "home",
                     targets == person,
-                ],
+                ),
             ):
                 data = {"tag": kwargs["title"]}
                 if "critical" in kwargs:
@@ -81,6 +81,36 @@ class App(hass.Hass):
                     data=data,
                 )
         self.log(f"Notified '{targets}': \"{kwargs['title']}: {message}\"")
+
+    @property
+    def climate(self) -> Climate:
+        """"""
+        return self.get_app("Climate")
+
+    @property
+    def control(self) -> Control:
+        """"""
+        return self.get_app("Control")
+
+    @property
+    def lights(self) -> Lights:
+        """"""
+        return self.get_app("Lights")
+
+    @property
+    def media(self) -> Media:
+        """"""
+        return self.get_app("Media")
+
+    @property
+    def presence(self) -> Presence:
+        """"""
+        return self.get_app("Presence")
+
+    @property
+    def safety(self) -> Safety:
+        """"""
+        return self.get_app("Safety")
 
 
 class Device:

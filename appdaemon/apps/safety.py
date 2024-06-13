@@ -53,7 +53,7 @@ class Safety(App):
         del attribute, kwargs
         if new == "on":
             self.control.scene = "Bright"
-            self.apps["media"].pause()
+            self.media.pause()
             alert_type = (
                 entity.removeprefix(self.owlet_sensor_prefix)
                 .removesuffix(self.owlet_sensor_suffix)
@@ -98,7 +98,7 @@ class FireSensor:
         del attribute, kwargs
         if new == "on":
             self.controller.control.scene = "Bright"
-            self.controller.apps["media"].pause()
+            self.controller.media.pause()
             alert_type = (
                 entity.removeprefix(f"{self.sensor_prefix}{self.sensor_id}_")
                 .removesuffix(self.sensor_suffix)
