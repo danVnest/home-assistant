@@ -604,11 +604,13 @@ class ClimateDevice(Device):
             check_if_would_adjust_only=True,
         ):
             self.control_enabled = False
-            self.controller.log(
-                f"Disabling climate control for {self.device_id} "
-                "due to user control confliction",
+            self.controller.notify(
+                f"The {self.device.friendly_name.lower()} was adjusted manually - "
+                "climate control is now disabled for this device to prevent it from "
+                "immediately re-adjusting",
+                title="Climate Control",
+                targets="anyone_home_else_all",
             )
-            # TODO: self.controller.notify
 
 
 class Aircon(ClimateDevice, PresenceDevice):
