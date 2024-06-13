@@ -33,6 +33,13 @@ class App(hass.Hass):
     def initialize(self):
         """AppDaemon calls when app is ready."""
 
+    def get_setting(self, setting_name: str) -> int:
+        """Get UI input_number setting values."""
+        if setting_name.endswith("_time"):
+            return self.get_state(f"input_datetime.{setting_name}")
+        return int(float(self.get_state(f"input_number.{setting_name}")))
+        # TODO: detect more types
+
     def cancel_timer(self, handle):
         """Cancel timer after checking it is valid and running."""
         if self.timer_running(handle):
