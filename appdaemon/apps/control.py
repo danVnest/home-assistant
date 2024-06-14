@@ -284,7 +284,7 @@ class Control(App):
             # (disabling climate control for each option above where required)
             # self.climate.toggle_climate_control_in_room(room)
             self.climate.toggle_airconditioning(
-                user_initiated=True,
+                user=f"the {room} button",
             )  # TODO: remove once above implemented
 
     def handle_button_click(self, room: str):
@@ -334,7 +334,7 @@ class Control(App):
                 not self.climate.all_climate_control_enabled
             )
         elif "aircon" in data:
-            self.climate.toggle_airconditioning(user_initiated=True)
+            self.climate.toggle_airconditioning(user="voice control")
         elif "lock" in data:
             command = (
                 "unlock" if self.entities.lock.door_lock.state == "locked" else "lock"

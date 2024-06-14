@@ -246,10 +246,21 @@ class Device:
         del entity, attribute, old, kwargs
         user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
         self.controller.log(f"'{user}' changed {self.device_id} from UI")
-        self.handle_user_adjustment()
+        self.handle_user_adjustment(user)
 
-    def handle_user_adjustment(self):
+    def handle_user_adjustment(self, user: str):
         """Override this in child class to adjust device settings appropriately."""
+        if self.control_enabled and self.check_conditions_and_adjust(
+            check_if_would_adjust_only=True,
+        ):
+            self.control_enabled = False
+            self.controller.notify(
+                "Automatic control is now disabled for the "
+                f"{self.device.friendly_name.lower()} to prevent it from immediately "
+                f"overriding {user}'s manual adjustments",
+                title="Automatic Control",
+                targets="anyone_home_else_all",
+            )
 
     def __handle_control_enabled(
         self,

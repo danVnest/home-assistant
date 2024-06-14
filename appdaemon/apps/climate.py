@@ -136,12 +136,12 @@ class Climate(App):
             else:
                 aircon.turn_on_for_current_conditions()
 
-    def toggle_airconditioning(self, user_initiated: bool = False) -> None:
+    def toggle_airconditioning(self, user: str | None = None) -> None:
         """Toggle airconditioning on/off."""
         self.all_aircon_on = not self.all_aircon_on
-        if user_initiated:
+        if user:
             for aircon in self.aircons.values():
-                aircon.handle_user_adjustment()
+                aircon.handle_user_adjustment(user)
 
     def get_setting(self, setting_name: str) -> float:
         """Get temperature target and trigger settings, accounting for Sleep scene."""
@@ -603,20 +603,6 @@ class ClimateDevice(Device):
         else:
             self.check_conditions_and_adjust()
 
-    def handle_user_adjustment(self):
-        """"""
-        if self.control_enabled and self.check_conditions_and_adjust(
-            check_if_would_adjust_only=True,
-        ):
-            self.control_enabled = False
-            self.controller.notify(
-                f"The {self.device.friendly_name.lower()} was adjusted manually - "
-                "climate control is now disabled for this device to prevent it from "
-                "immediately re-adjusting",
-                title="Climate Control",
-                targets="anyone_home_else_all",
-            )
-
 
 class Aircon(ClimateDevice, PresenceDevice):
     """Control a specific aircon unit."""
@@ -821,11 +807,11 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Call one of the device's services in Home Assistant and wait for response."""
         super().call_service(service, **parameters, return_result=True)
 
-    def handle_user_adjustment(self):
+    def handle_user_adjustment(self, user: str):
         """"""
         if self.on:
             self.turn_on_for_current_conditions()
-        super().handle_user_adjustment()
+        super().handle_user_adjustment(user)
 
 
 class Fan(ClimateDevice, PresenceDevice):
