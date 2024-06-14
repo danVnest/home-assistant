@@ -143,7 +143,6 @@ class Control(App):
     def handle_app_reloaded(self, event_name: str, data: dict, **kwargs: dict):
         """Re-link the app and set a timer to initialise it."""
         del event_name, kwargs
-        setattr(self, data["app"].lower(), self.get_app(data["app"]))
         self.log(f"App added: '{data['app']}'")
         self.reset_scene()
 
