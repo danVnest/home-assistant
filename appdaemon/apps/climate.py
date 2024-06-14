@@ -945,17 +945,36 @@ class Heater(ClimateDevice, PresenceDevice):
         )
 
     @property
-    def target_temperature(self) -> float:
+    def desired_target_temperature(self) -> float:
         """Get the heater's target temperature."""
         return self.controller.get_setting("heating_target_temperature")
 
+    @property
+    def target_temperature(self) -> float:
+        """Get the heater's target temperature."""
+        return (
+            self.get_attribute("temperature")
+            if self.device_type == "climate"
+            else self.desired_target_temperature
+        )
+
+    @target_temperature.setter
+    def target_temperature(self, target: float):
+        if self.should_update_target_temperature:
+            self.call_service("set_temperature", temperature=target)
+
+    @property
+    def should_update_target_temperature(self):
+        """"""
+        return (
+            self.device_type == "climate"
+            and self.target_temperature != self.desired_target_temperature
+        )
+
     def turn_on(self):
         """Turn the heater on and adjust the target temperature if possible."""
-        if (
-            self.device_type == "climate"
-            and self.get_attribute("temperature") != self.target_temperature
-        ):
-            self.call_service("set_temperature", temperature=self.target_temperature)
+        # TODO: return if climate control off - when would this ever happen?
+        self.target_temperature = self.desired_target_temperature
         super().turn_on()
 
     def check_conditions_and_adjust(
@@ -963,31 +982,40 @@ class Heater(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the heater on/off based on current and target temperatures."""
-        if not self.control_enabled or (
-            not self.safe_when_vacant
+        if (
+            self.on
+            and not self.safe_when_vacant
             and (
                 not self.controller.presence.anyone_home
                 or "Away" in self.controller.control.scene
             )
         ):
-            self.controller.log(
-                f"Climate control is off but '{self.room}' heater's ",
-                "check_conditions_and_adjust was triggered",
-                level="DEBUG",
-            )
-            return False
-        if not self.on:
-            if self.room_temperature < self.target_temperature - self.controller.args[
-                "target_buffer"
-            ] and (self.ignoring_vacancy or not self.vacant):
-                if check_if_would_adjust_only:
-                    return True
-                self.turn_on()
-        elif self.room_temperature > 2 * self.target_temperature + self.controller.args[
-            "target_buffer"
-        ] or (not self.ignoring_vacancy and self.vacant):
             if check_if_would_adjust_only:
                 return True
             self.turn_off()
-            # TODO: figure out a better way to manage apparent temperature triggering nursery heater off than 2 *
+        elif self.control_enabled:
+            if not self.on:
+                if (
+                    self.room_temperature
+                    < self.desired_target_temperature
+                    - self.controller.args["target_buffer"]
+                    and (self.ignoring_vacancy or not self.vacant)
+                ):
+                    if check_if_would_adjust_only:
+                        return True
+                    self.turn_on()
+            elif (
+                self.room_temperature
+                > 2 * self.desired_target_temperature
+                + self.controller.args["target_buffer"]
+                or (not self.ignoring_vacancy and self.vacant)
+            ):
+                # TODO: figure out a better way to manage apparent temperature triggering nursery heater off than 2 *
+                if check_if_would_adjust_only:
+                    return True
+                self.turn_off()
+            elif check_if_would_adjust_only and self.should_update_target_temperature:
+                return True
+            else:
+                self.target_temperature = self.desired_target_temperature
         return False
