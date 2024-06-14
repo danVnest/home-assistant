@@ -10,12 +10,17 @@ User defined variables are configued in climate.yaml
 """
 
 # TODO: adjust ALL documentation text for all apps
+# TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
 from math import ceil
+from typing import TYPE_CHECKING
 
 from app import App, Device
 from presence import PresenceDevice
+
+if TYPE_CHECKING:
+    from appdaemon.entity import Entity
 
 
 class Climate(App):
@@ -622,7 +627,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         controller: Climate,
         room: str,
         linked_rooms: list[str] = (),
-        doors: list[str] = (),
+        doors: list[Entity] = (),
     ):
         """Initialise with an aircon's id, room(s), and the Climate controller."""
         super().__init__(
@@ -631,22 +636,27 @@ class Aircon(ClimateDevice, PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
-        self.__preferred_fan_mode = self.fan_mode
+        self.preferred_fan_mode = self.fan_mode
         # TODO: set adjustment_delay?
         self.vacating_delay = 60 * float(
             controller.entities.input_number.aircon_vacating_delay.state,
         )
-        self.doors = []
+        self.doors: list[Entity] = []
         for door in doors:
-            door_id = temperature_sensor_id = f"binary_sensor.{door}_door"
-            self.doors.append(self.controller.get_entity(temperature_sensor_id))
+            door_id = f"binary_sensor.{door}_door"
+            self.doors.append(self.controller.get_entity(door_id))
             self.controller.listen_state(
                 self.handle_door_change,
                 door_id,
                 new="off",
                 constrain_input_boolean=self.control_input_boolean,
             )
-        self.door_listeners = []
+            self.controller.listen_state(
+                self.handle_door_change,
+                door_id,
+                new="on",
+                duration=self.controller.args["aircon_reduce_fan_delay"],
+            )
         self.__door_open_delay = None
         self.door_open_delay = 60 * float(
             controller.entities.input_number.aircon_door_check_delay.state,
@@ -657,17 +667,11 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
         return self.get_attribute("fan_mode")
 
-    @property
-    def preferred_fan_mode(self) -> str:
+    @fan_mode.setter
+    def fan_mode(self, mode: str):
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
-        return self.__preferred_fan_mode
-
-    @preferred_fan_mode.setter
-    def preferred_fan_mode(self, fan_mode: str):
-        """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
-        self.__preferred_fan_mode = fan_mode
-        if self.on and self.fan_mode != fan_mode:
-            self.call_service("set_fan_mode", fan_mode=fan_mode)
+        if self.on and self.fan_mode != mode:
+            self.call_service("set_fan_mode", fan_mode=mode)
 
     def turn_on_for_current_conditions(
         self,
@@ -695,10 +699,12 @@ class Aircon(ClimateDevice, PresenceDevice):
         if self.fan_mode != self.preferred_fan_mode:
             if check_if_would_adjust_only:
                 return True
-            self.call_service("set_fan_mode", fan_mode=self.preferred_fan_mode)
+            if not self.door_open:
+                self.fan_mode = self.preferred_fan_mode
         if check_if_would_adjust_only:
             return False
         self.controller.allow_suggestion()
+        return True
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
         # What about cooling? Fans? Take into account pet presence in each room?
         # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
@@ -710,7 +716,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Adjust aircon based on current conditions and target temperatures."""
         if not self.control_enabled or (
             "Away" in self.controller.control.scene
-            and not self.controller.control.presence.pets_home_alone
+            and not self.controller.presence.pets_home_alone
         ):
             return False
         # TODO: reset suggestions more often? on any climate UI changes?
@@ -768,13 +774,13 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     @property
     def door_open(self) -> bool:
-        """Check if any doors are open."""
-        self.controller.log(
-            f"A door is open: {any(door.state == 'on' for door in self.doors)}",
-            level="DEBUG",
+        """Check if any doors are open (and have been for the required delay)."""
+        return any(
+            door.state == "on" and door.last_changed_seconds >= self.door_open_delay
+            for door in self.doors
         )
-        return any(door.state == "on" for door in self.doors)
         # TODO: maybe change all repeated get_state usages to storing the actual entitiy as a variable and getting state from that
+        # useful attributes: friendly_name, last_changed/_seconds, entity_name, domain, entity_id
 
     @property
     def door_open_delay(self) -> float:
@@ -786,20 +792,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Set the number of seconds to delay before registering a door as open."""
         if self.__door_open_delay != seconds:
             self.__door_open_delay = seconds
-            if self.door_listeners:
-                for listener in self.door_listeners:
-                    self.controller.cancel_listen_state(listener)
-                self.door_listeners = []
-            if seconds > 0:
-                for door in self.doors:
-                    self.door_listeners.append(
-                        self.controller.listen_state(
-                            self.handle_door_change,
-                            door.entity_id,
-                            new="on",
-                            duration=seconds,
-                        ),
-                    )
             self.check_conditions_and_adjust()
 
     def handle_door_change(
@@ -811,8 +803,19 @@ class Aircon(ClimateDevice, PresenceDevice):
         **kwargs: dict,
     ) -> None:
         """If the kitchen door status changes, check if aircon needs to change."""
-        del entity, attribute, old, new, kwargs
-        self.check_conditions_and_adjust()
+        del entity, attribute, old, kwargs
+        if not self.on or self.control_enabled:
+            return
+        if (
+            new == "on"
+            and self.fan_mode == "auto"
+            and abs(self.room_temperature - self.target_temperature)
+            > self.controller.args["aircon_reduce_fan_temperature_threshold"]
+        ):
+            self.fan_mode = "low"
+            # TODO: set timer to turn aircon off
+        else:
+            self.fan_mode = self.preferred_fan_mode
 
     def call_service(self, service: str, **parameters: dict):
         """Call one of the device's services in Home Assistant and wait for response."""
@@ -822,7 +825,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         """"""
         if self.on:
             self.turn_on_for_current_conditions()
-            # TODO: confirm that changing the switch template actually registers as user input for this device
         super().handle_user_adjustment()
 
 
