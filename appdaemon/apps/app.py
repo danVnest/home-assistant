@@ -183,10 +183,12 @@ class Device:
 
     def check_conditions_and_adjust(
         self,
+        *,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Override this in child class to adjust device settings appropriately."""
         del check_if_would_adjust_only
+        return False
 
     def turn_on(self, **kwargs: dict):
         """Turn the device on if it's off or adjust with provided parameters."""
@@ -250,15 +252,24 @@ class Device:
 
     def handle_user_adjustment(self, user: str):
         """Override this in child class to adjust device settings appropriately."""
-        if self.control_enabled and self.check_conditions_and_adjust(
-            check_if_would_adjust_only=True,
-        ):
+        if self.check_conditions_and_adjust(check_if_would_adjust_only=True):
+            if not self.control_enabled:
+                return
             self.control_enabled = False
             self.controller.notify(
                 "Automatic control is now disabled for the "
                 f"{self.device.friendly_name.lower()} to prevent it from immediately "
                 f"overriding {user}'s manual adjustments",
-                title="Automatic Control",
+                title=f"{self.device.friendly_name.title()} Control Disabled",
+                targets="anyone_home_else_all",
+            )
+        elif not self.control_enabled:
+            self.control_enabled = True
+            self.controller.notify(
+                "Automatic control is now enabled for the "
+                f"{self.device.friendly_name.lower()} as {user}'s manual adjustments "
+                "align with automatic control settings",
+                title=f"{self.device.friendly_name.title()} Control Enabled",
                 targets="anyone_home_else_all",
             )
 

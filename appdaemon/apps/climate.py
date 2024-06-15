@@ -661,6 +661,7 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     def turn_on_for_current_conditions(
         self,
+        *,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Set the aircon unit to heat or cool at desired settings."""
@@ -697,6 +698,7 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(
         self,
+        *,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Adjust aircon based on current conditions and target temperatures."""
@@ -875,6 +877,7 @@ class Fan(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(
         self,
+        *,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Calculate best fan speed for the current conditions and set accordingly."""
@@ -927,6 +930,7 @@ class Heater(ClimateDevice, PresenceDevice):
         controller: Climate,
         room: str,
         linked_rooms: list[str] = (),
+        *,
         safe_when_vacant: bool = False,
     ):
         """Initialise with a heater's id, room(s), and the Climate controller."""
@@ -979,6 +983,7 @@ class Heater(ClimateDevice, PresenceDevice):
 
     def check_conditions_and_adjust(
         self,
+        *,
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the heater on/off based on current and target temperatures."""

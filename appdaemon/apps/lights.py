@@ -829,10 +829,16 @@ class Light(PresenceDevice):
             return self.brightness > 0
         return self.presence_adjustments["vacant"]["brightness"] > 0
 
-    def check_conditions_and_adjust(self):
+    def check_conditions_and_adjust(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
         """Adjust to desired light settings for the current presence state."""
         if self.ignoring_vacancy:
-            return
+            return False
+        if check_if_would_adjust_only:
+            return True
         if self.transition_timer:
             presence = "entered"
         elif self.vacant:
@@ -847,6 +853,7 @@ class Light(PresenceDevice):
             f"Lighting '{self.device_id}' adjusted now room is '{presence}'",
             level="DEBUG",
         )
+        return True
 
     def start_transition_towards_occupied(self, progress: float = 0):
         """Calculate the light change required and start the transition."""

@@ -456,8 +456,14 @@ class PresenceDevice(Device):
                 self.start_transition_towards_occupied()
             self.check_conditions_and_adjust()
 
-    def check_conditions_and_adjust(self):
+    def check_conditions_and_adjust(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
         """Override this in child class to adjust device settings appropriately."""
+        del check_if_would_adjust_only
+        return False
 
     @property
     def transition_progress(self) -> float:
