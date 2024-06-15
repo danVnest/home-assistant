@@ -30,7 +30,7 @@ class Media(App):
         self.listen_state(
             self.state_change,
             self.play_state_sensor,
-            duration=self.args["state_change_delay"],
+            duration=self.constants["state_change_delay"],
         )
         # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
         # try without state_change_delay, I'd previously removed it!
@@ -41,7 +41,7 @@ class Media(App):
                 attribute="is_volume_muted",
                 old=not muted,
                 new=muted,
-                duration=self.args["state_change_delay"],
+                duration=self.constants["state_change_delay"],
             )
 
     @property
@@ -67,7 +67,7 @@ class Media(App):
     @property
     def pc_on(self) -> bool:
         """Check if the PC is currently on or not."""
-        return subprocess.call(["ping", "-c", "1", self.args["pc_ip"]]) == 0  # noqa: S603, S607
+        return subprocess.call(["ping", "-c", "1", self.constants["pc_ip"]]) == 0  # noqa: S603, S607
 
     def turn_off(self):
         """Turn the TV off."""
@@ -100,7 +100,9 @@ class Media(App):
                     source="LG 2 MQTT",
                     entity_id=self.entity_id,
                 )
-            self.run_in(self.setup_play_state_sensor, self.args["setup_check_delay"])
+            self.run_in(
+                self.setup_play_state_sensor, self.constants["setup_check_delay"]
+            )
             self.log("Loading app on TV to setup state sensor", level="DEBUG")
         else:
             self.log("Play state sensor setup complete", level="DEBUG")

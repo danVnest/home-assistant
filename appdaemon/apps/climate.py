@@ -374,7 +374,7 @@ class Climate(App):
         """Check if temperature is higher outside than inside."""
         return (
             self.inside_temperature
-            < self.outside_temperature - self.args["inside_outside_trigger"]
+            < self.outside_temperature - self.constants["inside_outside_trigger"]
         )
 
     @property
@@ -382,7 +382,7 @@ class Climate(App):
         """Check if temperature is lower outside than inside."""
         return (
             self.inside_temperature
-            > self.outside_temperature + self.args["inside_outside_trigger"]
+            > self.outside_temperature + self.constants["inside_outside_trigger"]
         )
 
     @property
@@ -530,7 +530,7 @@ class ClimateDevice(Device):
         return (
             self.room_temperature
             < self.controller.outside_temperature
-            - self.controller.args["inside_outside_trigger"]
+            - self.constants["inside_outside_trigger"]
         )
 
     @property
@@ -538,7 +538,8 @@ class ClimateDevice(Device):
         """Check if temperature is lower outside than inside."""
         return (
             self.room_temperature
-            > self.controller.outside_temperature + self.args["inside_outside_trigger"]
+            > self.controller.outside_temperature
+            + self.constants["inside_outside_trigger"]
         )
 
     @property
@@ -641,7 +642,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.handle_door_change,
                 door_id,
                 new="on",
-                duration=self.controller.args["aircon_reduce_fan_delay"],
+                duration=self.constants["aircon_reduce_fan_delay"],
             )
         self.__door_open_delay = None
         self.door_open_delay = 60 * float(
@@ -803,7 +804,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             new == "on"
             and self.fan_mode == "auto"
             and abs(self.room_temperature - self.target_temperature)
-            > self.controller.args["aircon_reduce_fan_temperature_threshold"]
+            > self.constants["aircon_reduce_fan_temperature_threshold"]
         ):
             self.fan_mode = "low"
             # TODO: set timer to turn aircon off
@@ -846,7 +847,7 @@ class Fan(ClimateDevice, PresenceDevice):
         self.vacating_delay = 60 * float(
             controller.entities.input_number.fan_vacating_delay.state,
         )
-        self.adjustment_delay = controller.args["fan_adjustment_delay"]
+        self.adjustment_delay = self.constants["fan_adjustment_delay"]
 
     @property
     def speed(self) -> float:
@@ -1049,8 +1050,7 @@ class Heater(ClimateDevice, PresenceDevice):
             if not self.on:
                 if (
                     self.room_temperature
-                    < self.desired_target_temperature
-                    - self.controller.args["target_buffer"]
+                    < self.desired_target_temperature - self.constants["target_buffer"]
                     and (self.ignoring_vacancy or not self.vacant)
                 ):
                     if check_if_would_adjust_only:
@@ -1058,8 +1058,7 @@ class Heater(ClimateDevice, PresenceDevice):
                     self.turn_on_for_current_conditions()
             elif (
                 self.room_temperature
-                > 2 * self.desired_target_temperature
-                + self.controller.args["target_buffer"]
+                > 2 * self.desired_target_temperature + self.constants["target_buffer"]
                 or (not self.ignoring_vacancy and self.vacant)
             ):
                 # TODO: figure out a better way to manage apparent temperature triggering nursery heater off than 2 *

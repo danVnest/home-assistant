@@ -96,7 +96,7 @@ class Lights(App):
             self.handle_bright_outside,
             "binary_sensor.dark_outside",
             new="off",
-            duration=self.args["night_to_day_delay"],
+            duration=self.constants["night_to_day_delay"],
         )
         # TODO: https://app.asana.com/0/1207020279479204/1207351651288716/f
         # convert the following to for loop? or add to Light definition?
@@ -141,7 +141,7 @@ class Lights(App):
         if not self.lights["bedroom"].ignoring_vacancy:
             self.lights["bedroom"].set_presence_adjustments(
                 occupied=(
-                    self.args["max_brightness"],
+                    self.constants["max_brightness"],
                     self.lights["bedroom"].kelvin_limits["max"],
                 ),
                 vacating_delay=self.get_setting(
@@ -153,7 +153,7 @@ class Lights(App):
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
-                    self.args["max_brightness"],
+                    self.constants["max_brightness"],
                     self.lights[light_name].kelvin_limits["max"],
                 ),
                 vacating_delay=self.get_setting("office_vacating_delay"),
@@ -189,7 +189,7 @@ class Lights(App):
             vacant=(self.get_setting("tv_brightness"), kelvin),
             entered=(self.get_setting("tv_motion_brightness"), kelvin),
             occupied=(
-                self.args["max_brightness"],
+                self.constants["max_brightness"],
                 self.lights["kitchen"].kelvin_limits["max"],
             ),
             transition_period=self.get_setting("tv_transition_period"),
@@ -198,7 +198,7 @@ class Lights(App):
         self.lights["kitchen_strip"].set_presence_adjustments(
             entered=(self.get_setting("tv_motion_brightness"), kelvin),
             occupied=(
-                self.args["max_brightness"],
+                self.constants["max_brightness"],
                 self.lights["kitchen_strip"].kelvin_limits["max"],
             ),
             transition_period=self.get_setting("tv_transition_period"),
@@ -235,7 +235,7 @@ class Lights(App):
         for light_name in ("entryway", "kitchen"):
             self.lights[light_name].set_presence_adjustments(
                 entered=(
-                    self.args["min_brightness"],
+                    self.constants["min_brightness"],
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 occupied=(
@@ -250,7 +250,7 @@ class Lights(App):
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
-                    self.args["min_brightness"],
+                    self.constants["min_brightness"],
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 vacating_delay=self.get_setting(
@@ -277,11 +277,11 @@ class Lights(App):
         )
         self.lights["kitchen"].set_presence_adjustments(
             vacant=(brightness, kelvin),
-            occupied=(self.args["max_brightness"], kelvin),
+            occupied=(self.constants["max_brightness"], kelvin),
             vacating_delay=vacating_delay,
         )
         self.lights["kitchen_strip"].set_presence_adjustments(
-            occupied=(self.args["max_brightness"], kelvin),
+            occupied=(self.constants["max_brightness"], kelvin),
             vacating_delay=vacating_delay,
         )
         self.lights["office"].set_presence_adjustments(
@@ -301,7 +301,7 @@ class Lights(App):
         for light_name in ("entryway", "kitchen", "office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
-                    self.args["max_brightness"],
+                    self.constants["max_brightness"],
                     self.lights[light_name].kelvin_limits["max"],
                 ),
                 vacating_delay=float(
@@ -358,7 +358,7 @@ class Lights(App):
                 kelvin,
             ),
             occupied=(
-                self.args["max_brightness"],
+                self.constants["max_brightness"],
                 self.get_setting("night_motion_kelvin"),
             ),
             transition_period=self.get_setting("night_transition_period"),
@@ -369,7 +369,7 @@ class Lights(App):
             if brightness >= self.get_setting("night_motion_brightness")
             else (self.get_setting("night_motion_brightness"), kelvin),
             occupied=(
-                self.args["max_brightness"],
+                self.constants["max_brightness"],
                 self.get_setting("night_motion_kelvin"),
             ),
             transition_period=self.get_setting("night_transition_period"),
@@ -500,7 +500,7 @@ class Lights(App):
         return (
             float(self.get_state(f"sensor.{room}_presence_sensor_illuminance"))
             - self.lighting_illuminance()
-            >= self.args["night_max_illuminance"]
+            >= self.constants["night_max_illuminance"]
         )
         # TODO: this is currently not used, remove?
 
@@ -508,8 +508,8 @@ class Lights(App):
         """Return approximate illuminance of powered lights affecting light sensors."""
         return (
             self.lights[room].brightness
-            / self.args["max_brightness"]
-            * self.args["lighting_illuminance_factor"]
+            / self.constants["max_brightness"]
+            * self.constants["lighting_illuminance_factor"]
         )
 
     def handle_dark_outside(
@@ -558,11 +558,14 @@ class Lights(App):
         if new == "unavailable":
             self.log("'Kitchen' illuminance is 'unavailable'", level="WARNING")
             return
-        if self.control.scene != "Morning":
+        if (
+            self.control.scene != "Morning"
+            or not self.lights["kitchen"].control_enabled
+        ):
             return
         if (
             float(new) - self.lighting_illuminance()
-            >= self.args["night_max_illuminance"]
+            >= self.constants["night_max_illuminance"]
         ):
             if self.lights["kitchen"].on_when_vacant:
                 self.log(
@@ -571,13 +574,14 @@ class Lights(App):
                 )
                 self.lights["kitchen"].set_presence_adjustments(
                     occupied=(
-                        self.args["max_brightness"],
+                        self.constants["max_brightness"],
                         self.get_setting("morning_kelvin"),
                     ),
                     vacating_delay=self.get_setting("morning_vacating_delay"),
                 )
         elif (
-            float(new) - self.lighting_illuminance() <= self.args["day_min_illuminance"]
+            float(new) - self.lighting_illuminance()
+            <= self.constants["day_min_illuminance"]
             and not self.lights["kitchen"].on_when_vacant
         ):
             self.log(
@@ -587,7 +591,7 @@ class Lights(App):
             kelvin = self.get_setting("morning_kelvin")
             self.lights["kitchen"].set_presence_adjustments(
                 vacant=(self.get_setting("morning_brightness"), kelvin),
-                occupied=(self.args["max_brightness"], kelvin),
+                occupied=(self.constants["max_brightness"], kelvin),
                 vacating_delay=self.get_setting("morning_vacating_delay"),
             )
 
@@ -605,16 +609,16 @@ class Lights(App):
             self.log("'Bedroom' illuminance is 'unavailable'", level="WARNING")
             return
         if self.control.scene == "Morning":
-            if float(new) >= self.args["morning_max_illuminance"]:
+            if float(new) >= self.constants["morning_max_illuminance"]:
                 self.log(
                     f"Bedroom light levels are high ({new}lx), "
                     "transitioning to day scene",
                 )
                 self.control.scene = "Day"
-        elif self.control.scene == "Day":
+        elif self.control.scene == "Day" and self.lights["bedroom"].control_enabled:
             if (
                 float(new) - self.lighting_illuminance("bedroom")
-                >= self.args["morning_max_illuminance"]
+                >= self.constants["morning_max_illuminance"]
             ):
                 if not self.lights["bedroom"].ignoring_vacancy:
                     self.lights["bedroom"].ignore_vacancy()
@@ -626,7 +630,7 @@ class Lights(App):
             elif self.lights["bedroom"].ignoring_vacancy:
                 self.lights["bedroom"].set_presence_adjustments(
                     occupied=(
-                        self.args["max_brightness"],
+                        self.constants["max_brightness"],
                         self.lights["bedroom"].kelvin_limits["max"],
                     ),
                     vacating_delay=self.get_setting(
@@ -738,8 +742,8 @@ class Light(PresenceDevice):
                 f"Kelvin ({value}) out of bounds for '{self.device_id}'",
                 level="DEBUG",
             )
-        return self.controller.constants["kelvin_per_step"] * int(
-            value / self.controller.constants["kelvin_per_step"],
+        return self.constants["kelvin_per_step"] * int(
+            value / self.constants["kelvin_per_step"],
         )
 
     def adjust(self, brightness: int, kelvin: int):
@@ -882,13 +886,11 @@ class Light(PresenceDevice):
         if brightness_change == 0 and kelvin_change == 0:
             return
         steps = max(
-            abs(brightness_change) / self.controller.constants["brightness_per_step"],
-            abs(kelvin_change) / self.controller.constants["kelvin_per_step"],
+            abs(brightness_change) / self.constants["brightness_per_step"],
+            abs(kelvin_change) / self.constants["kelvin_per_step"],
             1,
         )
-        max_steps = (
-            self.transition_period * self.controller.constants["max_steps_per_second"]
-        )
+        max_steps = self.transition_period * self.constants["max_steps_per_second"]
         if steps > max_steps:
             steps = max_steps
         brightness_step = brightness_change / steps

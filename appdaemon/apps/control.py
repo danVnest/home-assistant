@@ -52,7 +52,7 @@ class Control(App):
             self.listen_state(
                 self.handle_ui_settings_change,
                 setting,
-                duration=self.args["settings_change_delay"],
+                duration=self.constants["settings_change_delay"],
             )
         self.listen_event(self.handle_button, "zwave_js_value_notification")
         self.listen_event(self.handle_ifttt, "ifttt_webhook_received")
@@ -88,12 +88,12 @@ class Control(App):
                 f"sensor.{battery}_battery_level",
             )
         self.set_timer("morning_time")
-        self.run_daily(self.handle_day_time, self.args["day_time"])
+        self.run_daily(self.handle_day_time, self.constants["day_time"])
         self.set_timer("bed_time")
         self.timers["heartbeat"] = self.run_every(
             self.heartbeat,
             "now",
-            self.args["heartbeat_period"],
+            self.constants["heartbeat_period"],
         )
         for system_component in [
             "update.home_assistant_core_update",
@@ -113,7 +113,7 @@ class Control(App):
         self.listen_event(self.all_initialized, "appd_started")
         self.timers["init_delay"] = self.run_in(
             self.assume_all_initialised,
-            self.args["init_delay"],
+            self.constants["init_delay"],
         )
         # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
         # test self.notify("test message", targets="dan", title="test title", critical=True)
@@ -136,12 +136,12 @@ class Control(App):
         if not self.is_all_initialised:
             self.log(
                 "Assuming initialisation complete after "
-                f"{self.args['init_delay']} seconds",
+                f"{self.constants['init_delay']} seconds",
             )
             self.all_initialized(None, None)
 
     def handle_app_reloaded(self, event_name: str, data: dict, **kwargs: dict):
-        """Re-link the app and set a timer to initialise it."""
+        """Re-link the app and set a timer to initialise it?"""
         del event_name, kwargs
         self.log(f"App added: '{data['app']}'")
         self.reset_scene()
@@ -158,6 +158,7 @@ class Control(App):
         # TODO: figure out where scene needs to be reset and why (current reason this isn't checked)
         old_scene = self.__scene
         self.__scene = new_scene
+        # TODO: if old_scene is no longer required, remove __scene and just get from entity directly (in app.py)
         self.log(f"Setting scene to '{new_scene}' (transitioning from '{old_scene}')")
         self.lights.transition_to_scene(new_scene)
         self.climate.transition_between_scenes(new_scene, old_scene)
@@ -207,7 +208,7 @@ class Control(App):
                 if (
                     self.parse_time(self.get_setting("morning_time"))
                     < self.time()
-                    < self.parse_time(self.args["day_time"])
+                    < self.parse_time(self.constants["day_time"])
                 )
                 else "Sleep"
             )
@@ -229,7 +230,7 @@ class Control(App):
         """Check if morning and bed times are appropriate."""
         return (
             self.parse_time(self.get_setting("morning_time"))
-            < self.parse_time(self.args["day_time"])
+            < self.parse_time(self.constants["day_time"])
             < self.parse_time(self.get_setting("bed_time"))
         )
 
@@ -269,7 +270,7 @@ class Control(App):
         del event_name, kwargs
         room = (
             "bedroom"
-            if data["node_id"] == self.args["bedroom_button_node_id"]
+            if data["node_id"] == self.constants["bedroom_button_node_id"]
             else "living_room"
         )
         if data["value"] == "KeyPressed":
@@ -427,9 +428,9 @@ class Control(App):
         # notify of low battery level only once per day and only if different to previous (or unavailable/old date)
         if new in ("unavailable", "unknown", None):
             self.log(f"'{entity}' is '{new}'", level="WARNING")
-        elif float(new) <= self.args["notify_battery_level"] and (
+        elif float(new) <= self.constants["notify_battery_level"] and (
             old in ("unavailable", "unknown", None)
-            or float(old) >= self.args["notify_battery_level"]
+            or float(old) >= self.constants["notify_battery_level"]
         ):
             self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
@@ -438,15 +439,15 @@ class Control(App):
         del kwargs
         try:
             urllib.request.urlopen(  # noqa: S310
-                self.args["heartbeat_url"],
-                timeout=self.args["heartbeat_timeout"],
+                self.constants["heartbeat_url"],
+                timeout=self.constants["heartbeat_timeout"],
             )
         except OSError:
             self.timers["heartbeat_fail_count"] += 1
             if (
                 self.online
                 and self.timers["heartbeat_fail_count"]
-                >= self.args["heartbeat_max_fail_count"]
+                >= self.constants["heartbeat_max_fail_count"]
             ):
                 self.online = False
                 self.log("Heartbeat timed out", level="WARNING")
@@ -460,7 +461,7 @@ class Control(App):
                 self.online = True
                 if (
                     self.timers["heartbeat_fail_count"]
-                    >= self.args["heartbeat_max_fail_count"]
+                    >= self.constants["heartbeat_max_fail_count"]
                 ):
                     self.log("Restarting Home Assistant to fix any broken entities")
                     self.cancel_listen_log(self.handle_log)

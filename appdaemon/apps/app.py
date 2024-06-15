@@ -28,7 +28,7 @@ class App(hass.Hass):
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.constants = {}
+        self.constants = self.args
 
     def initialize(self):
         """AppDaemon calls when app is ready."""
@@ -60,7 +60,7 @@ class App(hass.Hass):
             ):
                 data = {"tag": kwargs["title"]}
                 if "critical" in kwargs:
-                    if self.control.args["mobiles"][person]["type"] == "iOS":
+                    if self.control.constants["mobiles"][person]["type"] == "iOS":
                         data.update(
                             {
                                 "push": {
@@ -84,7 +84,7 @@ class App(hass.Hass):
                 super().notify(
                     message,
                     title=kwargs["title"],
-                    name=self.control.args["mobiles"][person]["name"],
+                    name=self.control.constants["mobiles"][person]["name"],
                     data=data,
                 )
         self.log(f"Notified '{targets}': \"{kwargs['title']}: {message}\"")
@@ -136,6 +136,7 @@ class Device:
         self.device_type = device_id.split(".")[0]
         self.device = controller.get_entity(device_id)
         self.controller = controller
+        self.constants = controller.constants
         self.control_input_boolean = (
             "input_boolean.control_"
             + device_id.split(".")[1]

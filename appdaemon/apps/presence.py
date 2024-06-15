@@ -163,7 +163,7 @@ class Presence(App):
             "Away" in self.control.scene
             and self.date() - self.last_device_date
             > timedelta(
-                hours=self.args["new_device_notification_delay"],
+                hours=self.constants["new_device_notification_delay"],
             )
         ):
             self.notify(
