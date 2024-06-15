@@ -599,7 +599,7 @@ class ClimateDevice(Device):
     def adjust_temperature_targets_and_triggers(self):
         """"""
         if self.on:
-            self.turn_on()
+            self.turn_on_for_current_conditions()
         else:
             self.check_conditions_and_adjust()
 
@@ -649,6 +649,30 @@ class Aircon(ClimateDevice, PresenceDevice):
         )
 
     @property
+    def best_mode_for_conditions(self) -> str:
+        """?"""
+        return (
+            "cool"
+            if self.above_target_temperature or self.closer_to_hot_than_cold
+            else "heat"
+        )
+
+    @property
+    def target_temperature(self) -> float:
+        """"""
+        return self.get_attribute("temperature") if self.on else self.room_temperature
+
+    @property
+    def desired_target_temperature(self) -> float:
+        """"""
+        mode = self.best_mode_for_conditions
+        return self.controller.get_setting(
+            mode + "ing_target_temperature",
+        ) + self.constants["target_buffer"] * (
+            1 if mode == "heat" else -1
+        )  # TODO: potentially remove target_buffer?
+
+    @property
     def fan_mode(self) -> str:
         """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
         return self.get_attribute("fan_mode")
@@ -665,24 +689,16 @@ class Aircon(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Set the aircon unit to heat or cool at desired settings."""
-        mode = (
-            "cool"
-            if self.above_target_temperature or self.closer_to_hot_than_cold
-            else "heat"
-        )
+        mode = self.best_mode_for_conditions
         if self.device.state != mode:
             if check_if_would_adjust_only:
                 return True
             self.call_service("set_hvac_mode", hvac_mode=mode)
-        target_temperature = self.controller.get_setting(
-            mode + "ing_target_temperature",
-        ) + self.controller.args["target_buffer"] * (
-            1 if mode == "heat" else -1
-        )  # TODO: potentially remove target_buffer?
-        if self.get_attribute("temperature") != target_temperature:
+        desired_target_temperature = self.desired_target_temperature
+        if self.target_temperature != desired_target_temperature:
             if check_if_would_adjust_only:
                 return True
-            self.call_service("set_temperature", temperature=target_temperature)
+            self.call_service("set_temperature", temperature=desired_target_temperature)
         if self.fan_mode != self.preferred_fan_mode:
             if check_if_would_adjust_only:
                 return True
@@ -708,37 +724,26 @@ class Aircon(ClimateDevice, PresenceDevice):
         ):
             return False
         # TODO: reset suggestions more often? on any climate UI changes?
-        # TODO: this is too complex, move parts to another method
         if not self.on:
-            if self.too_hot_or_cold and (self.ignoring_vacancy or not self.vacant):
-                if not self.door_open:
-                    if (
-                        not check_if_would_adjust_only
-                        and not self.controller.any_aircon_on
-                        and self.controller.presence.pets_home_alone
-                        and not self.controller.presence.anyone_home
-                    ):
-                        self.controller.notify(
-                            f"It is {self.room_temperature}º in the {self.room}, "
-                            "turning aircon on for the pets",
-                            title="Climate Control",
-                        )
-                    if (
-                        check_if_would_adjust_only
-                        and self.turn_on_for_current_conditions(
-                            check_if_would_adjust_only,
-                        )
-                    ):
-                        return True
-                    self.turn_on_for_current_conditions()
-                elif (
-                    not check_if_would_adjust_only
-                    and not self.outside_temperature_nicer
-                    and self.controller.presence.anyone_home
+            if (
+                self.too_hot_or_cold
+                and (self.ignoring_vacancy or not self.vacant)
+                and not self.door_open
+            ):
+                if check_if_would_adjust_only and self.turn_on_for_current_conditions(
+                    check_if_would_adjust_only,
                 ):
-                    self.controller.suggest(
-                        f"It's {self.room_temperature}º in the {self.room} right now, "
-                        "consider closing up the house so aircon can turn on",
+                    return True
+                self.turn_on_for_current_conditions()
+                if (
+                    not self.controller.any_aircon_on
+                    and self.controller.presence.pets_home_alone
+                    and not self.controller.presence.anyone_home
+                ):
+                    self.controller.notify(
+                        f"It is {self.room_temperature}º in the {self.room}, "
+                        "turning aircon on for the pets",
+                        title="Climate Control",
                     )
         elif (
             self.door_open
@@ -844,7 +849,7 @@ class Fan(ClimateDevice, PresenceDevice):
         self.adjustment_delay = controller.args["fan_adjustment_delay"]
 
     @property
-    def speed(self) -> bool:
+    def speed(self) -> float:
         """Get the fan's speed if it was on (100 is full speed)."""
         return self.get_attribute("percentage")
 
@@ -862,6 +867,21 @@ class Fan(ClimateDevice, PresenceDevice):
             self.turn_on(percentage=new_speed)
 
     @property
+    def desired_speed_if_cooling(self) -> float:
+        """"""
+        return 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
+        # return self.speed_per_level * max(
+        #     min(
+        #         self.speed_levels,
+        #         ceil(
+        #             (self.room_temperature - self.target_temperature)
+        #             * self.constants["fan_speed_change_rate"],
+        #         ),
+        #     ),
+        #     1,
+        # )
+
+    @property
     def reverse(self) -> bool:
         """True if the fan's spin direction is set to reverse."""
         return self.get_attribute("direction") == "reverse"
@@ -874,6 +894,25 @@ class Fan(ClimateDevice, PresenceDevice):
                 "set_direction",
                 direction="reverse" if new_reverse else "forward",
             )
+
+    @property
+    def target_temperature(self) -> float:
+        """Get the fan's target temperature."""
+        return self.controller.get_setting("cooling_target_temperature")
+
+    def turn_on_for_current_conditions(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """"""
+        hot = not self.below_target_temperature
+        speed = self.desired_speed_if_cooling if hot else self.speed_per_level * 1
+        if check_if_would_adjust_only:
+            return self.speed != speed or self.reverse == hot
+        self.reverse = not hot
+        self.speed = speed
+        return True
 
     def check_conditions_and_adjust(
         self,
@@ -895,20 +934,17 @@ class Fan(ClimateDevice, PresenceDevice):
         ):
             hot = self.above_target_temperature
             if hot:
-                speed = self.speed_per_level * min(
-                    self.speed_levels,
-                    ceil(
-                        self.room_temperature
-                        - self.controller.get_setting("cooling_target_temperature"),
-                    ),
+                speed = self.desired_speed_if_cooling
+            elif (
+                self.companion_device
+                and self.companion_device.state == "heat"
+                and self.controller.control.scene
+                not in (
+                    "Sleep",
+                    "Morning",
                 )
-                speed = 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
-            elif self.companion_device and self.controller.control.scene not in (
-                "Sleep",
-                "Morning",
             ):
-                if self.companion_device.on:
-                    speed = self.speed_per_level * 1
+                speed = self.speed_per_level * 1
         if check_if_would_adjust_only:
             return self.speed != speed or self.reverse == hot
         self.reverse = not hot
@@ -975,11 +1011,22 @@ class Heater(ClimateDevice, PresenceDevice):
             and self.target_temperature != self.desired_target_temperature
         )
 
-    def turn_on(self):
-        """Turn the heater on and adjust the target temperature if possible."""
-        # TODO: return if climate control off - when would this ever happen?
+    def turn_on_for_current_conditions(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Turn the heater on and adjust the target temperature if appropriate."""
+        if (
+            check_if_would_adjust_only
+            and self.target_temperature != self.desired_target_temperature
+        ):
+            return True
         self.target_temperature = self.desired_target_temperature
-        super().turn_on()
+        if check_if_would_adjust_only and not self.on:
+            return True
+        self.turn_on()
+        return False
 
     def check_conditions_and_adjust(
         self,
@@ -1008,7 +1055,7 @@ class Heater(ClimateDevice, PresenceDevice):
                 ):
                     if check_if_would_adjust_only:
                         return True
-                    self.turn_on()
+                    self.turn_on_for_current_conditions()
             elif (
                 self.room_temperature
                 > 2 * self.desired_target_temperature
