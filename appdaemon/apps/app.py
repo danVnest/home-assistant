@@ -245,9 +245,9 @@ class Device:
         **kwargs: dict,
     ):
         """"""
-        del entity, attribute, old, kwargs
+        del attribute, old, kwargs
         user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
-        self.controller.log(f"'{user}' changed {self.device_id} from UI")
+        self.controller.log(f"'{user}' changed {entity} from UI")
         self.handle_user_adjustment(user)
 
     def handle_user_adjustment(self, user: str):
