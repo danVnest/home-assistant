@@ -117,9 +117,19 @@ class Presence(App):
                 # TODO: don't do this, create specific self.climate.handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
     @property
-    def kitchen_door_open(self) -> bool:
-        """Check if the kitchen door is open."""
-        return self.entities.binary_sensor.kitchen_door.state == "on"
+    def door_locked(self) -> bool:
+        """True if the front door is locked."""
+        return self.entities.lock.door_lock.state == "locked"
+
+    def lock_door(self):
+        """Lock the front door if not already locked."""
+        if not self.door_locked:
+            self.call_service("lock/lock", entity_id="lock.door_lock")
+
+    def unlock_door(self):
+        """Unlock the front door if not already unlocked."""
+        if self.door_locked:
+            self.call_service("lock/unlock", entity_id="lock.door_lock")
 
     # TODO: probably move above to Climate
 
@@ -135,13 +145,13 @@ class Presence(App):
         del attribute, kwargs
         self.log(f"'{entity}' is '{new}'")
         if new == "home":
-            self.call_service("lock/unlock", entity_id="lock.door_lock")
+            self.unlock_door()
             if "Away" in self.control.scene:
                 self.pets_home_alone = False
                 self.control.reset_scene()
         else:
             if old == "home":
-                self.call_service("lock/lock", entity_id="lock.door_lock")
+                self.lock_door()
             if (
                 "Away" not in self.control.scene
                 and self.get_state(

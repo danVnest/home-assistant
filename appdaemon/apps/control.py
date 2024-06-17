@@ -165,7 +165,7 @@ class Control(App):
         self.lights.transition_to_scene(new_scene)
         self.climate.transition_between_scenes(new_scene, old_scene)
         if new_scene == "Sleep" or "Away" in new_scene:
-            self.call_service("lock/lock", entity_id="lock.door_lock")
+            self.presence.lock_door()
             self.turn_on("switch.entryway_camera_enabled")
             self.turn_on("switch.back_door_camera_enabled")
             if "Away" in new_scene:
@@ -262,7 +262,7 @@ class Control(App):
             self.climate.pre_condition_for_sleep()
         else:
             self.climate.pre_condition_nursery()
-        self.call_service("lock/lock", entity_id="lock.door_lock")
+        self.presence.lock_door()
 
     @property
     def bed_time(self) -> bool:
@@ -341,10 +341,10 @@ class Control(App):
         elif "aircon" in data:
             self.climate.toggle_airconditioning(user="voice control")
         elif "lock" in data:
-            command = (
-                "unlock" if self.entities.lock.door_lock.state == "locked" else "lock"
-            )
-            self.call_service(f"lock/{command}", entity_id="lock.door_lock")
+            if self.presence.door_locked:
+                self.presence.unlock_door()
+            else:
+                self.presence.lock_door()
 
     def handle_ui_settings_change(
         self,
