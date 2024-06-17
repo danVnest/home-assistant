@@ -2,7 +2,7 @@ Control:
   module: control
   class: Control
   init_delay: 10
-  day_time: "12:00:00"
+  day_time: "10:00:00"
   settings_change_delay: 2
   heartbeat_url: !secret heartbeat_url
   heartbeat_timeout: 10
