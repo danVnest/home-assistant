@@ -625,6 +625,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         )
         self.preferred_fan_mode = self.fan_mode
         # TODO: set adjustment_delay?
+        self.turn_off_timer_handle = None
         self.vacating_delay = 60 * float(
             controller.entities.input_number.aircon_vacating_delay.state,
         )
@@ -636,7 +637,6 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.handle_door_change,
                 door_id,
                 new="off",
-                constrain_input_boolean=self.control_input_boolean,
             )
             self.controller.listen_state(
                 self.handle_door_change,
@@ -712,6 +712,11 @@ class Aircon(ClimateDevice, PresenceDevice):
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
         # What about cooling? Fans? Take into account pet presence in each room?
         # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
+
+    def turn_off_after_delay(self, **kwargs: dict):
+        """Turn aircon off after the required delay when a door opens."""
+        del kwargs
+        self.turn_off()
 
     def check_conditions_and_adjust(
         self,
@@ -798,18 +803,29 @@ class Aircon(ClimateDevice, PresenceDevice):
     ) -> None:
         """If the kitchen door status changes, check if aircon needs to change."""
         del entity, attribute, old, kwargs
-        if not self.on or self.control_enabled:
+        self.controller.cancel_timer(self.turn_off_timer_handle)
+        if not self.control_enabled:
             return
-        if (
-            new == "on"
-            and self.fan_mode == "auto"
-            and abs(self.room_temperature - self.target_temperature)
-            > self.constants["aircon_reduce_fan_temperature_threshold"]
-        ):
-            self.fan_mode = "low"
-            # TODO: set timer to turn aircon off
-        else:
-            self.fan_mode = self.preferred_fan_mode
+        if new == "on" and self.on:
+            if self.vacating_delay - self.constants["aircon_reduce_fan_delay"] <= 0:
+                self.turn_off()
+            else:
+                self.turn_off_timer_handle = self.controller.run_in(
+                    self.turn_off_after_delay,
+                    self.vacating_delay - self.constants["aircon_reduce_fan_delay"],
+                    constrain_input_boolean=self.control_input_boolean,
+                )
+                if (
+                    self.fan_mode == "auto"
+                    and abs(self.room_temperature - self.target_temperature)
+                    > self.constants["aircon_reduce_fan_temperature_threshold"]
+                ):
+                    self.fan_mode = "low"
+        elif not self.door_open:
+            if self.on:
+                self.fan_mode = self.preferred_fan_mode
+            else:
+                self.check_conditions_and_adjust()
 
     def call_service(self, service: str, **parameters: dict):
         """Call one of the device's services in Home Assistant and wait for response."""

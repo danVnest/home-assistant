@@ -41,9 +41,8 @@ class App(hass.Hass):
         # TODO: detect more types
 
     def cancel_timer(self, handle):
-        """Cancel timer after checking it is valid and running."""
-        if self.timer_running(handle):
-            super().cancel_timer(handle)
+        """Cancel timer or ignore if it is invalid or has already triggered."""
+        super().cancel_timer(handle, silent=True)
 
     def notify(self, message: str, **kwargs):
         """Send a notification (title required) to target users (anyone_home or all)."""
