@@ -258,7 +258,7 @@ class Climate(App):
         forecast = self.extreme_forecast
         if forecast is not None:
             self.suggest(
-                f"It's forecast to reach {forecast}º, "  # TODO: format to one decimal place
+                f"It's forecast to reach {forecast:.1f}º, "
                 "consider enabling climate control",
             )
 
