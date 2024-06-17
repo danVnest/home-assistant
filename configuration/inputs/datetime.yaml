@@ -2,6 +2,10 @@ morning_time:
   name: Morning time
   has_time: true
   icon: mdi:alarm
+nursery_time:
+  name: Nursery time
+  has_time: true
+  icon: mdi:cradle
 bed_time:
   name: Bed time
   has_time: true

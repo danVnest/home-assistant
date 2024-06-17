@@ -21,6 +21,7 @@ class Control(App):
         self.timers = {
             "morning_time": None,
             "day_time": None,
+            "nursery_time": None,
             "bed_time": None,
             "heartbeat": None,
             "heartbeat_fail_count": 0,
@@ -89,6 +90,7 @@ class Control(App):
             )
         self.set_timer("morning_time")
         self.run_daily(self.handle_day_time, self.constants["day_time"])
+        self.set_timer("nursery_time")
         self.set_timer("bed_time")
         self.timers["heartbeat"] = self.run_every(
             self.heartbeat,
@@ -216,13 +218,14 @@ class Control(App):
             self.scene = "Night"
 
     def set_timer(self, name: str):
-        """Set morning or bed timer as specified by the corresponding settings."""
+        """Set morning or bed timers as specified by the corresponding settings."""
         self.cancel_timer(self.timers[name])
         self.timers[name] = self.run_daily(
             self.handle_morning_time
             if name == "morning_time"
-            else self.handle_bed_time,
+            else self.handle_bed_times,
             self.get_setting(name),
+            timer_name=name,
         )
 
     @property
@@ -252,11 +255,13 @@ class Control(App):
         else:
             self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Morning')")
 
-    def handle_bed_time(self, **kwargs: dict):
-        """Adjust climate control when nearing bed time (callback for daily timer)."""
-        del kwargs
-        self.log("Bed timer triggered")
-        self.climate.pre_condition_bedrooms()
+    def handle_bed_times(self, **kwargs: dict):
+        """Adjust climate control when nearing bed times (callback for daily timer)."""
+        self.log(f"{kwargs['timer_name']} triggered")
+        if kwargs["timer_name"] == "bed_time":
+            self.climate.pre_condition_for_sleep()
+        else:
+            self.climate.pre_condition_nursery()
         self.call_service("lock/lock", entity_id="lock.door_lock")
 
     @property

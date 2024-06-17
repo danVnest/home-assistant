@@ -310,6 +310,7 @@ views:
       - cards:
           - entities:
               - entity: input_datetime.morning_time
+              - entity: input_datetime.nursery_time
               - entity: input_datetime.bed_time
             show_header_toggle: false
             title: Times

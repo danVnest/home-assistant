@@ -180,7 +180,7 @@ class Climate(App):
             for heater in self.heaters.values():
                 heater.turn_off()
         if new_scene == "Sleep":
-            self.end_pre_condition_bedrooms()
+            self.end_pre_condition_for_sleep()
         elif new_scene == "Morning":
             self.heaters["nursery"].monitor_presence()
             # TODO: remove when nursery presence is reliable
@@ -192,12 +192,12 @@ class Climate(App):
         if self.any_climate_control_enabled:
             self.check_conditions_and_adjust()
         elif any(
-            [
+            (
                 new_scene == "Day" and old_scene in ["Sleep", "Morning"],
                 new_scene == "Night" and old_scene == "Day",
                 "Away" not in new_scene and "Away" in old_scene,
                 self.presence.pets_home_alone,
-            ],
+            ),
         ):  # TODO: consider simplifying and removing old_scene?
             self.suggest_if_extreme_forecast()
 
@@ -236,18 +236,22 @@ class Climate(App):
             )
             # TODO: above doesn't account for the situation where the bedroom door is closed
 
-    def pre_condition_bedrooms(self):
-        """Pre-cool/heat the bedroom and nursery for nice sleeping conditions."""
+    def pre_condition_nursery(self):
+        """Pre-cool/heat the nursery for nice sleeping conditions."""
+        self.heaters["nursery"].ignore_vacancy()
+        self.heaters["nursery"].check_conditions_and_adjust()
+
+    def pre_condition_for_sleep(self):
+        """Pre-cool/heat the bedroom and dog bed area for nice sleeping conditions."""
         for device in (
             self.aircons["bedroom"],
-            self.heaters["nursery"],
             self.aircons["dining_room"],
         ):
             # TODO: remove dining room once presence detects dogs properly?
             device.ignore_vacancy()
             device.check_conditions_and_adjust()
 
-    def end_pre_condition_bedrooms(self):
+    def end_pre_condition_for_sleep(self):
         """Return bedroom and nursery climate control to normal."""
         self.aircons["bedroom"].monitor_presence()
         # self.heaters["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
