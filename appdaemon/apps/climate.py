@@ -958,7 +958,7 @@ class Fan(ClimateDevice, PresenceDevice):
                 speed = self.desired_speed_if_cooling
             elif (
                 self.companion_device
-                and self.companion_device.state == "heat"
+                and self.companion_device.device.state == "heat"
                 and self.controller.control.scene
                 not in (
                     "Sleep",
