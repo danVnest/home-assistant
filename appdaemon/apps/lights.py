@@ -297,7 +297,7 @@ class Lights(App):
             self.lights[light_name].turn_off()
 
     def transition_to_away_scene(self):
-        """Configure lighting for the away scene."""
+        """Configure lighting for the Away (Night) scene."""
         for light_name in ("entryway", "kitchen", "office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
@@ -308,10 +308,22 @@ class Lights(App):
                     self.entities.input_number.night_vacating_delay.state,
                 ),
             )
-        self.lights["dining_room"].adjust_to_max()
+        if self.now_is_between("12:00:00", "23:59:59"):
+            self.lights["dining_room"].adjust_to_max()
+        else:
+            self.lights["dining_room"].ignore_vacancy()
+            self.lights["dining_room"].turn_off()
         for light_name in ("kitchen_strip", "tv", "hall", "bedroom", "nursery"):
             self.lights[light_name].ignore_vacancy()
             self.lights[light_name].turn_off()
+        if any(
+            light.on and not light.control_enabled for light in self.lights.values()
+        ):
+            self.notify(
+                "Some lights are still on because their automatic control was disabled "
+                "- enable control or turn off manually if required",
+                title="Light Control",
+            )
 
     def start_circadian(self):
         """Schedule a timer to periodically set the lighting appropriately."""
@@ -494,6 +506,9 @@ class Lights(App):
         )
         if self.control.scene == "Night":
             self.start_circadian()
+        elif self.control.scene == "Away (Night)":
+            self.lights["dining_room"].ignore_vacancy()
+            self.lights["dining_room"].turn_off()
 
     def is_lighting_sufficient(self, room: str = "kitchen") -> bool:
         """Return if there is enough light to not require further lighting."""
@@ -683,6 +698,8 @@ class Light(PresenceDevice):
     @brightness.setter
     def brightness(self, value: int):
         """Set and validate light's brightness."""
+        if not self.control_enabled:
+            return
         value = self.validate_brightness(value)
         if self.brightness == value:
             return
@@ -719,6 +736,8 @@ class Light(PresenceDevice):
     @kelvin.setter
     def kelvin(self, value: int):
         """Set and validate light's warmth of colour."""
+        if not self.control_enabled:
+            return
         value = self.validate_kelvin(value)
         if value is None or value == self.kelvin:
             return
@@ -748,6 +767,8 @@ class Light(PresenceDevice):
 
     def adjust(self, brightness: int, kelvin: int):
         """Adjust light brightness and kelvin at the same time."""
+        if not self.control_enabled:
+            return
         brightness = self.validate_brightness(brightness)
         if brightness == 0:
             self.turn_off()
@@ -786,7 +807,7 @@ class Light(PresenceDevice):
 
     def turn_off(self):
         """Turn light off and record previous kelvin level."""
-        if self.brightness != 0:
+        if self.control_enabled and self.brightness != 0:
             self.kelvin_before_off = self.kelvin
             self.controller.log(
                 f"Turning '{self.device_id}' off (previously at"

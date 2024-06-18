@@ -207,10 +207,9 @@ class Control(App):
         elif self.scene in ("Morning", "Sleep"):
             self.scene = (
                 "Morning"
-                if (
-                    self.parse_time(self.get_setting("morning_time"))
-                    < self.time()
-                    < self.parse_time(self.constants["day_time"])
+                if self.now_is_between(
+                    self.get_setting("morning_time"),
+                    self.constants["day_time"],
                 )
                 else "Sleep"
             )
