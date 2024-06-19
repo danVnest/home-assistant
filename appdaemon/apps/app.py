@@ -258,15 +258,14 @@ class Device:
         """"""
         del attribute, old, kwargs
         user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
-        self.controller.log(f"'{user}' changed {entity} from UI")
+        self.controller.log(
+            f"'{user}' changed {entity} from UI: "
+            f"{self.controller.get_state(entity,'all')}",
+        )
         self.handle_user_adjustment(user)
 
     def handle_user_adjustment(self, user: str):
         """Override this in child class to adjust device settings appropriately."""
-        self.controller.log(
-            f"'{self.device_id}' is now '{self.device.state}' "
-            f"with attributes {self.device.attributes}",
-        )
         if self.check_conditions_and_adjust(check_if_would_adjust_only=True):
             if not self.control_enabled:
                 return
