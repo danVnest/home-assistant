@@ -741,7 +741,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 and not self.door_open
             ):
                 if check_if_would_adjust_only and self.turn_on_for_current_conditions(
-                    check_if_would_adjust_only,
+                    check_if_would_adjust_only=check_if_would_adjust_only,
                 ):
                     return True
                 self.turn_on_for_current_conditions()
