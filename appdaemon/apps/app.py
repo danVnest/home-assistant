@@ -232,7 +232,7 @@ class Device:
         self,
         attribute: str,
         default: str | float | None = None,
-    ) -> str | float | None:
+    ) -> str | float | list | None:
         """Get an attribute of the device (or group of synced devices)."""
         value = self.controller.get_state(
             self.device_id
@@ -244,7 +244,7 @@ class Device:
             return default
         try:
             return float(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return value
 
     def __handle_user_adjustment(

@@ -47,7 +47,7 @@ all_lights:
   icon: mdi:lightbulb-group
 
 any_aircon:
-  name: All aircon
+  name: Any aircon
   entities:
     - switch.living_room_aircon
     - switch.dining_room_aircon
@@ -61,6 +61,13 @@ all_aircon:
     - switch.bedroom_aircon
   all: true
 
+any_fans:
+  name: Any fans
+  entities:
+    - fan.bedroom
+    - fan.nursery
+    - fan.office
+
 all_fans:
   name: All fans
   entities:
@@ -68,6 +75,12 @@ all_fans:
     - fan.nursery
     - fan.office
   all: true
+
+any_heaters:
+  name: Any heaters
+  entities:
+    - switch.nursery_heater
+    - switch.office_heater
 
 all_heaters:
   name: All heaters

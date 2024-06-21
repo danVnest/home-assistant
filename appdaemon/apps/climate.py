@@ -628,6 +628,9 @@ class Aircon(ClimateDevice, PresenceDevice):
             linked_rooms=linked_rooms,
         )
         self.preferred_fan_mode = self.fan_mode
+        self.preferred_swing_mode = (
+            "both" if "both" in self.get_attribute("swing_modes") else "rangefull"
+        )
         # TODO: set adjustment_delay?
         self.turn_off_timer_handle = None
         self.vacating_delay = 60 * float(
@@ -679,43 +682,45 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     @property
     def fan_mode(self) -> str:
-        """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
+        """Get the aircon's current fan mode (main options: 'low', 'auto')."""
         return self.get_attribute("fan_mode")
 
     @fan_mode.setter
     def fan_mode(self, mode: str):
-        """Set the fan mode to the specified level (main options: 'low', 'auto')?"""
+        """Set the fan mode to the specified level (main options: 'low', 'auto')."""
         if self.on and self.fan_mode != mode:
             self.call_service("set_fan_mode", fan_mode=mode)
 
-    def turn_on_for_current_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
+    @property
+    def swing_mode(self) -> str:
+        """Get the aircon's current swing mode (main options: 'rangefull', 'both')."""
+        return self.get_attribute("swing_mode")
+
+    def turn_on_for_current_conditions(self) -> bool:
         """Set the aircon unit to heat or cool at desired settings."""
         mode = self.best_mode_for_conditions
         if self.device.state != mode:
-            if check_if_would_adjust_only:
-                return True
             self.call_service("set_hvac_mode", hvac_mode=mode)
         desired_target_temperature = self.desired_target_temperature
         if self.target_temperature != desired_target_temperature:
-            if check_if_would_adjust_only:
-                return True
             self.call_service("set_temperature", temperature=desired_target_temperature)
-        if self.fan_mode != self.preferred_fan_mode:
-            if check_if_would_adjust_only:
-                return True
-            if not self.door_open:
-                self.fan_mode = self.preferred_fan_mode
-        if check_if_would_adjust_only:
-            return False
+        if self.fan_mode != self.preferred_fan_mode and not self.door_open:
+            self.fan_mode = self.preferred_fan_mode
+        if self.swing_mode != self.preferred_swing_mode:
+            self.call_service("set_swing_mode", swing_mode=self.preferred_swing_mode)
         self.controller.allow_suggestion()
-        return True
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
         # What about cooling? Fans? Take into account pet presence in each room?
         # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
+
+    def would_adjust_for_current_conditions(self):
+        """Check if turn_on_for_current_conditions would actually make any changes."""
+        return (
+            self.device.state != self.best_mode_for_conditions
+            or self.target_temperature != self.desired_target_temperature
+            or self.fan_mode != self.preferred_fan_mode
+            or self.swing_mode != self.preferred_swing_mode
+        )
 
     def turn_off_after_delay(self, **kwargs: dict):
         """Turn aircon off after the required delay when a door opens."""
@@ -740,21 +745,21 @@ class Aircon(ClimateDevice, PresenceDevice):
                 and (self.ignoring_vacancy or not self.vacant)
                 and not self.door_open
             ):
-                if check_if_would_adjust_only and self.turn_on_for_current_conditions(
-                    check_if_would_adjust_only=check_if_would_adjust_only,
-                ):
-                    return True
-                self.turn_on_for_current_conditions()
-                if (
-                    not self.controller.any_aircon_on
-                    and self.controller.presence.pets_home_alone
-                    and not self.controller.presence.anyone_home
-                ):
-                    self.controller.notify(
-                        f"It is {self.room_temperature}º in the {self.room}, "
-                        "turning aircon on for the pets",
-                        title="Climate Control",
-                    )
+                if check_if_would_adjust_only:
+                    if self.would_adjust_for_current_conditions():
+                        return True
+                else:
+                    self.turn_on_for_current_conditions()
+                    if (
+                        not self.controller.any_aircon_on
+                        and self.controller.presence.pets_home_alone
+                        and not self.controller.presence.anyone_home
+                    ):
+                        self.controller.notify(
+                            f"It is {self.room_temperature}º in the {self.room}, "
+                            "turning aircon on for the pets",
+                            title="Climate Control",
+                        )
         elif (
             self.door_open
             or self.within_target_temperatures
@@ -806,7 +811,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         **kwargs: dict,
     ) -> None:
         """If the kitchen door status changes, check if aircon needs to change."""
-        del entity, attribute, old, kwargs
+        del attribute, old, kwargs
         self.controller.cancel_timer(self.turn_off_timer_handle)
         if not self.control_enabled:
             return
@@ -820,7 +825,8 @@ class Aircon(ClimateDevice, PresenceDevice):
                     constrain_input_boolean=self.control_input_boolean,
                 )
                 if (
-                    self.fan_mode == "auto"
+                    entity == self.doors[0].entity_id
+                    and self.fan_mode == "auto"
                     and abs(self.room_temperature - self.target_temperature)
                     > self.constants["aircon_reduce_fan_temperature_threshold"]
                 ):
@@ -837,7 +843,7 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     def handle_user_adjustment(self, user: str):
         """"""
-        if self.on:
+        if self.control_enabled and self.on:
             self.turn_on_for_current_conditions()
         super().handle_user_adjustment(user)
 
