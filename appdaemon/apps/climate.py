@@ -45,21 +45,21 @@ class Climate(App):
                 device_id="climate.bedroom_aircon",
                 controller=self,
                 room="bedroom",
-                doors=["bedroom_balcony"],
+                doors=["bedroom_balcony", "kitchen", "dining_room_balcony"],
             ),
             "living_room": Aircon(
                 device_id="climate.living_room_aircon",
                 controller=self,
                 room="living_room",
                 linked_rooms=["dining_room", "kitchen"],
-                doors=["kitchen", "dining_room_balcony"],
+                doors=["kitchen", "dining_room_balcony", "bedroom_balcony"],
             ),
             "dining_room": Aircon(
                 device_id="climate.dining_room_aircon",
                 controller=self,
                 room="dining_room",
                 linked_rooms=["living_room", "kitchen"],
-                doors=["kitchen", "dining_room_balcony"],
+                doors=["kitchen", "dining_room_balcony", "bedroom_balcony"],
             ),
         }
         self.heaters = {
