@@ -1038,11 +1038,17 @@ class Heater(ClimateDevice, PresenceDevice):
             and self.target_temperature != self.desired_target_temperature
         )
 
-    def turn_on_for_current_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
+    @property
+    def on_when_away_and_not_safe(self):
+        """Check if device is on, not safe, and no-one home."""
+        return (
+            not self.safe_when_vacant
+            and self.on
+            and (
+                not self.controller.presence.anyone_home
+                or "Away" in self.controller.control.scene
+            )
+        )
         """Turn the heater on and adjust the target temperature if appropriate."""
         if (
             check_if_would_adjust_only
@@ -1061,14 +1067,7 @@ class Heater(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the heater on/off based on current and target temperatures."""
-        if (
-            self.on
-            and not self.safe_when_vacant
-            and (
-                not self.controller.presence.anyone_home
-                or "Away" in self.controller.control.scene
-            )
-        ):
+        if self.on_when_away_and_not_safe:
             if check_if_would_adjust_only:
                 return True
             self.turn_off()
@@ -1095,4 +1094,16 @@ class Heater(ClimateDevice, PresenceDevice):
                 return True
             else:
                 self.target_temperature = self.desired_target_temperature
-        return False
+
+    def handle_user_adjustment(self, user: str):
+        """Handle manual heater adjustment appropriately."""
+        if self.on_when_away_and_not_safe:
+            self.turn_off()
+            self.controller.notify(
+                f"The {self.device.friendly_name.lower()} is not safe "
+                "to turn on when no-one is home",
+                title=f"{self.device.friendly_name.title()} Turned Off",
+                targets="anyone_home_else_all",
+            )
+        else:
+            super().handle_user_adjustment(user)
