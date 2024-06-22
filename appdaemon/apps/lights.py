@@ -791,7 +791,7 @@ class Light(PresenceDevice):
         """Adjust light brightness and kelvin at the same time to maximum values."""
         self.adjust(self.controller.args["max_brightness"], self.kelvin_limits["max"])
 
-    def turn_on_for_current_conditions(
+    def turn_on_for_conditions(
         self,
         *,
         check_if_would_adjust_only: bool = False,
@@ -800,7 +800,7 @@ class Light(PresenceDevice):
         if check_if_would_adjust_only:
             return True
         if not self.ignoring_vacancy:
-            self.check_conditions_and_adjust()
+            self.adjust_for_conditions()
         else:
             self.controller.transition_to_scene(self.control.scene)
         return True
@@ -868,7 +868,7 @@ class Light(PresenceDevice):
             return self.brightness > 0
         return self.presence_adjustments["vacant"]["brightness"] > 0
 
-    def check_conditions_and_adjust(
+    def adjust_for_conditions(
         self,
         *,
         check_if_would_adjust_only: bool = False,

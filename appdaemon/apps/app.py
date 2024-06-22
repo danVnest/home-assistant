@@ -179,9 +179,13 @@ class Device:
                 entity_id=self.control_input_boolean,
             )
         if enabled:
-            self.check_conditions_and_adjust()
+            self.adjust_for_conditions()
 
-    def check_conditions_and_adjust(
+    def turn_on_for_conditions(self):
+        """Override this in child class to turn device on with best settings."""
+        self.turn_on()
+
+    def adjust_for_conditions(
         self,
         *,
         check_if_would_adjust_only: bool = False,
@@ -189,17 +193,6 @@ class Device:
         """Override this in child class to adjust device settings appropriately."""
         del check_if_would_adjust_only
         return False
-
-    def turn_on_for_current_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
-        """Override this in child class to turn device on with best settings."""
-        if check_if_would_adjust_only:
-            return True
-        self.turn_on()
-        return True
 
     def turn_on(self, **kwargs: dict):
         """Turn the device on if it's off or adjust with provided parameters."""
@@ -266,7 +259,7 @@ class Device:
 
     def handle_user_adjustment(self, user: str):
         """Override this in child class to adjust device settings appropriately."""
-        if self.check_conditions_and_adjust(check_if_would_adjust_only=True):
+        if self.adjust_for_conditions(check_if_would_adjust_only=True):
             if not self.control_enabled:
                 return
             self.control_enabled = False
@@ -297,6 +290,6 @@ class Device:
     ):
         """"""
         del entity, attribute, old, new, kwargs
-        self.check_conditions_and_adjust()
+        self.adjust_for_conditions()
         if self.on:
-            self.turn_on_for_current_conditions()
+            self.turn_on_for_conditions()
