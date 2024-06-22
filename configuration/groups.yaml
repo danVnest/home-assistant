@@ -119,7 +119,7 @@ all_climate_control:
 any_light_control:
   name: Light control
   entities:
-    - input_boolean.control_entryway_light
+    - input_boolean.control_entryway_lights
     - input_boolean.control_kitchen_light
     - input_boolean.control_kitchen_strip_light
     - input_boolean.control_tv_lights
@@ -134,7 +134,7 @@ any_light_control:
 all_light_control:
   name: Light control
   entities:
-    - input_boolean.control_entryway_light
+    - input_boolean.control_entryway_lights
     - input_boolean.control_kitchen_light
     - input_boolean.control_kitchen_strip_light
     - input_boolean.control_tv_lights
