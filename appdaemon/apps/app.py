@@ -21,6 +21,11 @@ if TYPE_CHECKING:
     from presence import Presence
     from safety import Safety
 
+    from appdaemon.apps.appdaemon.entity import Entity
+
+SYSTEM_ID = "57bea01aa68f44eb94ac2031ecb5b7ba"
+RACHEL_ID = "9a17567"
+
 
 class App(hass.Hass):
     """Utility functions and methods for Home Assistant interaction."""
@@ -133,7 +138,7 @@ class Device:
         """Initialise with device parameters and prepare for presence adjustments."""
         self.device_id = device_id
         self.device_type = device_id.split(".")[0]
-        self.device = controller.get_entity(device_id)
+        self.device: Entity = controller.get_entity(device_id)
         self.controller = controller
         self.constants = controller.constants
         self.control_input_boolean = (
@@ -151,8 +156,7 @@ class Device:
                 self.__handle_user_adjustment,
                 entity_id=device,
                 attribute="context",
-                new=lambda new: new["user_id"]
-                not in (None, "57bea01aa68f44eb94ac2031ecb5b7ba"),
+                new=lambda new: new["user_id"] not in (None, SYSTEM_ID),
             )
         self.controller.listen_state(
             self.__handle_control_enabled,
@@ -250,7 +254,7 @@ class Device:
     ):
         """"""
         del attribute, old, kwargs
-        user = "Rachel" if new["user_id"].startswith("9a17567") else "Dan"
+        user = "Rachel" if new["user_id"].startswith(RACHEL_ID) else "Dan"
         self.controller.log(
             f"'{user}' changed {entity} from UI: "
             f"{self.controller.get_state(entity,'all')}",
