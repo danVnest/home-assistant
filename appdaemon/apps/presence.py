@@ -464,9 +464,9 @@ class PresenceDevice(Device):
             self.transition_timer = None
             if self.should_transition_towards_occupied:
                 self.start_transition_towards_occupied()
-            self.check_conditions_and_adjust()
+            self.adjust_for_conditions()
 
-    def check_conditions_and_adjust(
+    def adjust_for_conditions(
         self,
         *,
         check_if_would_adjust_only: bool = False,
@@ -529,7 +529,7 @@ class PresenceDevice(Device):
                 level="DEBUG",
             )
             self.transition_timer = None
-            self.check_conditions_and_adjust()
+            self.adjust_for_conditions()
         else:
             self.controller.log(
                 f"{kwargs['steps_remaining']} steps until '{self.device_id}' "
