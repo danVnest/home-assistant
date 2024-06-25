@@ -1,7 +1,244 @@
 title: Smart Nest
 views:
-  - path: control_and_status
-    title: Control & Status
+  - title: Overview
+    path: overview
+    type: sections
+    max_columns: 5
+    icon: mdi:home-assistant
+    sections:
+      - type: grid
+        cards:
+          - type: entity
+            entity: input_select.scene
+            state_color: false
+          - show_name: true
+            show_icon: true
+            type: button
+            tap_action:
+              action: toggle
+            entity: lock.door_lock
+            show_state: true
+            name: Front Door
+            icon_height: 50px
+          - type: tile
+            entity: input_boolean.pets_home_alone
+            vertical: true
+            hide_state: false
+            visibility:
+              - condition: or
+                conditions:
+                  - condition: state
+                    entity: input_select.scene
+                    state: Away (Day)
+                  - condition: state
+                    entity: input_select.scene
+                    state: Away (Night)
+        title: Scene
+      - type: grid
+        cards:
+          - entities:
+              - entity: sensor.weighted_average_inside_apparent_temperature
+                name: Inside
+                icon: mdi:home-thermometer
+              - entity: sensor.outside_apparent_temperature
+                name: Outside
+                icon: mdi:sun-thermometer
+              - entity: sensor.outside_apparent_temperature_8h_forecast
+                name: Forecast
+                icon: mdi:sun-thermometer-outline
+            show_name: true
+            type: glance
+          - entities:
+              - entity: sensor.bedroom_apparent_temperature
+                name: Bedroom
+              - entity: sensor.nursery_apparent_temperature
+                name: Nursery
+              - entity: sensor.dining_room_apparent_temperature
+                name: Dog bed area
+            show_name: true
+            type: glance
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            entities:
+              - entity: group.any_aircon
+                name: Aircon
+                icon: mdi:air-conditioner
+              - entity: group.any_fans
+                name: Fans
+                icon: mdi:fan
+              - entity: group.any_heaters
+                name: Heaters
+                icon: mdi:radiator
+            state_color: true
+          - content: >-
+              Manually controlling aircon, fans, or heaters may disable
+              **automatic control** for those devices. You can toggle
+              **automatic control** of all/individual devices below.
+            type: markdown
+          - type: tile
+            entity: group.any_climate_control
+            name: Automatic
+          - type: entity-filter
+            entities:
+              - input_boolean.control_living_room_aircon
+              - input_boolean.control_dining_room_aircon
+              - input_boolean.control_bedroom_aircon
+              - input_boolean.control_nursery_fan
+              - input_boolean.control_office_fan
+              - input_boolean.control_bedroom_fan
+              - input_boolean.control_nursery_heater
+              - input_boolean.control_office_heater
+            conditions:
+              - condition: state
+                state: "off"
+            card:
+              type: entities
+            visibility:
+              - condition: state
+                entity: group.any_climate_control
+                state: "on"
+        title: Climate
+      - type: grid
+        cards:
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            state_color: true
+            entities:
+              - entity: group.all_lights
+                name: Any / all
+              - entity: group.entryway_lights
+                name: Entryway
+              - entity: group.kitchen_lights
+                name: Kitchen
+              - entity: group.tv_lights
+                name: TV
+              - entity: group.dining_room_lights
+                name: Dining room
+              - entity: light.hall
+                name: Hall
+              - entity: light.bathroom
+                name: Bathroom
+              - entity: light.bedroom
+                name: Bedroom
+              - entity: light.nursery
+                name: Nursery
+              - entity: light.office
+                name: Office
+          - content: >-
+              Manually controlling lights may disable **automatic control** for
+              those lights. You can toggle **automatic control** of
+              all/individual lights below.
+            type: markdown
+          - type: tile
+            entity: group.any_light_control
+            name: Automatic
+          - type: entity-filter
+            entities:
+              - input_boolean.control_entryway_lights
+              - input_boolean.control_kitchen_light
+              - input_boolean.control_kitchen_strip_light
+              - input_boolean.control_tv_lights
+              - input_boolean.control_dining_room_lights
+              - input_boolean.control_hall_light
+              - input_boolean.control_bathroom_light
+              - input_boolean.control_bedroom_light
+              - input_boolean.control_nursery_light
+              - input_boolean.control_office_light
+            conditions:
+              - condition: state
+                state: "off"
+            card:
+              type: entities
+            visibility:
+              - condition: state
+                entity: group.any_light_control
+                state: "on"
+        title: Lights
+      - type: grid
+        cards:
+          - type: tile
+            entity: sensor.washer_completion_time
+            name: Washing done
+            icon: mdi:washing-machine
+            color: accent
+            visibility:
+              - condition: state
+                entity: binary_sensor.washer_running
+                state: "on"
+          - type: tile
+            entity: sensor.washer_completion_time
+            name: Washing done
+            icon: mdi:washing-machine
+            visibility:
+              - condition: state
+                entity: binary_sensor.washer_running
+                state: "off"
+          - type: tile
+            entity: sensor.dryer_completion_time
+            name: Drying done
+            icon: mdi:tumble-dryer
+            color: accent
+            visibility:
+              - condition: state
+                entity: binary_sensor.dryer_running
+                state: "on"
+          - type: tile
+            entity: sensor.dryer_completion_time
+            name: Drying done
+            icon: mdi:tumble-dryer
+            visibility:
+              - condition: state
+                entity: binary_sensor.dryer_running
+                state: "off"
+        title: Washing
+      - type: grid
+        cards:
+          - entities:
+              - entity: sensor.soil_moisture_vegetable_garden_sun
+                name: Vegetable garden (sun)
+              - entity: sensor.soil_moisture_vegetable_garden_shade
+                name: Vegetable garden (shade)
+              - entity: sensor.soil_moisture_front_deck
+                name: Front deck
+              - entity: sensor.soil_moisture_back_deck
+                name: Back deck
+              - entity: sensor.soil_moisture_carport_pots
+                name: Carport pots
+              - entity: sensor.soil_moisture_dining_room
+                name: Dining room
+              - entity: sensor.soil_moisture_living_room
+                name: Living room
+              - entity: sensor.soil_moisture_office
+                name: Office
+            hours_to_show: 240
+            refresh_interval: 0
+            type: history-graph
+            logarithmic_scale: false
+        title: Plants
+      - type: grid
+        cards:
+          - cards:
+              - entities:
+                  - entity: input_datetime.morning_time
+                  - entity: input_datetime.nursery_time
+                  - entity: input_datetime.bed_time
+                show_header_toggle: false
+                type: entities
+                state_color: true
+              - content: >-
+                  Specify the time for which the ***Morning*** scene and
+                  pre-sleep climate controls will trigger. More information in
+                  the **Instructions** tab.
+                type: markdown
+            type: vertical-stack
+        title: Times
+    cards: []
+  - path: status_and_suggestions
+    title: Status & Suggestions
     icon: mdi:home-assistant
     cards:
       - entities:
@@ -34,172 +271,34 @@ views:
           - entity: switch.dryer
             state: "on"
         type: conditional
-      - cards:
-          - entities:
-              - entity: sensor.weighted_average_inside_apparent_temperature
-                name: Inside
-                icon: mdi:home-thermometer
-              - entity: sensor.outside_apparent_temperature
-                name: Outside
-                icon: mdi:sun-thermometer
-            show_name: true
-            type: glance
-          - entities:
-              - entity: sensor.bedroom_apparent_temperature
-                name: Bedroom
-              - entity: sensor.nursery_apparent_temperature
-                name: Nursery
-              - entity: sensor.dining_room_apparent_temperature
-                name: Dog bed area
-            show_name: true
-            type: glance
-        type: vertical-stack
-        view_layout:
-          position: sidebar
-      - cards:
-          - show_name: true
-            show_icon: true
-            show_state: false
-            type: glance
-            entities:
-              - entity: group.all_aircon
-                name: All
-              - entity: climate.living_room_aircon
-                name: Living room
-              - entity: climate.dining_room_aircon
-                name: Dining room
-              - entity: climate.bedroom_aircon
-            state_color: true
-            title: Aircon
-          - show_name: true
-            show_icon: true
-            show_state: false
-            type: glance
-            entities:
-              - entity: group.all_fans
-                name: All
-              - entity: fan.nursery
-                name: Nursery
-              - entity: fan.office
-                name: Office
-              - entity: fan.bedroom
-                name: Bedroom
-            state_color: true
-            title: Fans
-          - show_name: true
-            show_icon: true
-            show_state: false
-            type: glance
-            entities:
-              - entity: group.all_heaters
-                name: All
-              - entity: switch.nursery_heater
-                name: Nursery
-                icon: mdi:radiator
-              - entity: switch.office_heater
-                name: Office
-                icon: mdi:radiator
-            title: Heaters
-          - content: >-
-              Manually controlling aircon, fans, or heaters may disable
-              **automatic control** for those devices. You can toggle
-              **automatic control** of all/individual devices below.
-            type: markdown
-          - type: entities
-            title: Automatic climate control
-            entities:
-              - input_boolean.climate_control_living_room_aircon
-              - input_boolean.climate_control_dining_room_aircon
-              - input_boolean.climate_control_bedroom_aircon
-              - input_boolean.climate_control_nursery_fan
-              - input_boolean.climate_control_office_fan
-              - input_boolean.climate_control_bedroom_fan
-              - input_boolean.climate_control_nursery_heater
-              - input_boolean.climate_control_office_heater
-            show_header_toggle: true
-          - type: markdown
-            content: >-
-              **Automatic climate control** will control each aircon, fan, and
-              heater based on room temperature and occupancy.
-
-              If the **pets are home alone** (or are going to be soon), you can
-              manually specify this or wait for their movement to be detected to
-              trigger **climate control**.
-
-              Only the bedroom aircon will be controlled when **pets are home
-              alone** (bedroom and office fans will be on as well) or after the
-              specified bed time. **Aircon** can also be manually turned on and
-              off. These settings can be controlled by telling Siri/Google:
-
-              - **"climate control on"** or **"climate control off"**
-
-              - **"aircon on"** or **"aircon off"**
-
-
-              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
-              CONTROL DISABLED
-        type: vertical-stack
-      - cards:
-          - type: glance
-            entities:
-              - entity: group.all_lights
-                name: Any / all
-              - entity: group.entryway_lights
-                name: Entryway
-              - entity: group.kitchen_lights
-                name: Kitchen
-              - entity: group.tv_lights
-                name: TV
-              - entity: group.dining_lights
-                name: Dining
-              - entity: light.hall
-                name: Hall
-              - entity: light.bathroom
-                name: Bathroom
-              - entity: light.bedroom
-                name: Bedroom
-              - entity: light.nursery
-                name: Nursery
-              - entity: light.office
-                name: Office
-            show_icon: true
-            show_name: true
-            show_state: true
-            title: Lights
-            state_color: true
-          - content: >-
-              Manually controlling lights may disable **automatic control** for
-              those lights. You can toggle **automatic control** of
-              all/individual lights below.
-            type: markdown
-          - type: entities
-            title: Automatic light control
-            entities:
-              - input_boolean.light_control_entryway
-              - input_boolean.light_control_kitchen
-              - input_boolean.light_control_kitchen_strip
-              - input_boolean.light_control_tv
-              - input_boolean.light_control_dining
-              - input_boolean.light_control_hall
-              - input_boolean.light_control_bathroom
-              - input_boolean.light_control_bedroom
-              - input_boolean.light_control_nursery
-              - input_boolean.light_control_office
-            show_header_toggle: true
-          - type: markdown
-            content: >-
-              Lighting in the entryway, kitchen, office and bedroom will
-              automatically brighten when someone enters, and dim shortly after
-              they leave (depending on scene settings). Automatic bedroom
-              lighting is disabled as soon as the ***Sleep*** scene starts, only
-              enabling again when the bedroom **button** is clicked or after
-              illuminance levels peak (i.e. after blinds are first opened in the
-              morning).
-
-
-              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
-              CONTROL DISABLED
-        type: vertical-stack
+      - type: entity-filter
+        entities:
+          - entity: sensor.weighted_average_inside_apparent_temperature
+            name: Inside
+          - entity: sensor.outside_apparent_temperature
+            name: Outside
+          - entity: sensor.bathroom_apparent_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_apparent_temperature
+            name: Dining room
+          - entity: sensor.dog_bed_area_apparent_temperature
+            name: Kitchen
+          - entity: sensor.living_room_apparent_temperature
+            name: Living room
+          - entity: sensor.nursery_apparent_temperature
+            name: Nursery
+          - entity: sensor.office_apparent_temperature
+            name: Office
+        conditions:
+          - condition: or
+            conditions:
+              - condition: numeric_state
+                above: input_number.high_temperature_aircon_trigger
+              - condition: numeric_state
+                below: input_number.low_temperature_aircon_trigger
+        card:
+          type: entities
+          title: Undesired temperatures
       - content: >-
           **Lighting** and **climate** settings are automatically adjusted based
           on time, room occupancy, temperatures, illuminance, and various other
@@ -253,10 +352,143 @@ views:
           entering ***Sleep***). Holding either button for a few seconds will
           toggle the aircon.
         type: markdown
+      - cards:
+          - entities:
+              - entity: input_datetime.morning_time
+              - entity: input_datetime.nursery_time
+              - entity: input_datetime.bed_time
+            show_header_toggle: false
+            title: Times
+            type: entities
+            state_color: true
+          - content: >-
+              Specify the time for which the ***Morning*** scene and pre-sleep
+              climate controls will trigger. More information in the
+              **Instructions** tab.
+            type: markdown
+        type: vertical-stack
+    visible:
+      - user: 037b9dab7fb04176b342f8c42a79bb17
   - title: Climate
     path: climate
     icon: mdi:thermometer
     cards:
+      - cards:
+          - entities:
+              - entity: sensor.weighted_average_inside_apparent_temperature
+                name: Inside
+                icon: mdi:home-thermometer
+              - entity: sensor.outside_apparent_temperature
+                name: Outside
+                icon: mdi:sun-thermometer
+            show_name: true
+            type: glance
+          - entities:
+              - entity: sensor.bedroom_apparent_temperature
+                name: Bedroom
+              - entity: sensor.nursery_apparent_temperature
+                name: Nursery
+              - entity: sensor.office_apparent_temperature
+                name: Office
+              - entity: sensor.dining_room_apparent_temperature
+                name: Dining room
+              - entity: sensor.living_room_apparent_temperature
+                name: Living room
+              - entity: sensor.dog_bed_area_apparent_temperature
+                name: Dog bed area
+              - entity: sensor.kitchen_apparent_temperature
+                name: Kitchen
+              - entity: sensor.bathroom_apparent_temperature
+                name: Bathroom
+              - entity: sensor.entryway_apparent_temperature
+                name: Entryway
+            show_name: true
+            columns: 3
+            type: glance
+        type: vertical-stack
+      - cards:
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            entities:
+              - entity: group.all_aircon
+                name: All
+              - entity: climate.living_room_aircon
+                name: Living room
+              - entity: climate.dining_room_aircon
+                name: Dining room
+              - entity: climate.bedroom_aircon
+            state_color: true
+            title: Aircon
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            entities:
+              - entity: group.all_fans
+                name: All
+              - entity: fan.nursery
+                name: Nursery
+              - entity: fan.office
+                name: Office
+              - entity: fan.bedroom
+                name: Bedroom
+            state_color: true
+            title: Fans
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            entities:
+              - entity: group.all_heaters
+                name: All
+              - entity: switch.nursery_heater
+                name: Nursery
+                icon: mdi:radiator
+              - entity: switch.office_heater
+                name: Office
+                icon: mdi:radiator
+            title: Heaters
+          - content: >-
+              Manually controlling aircon, fans, or heaters may disable
+              **automatic control** for those devices. You can toggle
+              **automatic control** of all/individual devices below.
+            type: markdown
+          - type: entities
+            title: Automatic climate control
+            entities:
+              - input_boolean.control_living_room_aircon
+              - input_boolean.control_dining_room_aircon
+              - input_boolean.control_bedroom_aircon
+              - input_boolean.control_nursery_fan
+              - input_boolean.control_office_fan
+              - input_boolean.control_bedroom_fan
+              - input_boolean.control_nursery_heater
+              - input_boolean.control_office_heater
+            show_header_toggle: true
+          - type: markdown
+            content: >-
+              **Automatic climate control** will control each aircon, fan, and
+              heater based on room temperature and occupancy.
+
+              If the **pets are home alone** (or are going to be soon), you can
+              manually specify this or wait for their movement to be detected to
+              trigger **climate control**.
+
+              Only the bedroom aircon will be controlled when **pets are home
+              alone** (bedroom and office fans will be on as well) or after the
+              specified bed time. **Aircon** can also be manually turned on and
+              off. These settings can be controlled by telling Siri/Google:
+
+              - **"climate control on"** or **"climate control off"**
+
+              - **"aircon on"** or **"aircon off"**
+
+
+              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
+              CONTROL DISABLED
+        type: vertical-stack
       - entities:
           - entity: input_number.cooling_target_temperature
           - entity: input_number.heating_target_temperature
@@ -282,10 +514,99 @@ views:
           - entity: input_number.fan_vacating_delay
           - entity: input_number.heater_vacating_delay
         title: Delays
+      - entities:
+          - entity: sensor.weighted_average_inside_apparent_temperature
+            name: Inside
+          - entity: sensor.outside_apparent_temperature
+            name: Outside
+          - entity: sensor.bathroom_apparent_temperature
+            name: Bathroom
+          - entity: sensor.bedroom_apparent_temperature
+            name: Bedroom
+          - entity: sensor.dining_room_apparent_temperature
+            name: Dining room
+          - entity: sensor.dog_bed_area_apparent_temperature
+            name: Dog bed area
+          - entity: sensor.entryway_apparent_temperature
+            name: Entryway
+          - entity: sensor.kitchen_apparent_temperature
+            name: Kitchen
+          - entity: sensor.living_room_apparent_temperature
+            name: Living room
+          - entity: sensor.nursery_apparent_temperature
+            name: Nursery
+          - entity: sensor.office_apparent_temperature
+            name: Office
+        refresh_interval: 0
+        title: Temperatures
+        type: history-graph
+        hours_to_show: 12
+        logarithmic_scale: false
   - path: lights
     title: Lights
     icon: mdi:lightbulb-variant
     cards:
+      - cards:
+          - type: glance
+            entities:
+              - entity: group.all_lights
+                name: Any / all
+              - entity: group.entryway_lights
+                name: Entryway
+              - entity: group.kitchen_lights
+                name: Kitchen
+              - entity: group.tv_lights
+                name: TV
+              - entity: group.dining_room_lights
+                name: Dining
+              - entity: light.hall
+                name: Hall
+              - entity: light.bathroom
+                name: Bathroom
+              - entity: light.bedroom
+                name: Bedroom
+              - entity: light.nursery
+                name: Nursery
+              - entity: light.office
+                name: Office
+            show_icon: true
+            show_name: true
+            show_state: false
+            title: Lights
+            state_color: true
+          - content: >-
+              Manually controlling lights may disable **automatic control** for
+              those lights. You can toggle **automatic control** of
+              all/individual lights below.
+            type: markdown
+          - type: entities
+            title: Automatic light control
+            entities:
+              - input_boolean.control_entryway_lights
+              - input_boolean.control_kitchen_light
+              - input_boolean.control_kitchen_strip_light
+              - input_boolean.control_tv_lights
+              - input_boolean.control_dining_room_lights
+              - input_boolean.control_hall_light
+              - input_boolean.control_bathroom_light
+              - input_boolean.control_bedroom_light
+              - input_boolean.control_nursery_light
+              - input_boolean.control_office_light
+            show_header_toggle: true
+          - type: markdown
+            content: >-
+              Lighting in the entryway, kitchen, office and bedroom will
+              automatically brighten when someone enters, and dim shortly after
+              they leave (depending on scene settings). Automatic bedroom
+              lighting is disabled as soon as the ***Sleep*** scene starts, only
+              enabling again when the bedroom **button** is clicked or after
+              illuminance levels peak (i.e. after blinds are first opened in the
+              morning).
+
+
+              NOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC
+              CONTROL DISABLED
+        type: vertical-stack
       - cards:
           - entities:
               - entity: input_number.initial_circadian_brightness
@@ -305,21 +626,6 @@ views:
               Initial circadian settings occur after sunset (specified in hours
               by *initial sunset offset*) and reaches the final values at *end
               time*.
-            type: markdown
-        type: vertical-stack
-      - cards:
-          - entities:
-              - entity: input_datetime.morning_time
-              - entity: input_datetime.nursery_time
-              - entity: input_datetime.bed_time
-            show_header_toggle: false
-            title: Times
-            type: entities
-            state_color: true
-          - content: >-
-              Specify the time for which the ***Morning*** scene and pre-sleep
-              climate control will trigger. More information in the
-              **Instructions** tab.
             type: markdown
         type: vertical-stack
       - cards:
@@ -387,7 +693,7 @@ views:
         default_zoom: 12
         auto_fit: true
         entities:
-          - device_tracker.daniels_phone
+          - device_tracker.dans_phone
           - device_tracker.rachels_phone
         hours_to_show: 1
         type: map
@@ -495,6 +801,143 @@ views:
           - entity: binary_sensor.office_presence_sensor_occupancy
         title: Motion
         hours_to_show: 24
+  - title: Statistics
+    path: statistics
+    icon: mdi:chart-box
+    cards:
+      - type: entities
+        entities:
+          - entity: binary_sensor.rachel_asleep
+          - entity: sensor.rachel_asleep_probability
+          - entity: sensor.rachel_hours_asleep
+          - entity: sensor.rachel_hours_asleep_yesterday
+      - type: entities
+        entities:
+          - entity: binary_sensor.dan_asleep
+          - entity: sensor.dan_asleep_probability
+          - entity: sensor.dan_hours_asleep
+          - entity: sensor.dan_hours_asleep_yesterday
+      - type: entities
+        entities:
+          - entity: sensor.bedroom_bed_occupied_probability
+      - type: history-graph
+        entities:
+          - entity: binary_sensor.rachel_asleep
+          - entity: sensor.rachel_asleep_probability
+          - entity: binary_sensor.dan_asleep
+          - entity: sensor.dan_asleep_probability
+          - entity: binary_sensor.bedroom_bed_occupied
+          - entity: sensor.bedroom_bed_occupied_probability
+        hours_to_show: 72
+      - chart_type: bar
+        period: month
+        type: statistics-graph
+        entities:
+          - sensor.anyone_asleep_ratio_while_asleep
+          - sensor.bedroom_occupancy_ratio_while_asleep
+          - >-
+            sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep
+          - sensor.anyone_asleep_ratio_while_asleep
+          - sensor.bedroom_bed_occupied_ratio_while_asleep
+          - sensor.bedroom_light_off_ratio_while_asleep
+          - >-
+            sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep
+          - sensor.rachel_s_phone_s_still_ratio_while_asleep
+          - sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep
+          - sensor.dan_s_phone_still_ratio_while_asleep
+          - sensor.dan_s_phone_plugged_in_ratio_while_asleep
+          - sensor.anyone_asleep_ratio_while_awake
+          - sensor.bedroom_occupancy_ratio_while_awake
+          - >-
+            sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake
+          - sensor.anyone_asleep_ratio_while_awake
+          - sensor.bedroom_bed_occupied_ratio_while_awake
+          - sensor.bedroom_light_off_ratio_while_awake
+          - sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake
+          - sensor.rachel_s_phone_s_still_ratio_while_awake
+          - sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake
+          - sensor.dan_s_phone_still_ratio_while_awake
+          - sensor.dan_s_phone_plugged_in_ratio_while_awake
+        stat_types:
+          - mean
+          - min
+          - max
+        title: Long term statistics
+        logarithmic_scale: false
+        hide_legend: false
+      - type: entities
+        title: While asleep
+        entities:
+          - entity: sensor.bedroom_occupancy_ratio_while_asleep
+          - entity: >-
+              sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep
+          - entity: sensor.anyone_asleep_ratio_while_asleep
+          - entity: sensor.bedroom_bed_occupied_ratio_while_asleep
+          - entity: sensor.bedroom_light_off_ratio_while_asleep
+          - entity: >-
+              sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep
+          - entity: sensor.rachel_s_phone_s_still_ratio_while_asleep
+          - entity: sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep
+          - entity: sensor.dan_s_phone_still_ratio_while_asleep
+          - entity: sensor.dan_s_phone_plugged_in_ratio_while_asleep
+      - type: entities
+        title: While awake
+        entities:
+          - entity: sensor.bedroom_occupancy_ratio_while_awake
+          - entity: >-
+              sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake
+          - entity: sensor.anyone_asleep_ratio_while_awake
+          - entity: sensor.bedroom_bed_occupied_ratio_while_awake
+          - entity: sensor.bedroom_light_off_ratio_while_awake
+          - entity: >-
+              sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake
+          - entity: sensor.rachel_s_phone_s_still_ratio_while_awake
+          - entity: sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake
+          - entity: sensor.dan_s_phone_still_ratio_while_awake
+          - entity: sensor.dan_s_phone_plugged_in_ratio_while_awake
+    visible:
+      - user: 15ff7a86d4ae4d38a60003ad4064ff78
+      - user: 037b9dab7fb04176b342f8c42a79bb17
+      - user: 9a175674be354863afb9634adc4b8980
+  - title: Instructions
+    path: instructions
+    icon: mdi:text-box
+    cards:
+      - type: markdown
+        content: >-
+
+          In order to use Siri, you will need to add the following Siri
+          shortcuts to your device: [Sleep
+          Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9),
+          [Lights On
+          Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010),
+          [Lights
+          On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd),
+          [Lights
+          Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167),
+          [Aircon
+          On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34),
+          [Aircon
+          Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655),
+          [Enable Climate
+          Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35),
+          [Disable Climate
+          Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706),
+          [Lock The
+          Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1),
+          [Unlock The
+          Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
+          [TV
+          On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
+
+          In order to use Google, you will need to connect your Google Assistant
+          to IFTTT and add applets with webhooks to Home Assistant corresponding
+          to each command.
+
+
+          CHANGE ABOVE TO LIST OF QUOTES
+        title: Voice control
+    subview: false
   - path: development
     title: Development
     visible:
@@ -592,164 +1035,5 @@ views:
         type: history-graph
         logarithmic_scale: false
         hours_to_show: 240
-      - entities:
-          - entity: sensor.weighted_average_inside_apparent_temperature
-            name: Inside
-          - entity: sensor.outside_apparent_temperature
-            name: Outside
-          - entity: sensor.bathroom_apparent_temperature
-            name: Bathroom
-          - entity: sensor.bedroom_apparent_temperature
-            name: Bedroom
-          - entity: sensor.dining_room_apparent_temperature
-            name: Dining room
-          - entity: sensor.dog_bed_area_apparent_temperature
-            name: Dog bed area
-          - entity: sensor.entryway_apparent_temperature
-            name: Entryway
-          - entity: sensor.kitchen_apparent_temperature
-            name: Kitchen
-          - entity: sensor.living_room_apparent_temperature
-            name: Living room
-          - entity: sensor.nursery_apparent_temperature
-            name: Nursery
-          - entity: sensor.office_apparent_temperature
-            name: Office
-        refresh_interval: 0
-        title: Temperatures
-        type: history-graph
-        hours_to_show: 12
-        logarithmic_scale: false
-      - entities:
-          - entity: sensor.soil_moisture_vegetable_garden_sun
-            name: Vegetable garden (sun)
-          - entity: sensor.soil_moisture_vegetable_garden_shade
-            name: Vegetable garden (shade)
-          - entity: sensor.soil_moisture_front_deck
-            name: Front deck
-          - entity: sensor.soil_moisture_back_deck
-            name: Back deck
-          - entity: sensor.soil_moisture_carport_pots
-            name: Carport pots
-          - entity: sensor.soil_moisture_dining_room
-            name: Dining room
-          - entity: sensor.soil_moisture_living_room
-            name: Living room
-          - entity: sensor.soil_moisture_office
-            name: Office
-        hours_to_show: 240
-        refresh_interval: 0
-        type: history-graph
-        title: Soil moisture
-        logarithmic_scale: false
       - entity: media_player.tv
         type: media-control
-      - type: entities
-        entities:
-          - entity: sensor.weighted_average_inside_apparent_temperature
-            name: Inside
-          - entity: sensor.outside_apparent_temperature
-            name: Outside
-          - entity: sensor.bathroom_apparent_temperature
-            name: Bathroom
-          - entity: sensor.bedroom_apparent_temperature
-            name: Bedroom
-          - entity: sensor.dining_room_apparent_temperature
-            name: Dining room
-          - entity: sensor.dog_bed_area_apparent_temperature
-            name: Dog bed area
-          - entity: sensor.entryway_apparent_temperature
-            name: Entryway
-          - entity: sensor.kitchen_apparent_temperature
-            name: Kitchen
-          - entity: sensor.living_room_apparent_temperature
-            name: Living room
-          - entity: sensor.nursery_apparent_temperature
-            name: Nursery
-          - entity: sensor.office_apparent_temperature
-            name: Office
-        title: Current Apparent Temperatures
-      - type: entities
-        entities:
-          - entity: sensor.bathroom_multisensor_temperature
-            name: Bathroom
-          - entity: sensor.bedroom_temperature
-            name: Bedroom
-          - entity: sensor.dining_room_temperature
-            name: Dining room
-          - entity: sensor.dog_bed_area_sensor_temperature
-            name: Dog bed area
-          - entity: sensor.entryway_multisensor_temperature
-            name: Entryway
-          - entity: sensor.kitchen_temperature
-            name: Kitchen
-          - entity: sensor.living_room_temperature
-            name: Living room
-          - entity: sensor.nursery_temperature
-            name: Nursery
-          - entity: sensor.office_sensor_temperature
-            name: Office
-        title: Current Temperatures
-      - entities:
-          - entity: sensor.bathroom_multisensor_temperature
-            name: Bathroom
-          - entity: sensor.bedroom_temperature
-            name: Bedroom
-          - entity: sensor.dining_room_temperature
-            name: Dining room
-          - entity: sensor.dog_bed_area_sensor_temperature
-            name: Dog bed area
-          - entity: sensor.entryway_multisensor_temperature
-            name: Entryway
-          - entity: sensor.kitchen_temperature
-            name: Kitchen
-          - entity: sensor.living_room_temperature
-            name: Living room
-          - entity: sensor.nursery_temperature
-            name: Nursery
-          - entity: sensor.office_sensor_temperature
-            name: Office
-        refresh_interval: 0
-        title: Temperatures
-        type: history-graph
-        hours_to_show: 12
-        logarithmic_scale: false
-  - title: Instructions
-    path: instructions
-    icon: mdi:text-box
-    cards:
-      - type: markdown
-        content: >-
-
-          In order to use Siri, you will need to add the following Siri
-          shortcuts to your device: [Sleep
-          Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9),
-          [Lights On
-          Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010),
-          [Lights
-          On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd),
-          [Lights
-          Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167),
-          [Aircon
-          On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34),
-          [Aircon
-          Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655),
-          [Enable Climate
-          Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35),
-          [Disable Climate
-          Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706),
-          [Lock The
-          Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1),
-          [Unlock The
-          Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d),
-          [TV
-          On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).
-
-          In order to use Google, you will need to connect your Google Assistant
-          to IFTTT and add applets with webhooks to Home Assistant corresponding
-          to each command.
-
-
-          CHANGE ABOVE TO LIST OF QUOTES
-        title: Voice control
-    subview: false
