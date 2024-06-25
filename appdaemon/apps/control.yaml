@@ -12,10 +12,10 @@ Control:
   notify_battery_level: 25
   mobiles:
     dan:
-      name: mobile_app_daniels_phone
+      name: mobile_app_dans_phone
       type: iOS
     rachel:
-      name: mobile_app_rachel_s_phone
+      name: mobile_app_rachels_phone
       type: Android
   priority: 1
   # log_level: DEBUG
