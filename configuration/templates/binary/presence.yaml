@@ -1,0 +1,62 @@
+- name: Desk occupied
+  state: >
+    {{
+      states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
+      states('sensor.office_presence_sensor_distance') | float < 1.5
+    }}
+  delay_on: 0:00:05
+  delay_off: 0:00:05
+- name: Dan's computer active at home # TODO: maybe not required anymore
+  state: >
+    {{
+      states('binary_sensor.dans_computer_active') == 'on' and
+      states('device_tracker.dans_computer') == 'home'
+    }}
+- name: Desk occupied and computer active
+  state: >
+    {{
+      states('binary_sensor.desk_occupied') == 'on' and
+      states('binary_sensor.dans_computer_active_at_home') == 'on'
+    }}
+- name: Office pet bed occupied within last 5 minutes
+  state: >
+    {{
+      states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
+      states('sensor.office_presence_sensor_distance') | float > 2.3
+    }}
+  delay_on: 0:00:10
+  delay_off: 0:05
+
+- name: Bedroom occupied
+  state: >
+    {{
+      states('binary_sensor.bedroom_presence_sensor_occupancy') == 'on' or
+      states('binary_sensor.bedroom_bed_occupied') == 'on'
+    }}
+- name: Bedroom presence sensor distance in bed range
+  state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance') | float < 2.5 }}"
+  delay_off: 0:00:15
+- name: Anyone asleep
+  state: >
+    {{
+      states('binary_sensor.dan_asleep') == 'on' or
+      states('binary_sensor.rachel_asleep') == 'on'
+    }}
+- name: Rachel was asleep within last 5 minutes
+  state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
+  delay_off: 0:05
+- name: Rachel's phone's sleep confidence high
+  unique_id: rachels_phones_sleep_confidence_high
+  state: "{{ states('sensor.rachels_phone_sleep_confidence') | float > 75 }}"
+- name: Rachel's phone still
+  unique_id: rachels_phone_still
+  state: "{{ states('sensor.rachels_phone_detected_activity') == 'still' }}"
+- name: Dan's phone still
+  unique_id: dans_phone_still
+  state: "{{ states('sensor.dans_phone_activity') == 'Stationary' }}"
+- name: Dan's phone unplugged
+  unique_id: dans_phone_unplugged
+  state: "{{ states('sensor.dans_phone_battery_state') == 'Not Charging' }}"
+
+- name: Kitchen door motion # TODO: maybe not required anymore
+  state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
