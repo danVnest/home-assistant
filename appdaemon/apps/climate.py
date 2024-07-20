@@ -259,10 +259,10 @@ class Climate(App):
     def suggest_if_extreme_forecast(self):
         """Suggest user enables control if extreme temperatures are forecast."""
         self.allow_suggestion()
-        forecast = self.extreme_forecast
-        if forecast is not None:
+        forecast = self.get_state("sensor.extreme_forecast")
+        if forecast:
             self.suggest(
-                f"It's forecast to reach {forecast:.1f}º, "
+                f"It's forecast to reach {float(forecast):.1f}º, "
                 "consider enabling climate control",
             )
 
@@ -432,23 +432,6 @@ class Climate(App):
             )
             / 2
         )
-
-    @property
-    def extreme_forecast(self) -> float:
-        """Return the forecasted temperature if it exceeds thresholds."""
-        forecasts = [
-            float(
-                self.get_state(f"sensor.outside_apparent_temperature_{hour}h_forecast"),
-            )
-            for hour in ["2", "4", "6", "8"]
-        ]
-        max_forecast = max(forecasts)
-        if max_forecast >= self.get_setting("high_temperature_aircon_trigger"):
-            return max_forecast
-        min_forecast = min(forecasts)
-        if min_forecast <= self.get_setting("low_temperature_aircon_trigger"):
-            return min_forecast
-        return None
 
 
 class ClimateDevice(Device):

@@ -85,3 +85,26 @@
     ) / 2 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
+
+- name: Extreme forecast
+  state: >
+    {%- set forecasts = (
+      states('sensor.outside_apparent_temperature_2h_forecast') | float,
+      states('sensor.outside_apparent_temperature_4h_forecast') | float,
+      states('sensor.outside_apparent_temperature_6h_forecast') | float,
+      states('sensor.outside_apparent_temperature_8h_forecast') | float,
+      states('sensor.outside_apparent_temperature_10h_forecast') | float,
+    ) -%}
+    {%- set max_forecast = forecasts | max -%}
+    {%- if max_forecast >= states('input_number.high_temperature_aircon_trigger') | float -%}
+      {{ max_forecast }}
+    {%- else -%}
+      {%- set min_forecast = forecasts | min -%}
+      {%- if min_forecast <= states('input_number.low_temperature_aircon_trigger') | float -%}
+        {{ min_forecast }}
+      {%- else -%}
+        None
+      {%- endif -%}
+    {%- endif -%}
+  unit_of_measurement: "°C"
+  state_class: measurement

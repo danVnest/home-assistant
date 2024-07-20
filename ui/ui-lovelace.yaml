@@ -36,18 +36,23 @@ views:
         title: Scene
       - type: grid
         cards:
-          - entities:
+          - type: entity-filter
+            card:
+              type: glance
+            show_name: true
+            entities:
               - entity: sensor.weighted_average_inside_apparent_temperature
                 name: Inside
                 icon: mdi:home-thermometer
               - entity: sensor.outside_apparent_temperature
                 name: Outside
                 icon: mdi:sun-thermometer
-              - entity: sensor.outside_apparent_temperature_8h_forecast
+              - entity: sensor.extreme_forecast
                 name: Forecast
                 icon: mdi:sun-thermometer-outline
-            show_name: true
-            type: glance
+            conditions:
+              - condition: state
+                state_not: unknown
           - entities:
               - entity: sensor.bedroom_apparent_temperature
                 name: Bedroom
