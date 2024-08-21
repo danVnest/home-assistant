@@ -808,7 +808,7 @@ class Light(PresenceDevice):
         if not self.ignoring_vacancy:
             self.adjust_for_conditions()
         else:
-            self.controller.transition_to_scene(self.control.scene)
+            self.controller.transition_to_scene(self.controller.control.scene)
         return True
 
     def turn_off(self):
