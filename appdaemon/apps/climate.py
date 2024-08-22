@@ -185,7 +185,7 @@ class Climate(App):
 
     def update_humidifier_vacating_delays(self, seconds: float):
         """Update room vacating delay for each humidifier."""
-        for humidifier in self.humidifier.values():
+        for humidifier in self.humidifiers.values():
             humidifier.vacating_delay = seconds
 
     def transition_between_scenes(self, new_scene: str, old_scene: str):
@@ -202,7 +202,7 @@ class Climate(App):
             self.end_pre_condition_for_sleep()
         elif new_scene == "Morning":
             self.heaters["nursery"].monitor_presence()
-            self.humidifier["nursery"].monitor_presence()
+            self.humidifiers["nursery"].monitor_presence()
             # TODO: remove when nursery presence is reliable
             self.aircons["dining_room"].monitor_presence()
             # TODO: remove dining room once presence detects dogs properly?
@@ -279,10 +279,10 @@ class Climate(App):
     def end_pre_condition_for_sleep(self):
         """Return bedroom and nursery climate control to normal."""
         self.aircons["bedroom"].monitor_presence()
-        self.humidifier["bedroom"].monitor_presence()
+        self.humidifiers["bedroom"].monitor_presence()
         # self.aircons["dining_room"].monitor_presence() # TODO: ?
         # self.heaters["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
-        # self.humidifier["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
+        # self.humidifiers["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
 
     def suggest_if_extreme_forecast(self):
         """Suggest user enables control if extreme temperatures are forecast."""
@@ -1220,6 +1220,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the humidifier on/off based on current and target humidities."""
+        # TODO: only enable humidifiers during Sleep scene??
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
         if (
