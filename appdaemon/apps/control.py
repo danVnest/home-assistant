@@ -97,20 +97,10 @@ class Control(App):
             "now",
             self.constants["heartbeat_period"],
         )
-        for system_component in [
-            "update.home_assistant_core_update",
-            "update.home_assistant_supervisor_update",
-            "update.home_assistant_operating_system_update",
-        ]:
-            self.listen_state(
-                self.handle_system_update_available,
-                system_component,
-                attribute="latest_version",
-            )
         self.listen_state(
-            self.handle_hacs_update_available,
-            "sensor.hacs",
-            attribute="repositories",
+            self.handle_update_available,
+            "update",
+            attribute="latest_version",
         )
         self.listen_event(self.all_initialized, "appd_started")
         self.timers["init_delay"] = self.run_in(
@@ -497,7 +487,7 @@ class Control(App):
                 entity_id=f"counter.{level.lower()}s",
             )
 
-    def handle_system_update_available(
+    def handle_update_available(
         self,
         entity: str,
         attribute: str,
@@ -505,28 +495,10 @@ class Control(App):
         new: str,
         **kwargs: dict,
     ):
-        """Notify when a system update is available."""
+        """Notify when a system or component update is available."""
         del attribute, old, new, kwargs
         self.notify(
             f"{self.get_state(entity, attribute='title')} update available",
-            title="System Update Available",
+            title="Update Available",
             targets="dan",
         )
-
-    def handle_hacs_update_available(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        **kwargs: dict,
-    ):
-        """Notify when a HACS update is available."""
-        del entity, attribute, kwargs
-        count = len(new)
-        if count != 0 and count > len(old):
-            self.notify(
-                f"{count} HACS update{'s' if count != 1 else ''} available",
-                title="System Update Available",
-                targets="dan",
-            )

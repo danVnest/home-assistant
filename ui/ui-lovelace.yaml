@@ -993,22 +993,13 @@ views:
       - user: d678a59ca9604e2ba14c3ac3705ba943
     icon: mdi:cog
     badges:
-      - type: entity-filter
-        state_filter:
-          - "on"
-        entities:
-          - entity: update.home_assistant_core_update
-            name: Core
-          - entity: update.home_assistant_supervisor_update
-            name: Supervisor
-          - entity: update.home_assistant_operating_system_update
-            name: Operating System
-      - type: entity-filter
-        state_filter:
-          - operator: ">"
-            value: 0
-        entities:
-          - entity: sensor.hacs
+      - type: custom:auto-entities
+        card:
+          type: glance
+        filter:
+          include:
+            - update
+        show_empty: false
     cards:
       - entities:
           - entity: input_select.scene
