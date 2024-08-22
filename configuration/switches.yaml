@@ -11,6 +11,22 @@
         service: climate.turn_off
         target:
           entity_id: climate.nursery_heater
+    office_heater:
+      friendly_name: Office heater
+      value_template: >
+        {{
+        states('switch.office_heater_dumb') == 'on' and 
+        states('sensor.office_heater_power') | float > 250
+        }}
+      turn_on:
+        service: switch.turn_on
+        target:
+          entity_id: switch.office_heater_dumb
+      turn_off:
+        service: climate.turn_off
+        target:
+          entity_id: switch.office_heater_dumb
+
     bedroom_humidifier:
       friendly_name: Bedroom humidifier
       value_template: "{{ states('humidifier.bedroom') not in ('off', 'unavailable', 'unknown') }}"
