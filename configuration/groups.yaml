@@ -89,6 +89,18 @@ all_heaters:
     - switch.office_heater
   all: true
 
+any_humidifiers:
+  name: Any humidifiers
+  entities:
+    - switch.nursery_humidifier
+    - switch.bedroom_humidifier
+
+all_humidifiers:
+  name: All humidifiers
+  entities:
+    - switch.nursery_humidifier
+    - switch.bedroom_humidifier
+  all: true
 any_climate_control:
   name: Climate control
   entities:
@@ -100,6 +112,8 @@ any_climate_control:
     - input_boolean.control_bedroom_fan
     - input_boolean.control_nursery_heater
     - input_boolean.control_office_heater
+    - input_boolean.control_bedroom_humidifier
+    - input_boolean.control_nursery_humidifier
   icon: mdi:home-thermometer
 
 all_climate_control:
@@ -113,6 +127,8 @@ all_climate_control:
     - input_boolean.control_bedroom_fan
     - input_boolean.control_nursery_heater
     - input_boolean.control_office_heater
+    - input_boolean.control_bedroom_humidifier
+    - input_boolean.control_nursery_humidifier
   icon: mdi:home-thermometer
   all: true
 

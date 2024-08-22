@@ -76,6 +76,9 @@ views:
               - entity: group.any_heaters
                 name: Heaters
                 icon: mdi:radiator
+              - entity: group.any_humidifiers
+                name: Humidifiers
+                icon: mdi:air-humidifier
             state_color: true
           - content: >-
               Manually controlling aircon, fans, or heaters may disable
@@ -95,6 +98,8 @@ views:
               - input_boolean.control_bedroom_fan
               - input_boolean.control_nursery_heater
               - input_boolean.control_office_heater
+              - input_boolean.control_bedroom_humidifier
+              - input_boolean.control_nursery_humidifier
             conditions:
               - condition: state
                 state: "off"
@@ -410,6 +415,15 @@ views:
             show_name: true
             columns: 3
             type: glance
+          - type: glance
+            entities:
+              - entity: input_number.humidifier_target
+              - entity: sensor.bedroom_humidity
+                name: Bedroom
+                icon: mdi:water
+              - entity: sensor.nursery_humidity
+                name: Nursery
+                icon: mdi:water
         type: vertical-stack
       - cards:
           - show_name: true
@@ -455,6 +469,20 @@ views:
                 name: Office
                 icon: mdi:radiator
             title: Heaters
+          - show_name: true
+            show_icon: true
+            show_state: false
+            type: glance
+            entities:
+              - entity: group.all_humidifiers
+                name: All
+              - entity: humidifier.bedroom
+                name: Bedroom
+                icon: mdi:air-humidifier
+              - entity: humidifier.nursery
+                name: Nursery
+                icon: mdi:air-humidifier
+            title: Humidifiers
           - content: >-
               Manually controlling aircon, fans, or heaters may disable
               **automatic control** for those devices. You can toggle
@@ -471,6 +499,8 @@ views:
               - input_boolean.control_bedroom_fan
               - input_boolean.control_nursery_heater
               - input_boolean.control_office_heater
+              - input_boolean.control_bedroom_humidifier
+              - input_boolean.control_nursery_humidifier
             show_header_toggle: true
           - type: markdown
             content: >-
@@ -518,35 +548,48 @@ views:
           - entity: input_number.aircon_vacating_delay
           - entity: input_number.fan_vacating_delay
           - entity: input_number.heater_vacating_delay
+          - entity: input_number.humidifier_vacating_delay
         title: Delays
-      - entities:
-          - entity: sensor.weighted_average_inside_apparent_temperature
-            name: Inside
-          - entity: sensor.outside_apparent_temperature
-            name: Outside
-          - entity: sensor.bathroom_apparent_temperature
-            name: Bathroom
-          - entity: sensor.bedroom_apparent_temperature
-            name: Bedroom
-          - entity: sensor.dining_room_apparent_temperature
-            name: Dining room
-          - entity: sensor.dog_bed_area_apparent_temperature
-            name: Dog bed area
-          - entity: sensor.entryway_apparent_temperature
-            name: Entryway
-          - entity: sensor.kitchen_apparent_temperature
-            name: Kitchen
-          - entity: sensor.living_room_apparent_temperature
-            name: Living room
-          - entity: sensor.nursery_apparent_temperature
-            name: Nursery
-          - entity: sensor.office_apparent_temperature
-            name: Office
-        refresh_interval: 0
-        title: Temperatures
-        type: history-graph
-        hours_to_show: 12
-        logarithmic_scale: false
+      - cards:
+          - entities:
+              - entity: sensor.weighted_average_inside_apparent_temperature
+                name: Inside
+              - entity: sensor.outside_apparent_temperature
+                name: Outside
+              - entity: sensor.bathroom_apparent_temperature
+                name: Bathroom
+              - entity: sensor.bedroom_apparent_temperature
+                name: Bedroom
+              - entity: sensor.dining_room_apparent_temperature
+                name: Dining room
+              - entity: sensor.dog_bed_area_apparent_temperature
+                name: Dog bed area
+              - entity: sensor.entryway_apparent_temperature
+                name: Entryway
+              - entity: sensor.kitchen_apparent_temperature
+                name: Kitchen
+              - entity: sensor.living_room_apparent_temperature
+                name: Living room
+              - entity: sensor.nursery_apparent_temperature
+                name: Nursery
+              - entity: sensor.office_apparent_temperature
+                name: Office
+            refresh_interval: 0
+            title: Temperatures
+            type: history-graph
+            hours_to_show: 12
+            logarithmic_scale: false
+          - entities:
+              - entity: sensor.bedroom_humidity
+                name: Bedroom
+              - entity: sensor.nursery_humidity
+                name: Nursery
+            refresh_interval: 0
+            title: Humidities
+            type: history-graph
+            hours_to_show: 12
+            logarithmic_scale: false
+        type: vertical-stack
   - path: lights
     title: Lights
     icon: mdi:lightbulb-variant

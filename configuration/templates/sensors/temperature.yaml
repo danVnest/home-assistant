@@ -14,11 +14,19 @@
   state_class: measurement
 
 - name: Bedroom temperature
-  state: "{{ state_attr('climate.bedroom_aircon', 'current_temperature') }}"
+  state: >
+    {{ ((
+    2 * state_attr('climate.bedroom_aircon', 'current_temperature') +
+    states('sensor.bedroom_humidifier_temperature') | float
+    ) / 3 ) | round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Bedroom humidity
-  state: "{{ state_attr('climate.bedroom_aircon', 'current_humidity') }}"
+  state: >
+    {{ ((
+    2 * state_attr('climate.bedroom_aircon', 'current_humidity') +
+    states('sensor.bedroom_humidifier_humidity') | float
+    ) / 3 ) | round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
@@ -81,9 +89,26 @@
   state: >
     {{ ((
     state_attr('climate.nursery_heater', 'current_temperature') +
-    states('sensor.nursery_sensor_temperature') | float
-    ) / 2 ) | round(1) }}
+    states('sensor.nursery_sensor_temperature') | float +
+    states('sensor.nursery_humidifier_temperature') | float 
+    ) / 3 ) | round(1) }}
   unit_of_measurement: "°C"
+  state_class: measurement
+- name: Nursery humidity
+  state: >
+    {{ ((
+    states('sensor.nursery_sensor_humidity') | float +
+    states('sensor.nursery_humidifier_humidity') | float 
+    ) / 2 ) | round(1) }}
+  unit_of_measurement: "%"
+  state_class: measurement
+
+- name: Office humidity
+  state: >
+    {{ (
+    states('sensor.office_sensor_humidity') | float
+    ) | round(1) }}
+  unit_of_measurement: "%"
   state_class: measurement
 
 - name: Extreme forecast

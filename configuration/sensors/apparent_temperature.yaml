@@ -49,7 +49,7 @@
   unique_id: nursery_apparent_temperature
   source:
     - sensor.nursery_temperature
-    - sensor.nursery_sensor_humidity
+    - sensor.nursery_humidity
     - sensor.nursery_airspeed
 - platform: apparent_temperature
   name: Office apparent temperature

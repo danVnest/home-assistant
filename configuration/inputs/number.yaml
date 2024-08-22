@@ -58,6 +58,14 @@ sleep_low_temperature_aircon_trigger:
   unit_of_measurement: °C
   mode: box
   icon: mdi:thermometer-low
+humidifier_target:
+  name: Target humidity
+  min: 25
+  max: 95
+  step: 5
+  unit_of_measurement: "%"
+  mode: box
+  icon: mdi:water-check
 aircon_door_check_delay:
   name: Aircon off if door open
   min: 1
@@ -84,6 +92,14 @@ fan_vacating_delay:
   icon: mdi:timer
 heater_vacating_delay:
   name: Heater off if room empty
+  min: 1
+  max: 60
+  step: 1
+  unit_of_measurement: min
+  mode: box
+  icon: mdi:timer
+humidifier_vacating_delay:
+  name: Humidifier off if room empty
   min: 1
   max: 60
   step: 1

@@ -29,7 +29,12 @@ control_nursery_heater:
 control_office_heater:
   name: Office heater
   icon: mdi:radiator
-
+control_bedroom_humidifier:
+  name: Bedroom humidifier
+  icon: mdi:air-humidifier
+control_nursery_humidifier:
+  name: Nursery humidifier
+  icon: mdi:air-humidifier
 control_entryway_lights:
   name: Entryway
   icon: mdi:lightbulb-multiple
