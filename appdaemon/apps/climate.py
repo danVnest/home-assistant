@@ -1226,13 +1226,20 @@ class Humidifier(ClimateDevice, PresenceDevice):
         if (
             self.room_too_dry
             and not self.on
-            and (self.ignoring_vacancy or not self.vacant)
+            and (
+                self.ignoring_vacancy
+                or (not self.vacant and self.controller.control.scene == "Sleep")
+            )
         ):
             if check_if_would_adjust_only:
                 return True
             self.turn_on_for_conditions()
         elif self.on and (
-            self.room_too_humid or (self.vacant and not self.ignoring_vacancy)
+            self.room_too_humid
+            or (
+                (self.controller.control.scene != "Sleep" or self.vacant)
+                and not self.ignoring_vacancy
+            )
         ):
             if check_if_would_adjust_only:
                 return True
