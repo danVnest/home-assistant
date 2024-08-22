@@ -52,7 +52,7 @@
 
     living_room_aircon:
       friendly_name: Living room aircon
-      value_template: "{{ states('climate.living_room_aircon') != 'off' }}"
+      value_template: "{{ states('climate.living_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
         service: climate.turn_on
         target:
@@ -64,7 +64,7 @@
 
     dining_room_aircon:
       friendly_name: Dining room aircon
-      value_template: "{{ states('climate.dining_room_aircon') != 'off' }}"
+      value_template: "{{ states('climate.dining_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
         service: climate.turn_on
         target:
@@ -76,7 +76,7 @@
 
     bedroom_aircon:
       friendly_name: Bedroom aircon
-      value_template: "{{ states('climate.bedroom_aircon') != 'off' }}"
+      value_template: "{{ states('climate.bedroom_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
         service: climate.turn_on
         target:
