@@ -737,14 +737,14 @@ views:
     badges: []
     cards:
       - aspect_ratio: "2"
-        dark_mode: true
         default_zoom: 12
         auto_fit: true
         entities:
-          - device_tracker.dans_phone
-          - device_tracker.rachels_phone
+          - entity: device_tracker.dan_s_phone
+          - entity: device_tracker.rachel_s_phone
         hours_to_show: 1
         type: map
+        theme_mode: dark
       - type: custom:webrtc-camera
         entity: camera.front_door
         poster: image.front_door_event_image

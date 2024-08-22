@@ -7,16 +7,17 @@
   delay_on: 0:00:05
   delay_off: 0:00:05
 - name: Dan's computer active at home # TODO: maybe not required anymore
+  unique_id: dan_s_computer_active_at_home
   state: >
     {{
-      states('binary_sensor.dans_computer_active') == 'on' and
-      states('device_tracker.dans_computer') == 'home'
+      states('binary_sensor.dan_s_computer_active') == 'on' and
+      states('device_tracker.dan_s_computer') == 'home'
     }}
 - name: Desk occupied and computer active
   state: >
     {{
       states('binary_sensor.desk_occupied') == 'on' and
-      states('binary_sensor.dans_computer_active_at_home') == 'on'
+      states('binary_sensor.dan_s_computer_active_at_home') == 'on'
     }}
 - name: Office pet bed occupied within last 5 minutes
   state: >
@@ -46,17 +47,17 @@
   state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
   delay_off: 0:05
 - name: Rachel's phone's sleep confidence high
-  unique_id: rachels_phones_sleep_confidence_high
-  state: "{{ states('sensor.rachels_phone_sleep_confidence') | float > 75 }}"
+  unique_id: rachel_s_phone_sleep_confidence_high
+  state: "{{ states('sensor.rachel_s_phone_sleep_confidence') | float > 75 }}"
 - name: Rachel's phone still
-  unique_id: rachels_phone_still
-  state: "{{ states('sensor.rachels_phone_detected_activity') == 'still' }}"
+  unique_id: rachel_s_phone_still
+  state: "{{ states('sensor.rachel_s_phone_detected_activity') == 'still' }}"
 - name: Dan's phone still
-  unique_id: dans_phone_still
-  state: "{{ states('sensor.dans_phone_activity') == 'Stationary' }}"
+  unique_id: dan_s_phone_still
+  state: "{{ states('sensor.dan_s_phone_activity') == 'Stationary' }}"
 - name: Dan's phone unplugged
-  unique_id: dans_phone_unplugged
-  state: "{{ states('sensor.dans_phone_battery_state') == 'Not Charging' }}"
+  unique_id: dan_s_phone_unplugged
+  state: "{{ states('sensor.dan_s_phone_battery_state') == 'Not Charging' }}"
 
 - name: Kitchen door motion # TODO: maybe not required anymore
   state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"

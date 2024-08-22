@@ -30,17 +30,17 @@
       prob_given_true: 0.99 # very likely the light is off given Rachel is asleep # UPDATE FROM HISTORY_STATS - bedroom light is almost never on when Rachel is asleep
       prob_given_false: 0.6 # chance light is off given Rachel is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.rachels_phone_still
+      entity_id: binary_sensor.rachel_s_phone_still
       to_state: "on"
       prob_given_true: 0.99 # very likely Rachel's phone is still given Rachel is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.5 # chance Rachel's phone is still given Rachel is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.rachels_phones_sleep_confidence_high
+      entity_id: binary_sensor.rachel_s_phone_sleep_confidence_high
       to_state: "on"
       prob_given_true: 0.95 # likely Rachel's phone will be confident Rachel is asleep given Rachel is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.3 # Rachel sometimes leaves her phone around and it becomes confident she's asleep when she's awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.rachels_sleep_time
+      entity_id: binary_sensor.rachel_s_sleep_time
       to_state: "on"
       prob_given_true: 0.7 # chance it is within typical sleeping hours given Rachel is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.3 # chance it is within typical sleeping hours given Rachel is awake # UPDATE FROM HISTORY_STATS
@@ -60,22 +60,22 @@
       prob_given_true: 0.99 # very likely the light is off given Dan is asleep # UPDATE FROM HISTORY_STATS - bedroom light is almost never on when Rachel is asleep
       prob_given_false: 0.6 # chance light is off given Dan is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: sensor.dans_phone_still
+      entity_id: sensor.dan_s_phone_still
       to_state: "on"
       prob_given_true: 0.99 # very likely Dan's phone is still given Dan is asleep # UPDATE FROM HISTORY_STATS
-      prob_given_false: 0.5 # chance Rachel's phone is still given Dan is awake # UPDATE FROM HISTORY_STATS
+      prob_given_false: 0.5 # chance Dan's phone is still given Dan is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.dans_phone_unplugged
+      entity_id: binary_sensor.dan_s_phone_unplugged
       to_state: "off"
       prob_given_true: 0.95 # likely Dan's phone is plugged in given Dan is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.1 # unlikely Dan's phone is plugged in given Dan is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.dans_computer_active
+      entity_id: binary_sensor.dan_s_computer_active
       to_state: "off"
       prob_given_true: 0.95 # likely Dan's computer isn't active given Dan is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.5 # chance Dan's computer isn't active given Dan is awake # UPDATE FROM HISTORY_STATS
     - platform: state
-      entity_id: binary_sensor.dans_sleep_time
+      entity_id: binary_sensor.dan_s_sleep_time
       to_state: "on"
       prob_given_true: 0.7 # chance it is within typical sleeping hours given Dan is asleep # UPDATE FROM HISTORY_STATS
       prob_given_false: 0.3 # chance it is within typical sleeping hours given Dan is awake # UPDATE FROM HISTORY_STATS

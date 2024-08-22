@@ -1,10 +1,10 @@
 - platform: tod
   name: Rachel's sleep time
-  unique_id: rachels_sleep_time
+  unique_id: rachel_s_sleep_time
   after: "22:00"
   before: "7:00"
 - platform: tod
   name: Dan's sleep time
-  unique_id: dans_sleep_time
+  unique_id: dan_s_sleep_time
   after: "23:30"
   before: "7:00"

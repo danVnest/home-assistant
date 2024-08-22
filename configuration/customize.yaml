@@ -1,7 +1,7 @@
 customize:
   zone.home:
     radius: 300
-  device_tracker.dans_phone:
+  device_tracker.dan_s_phone:
     entity_picture: /local/dan.png
-  device_tracker.rachels_phone:
+  device_tracker.rachel_s_phone:
     entity_picture: /local/rachel.png

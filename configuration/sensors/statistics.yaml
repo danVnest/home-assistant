@@ -81,21 +81,21 @@
   duration: "07:00"
 - platform: history_stats
   name: Dan's phone still ratio while asleep
-  entity_id: binary_sensor.dans_phone_still
+  entity_id: binary_sensor.dan_s_phone_still
   state: "on"
   type: ratio
   end: "{{ today_at('06:00') - timedelta(days=1) }}"
   duration: "07:00"
 - platform: history_stats
   name: Dan's phone plugged in ratio while asleep
-  entity_id: binary_sensor.dans_phone_unplugged
+  entity_id: binary_sensor.dan_s_phone_unplugged
   state: "off"
   type: ratio
   end: "{{ today_at('06:00') - timedelta(days=1) }}"
   duration: "07:00"
 - platform: history_stats
   name: Dan's computer inactive ratio while asleep
-  entity_id: binary_sensor.dans_computer_active
+  entity_id: binary_sensor.dan_s_computer_active
   state: "off"
   type: ratio
   end: "{{ today_at('06:00') - timedelta(days=1) }}"
@@ -159,21 +159,21 @@
   duration: "12:00"
 - platform: history_stats
   name: Dan's phone still ratio while awake
-  entity_id: binary_sensor.dans_phone_still
+  entity_id: binary_sensor.dan_s_phone_still
   state: "on"
   type: ratio
   start: "{{ today_at('09:00') - timedelta(days=1) }}"
   duration: "12:00"
 - platform: history_stats
   name: Dan's phone plugged in ratio while awake
-  entity_id: binary_sensor.dans_phone_unplugged
+  entity_id: binary_sensor.dan_s_phone_unplugged
   state: "off"
   type: ratio
   start: "{{ today_at('09:00') - timedelta(days=1) }}"
   duration: "12:00"
 - platform: history_stats
   name: Dan's computer inactive ratio while awake
-  entity_id: binary_sensor.dans_computer_active
+  entity_id: binary_sensor.dan_s_computer_active
   state: "off"
   type: ratio
   start: "{{ today_at('09:00') - timedelta(days=1) }}"

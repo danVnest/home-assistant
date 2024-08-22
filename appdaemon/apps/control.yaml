@@ -15,7 +15,7 @@ Control:
       name: mobile_app_dans_phone
       type: iOS
     rachel:
-      name: mobile_app_rachels_phone
+      name: mobile_app_rachel_s_phone
       type: Android
   priority: 1
   # log_level: DEBUG
