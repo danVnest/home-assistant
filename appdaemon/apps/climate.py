@@ -1180,7 +1180,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
     @property
     def desired_target_humidity(self) -> float:
         """Get the humidifier's target humidity."""
-        return self.controller.get_setting("humidifier_target")
+        return float(self.controller.get_state("input_number.humidifier_target"))
 
     @property
     def target_humidity(self) -> float:
