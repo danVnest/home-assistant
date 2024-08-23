@@ -235,7 +235,7 @@ class Climate(App):
             if all(aircon.door_open for aircon in self.aircons.values()):
                 reason = "the door(s) are open"
                 if self.too_hot_or_cold_outside:
-                    reason += f" (but outside is f{self.outside_temperature}º)"
+                    reason += f" (but outside is {self.outside_temperature}º)"
                 reason += ", consider"
             elif any(
                 not aircon.control_enabled and not aircon.door_open
