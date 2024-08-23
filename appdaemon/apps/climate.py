@@ -209,6 +209,8 @@ class Climate(App):
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if new_scene in ("Sleep", "Morning") else "auto"
         )
+        for humidifier in self.humidifiers.values():
+            humidifier.already_notified_of_empty_water_tank = False
         if self.any_climate_control_enabled:
             self.adjust_for_conditions()
         elif any(
@@ -1176,6 +1178,20 @@ class Humidifier(ClimateDevice, PresenceDevice):
         self.vacating_delay = 60 * float(
             self.controller.entities.input_number.humidifier_vacating_delay.state,
         )
+        self.controller.listen_state(
+            self.handle_empty_water_tank,
+            device_id,
+            attribute="humidifier.fault",
+            new=lambda x: x > 0,
+            old=0,
+        )
+        self.controller.listen_state(
+            self.handle_empty_water_tank,
+            device_id,
+            new=lambda x: x != "off",
+            old="off",
+        )
+        self.already_notified_of_empty_water_tank = False
 
     @property
     def desired_target_humidity(self) -> float:
@@ -1193,10 +1209,49 @@ class Humidifier(ClimateDevice, PresenceDevice):
         if self.target_humidity != self.desired_target_humidity:
             self.call_service("set_humidity", humidity=target)
 
+    @property
+    def constant_humidity_mode(self) -> bool:
+        """Check if the humidifier is set to reach and maintain a constant humidity."""
+        return self.get_attribute("mode") == "Constant Humidity"
+
+    def set_constant_humidity_mode(self):
+        """Set the humidifier to reach and maintain a constant humidity."""
+        if self.on and not self.constant_humidity_mode:
+            self.call_service("set_mode", mode="Constant Humidity")
+
     def turn_on_for_conditions(self):
         """Turn the humidifier on and adjust the target humidity if appropriate."""
+        self.set_constant_humidity_mode()
         self.target_humidity = self.desired_target_humidity
         self.turn_on()
+
+    @property
+    def empty_water_tank(self) -> bool:
+        """Check if the humidifier's water tank is empty."""
+        return self.get_attribute("humidifier.fault") > 0
+
+    def handle_empty_water_tank(
+        self,
+        entity: str,
+        attribute: str,
+        old: float,
+        new: float,
+        **kwargs: dict,
+    ):
+        """Handle empty water tank status by calling notification method."""
+        del entity, attribute, old, new, kwargs
+        if self.empty_water_tank:
+            self.notify_of_empty_water_tank()
+
+    def notify_of_empty_water_tank(self):
+        """Notify that the humidifier's water tank is empty (only once per scene)."""
+        if not self.already_notified_of_empty_water_tank:
+            self.controller.notify(
+                f"Refill the {self.room} humidifier water tank so it can turn on",
+                title=f"{self.device.friendly_name.title()} Water Tank Empty",
+                targets="anyone_home",
+            )
+            self.already_notified_of_empty_water_tank = True
 
     @property
     def room_too_dry(self) -> bool:
@@ -1220,7 +1275,6 @@ class Humidifier(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool:
         """Turn the humidifier on/off based on current and target humidities."""
-        # TODO: only enable humidifiers during Sleep scene??
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
         if (
@@ -1231,6 +1285,9 @@ class Humidifier(ClimateDevice, PresenceDevice):
                 or (not self.vacant and self.controller.control.scene == "Sleep")
             )
         ):
+            if self.empty_water_tank:
+                self.notify_of_empty_water_tank()
+                return False
             if check_if_would_adjust_only:
                 return True
             self.turn_on_for_conditions()
@@ -1245,12 +1302,11 @@ class Humidifier(ClimateDevice, PresenceDevice):
                 return True
             self.turn_off()
         elif self.on and (
-            self.get_attribute("mode") != "Constant Humidity"
+            not self.constant_humidity_mode
             or self.target_humidity != self.desired_target_humidity
         ):
-            # TODO: check if device turns itself off once target is reached? If so, remove self.on check above
             if check_if_would_adjust_only:
                 return True
-            self.call_service("set_mode", mode="Constant Humidity")
+            self.set_constant_humidity_mode()
             self.target_humidity = self.desired_target_humidity
         return False
