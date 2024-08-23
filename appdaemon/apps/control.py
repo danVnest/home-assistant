@@ -497,8 +497,9 @@ class Control(App):
     ):
         """Notify when a system or component update is available."""
         del attribute, old, new, kwargs
-        self.notify(
-            f"{self.get_state(entity, attribute='title')} update available",
-            title="Update Available",
-            targets="dan",
-        )
+        if not self.get_state(entity, attribute="auto_update"):
+            self.notify(
+                f"{self.get_state(entity, attribute='friendly_name')} available",
+                title="Update Available",
+                targets="dan",
+            )
