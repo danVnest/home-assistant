@@ -932,6 +932,8 @@ class Light(PresenceDevice):
 
     def transition_towards_occupied(self, **kwargs: dict):
         """Step towards occupied lighting settings."""
+        if kwargs["timer_id"] != self.transition_timer:
+            return
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining > 0:
             self.adjust(
