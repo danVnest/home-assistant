@@ -758,10 +758,8 @@ class Light(PresenceDevice):
         if self.kelvin_limits["min"] is None:
             return None
         validated_value = value
-        if validated_value < self.kelvin_limits["min"]:
-            validated_value = self.kelvin_limits["min"]
-        if validated_value > self.kelvin_limits["max"]:
-            validated_value = self.kelvin_limits["max"]
+        validated_value = max(validated_value, self.kelvin_limits["min"])
+        validated_value = min(validated_value, self.kelvin_limits["max"])
         if validated_value != value:
             self.controller.log(
                 f"Kelvin ({value}) out of bounds for '{self.device_id}'",
@@ -918,8 +916,7 @@ class Light(PresenceDevice):
             1,
         )
         max_steps = self.transition_period * self.constants["max_steps_per_second"]
-        if steps > max_steps:
-            steps = max_steps
+        steps = min(steps, max_steps)
         brightness_step = brightness_change / steps
         kelvin_step = kelvin_change / steps
         step_time = self.transition_period / steps
