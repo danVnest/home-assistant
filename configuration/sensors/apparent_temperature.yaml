@@ -4,6 +4,7 @@
   source:
     - sensor.bathroom_multisensor_temperature
     - sensor.bathroom_multisensor_humidity
+    - sensor.bathroom_airspeed
 - platform: apparent_temperature
   name: Bedroom apparent temperature
   unique_id: bedroom_apparent_temperature
@@ -24,12 +25,14 @@
   source:
     - sensor.dog_bed_area_sensor_temperature
     - sensor.dog_bed_area_sensor_humidity
+    - sensor.dog_bed_area_airspeed
 - platform: apparent_temperature
   name: Entryway apparent temperature
   unique_id: entryway_apparent_temperature
   source:
     - sensor.entryway_multisensor_temperature
     - sensor.entryway_multisensor_humidity
+    - sensor.entryway_airspeed
 - platform: apparent_temperature
   name: Kitchen apparent temperature
   unique_id: kitchen_apparent_temperature

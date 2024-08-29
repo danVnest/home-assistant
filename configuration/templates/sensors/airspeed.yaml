@@ -1,3 +1,7 @@
+- name: Bathroom airspeed
+  state: "{{ 0 }}"
+  unit_of_measurement: "m/s"
+  state_class: measurement
 - name: Bedroom airspeed
   state: >
     {% from 'custom_templates.jinja' import fan_airspeed, aircon_airspeed %}
@@ -8,6 +12,14 @@
   state: >
     {% from 'custom_templates.jinja' import aircon_airspeed %}
     {{ aircon_airspeed('dining_room') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Dog bed area airspeed
+  state: "{{ 0 }}"
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Entryway airspeed
+  state: "{{ 0 }}"
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Kitchen airspeed
