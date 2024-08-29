@@ -496,10 +496,18 @@ class Control(App):
         **kwargs: dict,
     ):
         """Notify when a system or component update is available."""
-        del attribute, old, new, kwargs
-        if not self.get_state(entity, attribute="auto_update"):
-            self.notify(
-                f"{self.get_state(entity, attribute='friendly_name')} available",
-                title="Update Available",
-                targets="dan",
+        del attribute, kwargs
+        if (
+            new is None
+            or (
+                old is None
+                and new == self.get_state(entity, attribute="installed_version")
             )
+            or self.get_state(entity, attribute="auto_update")
+        ):
+            return
+        self.notify(
+            f"{self.get_state(entity, attribute='friendly_name')} available",
+            title="Update Available",
+            targets="dan",
+        )
