@@ -245,3 +245,9 @@ bedroom_vacating_delay:
   max: 300
   step: 15
   icon: mdi:timer
+bathroom_vacating_delay:
+  name: Bathroom
+  min: 0
+  max: 300
+  step: 15
+  icon: mdi:timer

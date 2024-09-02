@@ -139,25 +139,18 @@ class Lights(App):
 
     def transition_to_day_scene(self):
         """Configure lighting for the day scene."""
+        light_names = ["office", "bathroom"]
         if not self.lights["bedroom"].ignoring_vacancy:
-            self.lights["bedroom"].set_presence_adjustments(
-                occupied=(
-                    self.constants["max_brightness"],
-                    self.lights["bedroom"].kelvin_limits["max"],
-                ),
-                vacating_delay=self.get_setting(
-                    "bedroom_vacating_delay",
-                ),
-                # TODO: https://app.asana.com/0/1207020279479204/1207237490859329/f
-                # this is always? the same, don't pass as an argument
-            )
-        for light_name in ("office", "bathroom"):
+            light_names.append("bedroom")
+        for light_name in light_names:
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
                     self.constants["max_brightness"],
                     self.lights[light_name].kelvin_limits["max"],
                 ),
-                vacating_delay=self.get_setting("office_vacating_delay"),
+                vacating_delay=self.get_setting(f"{light_name}_vacating_delay"),
+                # TODO: https://app.asana.com/0/1207020279479204/1207237490859329/f
+                # this is always? the same, don't pass as an argument
             )
         for light_name in (
             "entryway",
@@ -210,25 +203,26 @@ class Lights(App):
                 self.get_setting("tv_brightness"),
                 kelvin,
             )
-        self.lights["dining_room"].turn_off()  # TODO: adjust with presence
+        self.lights["dining_room"].set_presence_adjustments(
+            entered=(self.get_setting("tv_motion_brightness"), kelvin),
+            occupied=(
+                self.constants["max_brightness"],
+                self.lights["dining_room"].kelvin_limits["max"],
+            ),
+            transition_period=self.get_setting("tv_transition_period"),
+            vacating_delay=self.get_setting("tv_vacating_delay"),
+        )
         brightness, kelvin = self.calculate_circadian_brightness_kelvin()
-        for light_name in ("office", "bathroom"):
+        light_names = ["office", "bathroom"]
+        if not self.lights["bedroom"].ignoring_vacancy:
+            light_names.append("bedroom")
+        for light_name in light_names:
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
                     brightness,
                     kelvin,
                 ),
-                vacating_delay=self.get_setting(
-                    "office_vacating_delay",
-                ),  # TODO: update to f"{light_name}_vacating_delay")?
-            )
-        if not self.lights["bedroom"].ignoring_vacancy:
-            self.lights["bedroom"].set_presence_adjustments(
-                occupied=(
-                    brightness,
-                    kelvin,
-                ),
-                vacating_delay=self.get_setting("bedroom_vacating_delay"),
+                vacating_delay=self.get_setting(f"{light_name}_vacating_delay"),
             )
 
     def transition_to_sleep_scene(self):
@@ -255,8 +249,8 @@ class Lights(App):
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 vacating_delay=self.get_setting(
-                    "office_vacating_delay",
-                ),  # TODO: update to f"{light_name}_vacating_delay")?
+                    "sleep_vacating_delay",
+                ),
             )
         for light_name in ("kitchen_strip", "tv", "dining_room", "hall", "nursery"):
             self.lights[light_name].ignore_vacancy()
@@ -272,10 +266,6 @@ class Lights(App):
         brightness = self.get_setting("morning_brightness")
         kelvin = self.get_setting("morning_kelvin")
         vacating_delay = self.get_setting("morning_vacating_delay")
-        self.lights["entryway"].set_presence_adjustments(
-            occupied=(brightness, kelvin),
-            vacating_delay=vacating_delay,
-        )
         self.lights["kitchen"].set_presence_adjustments(
             vacant=(brightness, kelvin),
             occupied=(self.constants["max_brightness"], kelvin),
@@ -289,12 +279,13 @@ class Lights(App):
             occupied=(brightness, kelvin),
             vacating_delay=self.get_setting("office_vacating_delay"),
         )
-        self.lights["bathroom"].set_presence_adjustments(
-            occupied=(brightness, kelvin),
-            vacating_delay=vacating_delay,
-        )
-        self.lights["bedroom"].ignore_vacancy()
-        for light_name in ("tv", "dining_room", "hall", "bedroom"):
+        for light_name in ("tv", "dining_room", "bathroom", "entryway"):
+            self.lights[light_name].set_presence_adjustments(
+                occupied=(brightness, kelvin),
+                vacating_delay=vacating_delay,
+            )
+        for light_name in ("hall", "bedroom"):
+            self.lights[light_name].ignore_vacancy()
             self.lights[light_name].turn_off()
 
     def transition_to_away_scene(self):
@@ -388,7 +379,17 @@ class Lights(App):
             transition_period=self.get_setting("night_transition_period"),
             vacating_delay=self.get_setting("night_vacating_delay"),
         )
-        for light_name in ("tv", "dining_room", "hall"):
+        self.lights["dining_room"].set_presence_adjustments(
+            vacant=(brightness, kelvin),
+            entered=(brightness, kelvin),
+            occupied=(
+                max(brightness, self.get_setting("night_motion_brightness")),
+                kelvin,
+            ),
+            transition_period=self.get_setting("night_transition_period"),
+            vacating_delay=self.get_setting("night_vacating_delay"),
+        )
+        for light_name in ("tv", "hall"):
             self.lights[light_name].adjust(brightness, kelvin)
         self.lights["office"].set_presence_adjustments(
             occupied=(brightness, kelvin),

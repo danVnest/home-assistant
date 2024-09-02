@@ -729,6 +729,7 @@ views:
       - entities:
           - entity: input_number.office_vacating_delay
           - entity: input_number.bedroom_vacating_delay
+          - entity: input_number.bathroom_vacating_delay
         title: Room Vacating Delays
         type: entities
   - title: Presence
