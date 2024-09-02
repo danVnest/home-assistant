@@ -1179,7 +1179,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
             self.handle_empty_water_tank,
             device_id,
             attribute="humidifier.fault",
-            new=lambda x: x > 0,
+            new=lambda x: x is not None and x > 0,
             old=0,
         )
         self.controller.listen_state(
