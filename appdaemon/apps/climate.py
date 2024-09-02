@@ -916,7 +916,7 @@ class Fan(ClimateDevice, PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
-        self.speed_per_level = self.get_attribute("percentage_step")
+        self.speed_per_level = round(self.get_attribute("percentage_step"))
         self.speed_levels = round(100 / self.speed_per_level)
         self.minimum_speed = self.speed_per_level * 1
         self.companion_device = companion_device
