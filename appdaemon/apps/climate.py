@@ -13,7 +13,7 @@ User defined variables are configued in climate.yaml
 # TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
-# from math import ceil
+from math import ceil
 from typing import TYPE_CHECKING
 
 from app import App, Device
@@ -970,19 +970,23 @@ class Fan(ClimateDevice, PresenceDevice):
         )
 
     @property
-    def desired_speed_if_cooling(self) -> float:
-        """"""
-        return 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
-        # return self.speed_per_level * max(
-        #     min(
-        #         self.speed_levels,
-        #         ceil(
-        #             (self.room_temperature - self.target_temperature)
-        #             * self.constants["fan_speed_change_rate"],
-        #         ),
-        #     ),
-        #     1,
-        # )
+    def desired_cooling_speed(self) -> float:
+        """Calculate best fan speed for the current room temperature.
+
+        Formula derived from simultaneously solving the following:
+        apparent_temp = temp_without_fan - fan_cooling_per_speed * fan_speed
+        fan_speed = fan_speed_per_degree_off_target * (apparent_temp - target_temp)
+        """
+        speed = (
+            self.constants["fan_speed_per_degree_off_target"]
+            * (self.room_temperature_without_fan - self.target_temperature)
+            / (
+                1
+                + self.constants["fan_speed_per_degree_off_target"]
+                + self.constants["fan_cooling_per_speed"]
+            )
+        )
+        return speed
 
     @property
     def reverse(self) -> bool:
@@ -1007,11 +1011,17 @@ class Fan(ClimateDevice, PresenceDevice):
         """Get the fan's target temperature."""
         return self.controller.get_setting("cooling_target_temperature")
 
+
+    @property
+    def room_temperature_without_fan(self) -> float:
+        """Calculate what the apparent room temperature would be if the fan was off."""
+        return self.room_temperature + self.cooling_effect
+
     def turn_on_for_conditions(self):
-        """"""
+        """Turn the fan on with appropriate speed and direction for the environment."""
         hot = self.closer_to_hot_than_cold
         self.reverse = not hot
-        self.speed = self.desired_speed_if_cooling if hot else self.minimum_speed
+        self.speed = self.desired_cooling_speed if hot else self.minimum_speed
 
     def adjust_for_conditions(
         self,
@@ -1023,24 +1033,33 @@ class Fan(ClimateDevice, PresenceDevice):
             return None
         speed = 0
         hot = not self.reverse
+        # TODO: if Sleep or Morning and hot, don't turn fan on, only off - is this required, might happen naturally?
+        # TODO: handle if heating target is higher than cooling target
         if (
-            (
-                "Away" not in self.controller.control.scene
-                or self.controller.presence.pets_home_alone
-            )
-            and (self.ignoring_vacancy or not self.vacant)
-            and not self.within_target_temperatures
-        ):
-            hot = self.above_target_temperature
-            if hot:
-                speed = self.desired_speed_if_cooling
+            "Away" not in self.controller.control.scene
+            or self.controller.presence.pets_home_alone
+        ) and (self.ignoring_vacancy or not self.vacant):
+            if not self.within_target_temperatures:
+                hot = self.closer_to_hot_than_cold
+                if hot:
+                    speed = self.desired_cooling_speed
+                elif (
+                    self.companion_device
+                    and self.companion_device.on
+                    and self.controller.control.scene
+                    not in (
+                        "Sleep",
+                        "Morning",
+                    )
+                ):
+                    speed = self.minimum_speed
             elif (
-                self.companion_device
-                and self.companion_device.device.state == "heat"
-                and self.controller.control.scene
-                not in (
-                    "Sleep",
-                    "Morning",
+                self.on
+                and not self.reverse_desired
+                and (
+                    self.room_temperature_without_fan
+                    >= self.controller.get_setting("cooling_target_temperature")
+                    - self.constants["temperature_target_buffer"]
                 )
             ):
                 speed = self.minimum_speed

@@ -4,7 +4,9 @@ Climate:
   inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
   temperature_target_buffer: 1 # difference between actual device target temperature and the temperature which triggers device off
   humidity_target_buffer: 10 # difference between actual device target humidity and the humidity which triggers device off
-  fan_speed_change_rate: 0.5 # speed levels to change per degree away from target temperature
+  fan_speed_per_degree_off_target: 5 # fan speed percent to change per degree away from target temperature
+  fan_cooling_per_speed: 0.07 # degrees reduction in apparent temperature for each percent of fan speed
+  fan_cooling_reduction_factor_when_reverse: 3.333333333 # the factor of which cooling is reduced when a fan is in reverse
   fan_adjustment_delay: 300 # minimum number of seconds delay between seqential fan adjustments (per fan)
   aircon_reduce_fan_delay: 15 # number of seconds before the aircon fan reduces after its closest door opens
   aircon_reduce_fan_temperature_threshold: 2 # minimum temperature off target before fan reduces (when door open)
