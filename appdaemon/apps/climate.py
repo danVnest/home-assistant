@@ -394,9 +394,7 @@ class Climate(App):
     @property
     def above_target_temperature(self) -> bool:
         """Check if temperature is above the target temperature."""
-        return self.inside_temperature > float(
-            self.get_setting("cooling_target_temperature"),
-        )
+        return self.inside_temperature > self.get_setting("cooling_target_temperature")
 
     @property
     def below_target_temperature(self) -> bool:
