@@ -13,6 +13,7 @@ User defined variables are configued in climate.yaml
 # TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
+import logging
 from math import ceil
 from typing import TYPE_CHECKING
 
@@ -954,6 +955,12 @@ class Fan(ClimateDevice, PresenceDevice):
                 )
             self.turn_on(percentage=self.minimum_speed, return_result=True)
             self.reverse = self.reverse_desired
+            # TODO: try the above, if it doesn't work then try wait between each command
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Changing '{self.room}' fan speed from {self.speed}% to {new_speed}%",
+                level="DEBUG",
+            )
         if self.on:
             self.call_service("set_percentage", percentage=new_speed)
         else:
@@ -986,7 +993,27 @@ class Fan(ClimateDevice, PresenceDevice):
                 + self.constants["fan_cooling_per_speed"]
             )
         )
+        if self.controller.logger.isEnabledFor(
+            logging.DEBUG,
+        ):
+            validated_speed = self.validate_speed(speed)
+            temperature_change = self.cooling_effect_for_speed(
+                self.speed,
+                self.reverse,
+            ) - self.cooling_effect_for_speed(
+                validated_speed,
+                reverse=False,
+            )
+            self.controller.log(
+                f"Desired cooling speed in the '{self.room}' is {speed:.1f}% ("
+                f"actual will be {validated_speed:.0f}%, current is {self.speed:.0f}%) "
+                f"which will change the apparent temperature by "
+                f"{temperature_change:.1f}C to "
+                f"{self.room_temperature + temperature_change:.1f}C",
+                level="DEBUG",
+            )
         return speed
+        # return 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
 
     @property
     def reverse(self) -> bool:
@@ -1011,6 +1038,28 @@ class Fan(ClimateDevice, PresenceDevice):
         """Get the fan's target temperature."""
         return self.controller.get_setting("cooling_target_temperature")
 
+    @property
+    def cooling_effect(self) -> float:
+        """The reduction in apparent temperature caused by the fan's current speed."""
+        return self.cooling_effect_for_speed(self.speed)
+
+    def cooling_effect_for_speed(
+        self,
+        speed: float,
+        reverse: bool | None = None,
+    ) -> float:
+        """Calculate the reduction in apparent temperature caused by a given speed."""
+        if reverse is None:
+            reverse = self.reverse
+        return (
+            self.constants["fan_cooling_per_speed"]
+            * speed
+            / (
+                self.constants["fan_cooling_reduction_factor_when_reverse"]
+                if reverse
+                else 1
+            )
+        )
 
     @property
     def room_temperature_without_fan(self) -> float:
@@ -1053,6 +1102,18 @@ class Fan(ClimateDevice, PresenceDevice):
                     )
                 ):
                     speed = self.minimum_speed
+                    if self.controller.logger.isEnabledFor(logging.DEBUG):
+                        self.controller.log(
+                            f"The '{self.room}' fan will stay on with its companion "
+                            f"device ({self.companion_device.device.friendly_name})",
+                            level="DEBUG",
+                        )
+                elif self.controller.logger.isEnabledFor(logging.DEBUG) and self.on:
+                    self.controller.log(
+                        f"The '{self.room}' fan will turn off as the room is cold and "
+                        "won't help with heating or may disturb sleep",
+                        level="DEBUG",
+                    )
             elif (
                 self.on
                 and not self.reverse_desired
@@ -1063,6 +1124,14 @@ class Fan(ClimateDevice, PresenceDevice):
                 )
             ):
                 speed = self.minimum_speed
+                if self.controller.logger.isEnabledFor(logging.DEBUG):
+                    self.controller.log(
+                        f"'{self.room}' fan will maintain minimum speed as turning it "
+                        f"off will raise the apparent temperature by "
+                        f"{self.cooling_effect:.1f}C to "
+                        f"{self.room_temperature_without_fan:.1f}C",
+                        level="DEBUG",
+                    )
         if check_if_would_adjust_only:
             return self.reverse == hot or self.speed != speed
         self.reverse = not hot

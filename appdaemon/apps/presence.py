@@ -8,6 +8,7 @@ User defined variables are configued in presence.yaml
 
 from __future__ import annotations
 
+import logging
 import uuid
 from datetime import timedelta
 
@@ -236,11 +237,12 @@ class Room:
         self.callbacks = {}
         self.controller.listen_state(self.handle_presence_change, sensor_id)
         presence_message = "vacated" if vacant else "entered"
-        self.controller.log(
-            f"Room '{room_id}' initialised as last '{presence_message}' at "
-            f"{self.last_vacated if vacant else self.last_entered}",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Room '{room_id}' initialised as last '{presence_message}' at "
+                f"{self.last_vacated if vacant else self.last_entered}",
+                level="DEBUG",
+            )
 
     def is_vacant(self, vacating_delay: float = 0) -> bool:
         """Check if vacant based on last time vacated/entered, with optional delay."""
@@ -327,10 +329,11 @@ class Room:
                 level="DEBUG",
             )
             return
-        self.controller.log(
-            f"The '{self.room_id}' is now '{'vacant' if vacant else 'occupied'}'",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"The '{self.room_id}' is now '{'vacant' if vacant else 'occupied'}'",
+                level="DEBUG",
+            )
         for handle, callback in list(self.callbacks.items()):
             self.controller.cancel_timer(callback["timer_handle"])
             if not vacant or callback["vacating_delay"] == 0:
@@ -511,12 +514,13 @@ class PresenceDevice(Device):
             constrain_input_boolean=self.control_input_boolean,
             **kwargs,
         )
-        self.controller.log(
-            "Starting transition from entered state to occupied state with: "
-            f"step_time = {step_time}, steps_remaining = {steps_remaining}, "
-            f"settings = {kwargs}",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                "Starting transition from entered state to occupied state with: "
+                f"step_time = {step_time}, steps_remaining = {steps_remaining}, "
+                f"settings = {kwargs}",
+                level="DEBUG",
+            )
 
     def transition_towards_occupied(self, **kwargs: dict):
         """Scheduling for child to step towards occupied device settings."""
@@ -531,11 +535,12 @@ class PresenceDevice(Device):
             self.transition_timer = None
             self.adjust_for_conditions()
         else:
-            self.controller.log(
-                f"{kwargs['steps_remaining']} steps until '{self.device_id}' "
-                "transition to occupied state is complete",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"{kwargs['steps_remaining']} steps until '{self.device_id}' "
+                    "transition to occupied state is complete",
+                    level="DEBUG",
+                )
             self.controller.run_in(
                 self.transition_towards_occupied,
                 kwargs["step_time"],

@@ -9,6 +9,7 @@ User defined variables are configued in lights.yaml
 from __future__ import annotations
 
 import datetime
+import logging
 
 from app import App
 from presence import PresenceDevice
@@ -710,11 +711,12 @@ class Light(PresenceDevice):
         if self.brightness == value:
             return
         if value != 0:
-            self.controller.log(
-                f"Setting '{self.device_id}' brightness to {value} "
-                f"(from {self.brightness})",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"Setting '{self.device_id}' brightness to {value} "
+                    f"(from {self.brightness})",
+                    level="DEBUG",
+                )
             self.turn_on(brightness=value)
         else:
             self.turn_off()
@@ -747,10 +749,11 @@ class Light(PresenceDevice):
         value = self.validate_kelvin(value)
         if value is None or value == self.kelvin:
             return
-        self.controller.log(
-            f"Setting {self.device_id}'s kelvin to {value} (from {self.kelvin})",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Setting {self.device_id}'s kelvin to {value} (from {self.kelvin})",
+                level="DEBUG",
+            )
         self.turn_on(kelvin=value)
 
     def validate_kelvin(self, value: int) -> int | None:
@@ -778,12 +781,13 @@ class Light(PresenceDevice):
             self.turn_off()
         else:
             kelvin = self.validate_kelvin(kelvin)
-            self.controller.log(
-                f"Adjusting '{self.device_id}' to "
-                f"brightness {brightness} and kelvin {kelvin} "
-                f"(from {self.brightness} and {self.kelvin})",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"Adjusting '{self.device_id}' to "
+                    f"brightness {brightness} and kelvin {kelvin} "
+                    f"(from {self.brightness} and {self.kelvin})",
+                    level="DEBUG",
+                )
             if kelvin is None or kelvin == self.kelvin:
                 self.brightness = brightness
             elif brightness == self.brightness:
@@ -806,11 +810,12 @@ class Light(PresenceDevice):
         """Turn light off and record previous kelvin level."""
         if self.control_enabled and self.brightness != 0:
             self.kelvin_before_off = self.kelvin
-            self.controller.log(
-                f"Turning '{self.device_id}' off (previously at"
-                f" {self.brightness} brightness and {self.kelvin} kelvin)",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"Turning '{self.device_id}' off (previously at"
+                    f" {self.brightness} brightness and {self.kelvin} kelvin)",
+                    level="DEBUG",
+                )
             super().turn_off()
 
     def set_presence_adjustments(
@@ -852,11 +857,12 @@ class Light(PresenceDevice):
             )
         self.vacating_delay = vacating_delay
         self.monitor_presence()
-        self.controller.log(
-            f"Configured '{self.device_id}' with presence '{presence}' and "
-            f"presence adjustments: {self.presence_adjustments}",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Configured '{self.device_id}' with presence '{presence}' and "
+                f"presence adjustments: {self.presence_adjustments}",
+                level="DEBUG",
+            )
 
     @property
     def on_when_vacant(self) -> bool:
