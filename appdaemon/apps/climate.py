@@ -188,40 +188,33 @@ class Climate(App):
         for humidifier in self.humidifiers.values():
             humidifier.vacating_delay = seconds
 
-    def transition_between_scenes(self, new_scene: str, old_scene: str):
+    def transition_to_scene(self, scene: str):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
-        if "Away" in new_scene:
+        if "Away" in scene:
+            device_groups_to_turn_off = [self.heaters, self.humidifiers]
             if not self.presence.pets_home_alone:
-                for device_group in (self.aircons, self.fans):
-                    for device in device_group.values():
-                        device.turn_off()
-            for device_group in (self.heaters, self.humidifiers):
+                device_groups_to_turn_off.extend([self.aircons, self.fans])
+            for device_group in device_groups_to_turn_off:
                 for device in device_group.values():
                     device.turn_off()
-        if new_scene == "Sleep":
+        if scene == "Sleep":
             self.end_pre_condition_for_sleep()
-        elif new_scene == "Morning":
+        elif scene == "Morning":
             self.heaters["nursery"].monitor_presence()
             self.humidifiers["nursery"].monitor_presence()
             # TODO: remove when nursery presence is reliable
             self.aircons["dining_room"].monitor_presence()
             # TODO: remove dining room once presence detects dogs properly?
         self.aircons["bedroom"].preferred_fan_mode = (
-            "low" if new_scene in ("Sleep", "Morning") else "auto"
+            "low" if scene in ("Sleep", "Morning") else "auto"
         )
         for humidifier in self.humidifiers.values():
             humidifier.already_notified_of_empty_water_tank = False
         if self.any_climate_control_enabled:
             self.adjust_for_conditions()
-        elif any(
-            (
-                new_scene == "Day" and old_scene in ["Sleep", "Morning"],
-                new_scene == "Night" and old_scene == "Day",
-                "Away" not in new_scene and "Away" in old_scene,
-                self.presence.pets_home_alone,
-            ),
-        ):  # TODO: consider simplifying and removing old_scene?
-            self.suggest_if_extreme_forecast()
+        if scene in ("Day", "Sleep") or self.presence.pets_home_alone:
+            self.suggest_if_extreme_forecast_and_control_disabled()
+        self.allow_suggestion()
 
     def adjust_for_conditions(self):
         """Control aircon or suggest based on changes in inside temperature."""
@@ -286,19 +279,31 @@ class Climate(App):
         # self.heaters["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
         # self.humidifiers["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
 
-    def suggest_if_extreme_forecast(self):
-        """Suggest user enables control if extreme temperatures are forecast."""
-        self.allow_suggestion()
-        forecast = self.get_state("sensor.extreme_forecast")
-        if forecast:
+    def suggest_if_extreme_forecast_and_control_disabled(self):
+        """Suggest user enables more control if extreme temperatures are forecast."""
+        extreme_forecast = self.get_state("sensor.extreme_forecast")
+        if extreme_forecast and any(
+            not device.control_enabled
+            for device_group in (
+                [self.aircons, self.fans]
+                if float(extreme_forecast)
+                >= self.get_setting("high_temperature_aircon_trigger")
+                else [self.aircons, self.heaters]
+            )
+            for device in device_group.values()
+            if self.control.scene != "Sleep"
+            or device.room not in ("living_room", "office")
+        ):
             self.suggest(
-                f"It's forecast to reach {float(forecast):.1f}º, "
-                "consider enabling climate control",
+                f"It's forecast to reach {float(extreme_forecast):.1f}º, "
+                "consider enabling additional climate control",
+                force=True,
             )
 
-    def suggest(self, message: str):
+    def suggest(self, message: str, force: bool = False):
         """Make a suggestion to the users, but only if one has not already been sent."""
-        if not self.suggested:
+        self.suggested = False  # TODO: if this doesn't spam notifications, remove suggestion mechanism and just notify
+        if force or not self.suggested:
             self.suggested = True
             self.notify(
                 message,

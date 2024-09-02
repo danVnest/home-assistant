@@ -28,7 +28,6 @@ class Control(App):
             "init_delay": None,
         }
         self.is_all_initialised = False
-        self.__scene = None
         self.pre_sleep_scene = False
 
     def initialize(self):
@@ -40,7 +39,6 @@ class Control(App):
         self.listen_log(self.handle_log)
         if self.entities.input_boolean.development_mode.state == "off":
             self.set_production_mode()
-        self.__scene = self.entities.input_select.scene.state
         self.call_service("counter/reset", entity_id="counter.warnings")
         self.call_service("counter/reset", entity_id="counter.errors")
         for setting in [
@@ -140,20 +138,15 @@ class Control(App):
 
     @property
     def scene(self) -> str:
-        """Access scene setting (all apps) from here rather than Home Assistant."""
-        return self.__scene
+        """Get scene from Home Assistant."""
+        return self.get_state("input_select.scene")
 
     @scene.setter
     def scene(self, new_scene: str):
         """Propagate scene change to other apps and sync scene with Home Assistant."""
-        # TODO: this should check if new_scene is different to old scene
-        # TODO: figure out where scene needs to be reset and why (current reason this isn't checked)
-        old_scene = self.__scene
-        self.__scene = new_scene
-        # TODO: if old_scene is no longer required, remove __scene and just get from entity directly (in app.py)
-        self.log(f"Setting scene to '{new_scene}' (transitioning from '{old_scene}')")
+        self.log(f"Setting scene to '{new_scene}' (was previously '{self.scene}')")
         self.lights.transition_to_scene(new_scene)
-        self.climate.transition_between_scenes(new_scene, old_scene)
+        self.climate.transition_to_scene(new_scene)
         if new_scene == "Sleep" or "Away" in new_scene:
             self.presence.lock_door()
             self.turn_on("switch.entryway_camera_enabled")
