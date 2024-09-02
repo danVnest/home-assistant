@@ -982,7 +982,6 @@ class Fan(ClimateDevice, PresenceDevice):
         hot = self.closer_to_hot_than_cold
         self.reverse = not hot
         self.speed = self.desired_speed_if_cooling if hot else self.minimum_speed
-        return True
 
     def adjust_for_conditions(
         self,
