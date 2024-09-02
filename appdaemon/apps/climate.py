@@ -927,8 +927,8 @@ class Fan(ClimateDevice, PresenceDevice):
 
     @property
     def speed(self) -> float:
-        """Get the fan's speed if it was on (100 is full speed)."""
-        return self.get_attribute("percentage")
+        """Get the fan's speed (0 is off, 100 is full speed)."""
+        return self.get_attribute("percentage") if self.on else 0
 
     @speed.setter
     def speed(self, new_speed: int):
