@@ -891,7 +891,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Suggest opening up the house if outside is nicer."""
         if self.outside_temperature_nicer and self.controller.presence.anyone_home:
             self.controller.suggest(
-                f"Outside ({self.room_temperature}º) "
+                f"Outside ({self.controller.outside_temperature}º) "
                 f"is a more pleasant temperature than the {self.room} "
                 f"({self.room_temperature}º), consider opening up the house",
             )
