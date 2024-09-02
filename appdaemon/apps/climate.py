@@ -924,6 +924,7 @@ class Fan(ClimateDevice, PresenceDevice):
         self.speed_per_level = round(self.get_attribute("percentage_step"))
         self.speed_levels = round(100 / self.speed_per_level)
         self.minimum_speed = self.speed_per_level * 1
+        self.reverse_desired = self.reverse
         self.companion_device = companion_device
         self.vacating_delay = 60 * float(
             controller.entities.input_number.fan_vacating_delay.state,
@@ -936,17 +937,37 @@ class Fan(ClimateDevice, PresenceDevice):
         return self.get_attribute("percentage") if self.on else 0
 
     @speed.setter
-    def speed(self, new_speed: int):
-        """Set the fan's speed (0 is off, 100 is full speed)?"""
-        if self.speed == new_speed or (new_speed == 0 and not self.on):
+    def speed(self, new_speed: float):
+        """Set the fan's speed (0 is off, 100 is full speed)."""
+        if new_speed <= 0:
+            self.turn_off()
             return
+        new_speed = self.validate_speed(new_speed)
+        if self.speed == new_speed:
+            return
+        if self.reverse_desired != self.reverse:
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"Changing '{self.room}' fan's spin direction to "
+                    f"'{self.get_attribute('direction')}'",
+                    level="DEBUG",
+                )
+            self.turn_on(percentage=self.minimum_speed, return_result=True)
+            self.reverse = self.reverse_desired
         if self.on:
-            if new_speed == 0:
-                self.turn_off()
-            else:
-                self.call_service("set_percentage", percentage=new_speed)
+            self.call_service("set_percentage", percentage=new_speed)
         else:
             self.turn_on(percentage=new_speed)
+
+    def validate_speed(self, speed: float) -> float:
+        """Round speed up to nearest level and ensure it's between min/max values."""
+        return max(
+            self.minimum_speed,
+            min(
+                100,
+                ceil(speed / self.speed_per_level) * self.speed_per_level,
+            ),
+        )
 
     @property
     def desired_speed_if_cooling(self) -> float:
@@ -971,11 +992,15 @@ class Fan(ClimateDevice, PresenceDevice):
     @reverse.setter
     def reverse(self, new_reverse: bool):
         """Set the fan's spin direction (forward or reverse)."""
-        if self.reverse != new_reverse:
+        self.reverse_desired = new_reverse
+        if self.on and self.reverse != new_reverse:
+            # TODO: because reversing takes time, we may need to pause all logic while this happens
             self.call_service(
                 "set_direction",
                 direction="reverse" if new_reverse else "forward",
+                return_result=True,
             )
+            # TODO: double check if return_result helps at all here
 
     @property
     def target_temperature(self) -> float:
