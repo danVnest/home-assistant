@@ -979,7 +979,7 @@ class Fan(ClimateDevice, PresenceDevice):
 
     def turn_on_for_conditions(self):
         """"""
-        hot = not self.below_target_temperature
+        hot = self.closer_to_hot_than_cold
         self.reverse = not hot
         self.speed = self.desired_speed_if_cooling if hot else self.minimum_speed
         return True
