@@ -9,6 +9,7 @@ environmental changes.
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import appdaemon.plugins.hass.hassapi as hass
@@ -23,8 +24,28 @@ if TYPE_CHECKING:
 
     from appdaemon.apps.appdaemon.entity import Entity
 
-SYSTEM_ID = "57bea01aa68f44eb94ac2031ecb5b7ba"
-RACHEL_ID = "9a17567"
+
+class IDs:
+    """System and user IDs defined by Home Assistant when referencing state context."""
+
+    _named_ids = MappingProxyType(
+        {
+            None: "System",
+            "57bea01aa68f44eb94ac2031ecb5b7ba": "System",
+            "15ff7a86d4ae4d38a60003ad4064ff78": "Dan",
+            "9a175674be354863afb9634adc4b8980": "Rachel",
+        },
+    )
+
+    @classmethod
+    def get_name(cls, id_value):
+        """Get the user (or system) name for a given ID."""
+        return cls._named_ids.get(id_value, "Unknown")
+
+    @classmethod
+    def is_system(cls, id_value):
+        """Check if an ID refers to the system rather than a user."""
+        return cls.get_name(id_value) == "System"
 
 
 class App(hass.Hass):
@@ -156,7 +177,7 @@ class Device:
                 self.__handle_user_adjustment,
                 entity_id=device,
                 attribute="context",
-                new=lambda new: new["user_id"] not in (None, SYSTEM_ID),
+                new=lambda new: not IDs.is_system(new["user_id"]),
             )
         self.controller.listen_state(
             self.__handle_control_enabled,
@@ -254,7 +275,7 @@ class Device:
     ):
         """"""
         del attribute, old, kwargs
-        user = "Rachel" if new["user_id"].startswith(RACHEL_ID) else "Dan"
+        user = IDs.get_name(new["user_id"])
         self.controller.log(
             f"'{user}' changed {entity} from UI: "
             f"{self.controller.get_state(entity,'all')}",

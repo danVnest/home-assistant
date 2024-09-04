@@ -8,7 +8,7 @@ User defined variables are configued in control.yaml
 import datetime
 import urllib.request
 
-from app import App
+from app import App, IDs
 
 
 class Control(App):
@@ -338,15 +338,20 @@ class Control(App):
     ):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
-        # TODO: use same logic in Device to listen to context and detect user input
         setting = entity.split(".")[1]
-        self.log(f"UI setting '{setting}' changed to '{new}' from '{old}'")
+        user_id = self.get_state(entity, attribute="context")["user_id"]
+        is_user = not IDs.is_system(user_id)
+        self.log(
+            f"'{IDs.get_name(user_id)}' changed UI setting '{setting}' "
+            f"to '{new}' from '{old}'",
+            level="DEBUG" if not is_user else "INFO",
+        )
+        if not is_user:
+            return
         if setting == "scene":
-            if new != self.scene:
-                self.scene = new
+            self.scene = new
         elif setting == "pets_home_alone":
             if (new == "on") != self.presence.pets_home_alone:
-                self.log(f"UI setting '{setting}' changed to '{new}'")
                 self.presence.pets_home_alone = new == "on"
         else:
             self.handle_simple_settings_change(setting, new, old)
