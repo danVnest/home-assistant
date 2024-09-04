@@ -158,14 +158,12 @@ class Device:
     ):
         """Initialise with device parameters and prepare for presence adjustments."""
         self.device_id = device_id
-        self.device_type = device_id.split(".")[0]
+        self.device_type, device_name = controller.split_entity(device_id)
         self.device: Entity = controller.get_entity(device_id)
         self.controller = controller
         self.constants = controller.constants
         self.control_input_boolean = (
-            "input_boolean.control_"
-            + device_id.split(".")[1]
-            + control_input_boolean_suffix
+            "input_boolean.control_" + device_name + control_input_boolean_suffix
         )
         self.room = room
         self.linked_rooms = linked_rooms

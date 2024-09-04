@@ -338,7 +338,7 @@ class Control(App):
     ):
         """Act on setting changes made by the user through the UI."""
         del attribute, kwargs
-        setting = entity.split(".")[1]
+        _, setting = self.split_entity(entity)
         user_id = self.get_state(entity, attribute="context")["user_id"]
         is_user = not IDs.is_system(user_id)
         self.log(
