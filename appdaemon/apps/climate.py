@@ -1081,7 +1081,7 @@ class Fan(ClimateDevice, PresenceDevice):
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
         speed = 0
-        hot = not self.reverse
+        reverse = self.reverse
         # TODO: if Sleep or Morning and hot, don't turn fan on, only off - is this required, might happen naturally?
         # TODO: handle if heating target is higher than cooling target
         if (
@@ -1089,9 +1089,9 @@ class Fan(ClimateDevice, PresenceDevice):
             or self.controller.presence.pets_home_alone
         ) and (self.ignoring_vacancy or not self.vacant):
             if not self.within_target_temperatures:
-                hot = self.closer_to_hot_than_cold
-                if hot:
+                if self.closer_to_hot_than_cold:
                     speed = self.desired_cooling_speed
+                    reverse = False
                 elif (
                     self.companion_device
                     and self.companion_device.on
@@ -1102,6 +1102,7 @@ class Fan(ClimateDevice, PresenceDevice):
                     )
                 ):
                     speed = self.minimum_speed
+                    reverse = True
                     if self.controller.logger.isEnabledFor(logging.DEBUG):
                         self.controller.log(
                             f"The '{self.room}' fan will stay on with its companion "
@@ -1124,6 +1125,7 @@ class Fan(ClimateDevice, PresenceDevice):
                 )
             ):
                 speed = self.minimum_speed
+                reverse = False
                 if self.controller.logger.isEnabledFor(logging.DEBUG):
                     self.controller.log(
                         f"'{self.room}' fan will maintain minimum speed as turning it "
@@ -1133,8 +1135,8 @@ class Fan(ClimateDevice, PresenceDevice):
                         level="DEBUG",
                     )
         if check_if_would_adjust_only:
-            return self.reverse == hot or self.speed != speed
-        self.reverse = not hot
+            return self.reverse != reverse or self.speed != speed
+        self.reverse = reverse
         self.speed = speed
         return None
 
