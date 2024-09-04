@@ -18,7 +18,7 @@
 {%- endmacro -%}
 
 {%- macro aircon_airspeed(room) -%}
-    {%- set entity_id = 'climate.' + room -%}
+    {%- set entity_id = 'climate.' + room + '_aircon' -%}
     {%- if states(entity_id) not in ("off", "heat") -%}
         {%- set max_airspeed = 5 -%}
         {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
