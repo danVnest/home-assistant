@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "minor_version": 7,
+  "key": "core.area_registry",
+  "data": {
+    "areas": [
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:sofa",
+        "id": "ced5752a0ed847f2b792380a2049c4bf",
+        "labels": [],
+        "name": "Living Room",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:countertop",
+        "id": "424c9ac24a6f472992c60f52359dcb9c",
+        "labels": [],
+        "name": "Kitchen",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:bed",
+        "id": "f94bde2384f34ecbb1804a5ecbc81f75",
+        "labels": [],
+        "name": "Bedroom",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "downstairs",
+        "icon": "mdi:door",
+        "id": "698c6a1f29a84a80878e183c6b271939",
+        "labels": [],
+        "name": "Entryway",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:desktop-classic",
+        "id": "0a1369653eec4142a3c11c3c61d315db",
+        "labels": [],
+        "name": "Office",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": null,
+        "icon": "mdi:grass",
+        "id": "yard",
+        "labels": [],
+        "name": "Yard",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "downstairs",
+        "icon": "mdi:washing-machine",
+        "id": "downstairs",
+        "labels": [],
+        "name": "Downstairs",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:table-chair",
+        "id": "dining_room",
+        "labels": [],
+        "name": "Dining Room",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "downstairs",
+        "icon": "mdi:garage",
+        "id": "garage",
+        "labels": [],
+        "name": "Garage",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:cradle",
+        "id": "nursery",
+        "labels": [],
+        "name": "Nursery",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:shower-head",
+        "id": "bathroom",
+        "labels": [],
+        "name": "Bathroom",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      },
+      {
+        "aliases": [],
+        "floor_id": "upstairs",
+        "icon": "mdi:door-closed",
+        "id": "hall",
+        "labels": [],
+        "name": "Hall",
+        "picture": null,
+        "created_at": "1970-01-01T00:00:00+00:00",
+        "modified_at": "1970-01-01T00:00:00+00:00"
+      }
+    ]
+  }
+}

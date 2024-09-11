@@ -54,6 +54,6 @@ This home automation system is comprised of the following devices:
 
 The following are elements of this repository which are included for reference:
 
-- The Home Assistant dashboard is configured from the UI, but [ui-lovelace.yaml](ui/ui-lovelace.yaml) contains a copy of the code from the raw configuration editor.
-- Manifest files from custom components, as managed by [HACS](https://hacs.xyz).
-- [.gitignore](.gitignore) details what Home Assistant files aren't included in the repository.
+- Various entities, integrations, and core configurations are now implemented through the Home Assistant UI, so some elements of [.storage](.storage) have been included.
+- Manifest files from [custom components](custom_components), as managed by [HACS](https://hacs.xyz).
+- [.gitignore](.gitignore) details what Home Assistant files aren't included in this repository.

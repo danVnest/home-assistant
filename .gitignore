@@ -4,6 +4,15 @@
 ip_bans.yaml
 secrets.yaml
 
+# System configuration (keeping edits made through GUI)
+.storage/*
+!.storage/core.area_registry
+!.storage/core.device_registry
+!.storage/core.entity_registry
+!.storage/core.floor_registry
+!.storage/energy
+!.storage/lovelace
+
 # Custom components (keeping manifests and customisations)
 custom_components/*/*
 !custom_components/*/manifest.json
@@ -19,7 +28,6 @@ appdaemon/logs
 *.db-shm
 *.db-wal
 .ruff_cache
-.storage
 __pycache__
 appdaemon/compiled
 appdaemon/namespaces
