@@ -2,16 +2,30 @@
   state: "{{ 0 }}"
   unit_of_measurement: "m/s"
   state_class: measurement
-- name: Bedroom airspeed
+- name: Bedroom aircon airspeed
   state: >
-    {% from 'custom_templates.jinja' import fan_airspeed, aircon_airspeed %}
-    {{ fan_airspeed('bedroom') + aircon_airspeed('bedroom') }}
+    {% from 'custom_templates.jinja' import aircon_airspeed %}
+    {{ aircon_airspeed('bedroom') }}
   unit_of_measurement: "m/s"
   state_class: measurement
-- name: Dining room airspeed
+- name: Bedroom fan airspeed
+  state: >
+    {% from 'custom_templates.jinja' import fan_airspeed  %}
+    {{ fan_airspeed('bedroom') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Bedroom airspeed
+  state: "{{ states('sensor.bedroom_fan_airspeed') | float + states('sensor.bedroom_aircon_airspeed') | float}}"
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Dining room aircon airspeed
   state: >
     {% from 'custom_templates.jinja' import aircon_airspeed %}
     {{ aircon_airspeed('dining_room') }}
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Dining room airspeed
+  state: "{{ states('sensor.dining_room_aircon_airspeed') }}"
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Dog bed area airspeed
@@ -23,15 +37,17 @@
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Kitchen airspeed
+  state: "{{ states('sensor.living_room_aircon_airspeed') }}"
+  unit_of_measurement: "m/s"
+  state_class: measurement
+- name: Living room aircon airspeed
   state: >
     {% from 'custom_templates.jinja' import aircon_airspeed %}
     {{ aircon_airspeed('living_room') }}
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Living room airspeed
-  state: >
-    {% from 'custom_templates.jinja' import aircon_airspeed %}
-    {{ float(aircon_airspeed('living_room')) / 3 }}
+  state: "{{ states('sensor.living_room_aircon_airspeed') | float / 3}}"
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Nursery airspeed
