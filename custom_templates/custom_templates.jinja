@@ -19,8 +19,9 @@
 
 {%- macro aircon_airspeed(room) -%}
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
-    {%- if states(entity_id) not in ("off", "heat") -%}
+    {%- if states(entity_id) != "off" -%}
         {%- set max_airspeed = 5 -%}
+        {%- set max_fan_temp_diff = 7 -%}
         {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
         {%- if fan_strength == 'quiet' -%}
             {%- set fan_strength = 0.1 -%}
@@ -36,10 +37,53 @@
             {%- set fan_strength = 1 -%}
         {%- elif fan_strength == 'auto' -%}
             {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
-            {%- set fan_strength = max(0.1, min(1, temperature_difference / 5)) -%}
+            {%- set temperature_difference = temperature_difference if states(entity_id) == "heat" else -temperature_difference -%}
+            {%- set fan_strength = max(0.1, min(1, temperature_difference / max_fan_temp_diff)) -%}
         {%- endif -%}
         {{- max_airspeed * fan_strength -}}
     {%- else -%}
         {{- 0 -}}
     {%- endif -%}
 {%- endmacro -%}
+
+# {%- macro fan_power(room) -%}
+#     {%- set entity_id = 'fan.' + room -%}
+#     {%- if states(entity_id) != "off" -%}
+#         {%- set percent_per_fan_level = 11 -%}
+#         {{- 0.45 + 2.93 * state_attr(entity_id, 'percentage') / percent_per_fan_level -}}
+#     {%- else -%}
+#         {{- 0 -}}
+#     {%- endif -%}
+# {%- endmacro -%}
+
+{%- macro aircon_power(room) -%}
+    {%- set entity_id = 'climate.' + room + '_aircon' -%}
+    {%- set max_power_temp_diff = 7 -%}
+    {%- set max_airspeed = 5 -%}
+    {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
+    {%- set temperature_difference = temperature_difference if states(entity_id) == "heat" else -temperature_difference -%}
+    {%- set compressor_power = 200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff)) -%}
+    {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed') | float / max_airspeed -%}
+    {{- compressor_power + fan_power -}}
+{%- endmacro -%}
+
+# {%- macro humidifier_power(room) -%}
+#     {%- set entity_id = 'humidifier.' + room -%}
+#     {%- if states(entity_id) != "off" -%}
+#         {%- set max_power_humidity_diff = 30 -%}
+#         {%- set power_levels = 3 -%}
+#         {%- set humidity_difference = state_attr(entity_id, 'humidity') - state_attr(entity_id, 'current_humidity') -%}
+#         {{- 15.1 + 11.5 * max(0, min(1, (humidity_difference / max_power_humidity_diff * power_levels) | round(0,'floor') / 3)) -}}
+#     {%- else -%}
+#         {{- 0 -}}
+#     {%- endif -%}
+# {%- endmacro -%}
+
+# {%- macro light_power(light_id, max_power) -%}
+#     {%- set entity_id = 'light.' + light_id -%}
+#     {%- if states(entity_id) != "off" -%}
+#         {{- max_power * state_attr(entity_id, 'brightness') / 100 -}}
+#     {%- else -%}
+#         {{- 0 -}}
+#     {%- endif -%}
+# {%- endmacro -%}

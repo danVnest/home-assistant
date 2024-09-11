@@ -1,0 +1,161 @@
+- name: Energy cost per kWh
+  state: >
+    {%- set green_cost = states('input_number.energy_cost_green_power') | float -%}
+    {%- if states('sensor.monthly_energy_from_grid') | float < 100 -%}
+      {{- states('input_number.energy_cost_first_100kwh_of_month') | float + green_cost -}}
+    {%- else -%}
+      {{- states('input_number.energy_cost_after_first_100kwh_of_month') | float + green_cost -}}
+    {%- endif -%}
+  unit_of_measurement: "$/kWh"
+  state_class: measurement
+- name: Energy cost per Wh
+  state: "{{ states('sensor.energy_cost_per_kwh') | float / 1000 }}"
+  unit_of_measurement: "$/Wh"
+  state_class: measurement
+- name: Dan's phone charger power
+  state: >
+    {%- set current_level = states('sensor.dan_s_phone_battery_level') | float -%}
+    {%- set last_level = state_attr('sensor.dan_s_phone_charger_power', 'last_battery_level') | default(current_level) | float -%}
+    {%- set last_updated = state_attr('sensor.dan_s_phone_charger_power', 'last_updated') | default(as_timestamp(now())) | float -%}
+    {%- set time_diff = (as_timestamp(now()) - last_updated) / 3600 -%}
+    {%- if time_diff > 0 and current_level > last_level -%}
+      {%- set battery_change = current_level - last_level -%}
+      {%- set battery_capacity_wh = 16.7 -%}
+      {%- set energy_added_wh = (battery_change / 100) * battery_capacity_wh -%}
+      {{- (energy_added_wh / time_diff) | round(2) -}}
+    {%- else -%}
+      0
+    {%- endif -%}
+  unit_of_measurement: "W"
+  attributes:
+    last_battery_level: "{{ states('sensor.dan_s_phone_battery_level') | float }}"
+    last_updated: "{{ as_timestamp(now()) }}"
+  availability: >
+    {{ states('sensor.dan_s_phone_battery_level') not in ['unknown', 'unavailable'] }}
+
+# - name: Living room aircon power
+#   state: >
+#     {% from 'custom_templates.jinja' import aircon_power %}
+#     {{ aircon_power('living_room') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Dining room aircon power
+#   state: >
+#     {% from 'custom_templates.jinja' import aircon_power %}
+#     {{ aircon_power('dining_room') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Bedroom aircon power
+#   state: >
+#     {% from 'custom_templates.jinja' import aircon_power %}
+#     {{ aircon_power('bedroom') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Bedroom fan power
+#   state: >
+#     {% from 'custom_templates.jinja' import fan_power %}
+#     {{ fan_power('bedroom') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Office fan power
+#   state: >
+#     {% from 'custom_templates.jinja' import fan_power %}
+#     {{ fan_power('office') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Nursery fan power
+#   state: >
+#     {% from 'custom_templates.jinja' import fan_power %}
+#     {{ fan_power('nursery') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Bedroom humidifier power
+#   state: >
+#     {% from 'custom_templates.jinja' import humidifier_power %}
+#     {{ humidifier_power('bedroom') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Nursery humidifier power
+#   state: >
+#     {% from 'custom_templates.jinja' import humidifier_power %}
+#     {{ humidifier_power('nursery') }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Entryway lights power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ light_power('entryway', 7 + 4.9) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Kitchen light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ light_power('kitchen', 7) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Kitchen strip light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ light_power('kitchen_strip', 20) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: TV lights power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ 3 * light_power('tv_middle', 7) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Dining room lights power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ 2 * light_power('dining_room_left', 7) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Hall light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ light_power('hall', 7) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Bathroom light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ light_power('bathroom', 7) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Bedroom light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ fan_light_power('bedroom', 18) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Office light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ fan_light_power('office', 18) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement
+# - name: Nursery light power
+#   state: >
+#     {% from 'custom_templates.jinja' import light_power %}
+#     {{ fan_light_power('nursery', 18) }}
+#   device_class: power
+#   unit_of_measurement: "W"
+#   state_class: measurement

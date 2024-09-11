@@ -1,0 +1,4 @@
+energy:
+  name: Monthly energy from grid
+  source: sensor.energy_meter_real_energy_consumed
+  cycle: monthly

@@ -1,0 +1,114 @@
+# - platform: integration
+#   name: Living room aircon energy
+#   source: sensor.living_room_aircon_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Dining room aircon energy
+#   source: sensor.dining_room_aircon_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Bedroom aircon energy
+#   source: sensor.bedroom_aircon_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Nursery heater energy
+#   source: sensor.nursery_heater_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Bedroom fan energy
+#   source: sensor.bedroom_fan_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Office fan energy
+#   source: sensor.office_fan_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Nursery fan energy
+#   source: sensor.nursery_fan_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Bedroom humidifier energy
+#   source: sensor.bedroom_humidifier_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Nursery humidifier energy
+#   source: sensor.nursery_humidifier_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Entryway lights energy
+#   source: sensor.entryway_lights_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Kitchen light energy
+#   source: sensor.kitchen_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Kitchen strip light energy
+#   source: sensor.kitchen_strip_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: TV lights energy
+#   source: sensor.tv_lights_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Dining room lights energy
+#   source: sensor.dining_room_lights_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Hall light energy
+#   source: sensor.hall_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Bathroom light energy
+#   source: sensor.bathroom_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Bedroom light energy
+#   source: sensor.bedroom_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Office light energy
+#   source: sensor.office_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5
+# - platform: integration
+#   name: Nursery light energy
+#   source: sensor.nursery_light_power
+#   unit_prefix: k
+#   max_sub_interval:
+#     minutes: 5

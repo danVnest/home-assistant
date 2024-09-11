@@ -11,13 +11,13 @@ The user interface primarily features configuration parameters, but does also pr
 TODO: <https://app.asana.com/0/1207020279479204/1203851145721580/f>
 TODO: update screenshots once floor plan is added and layout is finalised
 
-![Control & Status](ui/control-status.png "Control & Status")
+![Control & Status](ui-screenshots/control-status.png "Control & Status")
 
-![Instructions](ui/instructions.png "Instructions")
+![Instructions](ui-screenshots/instructions.png "Instructions")
 
-![Settings](ui/settings.png "Settings")
+![Settings](ui-screenshots/settings.png "Settings")
 
-![System](ui/system.png "System")
+![System](ui-screenshots/system.png "System")
 
 ## Devices
 
@@ -39,6 +39,7 @@ This home automation system is comprised of the following devices:
 - [Hunter Pacific Evolve ceiling fans](https://www.hunterpacificinternational.com/smart-wifi-module)
 - [Sensibo Sky aircon controllers](https://sensibo.com/products/sensibo-sky)
 - [Mill smart panel heater](https://millnorway.com/product/mill-invisible-panel-heater-600-watt)
+- [Xiaomi humidifiers](https://www.mi.com/global/product/xiaomi-smart-humidifier-2)
 - [Arlec smart plugs](https://www.bunnings.com.au/arlec-grid-connect-smart-plug-in-socket-with-energy-meter-4-pack_p0273368)
 - [LG C1 TV](https://www.lg.com/au/tvs/lg-oled65c1ptb)
 - [Eufy doorbell](https://myeufy.com.au/eufy-video-doorbell-battery-powered.html)
@@ -48,6 +49,7 @@ This home automation system is comprised of the following devices:
 - [Owlet Smart Sock](https://owletcare.com.au/products/owlet-smart-sock)
 - [Samsung Smart Washer](https://www.samsung.com/au/washers-and-dryers/washing-machines/8kg-smart-ai-front-load-washer-ww85t554daw-ww85t554daw-sa)
 - [Samsung Smart Dryer](https://www.samsung.com/au/washers-and-dryers/dryers/8kg-smart-ai-heat-pump-dryer-dv80t5420aw-dv80t5420aw-sa)
+- [Fronius solar system](https://www.fronius.com/en-au/australia/solar-energy/installers-partners/technical-data/all-products/inverters/fronius-primo-gen24/fronius-primo-gen24-6-0)
 - [Android](https://play.google.com/store/apps/details?id=io.homeassistant.companion.android), [iPhone and MacBook apps](https://apps.apple.com/us/app/home-assistant/id1099568401) on corresponding devices
 
 ## Notes

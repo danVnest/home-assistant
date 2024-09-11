@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "energy",
+  "data": {
+    "energy_sources": [
+      {
+        "type": "solar",
+        "stat_energy_from": "sensor.inverter_total_energy",
+        "config_entry_solar_forecast": [
+          "01J70GAMKRWSDDJSQ0PANJBDP6"
+        ]
+      },
+      {
+        "type": "grid",
+        "flow_from": [
+          {
+            "stat_energy_from": "sensor.energy_meter_real_energy_consumed",
+            "stat_cost": null,
+            "entity_energy_price": "sensor.energy_cost_per_wh",
+            "number_energy_price": null
+          }
+        ],
+        "flow_to": [
+          {
+            "stat_energy_to": "sensor.energy_meter_real_energy_produced",
+            "stat_compensation": null,
+            "entity_energy_price": null,
+            "number_energy_price": 0.052
+          }
+        ],
+        "cost_adjustment_day": 0.0
+      }
+    ],
+    "device_consumption": [
+      {
+        "stat_consumption": "sensor.bedroom_light_energy",
+        "name": "Bedroom light"
+      },
+      {
+        "stat_consumption": "sensor.office_light_energy",
+        "name": "Office light"
+      },
+      {
+        "stat_consumption": "sensor.nursery_light_energy",
+        "name": "Nursery light"
+      },
+      {
+        "stat_consumption": "sensor.dryer_energy",
+        "name": "Dryer"
+      },
+      {
+        "stat_consumption": "sensor.washer_energy",
+        "name": "Washer"
+      },
+      {
+        "stat_consumption": "sensor.office_heater_energy",
+        "name": "Office heater"
+      },
+      {
+        "stat_consumption": "sensor.living_room_aircon_energy",
+        "name": "Living room aircon"
+      },
+      {
+        "stat_consumption": "sensor.dining_room_aircon_energy",
+        "name": "Dining room aircon"
+      },
+      {
+        "stat_consumption": "sensor.bedroom_aircon_energy",
+        "name": "Bedroom aircon"
+      },
+      {
+        "stat_consumption": "sensor.bedroom_fan_energy",
+        "name": "Bedroom fan"
+      },
+      {
+        "stat_consumption": "sensor.office_fan_energy",
+        "name": "Office fan"
+      },
+      {
+        "stat_consumption": "sensor.nursery_fan_energy",
+        "name": "Nursery fan"
+      },
+      {
+        "stat_consumption": "sensor.nursery_heater_energy",
+        "name": "Nursery heater"
+      },
+      {
+        "stat_consumption": "sensor.entryway_lights_energy",
+        "name": "Entryway lights"
+      },
+      {
+        "stat_consumption": "sensor.kitchen_light_energy",
+        "name": "Kitchen light"
+      },
+      {
+        "stat_consumption": "sensor.bathroom_light_energy",
+        "name": "Bathroom light"
+      },
+      {
+        "stat_consumption": "sensor.tv_lights_energy",
+        "name": "TV lights"
+      },
+      {
+        "stat_consumption": "sensor.kitchen_strip_light_energy",
+        "name": "Kitchen strip light"
+      },
+      {
+        "stat_consumption": "sensor.bedroom_humidifier_energy",
+        "name": "Bedroom humidifier"
+      },
+      {
+        "stat_consumption": "sensor.nursery_humidifier_energy",
+        "name": "Nursery humidifier "
+      },
+      {
+        "stat_consumption": "sensor.hall_light_energy",
+        "name": "Hall light"
+      },
+      {
+        "stat_consumption": "sensor.dishwasher_energy",
+        "name": "Dishwasher"
+      },
+      {
+        "stat_consumption": "sensor.fridge_energy",
+        "name": "Fridge"
+      },
+      {
+        "stat_consumption": "sensor.freezer_energy",
+        "name": "Freezer"
+      },
+      {
+        "stat_consumption": "sensor.paludarium_energy",
+        "name": "Paludarium"
+      },
+      {
+        "stat_consumption": "sensor.fish_tank_energy",
+        "name": "Fish tank"
+      },
+      {
+        "stat_consumption": "sensor.motion_sensors_energy",
+        "name": "Motion sensors"
+      },
+      {
+        "stat_consumption": "sensor.security_cameras_energy",
+        "name": "Security cameras"
+      },
+      {
+        "stat_consumption": "sensor.weather_stations_energy",
+        "name": "Weather stations"
+      },
+      {
+        "stat_consumption": "sensor.home_assistant_energy",
+        "name": "Home Assistant"
+      },
+      {
+        "stat_consumption": "sensor.temperature_egg_energy",
+        "name": "Temperature egg"
+      },
+      {
+        "stat_consumption": "sensor.dining_room_lights_energy",
+        "name": "Dining room lights"
+      },
+      {
+        "stat_consumption": "sensor.internet_energy",
+        "name": "Internet"
+      },
+      {
+        "stat_consumption": "sensor.office_desk_cooler_energy",
+        "name": "Office desk cooler"
+      },
+      {
+        "stat_consumption": "sensor.dan_s_computer_energy",
+        "name": "Dan's computer"
+      },
+      {
+        "stat_consumption": "sensor.picture_frame_energy",
+        "name": "Picture frame"
+      }
+    ]
+  }
+}
