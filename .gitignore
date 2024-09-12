@@ -4,11 +4,9 @@
 ip_bans.yaml
 secrets.yaml
 
-# System configuration (keeping edits made through GUI)
+# System configuration (keeping some edits made through GUI)
 .storage/*
 !.storage/core.area_registry
-!.storage/core.device_registry
-!.storage/core.entity_registry
 !.storage/core.floor_registry
 !.storage/energy
 !.storage/lovelace
