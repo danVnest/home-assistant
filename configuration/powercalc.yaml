@@ -176,26 +176,20 @@ sensors:
       - entity_id: switch.kitchen_right_switch
         power_sensor_id: sensor.right_switch_power
         ignore_unavailable_state: true
-  - create_group: Office desk
+  - create_group: Office desk, computer & monitor
     entities:
-      - entity_id: switch.dan_s_computer
-        power_sensor_id: sensor.dan_s_computer_power
+      - entity_id: switch.office_desk
+        power_sensor_id: sensor.office_desk_power
         ignore_unavailable_state: true
-      - entity_id: binary_sensor.dan_s_computer_using_power_at_home
-        name: Dan's computer monitor
-        fixed: # measured averages for each condition, including attached monitor
+      - entity_id: binary_sensor.desk_occupied_and_computer_active
+        name: Office computer monitor
+        fixed: # measured average
           power: 80
         standby_power: 0.2
   - create_group: Mobile devices
     entities:
-      - entity_id: device_tracker.dan_s_phone
-        name: Dan's phone
-        fixed:
-          power: 0
-          states_power:
-            home: "{{ max(0, states('sensor.dan_s_phone_battery_power') | float) }}"
-          # if home and not discharging
-          # what if at desk?
+      - power_sensor_id: sensor.dan_s_phone_power
+        energy_sensor_id: sensor.dan_s_phone_energy
       - entity_id: device_tracker.rachel_s_phone
         name: Rachel's phone
         fixed:

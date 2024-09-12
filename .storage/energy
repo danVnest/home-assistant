@@ -222,6 +222,22 @@
       {
         "stat_consumption": "sensor.mobile_devices_energy",
         "name": "Mobile devices"
+      },
+      {
+        "stat_consumption": "sensor.dan_s_phone_energy",
+        "name": "Dan's phone"
+      },
+      {
+        "stat_consumption": "sensor.office_computer_monitor_energy",
+        "name": "Office computer monitor"
+      },
+      {
+        "stat_consumption": "sensor.office_desk_computer_monitor_energy",
+        "name": "Office desk, computer & monitor"
+      },
+      {
+        "stat_consumption": "sensor.rachel_s_phone_energy",
+        "name": "Rachel's phone"
       }
     ]
   }

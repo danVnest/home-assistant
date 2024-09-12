@@ -12,23 +12,41 @@
   state: "{{ states('sensor.energy_cost_per_kwh') | float / 1000 }}"
   unit_of_measurement: "$/Wh"
   state_class: measurement
-- name: Dan's phone charger power
+- name: Dan's phone energy
   state: >
-    {%- set current_level = states('sensor.dan_s_phone_battery_level') | float -%}
-    {%- set last_level = state_attr('sensor.dan_s_phone_charger_power', 'last_battery_level') | default(current_level) | float -%}
-    {%- set last_updated = state_attr('sensor.dan_s_phone_charger_power', 'last_updated') | default(as_timestamp(now())) | float -%}
-    {%- set time_diff = (as_timestamp(now()) - last_updated) / 3600 -%}
-    {%- if time_diff > 0 and current_level > last_level -%}
-      {%- set battery_change = current_level - last_level -%}
-      {%- set battery_capacity_wh = 16.7 -%}
-      {%- set energy_added_wh = (battery_change / 100) * battery_capacity_wh -%}
-      {{- (energy_added_wh / time_diff) | round(2) -}}
+    {%- set energy = states('sensor.dan_s_phone_energy') | float(0) -%}
+    {%- if states('device_tracker.dan_s_phone') == "home" and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") and states('sensor.dan_s_phone_battery_level') | has_value -%}
+      {%- set current_battery_level = states('sensor.dan_s_phone_battery_level') | float -%}
+      {%- set last_battery_level = state_attr('sensor.dan_s_phone_energy', 'last_battery_level') | float(current_battery_level) -%}
+      {%- if current_battery_level > last_battery_level -%}
+        {%- set battery_capacity = 16.7 -%}
+        {%- set energy = energy + ((current_battery_level - last_battery_level) / 100 * battery_capacity) | round(2) -%}
+      {%- elif current_battery_level in (80, 100) -%}
+        {%- set last_update_time = state_attr('sensor.dan_s_phone_energy', 'last_update_time') | float(as_timestamp(now())) -%}
+        {%- set trickle_charge_power = 1 -%}
+        {%- set energy = energy + trickle_charge_power * (as_timestamp(now()) - last_update_time) / 3600 -%}
+      {%- endif -%}
+    {%- endif -%}
+    {{- energy -}}
+  unit_of_measurement: Wh
+  device_class: energy
+  state_class: total_increasing
+  attributes:
+    last_battery_level: "{{ states('sensor.dan_s_phone_battery_level') | float }}"
+    last_update_time: "{{ as_timestamp(now()) }}"
+- name: Dan's phone power
+  state: >
+    {%- set current_energy = states('sensor.dan_s_phone_energy') | float(0) -%}
+    {%- set last_energy = state_attr('sensor.dan_s_phone_power', 'last_energy') | float(current_energy) -%}
+    {%- set last_update_time = state_attr('sensor.dan_s_phone_power', 'last_update_time') | float(as_timestamp(now())) -%}
+    {%- set time_diff = (as_timestamp(now()) - last_update_time) / 3600 -%}
+    {%- if current_energy > last_energy and time_diff > 0 -%}
+      {{- ((current_energy - last_energy) / time_diff) | round(2) -}}
     {%- else -%}
       0
     {%- endif -%}
   unit_of_measurement: "W"
+  device_class: power
   attributes:
-    last_battery_level: "{{ states('sensor.dan_s_phone_battery_level') | float }}"
-    last_updated: "{{ as_timestamp(now()) }}"
-  availability: >
-    {{ states('sensor.dan_s_phone_battery_level') not in ['unknown', 'unavailable'] }}
+    last_energy: "{{ states('sensor.dan_s_phone_energy') }}"
+    last_update_time: "{{ as_timestamp(now()) }}"
