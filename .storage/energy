@@ -190,6 +190,38 @@
       {
         "stat_consumption": "sensor.tv_pc_home_assistant_orbi_satellite_eufy_hub_energy",
         "name": "TV ..."
+      },
+      {
+        "stat_consumption": "sensor.all_light_energy",
+        "name": "Lights"
+      },
+      {
+        "stat_consumption": "sensor.all_fan_energy",
+        "name": "Fans"
+      },
+      {
+        "stat_consumption": "sensor.all_humidifier_energy",
+        "name": "Humidifiers"
+      },
+      {
+        "stat_consumption": "sensor.automation_security_energy",
+        "name": "Automation & security"
+      },
+      {
+        "stat_consumption": "sensor.kitchen_appliances_energy",
+        "name": "Kitchen appliances"
+      },
+      {
+        "stat_consumption": "sensor.office_desk_energy",
+        "name": "Office desk"
+      },
+      {
+        "stat_consumption": "sensor.paludarium_fish_tank_energy",
+        "name": "Paludarium & fish tank"
+      },
+      {
+        "stat_consumption": "sensor.mobile_devices_energy",
+        "name": "Mobile devices"
       }
     ]
   }

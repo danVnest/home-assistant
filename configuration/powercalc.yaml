@@ -1,4 +1,8 @@
 energy_sensor_unit_prefix: k
+create_domain_groups:
+  - light
+  - fan
+  - humidifier
 sensors:
   - entity_id: switch.living_room_aircon
     fixed:
@@ -149,18 +153,6 @@ sensors:
   - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
     power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_power
     ignore_unavailable_state: true
-  - entity_id: switch.toaster_blender
-    power_sensor_id: sensor.toaster_blender_power
-    ignore_unavailable_state: true
-  - entity_id: switch.kettle_milk_frother
-    power_sensor_id: sensor.kettle_milk_frother_power
-    ignore_unavailable_state: true
-  - entity_id: switch.kitchen_left_switch
-    power_sensor_id: sensor.kitchen_left_switch_power
-    ignore_unavailable_state: true
-  - entity_id: switch.kitchen_right_switch
-    power_sensor_id: sensor.right_switch_power
-    ignore_unavailable_state: true
   - entity_id: switch.dishwasher
     power_sensor_id: sensor.dishwasher_power
     ignore_unavailable_state: true
@@ -170,50 +162,70 @@ sensors:
   - entity_id: switch.freezer_mini_fridge_routers
     power_sensor_id: sensor.freezer_mini_fridge_routers_power
     ignore_unavailable_state: true
-  - entity_id: switch.dan_s_computer
-    power_sensor_id: sensor.dan_s_computer_power
-    ignore_unavailable_state: true
-  - entity_id: binary_sensor.dan_s_computer_using_power_at_home
-    name: Dan's computer monitor
-    fixed: # measured averages for each condition, including attached monitor
-      power: 80
-    standby_power: 0.2
-  - entity_id: device_tracker.dan_s_phone
-    name: Dan's phone
-    fixed:
-      power: 0
-      states_power:
-        home: "{{ max(0, states('sensor.dan_s_phone_battery_power') | float) }}"
-  - entity_id: device_tracker.rachel_s_phone
-    name: Rachel's phone
-    fixed:
-      power: 0
-      states_power:
-        home: "{{ max(0, states('sensor.rachel_s_phone_battery_power') | float) }}"
-  - name: Fridge (rated)
-    daily_fixed_energy:
-      value: 1.2684931507 # from https://www.panasonic.com/au/support/product-archives/household/refrigeration/nr-by552xsau.specs.html
-  - name: Freezer (rated)
-    daily_fixed_energy:
-      value: 0.602739726 # from https://commercial.appliancesonline.com.au/p/haier-143l-chest-freezer-hcf143
-  - name: Paludarium
-    daily_fixed_energy:
-      value: 0 # MEASURE
-  - name: Fish tank
-    daily_fixed_energy:
-      value: 0 # MEASURE
-  - name: Motion sensors
-    daily_fixed_energy:
-      value: 0 # MEASURE
-  - name: Security cameras
-    daily_fixed_energy:
-      value: 0.108 # 3x, from https://www.reddit.com/r/EufyCam/comments/h8o4c5/indoor_cam_2k_power_consumption/
-  - name: Weather stations
-    daily_fixed_energy:
-      value: 0.12 # MEASURE
-  # - name: Internet
-  #   daily_fixed_energy: # measured average, but varies significantly depending on usage
-  #     value: "{{ 1.632 if today_at('09:00') > now() else 0.648 }}"
+  - create_group: Kitchen appliances
+    entities:
+      - entity_id: switch.toaster_blender
+        power_sensor_id: sensor.toaster_blender_power
+        ignore_unavailable_state: true
+      - entity_id: switch.kettle_milk_frother
+        power_sensor_id: sensor.kettle_milk_frother_power
+        ignore_unavailable_state: true
+      - entity_id: switch.kitchen_left_switch
+        power_sensor_id: sensor.kitchen_left_switch_power
+        ignore_unavailable_state: true
+      - entity_id: switch.kitchen_right_switch
+        power_sensor_id: sensor.right_switch_power
+        ignore_unavailable_state: true
+  - create_group: Office desk
+    entities:
+      - entity_id: switch.dan_s_computer
+        power_sensor_id: sensor.dan_s_computer_power
+        ignore_unavailable_state: true
+      - entity_id: binary_sensor.dan_s_computer_using_power_at_home
+        name: Dan's computer monitor
+        fixed: # measured averages for each condition, including attached monitor
+          power: 80
+        standby_power: 0.2
+  - create_group: Mobile devices
+    entities:
+      - entity_id: device_tracker.dan_s_phone
+        name: Dan's phone
+        fixed:
+          power: 0
+          states_power:
+            home: "{{ max(0, states('sensor.dan_s_phone_battery_power') | float) }}"
+          # if home and not discharging
+          # what if at desk?
+      - entity_id: device_tracker.rachel_s_phone
+        name: Rachel's phone
+        fixed:
+          power: 0
+          states_power:
+            home: "{{ max(0, states('sensor.rachel_s_phone_battery_power') | float) }}"
+  # - entity_id:
+  #   name: Owlet
+  #   fixed:
+  #     states_power:
+  #       value: 1 # MEASURE use battery percentage, charging, and on child
+  - create_group: Paludarium & fish tank
+    entities:
+      - name: Paludarium
+        daily_fixed_energy:
+          value: 0 # MEASURE
+      - name: Fish tank
+        daily_fixed_energy:
+          value: 0 # MEASURE
+  - create_group: Automation & security
+    entities:
+      - name: Motion sensors
+        daily_fixed_energy:
+          value: 0 # MEASURE
+      - name: Security cameras
+        daily_fixed_energy:
+          value: 0.108 # 3x, from https://www.reddit.com/r/EufyCam/comments/h8o4c5/indoor_cam_2k_power_consumption/
+      - name: Weather stations
+        daily_fixed_energy:
+          value: 0.12 # MEASURE
   # - name: Picture frame
   #   daily_fixed_energy:
   #     value: "{{ 0 if today_at('06:30') < now() < today_at('20:30') else 0 }}" # MEASURE when on and standby
@@ -224,6 +236,10 @@ sensors:
   - name: Temperature egg
     daily_fixed_energy:
       value: 0 # MEASURE
-  - entity_id: switch.spare_switch # TEMPORARY
-    power_sensor_id: sensor.spare_switch
-    ignore_unavailable_state: true
+  # TODO: delete the following once compared against switches and significant variation confirmed
+  - name: Fridge (rated)
+    daily_fixed_energy:
+      value: 1.2684931507 # from https://www.panasonic.com/au/support/product-archives/household/refrigeration/nr-by552xsau.specs.html
+  - name: Freezer (rated)
+    daily_fixed_energy:
+      value: 0.602739726 # from https://commercial.appliancesonline.com.au/p/haier-143l-chest-freezer-hcf143
