@@ -8,12 +8,6 @@
   state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
 - name: Owlet attached # TODO: update
   state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
-- name: Dan's computer using power at home
-  state: >
-    {{
-      states('device_tracker.dan_s_computer') == 'home' and
-      state_attr('sensor.dan_s_computer_internal_battery_state', 'Power Source State') == 'AC Power'
-    }}
 - name: Dark outside
   state: >
     {{
