@@ -374,18 +374,17 @@ class Control(App):
             self.climate.validate_target_and_trigger(setting)
         elif "door" in setting:
             self.climate.update_door_check_delay(float(new))
-        elif (
-            setting == "aircon_vacating_delay"
-        ):  # TODO: replace with single method for all vacating delay devices
-            self.climate.update_aircon_vacating_delays(float(new))
-        elif setting == "fan_vacating_delay":
-            self.climate.update_fan_vacating_delays(float(new))
-        elif setting == "heater_vacating_delay":
-            self.climate.update_heater_vacating_delays(float(new))
-        elif setting == "humidifier_vacating_delay":
-            self.climate.update_humidifier_vacating_delays(float(new))
         else:
-            self.lights.transition_to_scene(self.scene)
+            device_type = setting.split("_")[0]
+            if setting.endswith("vacating_delay") and device_type in (
+                "aircon",
+                "fan",
+                "heater",
+                "humidifier",
+            ):
+                self.climate.update_vacating_delays(device_type, float(new))
+            else:
+                self.lights.transition_to_scene(self.scene)
 
     def revert_setting(self, setting_id: str, value: str):
         """Revert setting to specified value & notify."""

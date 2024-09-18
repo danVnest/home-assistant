@@ -165,29 +165,16 @@ class Climate(App):
 
     def update_door_check_delay(self, seconds: float):
         """Update the delay before registering a door as open for each aircon."""
+        self.allow_suggestion()
         for aircon in self.aircons.values():
             aircon.door_open_delay = seconds
 
-    def update_aircon_vacating_delays(self, seconds: float):
-        """Update room vacating delay for each fan."""
-        for aircon in self.aircons.values():
-            aircon.vacating_delay = seconds
-
-    def update_fan_vacating_delays(self, seconds: float):
-        """Update room vacating delay for each fan."""
-        for fan in self.fans.values():
-            fan.vacating_delay = seconds
-
-    def update_heater_vacating_delays(self, seconds: float):
-        """Update room vacating delay for each heater."""
-        for heater in self.heaters.values():
-            if heater.safe_when_vacant:
-                heater.vacating_delay = seconds
-
-    def update_humidifier_vacating_delays(self, seconds: float):
-        """Update room vacating delay for each humidifier."""
-        for humidifier in self.humidifiers.values():
-            humidifier.vacating_delay = seconds
+    def update_vacating_delays(self, device_type: str, seconds: float):
+        """Update room vacating delay for each device of specified type."""
+        self.allow_suggestion()
+        for device in getattr(self, f"{device_type}s").values():
+            if not hasattr(device, "safe_when_vacant") or device.safe_when_vacant:
+                device.vacating_delay = seconds
 
     def transition_to_scene(self, scene: str):
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
@@ -231,7 +218,7 @@ class Climate(App):
             if all(aircon.door_open for aircon in self.aircons.values()):
                 reason = "the door(s) are open"
                 if self.too_hot_or_cold_outside:
-                    reason += f" (but outside is {self.outside_temperature}º)"
+                    reason += f" (but outside is {self.outside_temperature:.1f}º)"
                 reason += ", consider"
             elif any(
                 not aircon.control_enabled and not aircon.door_open
@@ -247,7 +234,7 @@ class Climate(App):
                 )
                 return
             self.suggest(
-                f"It is {self.inside_temperature}º inside but aircon won't turn on "
+                f"It is {self.inside_temperature:.1f}º inside but aircon won't turn on "
                 f"for the pets because {reason} turning aircon on manually",
             )
             # TODO: above doesn't account for the situation where the bedroom door is closed
@@ -283,7 +270,7 @@ class Climate(App):
     def suggest_if_extreme_forecast_and_control_disabled(self):
         """Suggest user enables more control if extreme temperatures are forecast."""
         extreme_forecast = self.get_state("sensor.extreme_forecast")
-        if extreme_forecast and any(
+        if extreme_forecast not in (None, "unavailable", "unknown") and any(
             not device.control_enabled
             for device_group in (
                 [self.aircons, self.fans]
@@ -295,16 +282,15 @@ class Climate(App):
             if self.control.scene != "Sleep"
             or device.room not in ("living_room", "office")
         ):
+            self.allow_suggestion()
             self.suggest(
                 f"It's forecast to reach {float(extreme_forecast):.1f}º, "
                 "consider enabling additional climate control",
-                force=True,
             )
 
-    def suggest(self, message: str, force: bool = False):
+    def suggest(self, message: str):
         """Make a suggestion to the users, but only if one has not already been sent."""
-        self.suggested = False  # TODO: if this doesn't spam notifications, remove suggestion mechanism and just notify
-        if force or not self.suggested:
+        if not self.suggested:
             self.suggested = True
             self.notify(
                 message,
@@ -352,6 +338,7 @@ class Climate(App):
                 f"the corresponding target/trigger to '{valid_other}º'",
                 level="WARNING",
             )
+        self.allow_suggestion()
         self.adjust_for_conditions()
 
     def terminate(self):
@@ -782,7 +769,6 @@ class Aircon(ClimateDevice, PresenceDevice):
                 return self.on
             self.turn_off()
             return None
-        # TODO: reset suggestions more often? on any climate UI changes?
         if not self.on:
             if (
                 self.too_hot_or_cold
@@ -897,9 +883,9 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Suggest opening up the house if outside is nicer."""
         if self.outside_temperature_nicer and self.controller.presence.anyone_home:
             self.controller.suggest(
-                f"Outside ({self.controller.outside_temperature}º) "
+                f"Outside ({self.controller.outside_temperature:.1f}º) "
                 f"is a more pleasant temperature than the {self.room} "
-                f"({self.room_temperature}º), consider opening up the house",
+                f"({self.room_temperature:.1f}º), consider opening up the house",
             )
 
 
@@ -1013,7 +999,6 @@ class Fan(ClimateDevice, PresenceDevice):
                 level="DEBUG",
             )
         return speed
-        # return 0  # TODO: remove this once the infinite toggle from apparent temperature change is solved
 
     @property
     def reverse(self) -> bool:
