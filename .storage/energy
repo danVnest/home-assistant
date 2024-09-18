@@ -34,28 +34,8 @@
     ],
     "device_consumption": [
       {
-        "stat_consumption": "sensor.bedroom_light_energy",
-        "name": "Bedroom light"
-      },
-      {
-        "stat_consumption": "sensor.office_light_energy",
-        "name": "Office light"
-      },
-      {
-        "stat_consumption": "sensor.nursery_light_energy",
-        "name": "Nursery light"
-      },
-      {
-        "stat_consumption": "sensor.dryer_energy",
-        "name": "Dryer"
-      },
-      {
-        "stat_consumption": "sensor.washer_energy",
-        "name": "Washer"
-      },
-      {
-        "stat_consumption": "sensor.office_heater_energy",
-        "name": "Office heater"
+        "stat_consumption": "sensor.all_light_energy",
+        "name": "Lights"
       },
       {
         "stat_consumption": "sensor.living_room_aircon_energy",
@@ -70,130 +50,12 @@
         "name": "Bedroom aircon"
       },
       {
-        "stat_consumption": "sensor.bedroom_fan_energy",
-        "name": "Bedroom fan"
-      },
-      {
-        "stat_consumption": "sensor.office_fan_energy",
-        "name": "Office fan"
-      },
-      {
-        "stat_consumption": "sensor.nursery_fan_energy",
-        "name": "Nursery fan"
+        "stat_consumption": "sensor.office_heater_energy",
+        "name": "Office heater"
       },
       {
         "stat_consumption": "sensor.nursery_heater_energy",
         "name": "Nursery heater"
-      },
-      {
-        "stat_consumption": "sensor.entryway_lights_energy",
-        "name": "Entryway lights"
-      },
-      {
-        "stat_consumption": "sensor.kitchen_light_energy",
-        "name": "Kitchen light"
-      },
-      {
-        "stat_consumption": "sensor.bathroom_light_energy",
-        "name": "Bathroom light"
-      },
-      {
-        "stat_consumption": "sensor.tv_lights_energy",
-        "name": "TV lights"
-      },
-      {
-        "stat_consumption": "sensor.kitchen_strip_light_energy",
-        "name": "Kitchen strip light"
-      },
-      {
-        "stat_consumption": "sensor.bedroom_humidifier_energy",
-        "name": "Bedroom humidifier"
-      },
-      {
-        "stat_consumption": "sensor.nursery_humidifier_energy",
-        "name": "Nursery humidifier "
-      },
-      {
-        "stat_consumption": "sensor.hall_light_energy",
-        "name": "Hall light"
-      },
-      {
-        "stat_consumption": "sensor.dishwasher_energy",
-        "name": "Dishwasher"
-      },
-      {
-        "stat_consumption": "sensor.fridge_energy",
-        "name": "Fridge"
-      },
-      {
-        "stat_consumption": "sensor.freezer_mini_fridge_routers_electricity",
-        "name": "Freezer, mini fridge, routers"
-      },
-      {
-        "stat_consumption": "sensor.paludarium_energy",
-        "name": "Paludarium"
-      },
-      {
-        "stat_consumption": "sensor.fish_tank_energy",
-        "name": "Fish tank"
-      },
-      {
-        "stat_consumption": "sensor.motion_sensors_energy",
-        "name": "Motion sensors"
-      },
-      {
-        "stat_consumption": "sensor.security_cameras_energy",
-        "name": "Security cameras"
-      },
-      {
-        "stat_consumption": "sensor.weather_stations_energy",
-        "name": "Weather stations"
-      },
-      {
-        "stat_consumption": "sensor.temperature_egg_energy",
-        "name": "Temperature egg"
-      },
-      {
-        "stat_consumption": "sensor.dining_room_lights_energy",
-        "name": "Dining room lights"
-      },
-      {
-        "stat_consumption": "sensor.dan_s_computer_energy",
-        "name": "Dan's computer"
-      },
-      {
-        "stat_consumption": "sensor.picture_frame_energy",
-        "name": "Picture frame"
-      },
-      {
-        "stat_consumption": "sensor.dan_s_computer_monitor_energy",
-        "name": "Dan's computer monitor"
-      },
-      {
-        "stat_consumption": "sensor.fridge_rated_energy"
-      },
-      {
-        "stat_consumption": "sensor.freezer_rated_energy"
-      },
-      {
-        "stat_consumption": "sensor.kitchen_left_switch_energy",
-        "name": "Kitchen left switch"
-      },
-      {
-        "stat_consumption": "sensor.kettle_milk_frother_energy",
-        "name": "Kettle & milk frother"
-      },
-      {
-        "stat_consumption": "sensor.toaster_blender_energy",
-        "name": "Toaster & blender"
-      },
-      {
-        "stat_consumption": "sensor.tv_pc_home_assistant_orbi_satellite_eufy_hub_energy",
-        "name": "TV ..."
-      },
-      {
-        "stat_consumption": "sensor.all_light_energy",
-        "name": "Lights"
       },
       {
         "stat_consumption": "sensor.all_fan_energy",
@@ -204,40 +66,52 @@
         "name": "Humidifiers"
       },
       {
-        "stat_consumption": "sensor.automation_security_energy",
-        "name": "Automation & security"
-      },
-      {
         "stat_consumption": "sensor.kitchen_appliances_energy",
         "name": "Kitchen appliances"
       },
       {
-        "stat_consumption": "sensor.office_desk_energy",
-        "name": "Office desk"
+        "stat_consumption": "sensor.dishwasher_energy",
+        "name": "Dishwasher"
       },
       {
-        "stat_consumption": "sensor.paludarium_fish_tank_energy",
-        "name": "Paludarium & fish tank"
+        "stat_consumption": "sensor.fridge_energy",
+        "name": "Fridge"
       },
       {
-        "stat_consumption": "sensor.mobile_devices_energy",
-        "name": "Mobile devices"
+        "stat_consumption": "sensor.freezer_mini_fridge_routers_energy",
+        "name": "Freezer, mini fridge, routers"
       },
       {
-        "stat_consumption": "sensor.dan_s_phone_energy",
-        "name": "Dan's phone"
+        "stat_consumption": "sensor.washer_energy",
+        "name": "Washer"
       },
       {
-        "stat_consumption": "sensor.office_computer_monitor_energy",
-        "name": "Office computer monitor"
+        "stat_consumption": "sensor.dryer_energy",
+        "name": "Dryer"
       },
       {
-        "stat_consumption": "sensor.office_desk_computer_monitor_energy",
-        "name": "Office desk, computer & monitor"
+        "stat_consumption": "sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy",
+        "name": "TV, speakers, PC, Home Assistant, router relay, security hub"
       },
       {
-        "stat_consumption": "sensor.rachel_s_phone_energy",
-        "name": "Rachel's phone"
+        "stat_consumption": "sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy",
+        "name": "Water heater, oven & stove, guest suite, garage, all other"
+      },
+      {
+        "stat_consumption": "sensor.office_desk_computer_monitor_cooler_fish_tank_energy",
+        "name": "Office desk, computer & monitor, cooler, fish tank"
+      },
+      {
+        "stat_consumption": "sensor.phone_chargers_energy",
+        "name": "Phone chargers"
+      },
+      {
+        "stat_consumption": "sensor.sensors_energy",
+        "name": "Sensors"
+      },
+      {
+        "stat_consumption": "sensor.paludarium_picture_frame_camera_energy",
+        "name": "Paludarium, picture frame, camera"
       }
     ]
   }

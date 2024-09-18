@@ -3,237 +3,266 @@ create_domain_groups:
   - light
   - fan
   - humidifier
+create_utility_meters: true
+utility_meter_types:
+  - daily
+  - monthly
 sensors:
-  - entity_id: switch.living_room_aircon
-    fixed:
-      power: >
-        {% from 'custom_templates.jinja' import aircon_power %}
-        {{ aircon_power('living_room') }}
-    standby_power: 3 # guessed aircon + Sensibo
-  - entity_id: switch.dining_room_aircon
-    fixed:
-      power: >
-        {% from 'custom_templates.jinja' import aircon_power %}
-        {{ aircon_power('dining_room') }}
-    standby_power: 2 # guessed aircon
-  - entity_id: switch.bedroom_aircon
-    fixed:
-      power: >
-        {% from 'custom_templates.jinja' import aircon_power %}
-        {{ aircon_power('bedroom') }}
-    standby_power: 3 # guessed aircon + Sensibo
-  - entity_id: fan.bedroom
-    name: Bedroom fan
-    linear:
-      calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_132cm.pdf
-        - 11 -> 3.6
-        - 22 -> 4.8
-        - 33 -> 10.1
-        - 44 -> 12.9
-        - 55 -> 15.9
-        - 66 -> 18.6
-        - 77 -> 21.6
-        - 88 -> 23.8
-        - 100 -> 26.2
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: fan.nursery
-    name: Nursery fan
-    linear:
-      calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
-        - 11 -> 3.5
-        - 22 -> 4.7
-        - 33 -> 9.8
-        - 44 -> 12.3
-        - 55 -> 15.4
-        - 66 -> 18.2
-        - 77 -> 21.1
-        - 88 -> 23.5
-        - 100 -> 26.1
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: fan.office
-    name: Office fan
-    linear:
-      calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
-        - 11 -> 3.5
-        - 22 -> 4.7
-        - 33 -> 9.8
-        - 44 -> 12.3
-        - 55 -> 15.4
-        - 66 -> 18.2
-        - 77 -> 21.1
-        - 88 -> 23.5
-        - 100 -> 26.1
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: switch.office_heater
-    power_sensor_id: sensor.office_heater_power
-    ignore_unavailable_state: true
-  - entity_id: switch.nursery_heater
-    power_sensor_id: sensor.nursery_heater_power
-  - entity_id: humidifier.bedroom
-    name: Bedroom humidifier
-    fixed: # measured with smart switch
-      power: "{{ 26 if state_attr('humidifier.bedroom', 'humidity') > state_attr('humidifier.bedroom', 'current_humidity') else 15.6 }}"
-    standby_power: 0.5 # guess
-  - entity_id: humidifier.nursery
-    name: Nursery humidifier
-    fixed: # measured with smart switch
-      power: "{{ 26 if state_attr('humidifier.nursery', 'humidity') > state_attr('humidifier.nursery', 'current_humidity') else 15.6 }}"
-    standby_power: 0.5 # guess
-  - create_group: Entryway lights
-    hide_members: true
+  - create_group: Tracked
     entities:
-      - entity_id: light.entryway
+      - entity_id: switch.living_room_aircon
+        fixed:
+          power: >
+            {% from 'custom_templates.jinja' import aircon_power %}
+            {{ aircon_power('living_room') }}
+        standby_power: 3 # guessed aircon + Sensibo
+      - entity_id: switch.dining_room_aircon
+        fixed:
+          power: >
+            {% from 'custom_templates.jinja' import aircon_power %}
+            {{ aircon_power('dining_room') }}
+        standby_power: 2 # guessed aircon
+      - entity_id: switch.bedroom_aircon
+        fixed:
+          power: >
+            {% from 'custom_templates.jinja' import aircon_power %}
+            {{ aircon_power('bedroom') }}
+        standby_power: 3 # guessed aircon + Sensibo
+      - entity_id: fan.bedroom
+        name: Bedroom fan
+        linear:
+          calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_132cm.pdf
+            - 11 -> 3.6
+            - 22 -> 4.8
+            - 33 -> 10.1
+            - 44 -> 12.9
+            - 55 -> 15.9
+            - 66 -> 18.6
+            - 77 -> 21.6
+            - 88 -> 23.8
+            - 100 -> 26.2
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - entity_id: fan.nursery
+        name: Nursery fan
+        linear:
+          calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
+            - 11 -> 3.5
+            - 22 -> 4.7
+            - 33 -> 9.8
+            - 44 -> 12.3
+            - 55 -> 15.4
+            - 66 -> 18.2
+            - 77 -> 21.1
+            - 88 -> 23.5
+            - 100 -> 26.1
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - entity_id: fan.office
+        name: Office fan
+        linear:
+          calibrate: # values from: https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
+            - 11 -> 3.5
+            - 22 -> 4.7
+            - 33 -> 9.8
+            - 44 -> 12.3
+            - 55 -> 15.4
+            - 66 -> 18.2
+            - 77 -> 21.1
+            - 88 -> 23.5
+            - 100 -> 26.1
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - entity_id: switch.office_heater
+        power_sensor_id: sensor.office_heater_power
+        ignore_unavailable_state: true
+      - entity_id: switch.nursery_heater
+        power_sensor_id: sensor.nursery_heater_power
+      - entity_id: humidifier.bedroom
+        name: Bedroom humidifier
+        fixed: # measured with smart switch
+          power: "{{ 26 if state_attr('humidifier.bedroom', 'humidity') > state_attr('humidifier.bedroom', 'current_humidity') else 15.6 }}"
+        standby_power: 0.5 # guess
+      - entity_id: humidifier.nursery
+        name: Nursery humidifier
+        fixed: # measured with smart switch
+          power: "{{ 26 if state_attr('humidifier.nursery', 'humidity') > state_attr('humidifier.nursery', 'current_humidity') else 15.6 }}"
+        standby_power: 0.5 # guess
+      - create_group: Entryway lights
+        hide_members: true
+        entities:
+          - entity_id: light.entryway
+            linear:
+              min_power: 0.7 # guess
+              max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
+            standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
+          - entity_id: light.stairway
+            linear:
+              min_power: 0.49 # guess
+              max_power: 4.9 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-candle-amber-25w-c35-e14/8718699787257
+            standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
+      - entity_id: light.kitchen
+        name: Kitchen light
         linear:
           min_power: 0.7 # guess
           max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
         standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-      - entity_id: light.stairway
+      - entity_id: light.kitchen_strip
+        name: Kitchen strip light
         linear:
-          min_power: 0.49 # guess
-          max_power: 4.9 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-candle-amber-25w-c35-e14/8718699787257
+          min_power: 2 # guess
+          max_power: 20 # from https://www.kogan.com/au/buy/kogan-smarterhometm-ip68-colour-whites-smart-led-light-strip-5m-kogan/
+        standby_power: 0.3 # guess
+      - entity_id: light.tv_middle
+        name: TV lights
+        linear:
+          min_power: 0.7 # guess
+          max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
         standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-  - entity_id: light.kitchen
-    name: Kitchen light
-    linear:
-      min_power: 0.7 # guess
-      max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
-    standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-  - entity_id: light.kitchen_strip
-    name: Kitchen strip light
-    linear:
-      min_power: 2 # guess
-      max_power: 20 # from https://www.kogan.com/au/buy/kogan-smarterhometm-ip68-colour-whites-smart-led-light-strip-5m-kogan/
-    standby_power: 0.3 # guess
-  - entity_id: light.tv_middle
-    name: TV lights
-    linear:
-      min_power: 0.7 # guess
-      max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
-    standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-    multiply_factor: 3
-    multiply_factor_standby: true
-  - entity_id: light.dining_room_left
-    name: Dining room lights
-    linear:
-      min_power: 0.7 # guess
-      max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
-    standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-    multiply_factor: 2
-    multiply_factor_standby: true
-  - entity_id: light.hall
-    name: Hall light
-    linear:
-      min_power: 0.7 # guess
-      max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
-    standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-  - entity_id: light.bathroom
-    name: Bathroom light
-    linear:
-      min_power: 0.7 # guess
-      max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
-    standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
-  - entity_id: light.bedroom
-    name: Bedroom light
-    linear:
-      min_power: 2 # guess
-      max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_132cm.pdf
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: light.office
-    name: Office light
-    linear:
-      min_power: 2 # guess
-      max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: light.nursery
-    name: Nursery light
-    linear:
-      min_power: 2 # guess
-      max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
-    standby_power: 0.25 # guess (equal split between fan and light)
-  - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
-    power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_power
-    ignore_unavailable_state: true
-  - entity_id: switch.dishwasher
-    power_sensor_id: sensor.dishwasher_power
-    ignore_unavailable_state: true
-  - entity_id: switch.fridge
-    power_sensor_id: sensor.fridge_power
-    ignore_unavailable_state: true
-  - entity_id: switch.freezer_mini_fridge_routers
-    power_sensor_id: sensor.freezer_mini_fridge_routers_power
-    ignore_unavailable_state: true
-  - create_group: Kitchen appliances
-    entities:
-      - entity_id: switch.toaster_blender
-        power_sensor_id: sensor.toaster_blender_power
+        multiply_factor: 3
+        multiply_factor_standby: true
+      - entity_id: light.dining_room_left
+        name: Dining room lights
+        linear:
+          min_power: 0.7 # guess
+          max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
+        standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
+        multiply_factor: 2
+        multiply_factor_standby: true
+      - entity_id: light.hall
+        name: Hall light
+        linear:
+          min_power: 0.7 # guess
+          max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
+        standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
+      - entity_id: light.bathroom
+        name: Bathroom light
+        linear:
+          min_power: 0.7 # guess
+          max_power: 7 # from https://www.wizconnected.com/en-au/p/filament-bulb-filament-globe-amber-50w-g95-e27/8718699786793
+        standby_power: 0.3 # estimate based on similar lights: https://library.powercalc.nl/
+      - entity_id: light.bedroom
+        name: Bedroom light
+        linear:
+          min_power: 2 # guess
+          max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_132cm.pdf
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - entity_id: light.office
+        name: Office light
+        linear:
+          min_power: 2 # guess
+          max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - entity_id: light.nursery
+        name: Nursery light
+        linear:
+          min_power: 2 # guess
+          max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
+        standby_power: 0.25 # guess (equal split between fan and light)
+      - create_group: TV, speakers, PC, Home Assistant, router relay, security hub
+        entities:
+          - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
+            power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_power
+            ignore_unavailable_state: true
+          - entity_id: sensor.dummy
+            name: TV subwoofer and rear speakers
+            fixed:
+              power: >
+                {%-
+                  set volume = state_attr('media_player.tv_speakers', 'volume_level') | float(0)
+                  if not state_attr('media_player.tv_speakers', 'is_volume_muted') else 0
+                -%}
+                {%- if state_attr('media_player.tv', 'sound_output') == "external_arc" -%}
+                  {{- 12 + 4 * volume * (1 + 6 * volume) if states('sensor.webostvservice_play_state') == "on" else 12 -}}
+                {%-
+                  elif state_attr('media_player.tv_speakers', 'source') == "Bluetooth" and
+                  '24:E8:53:AB:AC:DF (LG_Speaker_SP11RA_2463)' in
+                  state_attr('sensor.rachel_s_phone_bluetooth_connection', 'connected_paired_devices') and
+                  states('binary_sensor.rachel_s_phone_music_active') == "on"
+                -%}
+                  {{- 12 + 4 * volume * (1 + 6 * volume) -}}
+                {%- else -%}
+                  2
+                {%- endif -%}
+              # formula derived from the following measurements
+              # ≈4W * 3 when on @ 0% volume
+              # ≈10W subwoofer, ≈5W * 2 rear @ 50% volume
+              # ≈20W subwoofer, ≈10W * 2 rear @ 100% volume
+              # standby from https://www.lg.com/uk/speakers/soundbars/sp11ra/?srsltid=AfmBOopZ7O31FooCpPHhw462bAGGP_GJ9nZR9T5n9rWonUcFKXETGE2i
+      - entity_id: switch.dishwasher
+        power_sensor_id: sensor.dishwasher_power
         ignore_unavailable_state: true
-      - entity_id: switch.kettle_milk_frother
-        power_sensor_id: sensor.kettle_milk_frother_power
+      - entity_id: switch.fridge
+        power_sensor_id: sensor.fridge_power
         ignore_unavailable_state: true
-      - entity_id: switch.kitchen_left_switch
-        power_sensor_id: sensor.kitchen_left_switch_power
+      - entity_id: switch.freezer_mini_fridge_routers
+        power_sensor_id: sensor.freezer_mini_fridge_routers_power
         ignore_unavailable_state: true
-      - entity_id: switch.kitchen_right_switch
-        power_sensor_id: sensor.right_switch_power
+      - create_group: Kitchen appliances
+        entities:
+          - entity_id: switch.microwave
+            power_sensor_id: sensor.microwave_power
+            ignore_unavailable_state: true
+          - entity_id: switch.toaster_blender
+            power_sensor_id: sensor.toaster_blender_power
+            ignore_unavailable_state: true
+          - entity_id: switch.kettle_milk_frother
+            power_sensor_id: sensor.kettle_milk_frother_power
+            ignore_unavailable_state: true
+          - entity_id: switch.kitchen_switch
+            power_sensor_id: sensor.kitchen_switch_power
+            ignore_unavailable_state: true
+      - create_group: Office desk, computer & monitor, cooler, fish tank
+        entities:
+          - entity_id: switch.office_desk
+            power_sensor_id: sensor.office_desk_power
+            ignore_unavailable_state: true
+          - entity_id: binary_sensor.desk_occupied_and_computer_active
+            name: Office computer monitor
+            fixed: # measured average
+              power: 80
+            standby_power: 0.2
+          - name: Fish tank
+            fixed:
+              power: "{{ 4 if today_at('10:00') < now() < today_at('17:00') else 2 }}" # measured
+      - create_group: Phone chargers
+        entities:
+          - power_sensor_id: sensor.dan_s_phone_charger_power
+            energy_sensor_id: sensor.dan_s_phone_charger_energy
+          - entity_id: device_tracker.rachel_s_phone
+            name: Rachel's phone charger
+            fixed:
+              power: 0
+              states_power:
+                home: "{{ max(0, states('sensor.rachel_s_phone_battery_power') | float) }}"
+      - create_group: Sensors
+        entities:
+          - name: Motion sensors
+            daily_fixed_energy:
+              value: 0.025 # 3x, from https://r0.hlktech.com/download/HLK-LD1125F-24G/1/HLK-LD1125F-24G%E7%94%A8%E6%88%B7%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8CV1.0.pdf
+          - name: Security cameras
+            daily_fixed_energy:
+              value: 0.072 # 2x, from https://www.reddit.com/r/EufyCam/comments/h8o4c5/indoor_cam_2k_power_consumption/
+          - name: Weather stations
+            daily_fixed_energy:
+              value: 0.12 # MEASURE
+          # - name: Owlet
+          #   daily_fixed_energy:
+          #     value: 0.072 # guess
+          - name: Nursery egg temperature light
+            daily_fixed_energy:
+              value: 0.048 # guess
+      # - entity_id: sensor.dummy
+      #   name: Picture frame
+      #   fixed:
+      #     power: "{{ 5 if today_at('06:30') < now() < today_at('20:30') else 0.5 }}" # guesses
+      - entity_id: switch.paludarium_picture_frame_camera
+        name: Paludarium, picture frame, camera
+        power_sensor_id: sensor.paludarium_picture_frame_camera_power
         ignore_unavailable_state: true
-  - create_group: Office desk, computer & monitor
-    entities:
-      - entity_id: switch.office_desk
-        power_sensor_id: sensor.office_desk_power
-        ignore_unavailable_state: true
-      - entity_id: binary_sensor.desk_occupied_and_computer_active
-        name: Office computer monitor
-        fixed: # measured average
-          power: 80
-        standby_power: 0.2
-  - create_group: Mobile devices
-    entities:
-      - power_sensor_id: sensor.dan_s_phone_power
-        energy_sensor_id: sensor.dan_s_phone_energy
-      - entity_id: device_tracker.rachel_s_phone
-        name: Rachel's phone
-        fixed:
-          power: 0
-          states_power:
-            home: "{{ max(0, states('sensor.rachel_s_phone_battery_power') | float) }}"
-  # - entity_id:
-  #   name: Owlet
-  #   fixed:
-  #     states_power:
-  #       value: 1 # MEASURE use battery percentage, charging, and on child
-  - create_group: Paludarium & fish tank
-    entities:
-      - name: Paludarium
-        daily_fixed_energy:
-          value: 0 # MEASURE
-      - name: Fish tank
-        daily_fixed_energy:
-          value: 0 # MEASURE
-  - create_group: Automation & security
-    entities:
-      - name: Motion sensors
-        daily_fixed_energy:
-          value: 0 # MEASURE
-      - name: Security cameras
-        daily_fixed_energy:
-          value: 0.108 # 3x, from https://www.reddit.com/r/EufyCam/comments/h8o4c5/indoor_cam_2k_power_consumption/
-      - name: Weather stations
-        daily_fixed_energy:
-          value: 0.12 # MEASURE
-  # - name: Picture frame
-  #   daily_fixed_energy:
-  #     value: "{{ 0 if today_at('06:30') < now() < today_at('20:30') else 0 }}" # MEASURE when on and standby
   - entity_id: sensor.dummy
-    name: Picture frame
+    name: Water heater, oven & stove, guest suite, garage, all other
     fixed:
-      power: "{{ 0 if today_at('06:30') < now() < today_at('20:30') else 0 }}" # MEASURE when on and standby
-  - name: Temperature egg
-    daily_fixed_energy:
-      value: 0 # MEASURE
-  # TODO: delete the following once compared against switches and significant variation confirmed
-  - name: Fridge (rated)
-    daily_fixed_energy:
-      value: 1.2684931507 # from https://www.panasonic.com/au/support/product-archives/household/refrigeration/nr-by552xsau.specs.html
-  - name: Freezer (rated)
-    daily_fixed_energy:
-      value: 0.602739726 # from https://commercial.appliancesonline.com.au/p/haier-143l-chest-freezer-hcf143
+      power: >
+        {%- if has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.tracked_power') -%}
+          {{- max(0, states('sensor.power_meter_power_load_consumed') | float - states('sensor.tracked_power') | float) -}}
+        {%- else -%}
+          0
+        {%- endif -%}
