@@ -19,7 +19,8 @@
 
 {%- macro aircon_airspeed(room) -%}
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
-    {%- if states(entity_id) != "off" -%}
+    {%- set mode = states(entity_id) -%}
+    {%- if mode != "off" -%}
         {%- set max_airspeed = 5 -%}
         {%- set max_fan_temp_diff = 7 -%}
         {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
@@ -37,7 +38,11 @@
             {%- set fan_strength = 1 -%}
         {%- elif fan_strength == 'auto' -%}
             {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
-            {%- set temperature_difference = temperature_difference if states(entity_id) == "heat" else -temperature_difference -%}
+            {%- if mode == "heat" -%}
+                {%- set temperature_difference = -temperature_difference -%}
+            {%- elif mode == "heat_cool" -%}
+                {%- set temperature_difference = temperature_difference | abs -%}
+            {%- endif -%}
             {%- set fan_strength = max(0.1, min(1, temperature_difference / max_fan_temp_diff)) -%}
         {%- endif -%}
         {{- max_airspeed * fan_strength -}}
@@ -50,9 +55,14 @@
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
     {%- set max_power_temp_diff = 7 -%}
     {%- set max_airspeed = 5 -%}
+    {%- set mode = states(entity_id) -%}
     {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
-    {%- set temperature_difference = temperature_difference if states(entity_id) == "heat" else -temperature_difference -%}
-    {%- set compressor_power = 200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff)) -%}
+    {%- if mode == "heat" -%}
+        {%- set temperature_difference = -temperature_difference -%}
+    {%- elif mode == "heat_cool" -%}
+        {%- set temperature_difference = temperature_difference | abs -%}
+    {%- endif-%}
+    {%- set compressor_power = (200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff))) if mode != "fan_only" else 0 -%}
     {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed') | float / max_airspeed -%}
     {{- compressor_power + fan_power -}}
 {%- endmacro -%}
