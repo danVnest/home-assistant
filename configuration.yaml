@@ -20,6 +20,12 @@ automation: !include ./configuration/automations.yaml
 config:
 energy:
 frontend:
+  extra_module_url:
+    - /local/community/bar-card/bar-card.js
+    - /local/community/lovelace-auto-entities/auto-entities.js
+    - /local/community/lovelace-card-mod/card-mod.js
+    - /local/community/lovelace-multiple-entity-row/multiple-entity-row.js
+    - /local/community/power-flow-card-plus/power-flow-card-plus.js
 history:
 homeassistant_alerts:
 http:

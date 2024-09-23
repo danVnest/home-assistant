@@ -1,4 +1,97 @@
-energy:
-  name: Monthly energy from grid
-  source: sensor.energy_meter_real_energy_consumed
+monthly_energy_consumed:
+  name: Monthly energy consumed
+  source: sensor.total_energy_consumed
   cycle: monthly
+monthly_energy_from_grid:
+  name: Monthly energy from grid
+  source: sensor.smart_meter_real_energy_consumed
+  cycle: monthly
+
+total_energy:
+  name: Today's total energy cost
+  source: sensor.total_energy_cost
+  cycle: daily
+all_light:
+  name: Today's lights energy cost
+  source: sensor.all_light_energy_cost
+  cycle: daily
+living_room_aircon:
+  name: Today's living room aircon energy cost
+  source: sensor.living_room_aircon_energy_cost
+  cycle: daily
+dining_room_aircon:
+  name: Today's dining room aircon energy cost
+  source: sensor.dining_room_aircon_energy_cost
+  cycle: daily
+bedroom_aircon:
+  name: Today's bedroom aircon energy cost
+  source: sensor.bedroom_aircon_energy_cost
+  cycle: daily
+office_heater:
+  name: Today's office heater energy cost
+  source: sensor.office_heater_energy_cost
+  cycle: daily
+nursery_heater:
+  name: Today's nursery heater energy cost
+  source: sensor.nursery_heater_energy_cost
+  cycle: daily
+all_fan:
+  name: Today's fans energy cost
+  source: sensor.all_fan_energy_cost
+  cycle: daily
+all_humidifier:
+  name: Today's humidifiers energy cost
+  source: sensor.all_humidifier_energy_cost
+  cycle: daily
+kitchen_appliances:
+  name: Today's kitchen appliances energy cost
+  source: sensor.kitchen_appliances_energy_cost
+  cycle: daily
+dishwasher:
+  name: Today's dishwasher energy cost
+  source: sensor.dishwasher_energy_cost
+  cycle: daily
+fridge:
+  name: Today's fridge energy cost
+  source: sensor.fridge_energy_cost
+  cycle: daily
+freezer_mini_fridge_routers:
+  name: Today's freezer, mini fridge, routers energy cost
+  source: sensor.freezer_mini_fridge_routers_energy_cost
+  cycle: daily
+washer:
+  name: Today's washer energy cost
+  source: sensor.washer_energy_cost
+  cycle: daily
+dryer:
+  name: Today's dryer energy cost
+  source: sensor.dryer_energy_cost
+  cycle: daily
+tv_speakers_pc_home_assistant_router_relay_security_hub:
+  name: Today's TV, speakers, PC, etc. energy cost
+  source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost
+  cycle: daily
+water_heater_oven_stove_guest_suite_garage_all_other:
+  name: Today's water heater, oven, guest suite energy cost
+  source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
+  cycle: daily
+office_desk_computer_monitor_cooler_fish_tank:
+  name: Today's office desk, computer & monitor energy cost
+  source: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost
+  cycle: daily
+phone_chargers:
+  name: Today's phone chargers energy cost
+  source: sensor.phone_chargers_energy_cost
+  cycle: daily
+sensors:
+  name: Today's sensors energy cost
+  source: sensor.sensors_energy_cost
+  cycle: daily
+paludarium_picture_frame_camera:
+  name: Today's paludarium, picture frame, camera energy cost
+  source: sensor.paludarium_picture_frame_camera_energy_cost
+  cycle: daily
+all_standby:
+  name: Today's standby energy cost
+  source: sensor.all_standby_energy_cost
+  cycle: daily

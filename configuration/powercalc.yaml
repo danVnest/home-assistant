@@ -3,10 +3,6 @@ create_domain_groups:
   - light
   - fan
   - humidifier
-create_utility_meters: true
-utility_meter_types:
-  - daily
-  - monthly
 sensors:
   - create_group: Tracked
     entities:

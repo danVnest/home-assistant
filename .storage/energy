@@ -15,18 +15,18 @@
         "type": "grid",
         "flow_from": [
           {
-            "stat_energy_from": "sensor.energy_meter_real_energy_consumed",
+            "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
             "stat_cost": null,
-            "entity_energy_price": "sensor.energy_cost_per_wh",
+            "entity_energy_price": "sensor.grid_energy_cost_per_kwh",
             "number_energy_price": null
           }
         ],
         "flow_to": [
           {
-            "stat_energy_to": "sensor.energy_meter_real_energy_produced",
+            "stat_energy_to": "sensor.smart_meter_real_energy_produced",
             "stat_compensation": null,
-            "entity_energy_price": null,
-            "number_energy_price": 0.052
+            "entity_energy_price": "input_number.energy_export_price",
+            "number_energy_price": null
           }
         ],
         "cost_adjustment_day": 0.0

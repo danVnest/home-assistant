@@ -291,3 +291,11 @@ energy_cost_service:
   mode: box
   unit_of_measurement: $/day
   icon: mdi:currency-usd
+energy_export_price:
+  name: Energy export price
+  min: 0.01
+  max: 1
+  step: 0.0001
+  mode: box
+  unit_of_measurement: $/kWh
+  icon: mdi:currency-usd

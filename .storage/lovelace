@@ -1355,51 +1355,372 @@
           ]
         },
         {
-          "title": "Energy",
-          "path": "energy",
-          "icon": "mdi:lightning-bolt",
-          "cards": [
+          "type": "sections",
+          "path": "electricity",
+          "sections": [
             {
-              "type": "entities",
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "input_number.energy_cost_first_100kwh_of_month",
-                  "name": "<100kWh"
+                  "type": "custom:power-flow-card-plus",
+                  "entities": {
+                    "battery": {
+                      "state_of_charge": "sensor.soil_sensor_vegetable_garden_sun_battery_level"
+                    },
+                    "grid": {
+                      "entity": "sensor.power_meter_power_grid",
+                      "secondary_info": {
+                        "template": "",
+                        "accept_negative": true
+                      },
+                      "color_circle": true,
+                      "display_state": "one_way",
+                      "use_metadata": false,
+                      "color_value": true
+                    },
+                    "solar": {
+                      "entity": "sensor.inverter_ac_power",
+                      "display_zero_state": true,
+                      "secondary_info": {},
+                      "color_value": false,
+                      "color_icon": false,
+                      "invert_state": false
+                    },
+                    "fossil_fuel_percentage": {
+                      "state_type": "percentage",
+                      "secondary_info": {},
+                      "entity": "sensor.electricity_maps_grid_fossil_fuel_percentage",
+                      "color_value": false,
+                      "display_zero": false,
+                      "color_icon": true,
+                      "display_zero_state": false,
+                      "name": "Low-carbon"
+                    },
+                    "home": {
+                      "secondary_info": {},
+                      "subtract_individual": false,
+                      "circle_animation": true,
+                      "override_state": false,
+                      "entity": "sensor.power_meter_power_load_consumed"
+                    },
+                    "individual": []
+                  },
+                  "clickable_entities": false,
+                  "display_zero_lines": {
+                    "mode": "show",
+                    "transparency": 50,
+                    "grey_color": [
+                      189,
+                      189,
+                      189
+                    ]
+                  },
+                  "use_new_flow_rate_model": true,
+                  "w_decimals": 0,
+                  "kw_decimals": 1,
+                  "min_flow_rate": 0.75,
+                  "max_flow_rate": 6,
+                  "max_expected_power": 2000,
+                  "min_expected_power": 0.01,
+                  "watt_threshold": 1000,
+                  "transparency_zero_lines": 0,
+                  "disable_dots": false
                 },
                 {
-                  "entity": "input_number.energy_cost_after_first_100kwh_of_month",
-                  "name": ">100kWh"
-                },
-                {
-                  "entity": "input_number.energy_cost_controlled_load",
-                  "name": "Controlled load"
-                },
-                {
-                  "entity": "input_number.energy_cost_green_power",
-                  "name": "Green surcharge"
-                },
-                {
-                  "entity": "input_number.energy_cost_service",
-                  "name": "Service"
+                  "type": "custom:auto-entities",
+                  "card": {
+                    "type": "custom:bar-card",
+                    "height": "30px",
+                    "positions": {
+                      "icon": "inside",
+                      "indicator": "inside"
+                    },
+                    "max": 1000,
+                    "severity": [
+                      {
+                        "color": "#7bc13c",
+                        "from": 0,
+                        "to": 50
+                      },
+                      {
+                        "color": "#c1bb3c",
+                        "from": 50,
+                        "to": 250
+                      },
+                      {
+                        "color": "#ff8100",
+                        "from": 250,
+                        "to": 750
+                      },
+                      {
+                        "color": "#ff6700",
+                        "from": 750,
+                        "to": 1500
+                      },
+                      {
+                        "color": "#ff4d00",
+                        "from": 1500,
+                        "to": 50000
+                      }
+                    ],
+                    "unit_of_measurement": "W",
+                    "decimal": 0,
+                    "card_mod": {
+                      "style": "bar-card-iconbar {\n  --paper-item-icon-color: var(--text-secondary-color) !important;\n  padding-left: 10px;\n  justify-content: left;\n} bar-card-name {\n  white-space: nowrap;\n  width: 100%;\n  padding-right: 10px;\n} bar-card-value {\n  padding-right: 5px\n} bar-card-currentbar, bar-card-backgroundbar {\n  border-radius: 10px !important;\n} bar-card-currentbar {\n  opacity: 0.5;\n}"
+                    }
+                  },
+                  "entities": [
+                    {
+                      "entity": "sensor.all_light_power",
+                      "name": "Lights",
+                      "icon": "mdi:lightbulb-group"
+                    },
+                    {
+                      "entity": "sensor.living_room_aircon_power",
+                      "name": "Living room aircon",
+                      "icon": "mdi:air-conditioner"
+                    },
+                    {
+                      "entity": "sensor.dining_room_aircon_power",
+                      "name": "Dining room aircon",
+                      "icon": "mdi:air-conditioner"
+                    },
+                    {
+                      "entity": "sensor.bedroom_aircon_power",
+                      "name": "Bedroom aircon",
+                      "icon": "mdi:air-conditioner"
+                    },
+                    {
+                      "entity": "sensor.office_heater_power",
+                      "name": "Office heater",
+                      "icon": "mdi:radiator"
+                    },
+                    {
+                      "entity": "sensor.nursery_heater_power",
+                      "name": "Nursery heater",
+                      "icon": "mdi:radiator"
+                    },
+                    {
+                      "entity": "sensor.all_fan_power",
+                      "name": "Fans",
+                      "icon": "mdi:fan"
+                    },
+                    {
+                      "entity": "sensor.all_humidifier_power",
+                      "name": "Humidifiers",
+                      "icon": "mdi:air-humidifier"
+                    },
+                    {
+                      "entity": "sensor.kitchen_appliances_power",
+                      "name": "Kitchen appliances",
+                      "icon": "mdi:kettle-pour-over"
+                    },
+                    {
+                      "entity": "sensor.dishwasher_power",
+                      "name": "Dishwasher",
+                      "icon": "mdi:dishwasher"
+                    },
+                    {
+                      "entity": "sensor.fridge_power",
+                      "name": "Fridge",
+                      "icon": "mdi:fridge"
+                    },
+                    {
+                      "entity": "sensor.freezer_mini_fridge_routers_power",
+                      "name": "Freezer, mini fridge, routers",
+                      "icon": "mdi:fridge-industrial"
+                    },
+                    {
+                      "entity": "sensor.washer_power",
+                      "name": "Washer",
+                      "icon": "mdi:washing-machine"
+                    },
+                    {
+                      "entity": "sensor.dryer_power",
+                      "name": "Dryer",
+                      "icon": "mdi:tumble-dryer"
+                    },
+                    {
+                      "entity": "sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power",
+                      "name": "TV, speakers, PC, Home Assistant, router relay, security hub",
+                      "icon": "mdi:television"
+                    },
+                    {
+                      "entity": "sensor.water_heater_oven_stove_guest_suite_garage_all_other_power",
+                      "name": "Water heater, oven & stove, guest suite, garage, all other",
+                      "icon": "mdi:water-boiler"
+                    },
+                    {
+                      "entity": "sensor.office_desk_computer_monitor_cooler_fish_tank_power",
+                      "name": "Office desk, computer & monitor, cooler, fish tank",
+                      "icon": "mdi:desktop-tower-monitor"
+                    },
+                    {
+                      "entity": "sensor.phone_chargers_power",
+                      "name": "Phone chargers",
+                      "icon": "mdi:cellphone-charging"
+                    },
+                    {
+                      "entity": "sensor.sensors_power",
+                      "name": "Sensors",
+                      "icon": "mdi:motion-sensor"
+                    },
+                    {
+                      "entity": "sensor.paludarium_picture_frame_camera_power",
+                      "name": "Paludarium, picture frame, camera",
+                      "icon": "mdi:fishbowl"
+                    },
+                    {
+                      "entity": "sensor.all_standby_power",
+                      "name": "Standby",
+                      "icon": "mdi:power-standby"
+                    }
+                  ],
+                  "filter": {
+                    "exclude": [
+                      {
+                        "state": "<5"
+                      },
+                      {
+                        "state": "un*"
+                      }
+                    ]
+                  },
+                  "sort": {
+                    "method": "state",
+                    "numeric": true,
+                    "reverse": true
+                  }
                 }
               ],
-              "title": "Energy cost",
-              "show_header_toggle": false
+              "column_span": 1,
+              "title": "Power"
             },
             {
-              "type": "entities",
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "sensor.energy_cost_per_kwh",
-                  "name": "Current cost"
+                  "type": "energy-distribution"
                 },
                 {
-                  "entity": "sensor.monthly_energy_from_grid",
-                  "name": "Grid"
+                  "type": "energy-date-selection"
+                },
+                {
+                  "type": "energy-usage-graph"
+                },
+                {
+                  "type": "energy-devices-detail-graph"
                 }
-              ]
+              ],
+              "title": "Energy",
+              "column_span": 1
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "custom:auto-entities",
+                  "card": {
+                    "type": "entities"
+                  },
+                  "entities": [
+                    {
+                      "entity": "sensor.total_power_cost",
+                      "type": "custom:multiple-entity-row",
+                      "name": "Total",
+                      "icon": "mdi:flash-outline",
+                      "state_header": "Now",
+                      "format": "precision2",
+                      "unit": false,
+                      "styles": {
+                        "width": "43px"
+                      },
+                      "entities": [
+                        {
+                          "entity": "sensor.total_energy_cost_savings",
+                          "name": "Saved",
+                          "format": "precision0",
+                          "unit": false,
+                          "styles": {
+                            "color": "green"
+                          }
+                        },
+                        {
+                          "entity": "sensor.total_energy_cost_over_last_365_days",
+                          "name": "Year",
+                          "format": "precision0",
+                          "unit": false
+                        },
+                        {
+                          "entity": "sensor.total_energy_cost_over_last_30_days",
+                          "name": "Month",
+                          "format": "precision1",
+                          "unit": false
+                        },
+                        {
+                          "entity": "sensor.total_energy_cost_over_last_7_days",
+                          "name": "Week",
+                          "format": "precision1",
+                          "unit": false
+                        },
+                        {
+                          "entity": "sensor.today_s_total_energy_cost",
+                          "name": "Today",
+                          "format": "precision2",
+                          "unit": false
+                        }
+                      ]
+                    },
+                    {
+                      "type": "section"
+                    }
+                  ],
+                  "filter": {
+                    "template": "{% set entities = [\n  {'entity': 'lights', 'name': 'Lights', 'icon': 'mdi:lightbulb-group'},\n  {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'mdi:air-conditioner'},\n  {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'mdi:air-conditioner'},\n  {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'mdi:air-conditioner'},\n  {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'mdi:radiator'},\n  {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'mdi:radiator'},\n  {'entity': 'fans', 'name': 'Fans', 'icon': 'mdi:fan'},\n  {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'mdi:air-humidifier'},\n  {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'mdi:kettle-pour-over'},\n  {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'mdi:dishwasher'},\n  {'entity': 'fridge', 'name': 'Fridge', 'icon': 'mdi:fridge'},\n  {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'mdi:fridge-industrial'},\n  {'entity': 'washer', 'name': 'Washer', 'icon': 'mdi:washing-machine'},\n  {'entity': 'dryer', 'name': 'Dryer', 'icon': 'mdi:tumble-dryer'},\n  {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, etc.', 'icon': 'mdi:television'},\n  {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven, guest suite', 'icon': 'mdi:water-boiler'},\n  {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor', 'icon': 'mdi:desktop-tower-monitor'},\n  {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'mdi:cellphone-charging'},\n  {'entity': 'sensors', 'name': 'Sensors', 'icon': 'mdi:motion-sensor'},\n  {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'mdi:fishbowl'},\n  {'entity': 'standby', 'name': 'Standby', 'icon': 'mdi:power-standby'}\n] %} [{% for item in entities %}\n  {% set entity = 'sensor.' + item.entity %}\n  {{{\n      'entity': entity + '_power_cost',\n      'type': 'custom:multiple-entity-row',\n      'icon': item.icon,\n      'name': item.name,\n      'state_header': 'Now',\n      'format': 'precision2',\n      'secondary_info': false,\n      'unit': false,\n      'styles': {'width': '43px'},\n      'entities': [\n        {\n          'entity': entity + '_energy_cost_savings',\n          'name': 'Saved',\n          'format': 'precision0',\n          'unit': false,\n          'styles': {'color': 'green'},\n        },\n        {\n          'entity': entity + '_energy_cost_over_last_365_days',\n          'name': 'Year',\n          'format': 'precision0',\n          'unit': false,\n        },\n        {\n          'entity': entity + '_energy_cost_over_last_30_days',\n          'name': 'Month',\n          'format': 'precision1',\n          'unit': false,\n        },\n        {\n          'entity': entity + '_energy_cost_over_last_7_days',\n          'name': 'Week',\n          'format': 'precision1',\n          'unit': false,\n        },\n        {\n          'entity': 'sensor.today_s_' + item.entity + '_energy_cost',\n          'name': 'Today',\n          'format': 'precision2',\n          'unit': false,\n        }\n      ]\n  }}},\n{% endfor %}]"
+                  },
+                  "layout_options": {
+                    "grid_columns": "full"
+                  }
+                },
+                {
+                  "type": "entities",
+                  "entities": [
+                    {
+                      "entity": "input_number.energy_cost_first_100kwh_of_month",
+                      "name": "<100kWh"
+                    },
+                    {
+                      "entity": "input_number.energy_cost_after_first_100kwh_of_month",
+                      "name": ">100kWh"
+                    },
+                    {
+                      "entity": "input_number.energy_cost_controlled_load",
+                      "name": "Controlled load"
+                    },
+                    {
+                      "entity": "input_number.energy_cost_green_power",
+                      "name": "Green surcharge"
+                    },
+                    {
+                      "entity": "input_number.energy_cost_service",
+                      "name": "Service"
+                    },
+                    {
+                      "entity": "input_number.energy_export_price",
+                      "name": "Export price"
+                    }
+                  ],
+                  "show_header_toggle": false
+                }
+              ],
+              "column_span": 2
             }
-          ]
+          ],
+          "max_columns": 2,
+          "title": "Electricity",
+          "icon": "mdi:lightning-bolt",
+          "dense_section_placement": true,
+          "cards": []
         },
         {
           "title": "Statistics",

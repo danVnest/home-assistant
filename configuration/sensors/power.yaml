@@ -1,5 +1,0 @@
-- platform: derivative
-  name: Dan's phone charger power
-  source: sensor.dan_s_phone_charger_energy
-  unit: kW
-  time_window: "00:15:00"
