@@ -172,11 +172,11 @@
   state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power') | float * states('sensor.energy_savings_from_solar_per_wh') | float) | round(9) }}"
   unit_of_measurement: $/h
 
-- name: Water heater, oven & stovetop power cost
-  state: "{{ (states('sensor.water_heater_oven_stovetop_power') | float * states('sensor.effective_energy_cost_per_wh') | float) | round(9) }}"
+- name: Water heater, oven & stove, guest suite, garage, all other power cost
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') | float * states('sensor.effective_energy_cost_per_wh') | float) | round(9) }}"
   unit_of_measurement: $/h
-- name: Water heater, oven & stovetop power cost savings
-  state: "{{ (states('sensor.water_heater_oven_stovetop_power') | float * states('sensor.energy_savings_from_solar_per_wh') | float) | round(9) }}"
+- name: Water heater, oven & stove, guest suite, garage, all other power cost savings
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') | float * states('sensor.energy_savings_from_solar_per_wh') | float) | round(9) }}"
   unit_of_measurement: $/h
 
 - name: Office desk, computer & monitor, cooler, fish tank power cost
