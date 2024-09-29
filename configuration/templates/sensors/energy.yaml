@@ -176,7 +176,13 @@
   state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') | float * states('sensor.effective_energy_cost_per_wh') | float) | round(9) }}"
   unit_of_measurement: $/h
 - name: Water heater, oven & stove, guest suite, garage, all other power cost savings
-  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') | float * states('sensor.energy_savings_from_solar_per_wh') | float) | round(9) }}"
+  # assume water heater usage when solar available, use controlled load costs
+  state: >
+    {{
+      (states('input_number.energy_cost_green_power') | float +
+      states('input_number.energy_cost_controlled_load') | float) *
+      states('sensor.power_meter_relative_autonomy') | float / 100
+    }}
   unit_of_measurement: $/h
 
 - name: Office desk, computer & monitor, cooler, fish tank power cost
