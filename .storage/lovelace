@@ -4,7 +4,8 @@
   "key": "lovelace",
   "data": {
     "config": {
-      "title": "Smart Nest",
+      "title": "Nest Home Assistant",
+      "background": "var(--background-image)",
       "views": [
         {
           "title": "Overview",
