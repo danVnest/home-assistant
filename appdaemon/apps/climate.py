@@ -1293,6 +1293,12 @@ class Humidifier(ClimateDevice, PresenceDevice):
             new=lambda x: x != "off",
             old="off",
         )
+        self.controller.listen_state(self.sync_lighting, f"light.{room}")
+        self.controller.listen_state(
+            self.disable_beep,
+            f"switch.{self.room}_humidifier_beeper",
+            new="on",
+        )
         self.already_notified_of_empty_water_tank = False
 
     @property
@@ -1412,3 +1418,30 @@ class Humidifier(ClimateDevice, PresenceDevice):
             self.set_constant_humidity_mode()
             self.target_humidity = self.desired_target_humidity
         return False
+
+    def sync_lighting(
+        self,
+        entity: str,
+        attribute: str,
+        old: float,
+        new: float,
+        **kwargs: dict,
+    ):
+        """Sync the humidifier's light with the room's light."""
+        del entity, attribute, old, kwargs
+        if new != "on":
+            new = "off"
+        if new != self.controller.get_state(f"light.{self.room}_humidifier"):
+            self.controller.set_state(f"light.{self.room}_humidifier", state=new)
+
+    def disable_beep(
+        self,
+        entity: str,
+        attribute: str,
+        old: float,
+        new: float,
+        **kwargs: dict,
+    ):
+        """Ensure the humidifier is set to not beep on status change."""
+        del entity, attribute, old, new, kwargs
+        self.controller.set_state(f"switch.{self.room}_humidifier_beeper", state="off")
