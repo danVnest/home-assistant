@@ -232,7 +232,7 @@
       {%- elif current_battery_level in (80, 100) -%}
         {%- set time_since_last_update = (as_timestamp(now()) - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time') | float(as_timestamp(now()))) -%}
         {%- if time_since_last_update > 0.1 -%}
-          {%- set trickle_charge_power = 0.5 -%}
+          {%- set trickle_charge_power = 0.0005 -%}
           {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
         {%- endif -%}
       {%- endif -%}
