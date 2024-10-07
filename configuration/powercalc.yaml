@@ -228,7 +228,8 @@ sensors:
               power: "{{ 4 if today_at('10:00') < now() < today_at('17:00') else 2 }}"
       - create_group: Phone chargers
         entities:
-          - power_sensor_id: sensor.dan_s_phone_charger_power
+          - entity_id: sensor.dummy
+            power_sensor_id: sensor.dan_s_phone_charger_power
             energy_sensor_id: sensor.dan_s_phone_charger_energy
           - entity_id: device_tracker.rachel_s_phone
             name: Rachel's phone charger
