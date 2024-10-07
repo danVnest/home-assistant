@@ -2,6 +2,826 @@
   name: Total energy consumed
   source: sensor.power_meter_power_load_consumed
 
+- platform: influxdb
+  host: a0d7b954-influxdb
+  database: homeassistant
+  username: homeassistant
+  password: !secret influx_password
+  queries:
+    - name: Total energy cost weekly
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Total energy cost monthly
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Total energy cost yearly
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Total energy cost savings weekly
+      value_template: "{{ (states('sensor.total_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Total energy cost savings monthly
+      value_template: "{{ (states('sensor.total_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Total energy cost savings yearly
+      value_template: "{{ (states('sensor.total_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''total_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Lights energy cost weekly
+      value_template: "{{ (states('sensor.lights_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Lights energy cost monthly
+      value_template: "{{ (states('sensor.lights_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Lights energy cost yearly
+      value_template: "{{ (states('sensor.lights_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Lights energy cost savings weekly
+      value_template: "{{ (states('sensor.lights_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Lights energy cost savings monthly
+      value_template: "{{ (states('sensor.lights_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Lights energy cost savings yearly
+      value_template: "{{ (states('sensor.lights_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''lights_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Living room aircon energy cost weekly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Living room aircon energy cost monthly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Living room aircon energy cost yearly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Living room aircon energy cost savings weekly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Living room aircon energy cost savings monthly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Living room aircon energy cost savings yearly
+      value_template: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''living_room_aircon_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Dining room aircon energy cost weekly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dining room aircon energy cost monthly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dining room aircon energy cost yearly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Dining room aircon energy cost savings weekly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dining room aircon energy cost savings monthly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dining room aircon energy cost savings yearly
+      value_template: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dining_room_aircon_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Bedroom aircon energy cost weekly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Bedroom aircon energy cost monthly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Bedroom aircon energy cost yearly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Bedroom aircon energy cost savings weekly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Bedroom aircon energy cost savings monthly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Bedroom aircon energy cost savings yearly
+      value_template: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''bedroom_aircon_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Office heater energy cost weekly
+      value_template: "{{ (states('sensor.office_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Office heater energy cost monthly
+      value_template: "{{ (states('sensor.office_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Office heater energy cost yearly
+      value_template: "{{ (states('sensor.office_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Office heater energy cost savings weekly
+      value_template: "{{ (states('sensor.office_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Office heater energy cost savings monthly
+      value_template: "{{ (states('sensor.office_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Office heater energy cost savings yearly
+      value_template: "{{ (states('sensor.office_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_heater_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Nursery heater energy cost weekly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Nursery heater energy cost monthly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Nursery heater energy cost yearly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Nursery heater energy cost savings weekly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Nursery heater energy cost savings monthly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Nursery heater energy cost savings yearly
+      value_template: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''nursery_heater_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Fans energy cost weekly
+      value_template: "{{ (states('sensor.fans_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Fans energy cost monthly
+      value_template: "{{ (states('sensor.fans_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Fans energy cost yearly
+      value_template: "{{ (states('sensor.fans_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Fans energy cost savings weekly
+      value_template: "{{ (states('sensor.fans_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Fans energy cost savings monthly
+      value_template: "{{ (states('sensor.fans_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Fans energy cost savings yearly
+      value_template: "{{ (states('sensor.fans_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fans_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Humidifiers energy cost weekly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Humidifiers energy cost monthly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Humidifiers energy cost yearly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Humidifiers energy cost savings weekly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Humidifiers energy cost savings monthly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Humidifiers energy cost savings yearly
+      value_template: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''humidifiers_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Kitchen appliances energy cost weekly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Kitchen appliances energy cost monthly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Kitchen appliances energy cost yearly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Kitchen appliances energy cost savings weekly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Kitchen appliances energy cost savings monthly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Kitchen appliances energy cost savings yearly
+      value_template: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''kitchen_appliances_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Dishwasher energy cost weekly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dishwasher energy cost monthly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dishwasher energy cost yearly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Dishwasher energy cost savings weekly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dishwasher energy cost savings monthly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dishwasher energy cost savings yearly
+      value_template: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dishwasher_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Fridge energy cost weekly
+      value_template: "{{ (states('sensor.fridge_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Fridge energy cost monthly
+      value_template: "{{ (states('sensor.fridge_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Fridge energy cost yearly
+      value_template: "{{ (states('sensor.fridge_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Fridge energy cost savings weekly
+      value_template: "{{ (states('sensor.fridge_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Fridge energy cost savings monthly
+      value_template: "{{ (states('sensor.fridge_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Fridge energy cost savings yearly
+      value_template: "{{ (states('sensor.fridge_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''fridge_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Freezer, mini fridge, routers energy cost weekly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Freezer, mini fridge, routers energy cost monthly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Freezer, mini fridge, routers energy cost yearly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Freezer, mini fridge, routers energy cost savings weekly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Freezer, mini fridge, routers energy cost savings monthly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Freezer, mini fridge, routers energy cost savings yearly
+      value_template: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Washer energy cost weekly
+      value_template: "{{ (states('sensor.washer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Washer energy cost monthly
+      value_template: "{{ (states('sensor.washer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Washer energy cost yearly
+      value_template: "{{ (states('sensor.washer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Washer energy cost savings weekly
+      value_template: "{{ (states('sensor.washer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Washer energy cost savings monthly
+      value_template: "{{ (states('sensor.washer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Washer energy cost savings yearly
+      value_template: "{{ (states('sensor.washer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''washer_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Dryer energy cost weekly
+      value_template: "{{ (states('sensor.dryer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dryer energy cost monthly
+      value_template: "{{ (states('sensor.dryer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dryer energy cost yearly
+      value_template: "{{ (states('sensor.dryer_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Dryer energy cost savings weekly
+      value_template: "{{ (states('sensor.dryer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Dryer energy cost savings monthly
+      value_template: "{{ (states('sensor.dryer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Dryer energy cost savings yearly
+      value_template: "{{ (states('sensor.dryer_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''dryer_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost weekly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost monthly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost yearly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings weekly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings monthly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings yearly
+      value_template: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost weekly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost monthly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost yearly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings weekly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings monthly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings yearly
+      value_template: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost weekly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost monthly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost yearly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost savings weekly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost savings monthly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Office desk, computer & monitor, cooler, fish tank energy cost savings yearly
+      value_template: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Phone chargers energy cost weekly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Phone chargers energy cost monthly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Phone chargers energy cost yearly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Phone chargers energy cost savings weekly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Phone chargers energy cost savings monthly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Phone chargers energy cost savings yearly
+      value_template: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''phone_chargers_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Sensors energy cost weekly
+      value_template: "{{ (states('sensor.sensors_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Sensors energy cost monthly
+      value_template: "{{ (states('sensor.sensors_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Sensors energy cost yearly
+      value_template: "{{ (states('sensor.sensors_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Sensors energy cost savings weekly
+      value_template: "{{ (states('sensor.sensors_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Sensors energy cost savings monthly
+      value_template: "{{ (states('sensor.sensors_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Sensors energy cost savings yearly
+      value_template: "{{ (states('sensor.sensors_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''sensors_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Paludarium, picture frame, camera energy cost weekly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Paludarium, picture frame, camera energy cost monthly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Paludarium, picture frame, camera energy cost yearly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Paludarium, picture frame, camera energy cost savings weekly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Paludarium, picture frame, camera energy cost savings monthly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Paludarium, picture frame, camera energy cost savings yearly
+      value_template: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''paludarium_picture_frame_camera_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
+    - name: Standby energy cost weekly
+      value_template: "{{ (states('sensor.standby_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Standby energy cost monthly
+      value_template: "{{ (states('sensor.standby_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Standby energy cost yearly
+      value_template: "{{ (states('sensor.standby_energy_cost')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+    - name: Standby energy cost savings weekly
+      value_template: "{{ (states('sensor.standby_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost_savings'' AND time >= now() - 7d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/week
+    - name: Standby energy cost savings monthly
+      value_template: "{{ (states('sensor.standby_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost_savings'' AND time >= now() - 30d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/month
+    - name: Standby energy cost savings yearly
+      value_template: "{{ (states('sensor.standby_energy_cost_savings')|float - value|float)|round(2) }}"
+      where: '"entity_id" = ''standby_energy_cost_savings'' AND time >= now() - 365d'
+      group_function: first
+      measurement: '"$"'
+      unit_of_measurement: $/year
+
 - platform: integration
   name: Total energy cost
   source: sensor.total_power_cost
@@ -14,42 +834,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Total energy cost over last 7 days
-  entity_id: sensor.total_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Total energy cost over last 30 days
-  entity_id: sensor.total_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Total energy cost over last 365 days
-  entity_id: sensor.total_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Total energy cost savings over last 7 days
-  entity_id: sensor.total_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Total energy cost savings over last 30 days
-  entity_id: sensor.total_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Total energy cost savings over last 365 days
-  entity_id: sensor.total_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Lights energy cost
@@ -63,42 +847,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Lights energy cost over last 7 days
-  entity_id: sensor.lights_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Lights energy cost over last 30 days
-  entity_id: sensor.lights_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Lights energy cost over last 365 days
-  entity_id: sensor.lights_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Lights energy cost savings over last 7 days
-  entity_id: sensor.lights_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Lights energy cost savings over last 30 days
-  entity_id: sensor.lights_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Lights energy cost savings over last 365 days
-  entity_id: sensor.lights_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Living room aircon energy cost
@@ -112,42 +860,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Living room aircon energy cost over last 7 days
-  entity_id: sensor.living_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Living room aircon energy cost over last 30 days
-  entity_id: sensor.living_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Living room aircon energy cost over last 365 days
-  entity_id: sensor.living_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Living room aircon energy cost savings over last 7 days
-  entity_id: sensor.living_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Living room aircon energy cost savings over last 30 days
-  entity_id: sensor.living_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Living room aircon energy cost savings over last 365 days
-  entity_id: sensor.living_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Dining room aircon energy cost
@@ -161,42 +873,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Dining room aircon energy cost over last 7 days
-  entity_id: sensor.dining_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dining room aircon energy cost over last 30 days
-  entity_id: sensor.dining_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dining room aircon energy cost over last 365 days
-  entity_id: sensor.dining_room_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Dining room aircon energy cost savings over last 7 days
-  entity_id: sensor.dining_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dining room aircon energy cost savings over last 30 days
-  entity_id: sensor.dining_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dining room aircon energy cost savings over last 365 days
-  entity_id: sensor.dining_room_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Bedroom aircon energy cost
@@ -210,42 +886,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Bedroom aircon energy cost over last 7 days
-  entity_id: sensor.bedroom_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Bedroom aircon energy cost over last 30 days
-  entity_id: sensor.bedroom_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Bedroom aircon energy cost over last 365 days
-  entity_id: sensor.bedroom_aircon_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Bedroom aircon energy cost savings over last 7 days
-  entity_id: sensor.bedroom_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Bedroom aircon energy cost savings over last 30 days
-  entity_id: sensor.bedroom_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Bedroom aircon energy cost savings over last 365 days
-  entity_id: sensor.bedroom_aircon_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Office heater energy cost
@@ -259,42 +899,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Office heater energy cost over last 7 days
-  entity_id: sensor.office_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Office heater energy cost over last 30 days
-  entity_id: sensor.office_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Office heater energy cost over last 365 days
-  entity_id: sensor.office_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Office heater energy cost savings over last 7 days
-  entity_id: sensor.office_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Office heater energy cost savings over last 30 days
-  entity_id: sensor.office_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Office heater energy cost savings over last 365 days
-  entity_id: sensor.office_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Nursery heater energy cost
@@ -308,42 +912,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Nursery heater energy cost over last 7 days
-  entity_id: sensor.nursery_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Nursery heater energy cost over last 30 days
-  entity_id: sensor.nursery_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Nursery heater energy cost over last 365 days
-  entity_id: sensor.nursery_heater_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Nursery heater energy cost savings over last 7 days
-  entity_id: sensor.nursery_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Nursery heater energy cost savings over last 30 days
-  entity_id: sensor.nursery_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Nursery heater energy cost savings over last 365 days
-  entity_id: sensor.nursery_heater_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Fans energy cost
@@ -357,42 +925,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Fans energy cost over last 7 days
-  entity_id: sensor.fans_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Fans energy cost over last 30 days
-  entity_id: sensor.fans_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Fans energy cost over last 365 days
-  entity_id: sensor.fans_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Fans energy cost savings over last 7 days
-  entity_id: sensor.fans_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Fans energy cost savings over last 30 days
-  entity_id: sensor.fans_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Fans energy cost savings over last 365 days
-  entity_id: sensor.fans_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Humidifiers energy cost
@@ -406,42 +938,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Humidifiers energy cost over last 7 days
-  entity_id: sensor.humidifiers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Humidifiers energy cost over last 30 days
-  entity_id: sensor.humidifiers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Humidifiers energy cost over last 365 days
-  entity_id: sensor.humidifiers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Humidifiers energy cost savings over last 7 days
-  entity_id: sensor.humidifiers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Humidifiers energy cost savings over last 30 days
-  entity_id: sensor.humidifiers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Humidifiers energy cost savings over last 365 days
-  entity_id: sensor.humidifiers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Kitchen appliances energy cost
@@ -455,42 +951,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Kitchen appliances energy cost over last 7 days
-  entity_id: sensor.kitchen_appliances_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Kitchen appliances energy cost over last 30 days
-  entity_id: sensor.kitchen_appliances_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Kitchen appliances energy cost over last 365 days
-  entity_id: sensor.kitchen_appliances_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Kitchen appliances energy cost savings over last 7 days
-  entity_id: sensor.kitchen_appliances_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Kitchen appliances energy cost savings over last 30 days
-  entity_id: sensor.kitchen_appliances_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Kitchen appliances energy cost savings over last 365 days
-  entity_id: sensor.kitchen_appliances_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Dishwasher energy cost
@@ -504,42 +964,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Dishwasher energy cost over last 7 days
-  entity_id: sensor.dishwasher_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dishwasher energy cost over last 30 days
-  entity_id: sensor.dishwasher_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dishwasher energy cost over last 365 days
-  entity_id: sensor.dishwasher_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Dishwasher energy cost savings over last 7 days
-  entity_id: sensor.dishwasher_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dishwasher energy cost savings over last 30 days
-  entity_id: sensor.dishwasher_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dishwasher energy cost savings over last 365 days
-  entity_id: sensor.dishwasher_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Fridge energy cost
@@ -553,42 +977,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Fridge energy cost over last 7 days
-  entity_id: sensor.fridge_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Fridge energy cost over last 30 days
-  entity_id: sensor.fridge_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Fridge energy cost over last 365 days
-  entity_id: sensor.fridge_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Fridge energy cost savings over last 7 days
-  entity_id: sensor.fridge_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Fridge energy cost savings over last 30 days
-  entity_id: sensor.fridge_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Fridge energy cost savings over last 365 days
-  entity_id: sensor.fridge_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Freezer, mini fridge, routers energy cost
@@ -602,43 +990,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost over last 7 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost over last 30 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost over last 365 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost savings over last 7 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost savings over last 30 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Freezer, mini fridge, routers energy cost savings over last 365 days
-  entity_id: sensor.freezer_mini_fridge_routers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Washer energy cost
@@ -652,42 +1003,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Washer energy cost over last 7 days
-  entity_id: sensor.washer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Washer energy cost over last 30 days
-  entity_id: sensor.washer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Washer energy cost over last 365 days
-  entity_id: sensor.washer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Washer energy cost savings over last 7 days
-  entity_id: sensor.washer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Washer energy cost savings over last 30 days
-  entity_id: sensor.washer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Washer energy cost savings over last 365 days
-  entity_id: sensor.washer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Dryer energy cost
@@ -701,42 +1016,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Dryer energy cost over last 7 days
-  entity_id: sensor.dryer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dryer energy cost over last 30 days
-  entity_id: sensor.dryer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dryer energy cost over last 365 days
-  entity_id: sensor.dryer_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Dryer energy cost savings over last 7 days
-  entity_id: sensor.dryer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Dryer energy cost savings over last 30 days
-  entity_id: sensor.dryer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Dryer energy cost savings over last 365 days
-  entity_id: sensor.dryer_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost
@@ -750,42 +1029,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost over last 7 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost over last 30 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost over last 365 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings over last 7 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings over last 30 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings over last 365 days
-  entity_id: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Water heater, oven & stove, guest suite, garage, all other energy cost
@@ -799,42 +1042,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost over last 7 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost over last 30 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost over last 365 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost savings over last 7 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost savings over last 30 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost savings over last 365 days
-  entity_id: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Office desk, computer & monitor, cooler, fish tank energy cost
@@ -848,42 +1055,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost over last 7 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost over last 30 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost over last 365 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost savings over last 7 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost savings over last 30 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Office desk, computer & monitor, cooler, fish tank energy cost savings over last 365 days
-  entity_id: sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Phone chargers energy cost
@@ -897,42 +1068,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Phone chargers energy cost over last 7 days
-  entity_id: sensor.phone_chargers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Phone chargers energy cost over last 30 days
-  entity_id: sensor.phone_chargers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Phone chargers energy cost over last 365 days
-  entity_id: sensor.phone_chargers_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Phone chargers energy cost savings over last 7 days
-  entity_id: sensor.phone_chargers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Phone chargers energy cost savings over last 30 days
-  entity_id: sensor.phone_chargers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Phone chargers energy cost savings over last 365 days
-  entity_id: sensor.phone_chargers_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Sensors energy cost
@@ -946,42 +1081,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Sensors energy cost over last 7 days
-  entity_id: sensor.sensors_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Sensors energy cost over last 30 days
-  entity_id: sensor.sensors_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Sensors energy cost over last 365 days
-  entity_id: sensor.sensors_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Sensors energy cost savings over last 7 days
-  entity_id: sensor.sensors_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Sensors energy cost savings over last 30 days
-  entity_id: sensor.sensors_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Sensors energy cost savings over last 365 days
-  entity_id: sensor.sensors_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Paludarium, picture frame, camera energy cost
@@ -995,42 +1094,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost over last 7 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost over last 30 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost over last 365 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost savings over last 7 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost savings over last 30 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Paludarium, picture frame, camera energy cost savings over last 365 days
-  entity_id: sensor.paludarium_picture_frame_camera_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: integration
   name: Standby energy cost
@@ -1044,42 +1107,6 @@
   method: left
   max_sub_interval:
     minutes: 1
-- platform: statistics
-  name: Standby energy cost over last 7 days
-  entity_id: sensor.standby_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Standby energy cost over last 30 days
-  entity_id: sensor.standby_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Standby energy cost over last 365 days
-  entity_id: sensor.standby_energy_cost
-  state_characteristic: change
-  max_age:
-    days: 365
-- platform: statistics
-  name: Standby energy cost savings over last 7 days
-  entity_id: sensor.standby_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 7
-- platform: statistics
-  name: Standby energy cost savings over last 30 days
-  entity_id: sensor.standby_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 30
-- platform: statistics
-  name: Standby energy cost savings over last 365 days
-  entity_id: sensor.standby_energy_cost_savings
-  state_characteristic: change
-  max_age:
-    days: 365
 
 - platform: derivative
   name: Dan's phone charger power

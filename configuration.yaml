@@ -37,6 +37,12 @@ http:
   login_attempts_threshold: 10
 ifttt:
   key: !secret ifttt_key
+influxdb:
+  host: a0d7b954-influxdb
+  database: homeassistant
+  username: homeassistant
+  password: !secret influx_password
+  max_retries: 3
 logbook:
 mobile_app:
 my:
