@@ -10,3 +10,20 @@
 # TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
 # Maybe set up homekit here on zwave setup completion? Or maybe do this here:
 # https://app.asana.com/0/1207020279479204/1207033183175579/f
+
+- alias: Automatic theme change
+  description: "Automatically change the theme between light and dark based on sun position"
+  trigger:
+    - platform: homeassistant
+      event: start
+    - platform: state
+      entity_id: sun.sun
+  action:
+    - service_template: frontend.set_theme
+      data_template:
+        name: >
+          {% if is_state('sun.sun', 'above_horizon') %}
+            ios-light-mode-light-green
+          {% else %}
+            ios-dark-mode-dark-green
+          {% endif %}
