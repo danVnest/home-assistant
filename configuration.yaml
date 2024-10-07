@@ -31,10 +31,11 @@ frontend:
 history:
 homeassistant_alerts:
 http:
-  ssl_certificate: /ssl/fullchain.pem
-  ssl_key: /ssl/privkey.pem
   ip_ban_enabled: true
   login_attempts_threshold: 10
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
 ifttt:
   key: !secret ifttt_key
 influxdb:
