@@ -74,12 +74,20 @@ sensors:
       - entity_id: humidifier.bedroom
         name: Bedroom humidifier
         fixed: # measured with a smart switch
-          power: "{{ 26 if state_attr('humidifier.bedroom', 'humidity') > state_attr('humidifier.bedroom', 'current_humidity') else 15.6 }}"
+          power: >
+            {{
+              26 if state_attr('humidifier.bedroom', 'humidity') > state_attr('humidifier.bedroom', 'current_humidity') else 15.6
+              + 3 if states('light.bedroom_humidifier') == 'on' else 0
+            }}
         standby_power: 0.5 # estimate
       - entity_id: humidifier.nursery
         name: Nursery humidifier
         fixed: # measured with a smart switch
-          power: "{{ 26 if state_attr('humidifier.nursery', 'humidity') > state_attr('humidifier.nursery', 'current_humidity') else 15.6 }}"
+          power: >
+            {{
+              26 if state_attr('humidifier.nursery', 'humidity') > state_attr('humidifier.nursery', 'current_humidity') else 15.6
+              + 3 if states('light.nursery_humidifier') == 'on' else 0
+            }}
         standby_power: 0.5 # estimate
       - create_group: Entryway lights
         hide_members: true
@@ -140,10 +148,6 @@ sensors:
           min_power: 2 # estimate
           max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_132cm.pdf
         standby_power: 0.25 # estimate (equal split between fan and light)
-      - entity_id: light.bedroom_humidifier
-        name: Bedroom humidifier light
-        fixed:
-          power: 3 # estimate (standby power specified in humidifier config)
       - entity_id: light.office
         name: Office light
         linear:
@@ -156,10 +160,6 @@ sensors:
           min_power: 2 # estimate
           max_power: 18 # from https://hunterpacificinternational.com.au/downloads/datasheets/EvolveECDC_122cm.pdf
         standby_power: 0.25 # estimate (equal split between fan and light)
-      - entity_id: light.nursery_humidifier
-        name: Nursery humidifier light
-        fixed:
-          power: 3 # estimate (standby power specified in humidifier config)
       - create_group: TV, speakers, PC, Home Assistant, router relay, security hub
         entities:
           - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
