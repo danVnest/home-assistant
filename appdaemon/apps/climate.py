@@ -1293,11 +1293,16 @@ class Humidifier(ClimateDevice, PresenceDevice):
             new=lambda x: x != "off",
             old="off",
         )
-        self.controller.listen_state(self.sync_lighting, f"light.{room}")
+        self.controller.listen_state(
+            self.sync_lighting,
+            f"light.{room}",
+            immediate=True,
+        )
         self.controller.listen_state(
             self.disable_beep,
             f"switch.{self.room}_humidifier_beeper",
             new="on",
+            immediate=True,
         )
         self.already_notified_of_empty_water_tank = False
 
@@ -1429,6 +1434,10 @@ class Humidifier(ClimateDevice, PresenceDevice):
     ):
         """Sync the humidifier's light with the room's light."""
         del entity, attribute, old, kwargs
+        self.controller.log(
+            f"The {self.room} light is now {new}, syncing humidifier light "
+            f"(currently {self.controller.get_state(f'light.{self.room}_humidifier')})",
+        )
         if new != "on":
             new = "off"
         if new != self.controller.get_state(f"light.{self.room}_humidifier"):
