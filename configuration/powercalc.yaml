@@ -213,6 +213,12 @@ sensors:
           - entity_id: switch.kitchen_switch
             power_sensor_id: sensor.kitchen_switch_power
             ignore_unavailable_state: true
+      - entity_id: switch.washer
+        power_sensor_id: sensor.washer_power
+        energy_sensor_id: sensor.washer_energy
+      - entity_id: switch.dryer
+        power_sensor_id: sensor.dryer_power
+        energy_sensor_id: sensor.dryer_energy
       - create_group: Office desk, computer & monitor, cooler, fish tank
         entities:
           - entity_id: switch.office_desk
