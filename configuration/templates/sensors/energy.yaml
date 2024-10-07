@@ -95,6 +95,7 @@
   unit_of_measurement: $/h
 - name: Bedroom aircon power cost savings
   state: "{{ (states('sensor.bedroom_aircon_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
+  unit_of_measurement: $/h
 
 - name: Office heater power cost
   state: "{{ (states('sensor.office_heater_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
