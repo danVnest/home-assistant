@@ -2,7 +2,7 @@
   state: >
     {{
       states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
-      states('sensor.office_presence_sensor_distance') | float < 1.5
+      states('sensor.office_presence_sensor_distance')|float < 1.5
     }}
   delay_on: 0:00:05
   delay_off: 0:00:05
@@ -23,7 +23,7 @@
   state: >
     {{
       states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
-      states('sensor.office_presence_sensor_distance') | float > 2.3
+      states('sensor.office_presence_sensor_distance')|float > 2.3
     }}
   delay_on: 0:00:10
   delay_off: 0:05
@@ -35,7 +35,7 @@
       states('binary_sensor.bedroom_bed_occupied') == 'on'
     }}
 - name: Bedroom presence sensor distance in bed range
-  state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance') | float < 2.5 }}"
+  state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance')|float < 2.5 }}"
   delay_off: 0:00:15
 - name: Anyone asleep
   state: >
@@ -48,7 +48,7 @@
   delay_off: 0:05
 - name: Rachel's phone's sleep confidence high
   unique_id: rachel_s_phone_sleep_confidence_high
-  state: "{{ states('sensor.rachel_s_phone_sleep_confidence') | float > 75 }}"
+  state: "{{ states('sensor.rachel_s_phone_sleep_confidence')|float > 75 }}"
 - name: Rachel's phone still
   unique_id: rachel_s_phone_still
   state: "{{ states('sensor.rachel_s_phone_detected_activity') == 'still' }}"

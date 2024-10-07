@@ -15,7 +15,7 @@
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Bedroom airspeed
-  state: "{{ states('sensor.bedroom_fan_airspeed') | float + states('sensor.bedroom_aircon_airspeed') | float}}"
+  state: "{{ states('sensor.bedroom_fan_airspeed')|float + states('sensor.bedroom_aircon_airspeed')|float}}"
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Dining room aircon airspeed
@@ -47,7 +47,7 @@
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Living room airspeed
-  state: "{{ states('sensor.living_room_aircon_airspeed') | float / 3}}"
+  state: "{{ states('sensor.living_room_aircon_airspeed')|float / 3}}"
   unit_of_measurement: "m/s"
   state_class: measurement
 - name: Nursery airspeed

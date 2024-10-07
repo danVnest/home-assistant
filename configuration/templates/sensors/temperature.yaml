@@ -1,15 +1,15 @@
 - name: Weighted average inside apparent temperature
   state: >
     {{ ((
-    states('sensor.bathroom_apparent_temperature') | float +
-    3 * states('sensor.bedroom_apparent_temperature') | float +
-    states('sensor.dining_room_apparent_temperature') | float +
-    states('sensor.entryway_apparent_temperature') | float +
-    states('sensor.kitchen_apparent_temperature') | float +
-    4 * states('sensor.living_room_apparent_temperature') | float +
-    2 * states('sensor.nursery_apparent_temperature') | float +
-    states('sensor.office_apparent_temperature') | float
-    ) / 14 ) | round(1) }}
+    states('sensor.bathroom_apparent_temperature')|float +
+    3 * states('sensor.bedroom_apparent_temperature')|float +
+    states('sensor.dining_room_apparent_temperature')|float +
+    states('sensor.entryway_apparent_temperature')|float +
+    states('sensor.kitchen_apparent_temperature')|float +
+    4 * states('sensor.living_room_apparent_temperature')|float +
+    2 * states('sensor.nursery_apparent_temperature')|float +
+    states('sensor.office_apparent_temperature')|float
+    ) / 14 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 
@@ -17,16 +17,16 @@
   state: >
     {{ ((
     2 * state_attr('climate.bedroom_aircon', 'current_temperature') +
-    states('sensor.bedroom_humidifier_temperature') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.bedroom_humidifier_temperature')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Bedroom humidity
   state: >
     {{ ((
     2 * state_attr('climate.bedroom_aircon', 'current_humidity') +
-    states('sensor.bedroom_humidifier_humidity') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.bedroom_humidifier_humidity')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
@@ -34,18 +34,18 @@
   state: >
     {{ ((
     state_attr('climate.dining_room_aircon', 'current_temperature') +
-    states('sensor.dining_room_multisensor_temperature') | float +
-      states('sensor.dog_bed_area_sensor_temperature') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.dining_room_multisensor_temperature')|float +
+      states('sensor.dog_bed_area_sensor_temperature')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Dining room humidity
   state: >
     {{ ((
     state_attr('climate.dining_room_aircon', 'current_humidity') +
-    states('sensor.dining_room_multisensor_humidity') | float +
-    states('sensor.dog_bed_area_sensor_humidity') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.dining_room_multisensor_humidity')|float +
+    states('sensor.dog_bed_area_sensor_humidity')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
@@ -53,16 +53,16 @@
   state: >
     {{ ((
     state_attr('climate.living_room_aircon', 'current_temperature') +
-    states('sensor.soil_sensor_hub_indoor_temperature') | float
-    ) / 2 ) | round(1) }}
+    states('sensor.soil_sensor_hub_indoor_temperature')|float
+    ) / 2 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Kitchen humidity
   state: >
     {{ ((
     state_attr('climate.living_room_aircon', 'current_humidity') +
-    states('sensor.soil_sensor_hub_indoor_humidity') | float
-    ) / 2 ) | round(1) }}
+    states('sensor.soil_sensor_hub_indoor_humidity')|float
+    ) / 2 )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
@@ -71,8 +71,8 @@
     {{ ((
     state_attr('climate.living_room_aircon', 'current_temperature') +
     state_attr('climate.dining_room_aircon', 'current_temperature') +
-    states('sensor.hall_multisensor_temperature') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.hall_multisensor_temperature')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Living room humidity
@@ -80,8 +80,8 @@
     {{ ((
     state_attr('climate.living_room_aircon', 'current_humidity') +
     state_attr('climate.dining_room_aircon', 'current_humidity') +
-    states('sensor.hall_multisensor_humidity') | float
-    ) / 3 ) | round(1) }}
+    states('sensor.hall_multisensor_humidity')|float
+    ) / 3 )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
@@ -89,43 +89,43 @@
   state: >
     {{ ((
     state_attr('climate.nursery_heater', 'current_temperature') +
-    states('sensor.nursery_sensor_temperature') | float +
-    states('sensor.nursery_humidifier_temperature') | float 
-    ) / 3 ) | round(1) }}
+    states('sensor.nursery_sensor_temperature')|float +
+    states('sensor.nursery_humidifier_temperature')|float 
+    ) / 3 )|round(1) }}
   unit_of_measurement: "°C"
   state_class: measurement
 - name: Nursery humidity
   state: >
     {{ ((
-    states('sensor.nursery_sensor_humidity') | float +
-    states('sensor.nursery_humidifier_humidity') | float 
-    ) / 2 ) | round(1) }}
+    states('sensor.nursery_sensor_humidity')|float +
+    states('sensor.nursery_humidifier_humidity')|float 
+    ) / 2 )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
 - name: Office humidity
   state: >
     {{ (
-    states('sensor.office_sensor_humidity') | float
-    ) | round(1) }}
+    states('sensor.office_sensor_humidity')|float
+    )|round(1) }}
   unit_of_measurement: "%"
   state_class: measurement
 
 - name: Extreme forecast
   state: >
     {%- set forecasts = (
-      states('sensor.outside_apparent_temperature_2h_forecast') | float,
-      states('sensor.outside_apparent_temperature_4h_forecast') | float,
-      states('sensor.outside_apparent_temperature_6h_forecast') | float,
-      states('sensor.outside_apparent_temperature_8h_forecast') | float,
-      states('sensor.outside_apparent_temperature_10h_forecast') | float,
+      states('sensor.outside_apparent_temperature_2h_forecast')|float,
+      states('sensor.outside_apparent_temperature_4h_forecast')|float,
+      states('sensor.outside_apparent_temperature_6h_forecast')|float,
+      states('sensor.outside_apparent_temperature_8h_forecast')|float,
+      states('sensor.outside_apparent_temperature_10h_forecast')|float,
     ) -%}
-    {%- set max_forecast = forecasts | max -%}
-    {%- if max_forecast >= states('input_number.high_temperature_aircon_trigger') | float -%}
+    {%- set max_forecast = forecasts|max -%}
+    {%- if max_forecast >= states('input_number.high_temperature_aircon_trigger')|float -%}
       {{ max_forecast }}
     {%- else -%}
-      {%- set min_forecast = forecasts | min -%}
-      {%- if min_forecast <= states('input_number.low_temperature_aircon_trigger') | float -%}
+      {%- set min_forecast = forecasts|min -%}
+      {%- if min_forecast <= states('input_number.low_temperature_aircon_trigger')|float -%}
         {{ min_forecast }}
       {%- else -%}
         None

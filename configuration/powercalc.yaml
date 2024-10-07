@@ -170,7 +170,7 @@ sensors:
             fixed:
               power: >
                 {%-
-                  set volume = state_attr('media_player.tv_speakers', 'volume_level') | float(0)
+                  set volume = state_attr('media_player.tv_speakers', 'volume_level')|float(0)
                   if not state_attr('media_player.tv_speakers', 'is_volume_muted') else 0
                 -%}
                 {%- if state_attr('media_player.tv', 'sound_output') == "external_arc" -%}
@@ -235,13 +235,13 @@ sensors:
             fixed:
               power: 0
               states_power:
-                home: "{{ max(0, states('sensor.rachel_s_phone_battery_power') | float) }}"
+                home: "{{ max(0, states('sensor.rachel_s_phone_battery_power')|float) }}"
           - entity_id: device_tracker.rachel_s_tablet
             name: Rachel's tablet charger
             fixed:
               power: 0
               states_power:
-                home: "{{ max(0, states('sensor.rachel_s_tablet_battery_power') | float) }}"
+                home: "{{ max(0, states('sensor.rachel_s_tablet_battery_power')|float) }}"
       - create_group: Sensors
         entities:
           - name: Motion sensors
@@ -265,7 +265,7 @@ sensors:
     fixed:
       power: >
         {%- if has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.tracked_power') -%}
-          {{- max(0, states('sensor.power_meter_power_load_consumed') | float - states('sensor.tracked_power') | float) -}}
+          {{- max(0, states('sensor.power_meter_power_load_consumed')|float - states('sensor.tracked_power')|float) -}}
         {%- else -%}
           0
         {%- endif -%}

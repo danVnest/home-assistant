@@ -1,12 +1,12 @@
 - name: Bedroom bed occupied probability
-  state: "{{ (state_attr('binary_sensor.bedroom_bed_occupied', 'probability') * 100) | round() }}"
+  state: "{{ (state_attr('binary_sensor.bedroom_bed_occupied', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement
 - name: Rachel asleep probability
-  state: "{{ (state_attr('binary_sensor.rachel_asleep', 'probability') * 100) | round() }}"
+  state: "{{ (state_attr('binary_sensor.rachel_asleep', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement
 - name: Dan asleep probability
-  state: "{{ (state_attr('binary_sensor.dan_asleep', 'probability') * 100) | round() }}"
+  state: "{{ (state_attr('binary_sensor.dan_asleep', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement

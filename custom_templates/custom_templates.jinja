@@ -1,7 +1,7 @@
 {%- macro soil_sensor_battery(location) -%}
     {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
     {%- if has_value(entity_id) -%}
-        {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0)) | round(2))) -}}
+        {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
     {%- else -%}
         unavailable
     {%- endif -%}
@@ -41,7 +41,7 @@
             {%- if mode == "heat" -%}
                 {%- set temperature_difference = -temperature_difference -%}
             {%- elif mode == "heat_cool" -%}
-                {%- set temperature_difference = temperature_difference | abs -%}
+                {%- set temperature_difference = temperature_difference|abs -%}
             {%- endif -%}
             {%- set fan_strength = max(0.1, min(1, temperature_difference / max_fan_temp_diff)) -%}
         {%- endif -%}
@@ -60,9 +60,9 @@
     {%- if mode == "heat" -%}
         {%- set temperature_difference = -temperature_difference -%}
     {%- elif mode == "heat_cool" -%}
-        {%- set temperature_difference = temperature_difference | abs -%}
+        {%- set temperature_difference = temperature_difference|abs -%}
     {%- endif-%}
     {%- set compressor_power = (200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff))) if mode != "fan_only" else 0 -%}
-    {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed') | float / max_airspeed -%}
+    {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed')|float / max_airspeed -%}
     {{- compressor_power + fan_power -}}
 {%- endmacro -%}
