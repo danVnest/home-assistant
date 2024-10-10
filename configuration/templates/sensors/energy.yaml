@@ -225,18 +225,18 @@
 - name: Dan's phone charger energy
   state: >
     {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
-    {%- if states('device_tracker.dan_s_phone') == "home" and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") and has_value('sensor.dan_s_phone_battery_level') -%}
+    {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
       {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
       {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(current_battery_level) -%}
       {%- if current_battery_level > last_battery_level -%}
-        {%- set battery_capacity = 0.167 -%}
-        {%- set energy = energy + ((current_battery_level - last_battery_level) / 100 * battery_capacity) -%}
-      {%- elif current_battery_level in (80, 100) -%}
-        {%- set time_since_last_update = (as_timestamp(now()) - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(as_timestamp(now()))) -%}
-        {%- if time_since_last_update > 0.1 -%}
-          {%- set trickle_charge_power = 0.0005 -%}
-          {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
-        {%- endif -%}
+        {%- set battery_capacity = 0.0167 -%}
+        {%- set charging_efficiency = 1.1 -%}
+        {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
+      {%- elif current_battery_level in (80, 100) and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") -%}
+        {%- set now_timestamp = as_timestamp(now()) -%}
+        {%- set time_since_last_update = now_timestamp - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}  
+        {%- set trickle_charge_power = 0.0005 -%}
+        {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
       {%- endif -%}
     {%- endif -%}
     {{- energy -}}

@@ -241,14 +241,14 @@ sensors:
             name: Rachel's phone charger
             fixed:
               power: 0
-              states_power:
-                home: "{{ max(0, states('sensor.rachel_s_phone_battery_power')|float) }}"
+              states_power: # assumes 1.2W input per 1W charge
+                home: "{{ max(0, 1.2 * states('sensor.rachel_s_phone_battery_power')|float) }}"
           - entity_id: device_tracker.rachel_s_tablet
             name: Rachel's tablet charger
             fixed:
               power: 0
-              states_power:
-                home: "{{ max(0, states('sensor.rachel_s_tablet_battery_power')|float) }}"
+              states_power: # assumes 1.2W input per 1W charge
+                home: "{{ max(0, 1.2 * states('sensor.rachel_s_tablet_battery_power')|float) }}"
       - create_group: Sensors
         entities:
           - name: Motion sensors
