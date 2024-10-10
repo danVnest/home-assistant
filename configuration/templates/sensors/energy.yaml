@@ -39,6 +39,20 @@
   state: "{{ states('sensor.energy_savings_from_solar_per_kwh')|float / 1000 }}"
   unit_of_measurement: "$/Wh"
   state_class: measurement
+  icon: mdi:currency-usd
+
+- name: Energy savings from battery per kWh
+  state: "{{ 0 }}"
+  unit_of_measurement: "$/kWh"
+  state_class: measurement
+  icon: mdi:currency-usd
+  # TODO: update once battery is actually installed
+- name: Energy savings from battery per Wh
+  state: "{{ states('sensor.energy_savings_from_battery_per_kwh')|float / 1000 }}"
+  unit_of_measurement: "$/Wh"
+  state_class: measurement
+  icon: mdi:currency-usd
+  # TODO: update once battery is actually installed
 
 - name: Effective energy cost per kWh
   state: "{{ states('sensor.grid_energy_cost_per_kwh')|float * (1 - states('sensor.power_meter_relative_autonomy')|float / 100) }}"
@@ -246,3 +260,72 @@
   attributes:
     last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float }}"
     last_update_time: "{{ as_timestamp(now()) }}"
+
+- name: Total energy cost today 
+  state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
+  unit_of_measurement: $
+  state_class: total_increasing
+  icon: mdi:currency-usd
+
+- name: Days since solar installation
+  state: "{{ (today_at() - as_datetime('2024-09-05T00+10:00')).days }}"
+  unit_of_measurement: days
+- name: Average daily solar production
+  state: "{{- (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}"
+  unit_of_measurement: kWh/day
+  icon: mdi:solar-power-variant
+- name: Average daily solar export
+  state: "{{- (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}"
+  unit_of_measurement: kWh/day
+  icon: mdi:transmission-tower-import
+- name: Average daily solar storage
+  state: >
+    {{- 0 -}}
+  unit_of_measurement: kWh/day
+  icon: mdi:battery-charging
+  # TODO: update once battery is actually installed
+
+- name: Solar return on investment
+  state: >
+    {%- set install_costs = 8889.98 -%}
+    {%- set cost_savings_incorrect_start_offset = 506.89 -%}
+    {{- (states('sensor.total_energy_cost_savings')|float - install_costs - cost_savings_incorrect_start_offset)|round(2) -}}
+  unit_of_measurement: $
+  state_class: total
+  icon: mdi:currency-usd
+- name: Solar years to break even
+  state: >
+    {{- (states('sensor.solar_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) -}}
+  unit_of_measurement: years
+  icon: mdi:calendar
+  # TODO: update to yearly instead of monthly after the first year
+- name: Battery return on investment
+  state: >
+    {%- set install_costs = 8000 -%}
+    {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
+    {{- (savings_per_day * states('sensor.days_since_solar_installation')|float - install_costs)|round(2) -}}
+  unit_of_measurement: $
+  state_class: total
+  icon: mdi:currency-usd
+  # TODO: update once battery is actually installed
+- name: Battery years to break even
+  state: >
+    {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
+    {{- (states('sensor.battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
+  unit_of_measurement: years
+  icon: mdi:calendar
+  # TODO: update to yearly instead of monthly after the first year
+  # TODO: update once battery is actually installed
+- name: Solar and battery return on investment
+  state: "{{ states('sensor.solar_return_on_investment')|float + states('sensor.battery_return_on_investment')|float }}"
+  unit_of_measurement: $
+  state_class: total
+  icon: mdi:currency-usd
+- name: Solar and battery years to break even
+  state: >
+    {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float + states('sensor.total_energy_cost_savings_monthly')|float / 30 -%}
+    {{- (states('sensor.solar_and_battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
+  unit_of_measurement: years
+  icon: mdi:calendar
+  # TODO: update to yearly instead of monthly after the first year
+  # TODO: update once battery is actually installed
