@@ -1112,13 +1112,16 @@
   name: Dan's phone charger power
   source: sensor.dan_s_phone_charger_energy
   unit: kW
+  time_window: 00:15:00
 
 - platform: derivative
   name: Washer power
   source: sensor.washer_energy
   unit: kW
+  time_window: 00:15:00
 
 - platform: derivative
   name: Dryer power
   source: sensor.dryer_energy
   unit: kW
+  time_window: 00:15:00
