@@ -168,17 +168,17 @@
   unit_of_measurement: $/h
 
 - name: Washer power cost
-  state: "{{ (states('sensor.washer_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
+  state: "{{ (states('sensor.washer_power')|float * states('sensor.effective_energy_cost_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
 - name: Washer power cost savings
-  state: "{{ (states('sensor.washer_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
+  state: "{{ (states('sensor.washer_power')|float * states('sensor.energy_savings_from_solar_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
 
 - name: Dryer power cost
-  state: "{{ (states('sensor.dryer_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
+  state: "{{ (states('sensor.dryer_power')|float * states('sensor.effective_energy_cost_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
 - name: Dryer power cost savings
-  state: "{{ (states('sensor.dryer_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
+  state: "{{ (states('sensor.dryer_power')|float * states('sensor.energy_savings_from_solar_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
 
 - name: TV, speakers, PC, Home Assistant, router relay, security hub power cost
