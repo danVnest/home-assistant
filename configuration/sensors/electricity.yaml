@@ -9,19 +9,19 @@
   password: !secret influx_password
   queries:
     - name: Total energy cost weekly
-      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float + 7 * states('input_number.energy_cost_service')|float(0))|round(2) }}"
       where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 7d'
       group_function: first
       measurement: '"$"'
       unit_of_measurement: $/week
     - name: Total energy cost monthly
-      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float + 30 * states('input_number.energy_cost_service')|float(0))|round(2) }}"
       where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 30d'
       group_function: first
       measurement: '"$"'
       unit_of_measurement: $/month
     - name: Total energy cost yearly
-      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float)|round(2) }}"
+      value_template: "{{ (states('sensor.total_energy_cost')|float - value|float + 365 * states('input_number.energy_cost_service')|float(0))|round(2) }}"
       where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 365d'
       group_function: first
       measurement: '"$"'

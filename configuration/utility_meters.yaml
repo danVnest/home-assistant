@@ -7,8 +7,8 @@ monthly_energy_from_grid:
   source: sensor.smart_meter_real_energy_consumed
   cycle: monthly
 
-total_energy_cost_today:
-  name: Total energy cost today
+total_energy_cost_today_without_service_fee:
+  name: Total energy cost today without service fee
   source: sensor.total_energy_cost
   cycle: daily
 lights_energy_cost_today:
