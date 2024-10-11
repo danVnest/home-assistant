@@ -56,6 +56,6 @@ This home automation system is comprised of the following devices:
 
 The following are elements of this repository which are included for reference:
 
-- Various entities, integrations, and core configurations are now implemented through the Home Assistant UI, so some elements of [.storage](.storage) have been included.
+- Various entities, integrations, and core configurations are now implemented through the Home Assistant UI, so some elements of [.storage](.storage) have been included. In particular, [dashboard](.storage/lovelace) config is available in JSON format. To add to your own dashboard it's easiest to copy the relevant code to your own .storage/lovelace file and restart Home Assistant.
 - Manifest files from [custom components](custom_components), as managed by [HACS](https://hacs.xyz).
 - [.gitignore](.gitignore) details what Home Assistant files aren't included in this repository.
