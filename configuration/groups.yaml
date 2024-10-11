@@ -52,6 +52,7 @@ any_aircon:
     - switch.living_room_aircon
     - switch.dining_room_aircon
     - switch.bedroom_aircon
+  icon: mdi:air-conditioner
 
 all_aircon:
   name: All aircon
@@ -60,6 +61,7 @@ all_aircon:
     - switch.dining_room_aircon
     - switch.bedroom_aircon
   all: true
+  icon: mdi:air-conditioner
 
 any_fans:
   name: Any fans
@@ -67,6 +69,7 @@ any_fans:
     - fan.bedroom
     - fan.nursery
     - fan.office
+  icon: mdi:fan
 
 all_fans:
   name: All fans
@@ -75,12 +78,14 @@ all_fans:
     - fan.nursery
     - fan.office
   all: true
+  icon: mdi:fan
 
 any_heaters:
   name: Any heaters
   entities:
     - switch.nursery_heater
     - switch.office_heater
+  icon: mdi:radiator
 
 all_heaters:
   name: All heaters
@@ -88,12 +93,14 @@ all_heaters:
     - switch.nursery_heater
     - switch.office_heater
   all: true
+  icon: mdi:radiator
 
 any_humidifiers:
   name: Any humidifiers
   entities:
     - switch.nursery_humidifier
     - switch.bedroom_humidifier
+  icon: mdi:air-humidifier
 
 all_humidifiers:
   name: All humidifiers
@@ -101,6 +108,7 @@ all_humidifiers:
     - switch.nursery_humidifier
     - switch.bedroom_humidifier
   all: true
+  icon: mdi:air-humidifier
 any_climate_control:
   name: Climate control
   entities:

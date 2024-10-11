@@ -1,10 +1,15 @@
+{%- macro weighted_average(value_weight_array) -%}
+    {%- set var = namespace(sum = 0, count = 0) -%}
+    {%- for item in value_weight_array if item.value not in ("unknown", none) -%}
+        {%- set var.sum = var.sum + sensor.weight * sensor.value|float -%}
+        {%- set var.count = var.count + sensor.weight -%}
+    {%- endfor -%}
+    {{- (var.sum / var.count)|round(1) -}}
+{%- endmacro -%}
+
 {%- macro soil_sensor_battery(location) -%}
     {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
-    {%- if has_value(entity_id) -%}
-        {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
-    {%- else -%}
-        unavailable
-    {%- endif -%}
+    {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
 {%- endmacro -%}
 
 {%- macro fan_airspeed(room) -%}

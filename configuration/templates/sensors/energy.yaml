@@ -1,4 +1,3 @@
-# TODO: check if all kWh and Wh versions are needed
 - name: Grid energy cost per kWh
   state: >
     {{
@@ -6,7 +5,9 @@
       states('input_number.energy_cost_' + ('first' if states('sensor.monthly_energy_from_grid')|float < 100 else 'after_first') + '_100kwh_of_month')|float
     }}
   unit_of_measurement: "$/kWh"
+  device_class: monetary
   state_class: measurement
+  icon: mdi:currency-usd
   availability: >
     {{
       has_value('input_number.energy_cost_green_power') and
@@ -17,7 +18,10 @@
 - name: Grid energy cost per Wh
   state: "{{ states('sensor.grid_energy_cost_per_kwh')|float / 1000 }}"
   unit_of_measurement: "$/Wh"
+  device_class: monetary
   state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.grid_energy_cost_per_kwh') }}"
 
 - name: Energy savings from solar per kWh
   state: >
@@ -27,37 +31,47 @@
       states('sensor.effective_energy_cost_per_kwh')|float
     }}
   unit_of_measurement: "$/kWh"
+  device_class: monetary
   state_class: measurement
+  icon: mdi:currency-usd
   availability: >
     {{
       has_value('input_number.energy_cost_green_power') and
       has_value('sensor.monthly_energy_consumed') and
       has_value('input_number.energy_cost_first_100kwh_of_month') and
-      has_value('input_number.energy_cost_after_first_100kwh_of_month')
+      has_value('input_number.energy_cost_after_first_100kwh_of_month') and
+      has_value('sensor.effective_energy_cost_per_kwh')
     }}
 - name: Energy savings from solar per Wh
   state: "{{ states('sensor.energy_savings_from_solar_per_kwh')|float / 1000 }}"
   unit_of_measurement: "$/Wh"
+  device_class: monetary
   state_class: measurement
   icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.energy_savings_from_solar_per_kwh') }}"
 
 - name: Energy savings from battery per kWh
   state: "{{ 0 }}"
   unit_of_measurement: "$/kWh"
+  device_class: monetary
   state_class: measurement
   icon: mdi:currency-usd
   # TODO: update once battery is actually installed
 - name: Energy savings from battery per Wh
   state: "{{ states('sensor.energy_savings_from_battery_per_kwh')|float / 1000 }}"
   unit_of_measurement: "$/Wh"
+  device_class: monetary
   state_class: measurement
   icon: mdi:currency-usd
-  # TODO: update once battery is actually installed
+  availability: "{{ has_value('sensor.energy_savings_from_battery_per_kwh') }}"
 
+  # TODO: update once battery is actually installed
 - name: Effective energy cost per kWh
   state: "{{ states('sensor.grid_energy_cost_per_kwh')|float * (1 - states('sensor.power_meter_relative_autonomy')|float / 100) }}"
   unit_of_measurement: "$/kWh"
+  device_class: monetary
   state_class: measurement
+  icon: mdi:currency-usd
   availability: >
     {{
       has_value('sensor.grid_energy_cost_per_kwh') and
@@ -66,12 +80,19 @@
 - name: Effective energy cost per Wh
   state: "{{ states('sensor.effective_energy_cost_per_kwh')|float / 1000 }}"
   unit_of_measurement: "$/Wh"
+  device_class: monetary
   state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.effective_energy_cost_per_kwh') }}"
 
 - name: Total power cost
   state: "{{ (states('sensor.power_meter_power_load_consumed')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   #TODO: this doesn't take into account controlled load pricing
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Total power cost savings
   state: >
     {{
@@ -82,115 +103,249 @@
       )|round(9)
     }}
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: >
+    {{
+      has_value('sensor.power_meter_power_load_consumed') and
+      has_value('sensor.energy_savings_from_solar_per_wh') and
+      has_value('sensor.power_meter_power_grid_export') and
+      has_value('input_number.energy_export_price')
+    }}
 
 - name: Lights power cost
   state: "{{ (states('sensor.all_light_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_light_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Lights power cost savings
   state: "{{ (states('sensor.all_light_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_light_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Living room aircon power cost
   state: "{{ (states('sensor.living_room_aircon_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.living_room_aircon_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Living room aircon power cost savings
   state: "{{ (states('sensor.living_room_aircon_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.living_room_aircon_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Dining room aircon power cost
   state: "{{ (states('sensor.dining_room_aircon_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dining_room_aircon_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Dining room aircon power cost savings
   state: "{{ (states('sensor.dining_room_aircon_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dining_room_aircon_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Bedroom aircon power cost
   state: "{{ (states('sensor.bedroom_aircon_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.bedroom_aircon_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Bedroom aircon power cost savings
   state: "{{ (states('sensor.bedroom_aircon_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.bedroom_aircon_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Office heater power cost
   state: "{{ (states('sensor.office_heater_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.office_heater_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Office heater power cost savings
   state: "{{ (states('sensor.office_heater_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.office_heater_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Nursery heater power cost
   state: "{{ (states('sensor.nursery_heater_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.nursery_heater_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Nursery heater power cost savings
   state: "{{ (states('sensor.nursery_heater_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.nursery_heater_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Fans power cost
   state: "{{ (states('sensor.all_fan_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_fan_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Fans power cost savings
   state: "{{ (states('sensor.all_fan_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_fan_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Humidifiers power cost
   state: "{{ (states('sensor.all_humidifier_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_humidifier_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Humidifiers power cost savings
   state: "{{ (states('sensor.all_humidifier_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_humidifier_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Kitchen appliances power cost
   state: "{{ (states('sensor.kitchen_appliances_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.kitchen_appliances_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Kitchen appliances power cost savings
   state: "{{ (states('sensor.kitchen_appliances_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.kitchen_appliances_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Dishwasher power cost
   state: "{{ (states('sensor.dishwasher_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dishwasher_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Dishwasher power cost savings
   state: "{{ (states('sensor.dishwasher_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dishwasher_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Fridge power cost
   state: "{{ (states('sensor.fridge_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.fridge_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Fridge power cost savings
   state: "{{ (states('sensor.fridge_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.fridge_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Freezer, mini fridge, routers power cost
   state: "{{ (states('sensor.freezer_mini_fridge_routers_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Freezer, mini fridge, routers power cost savings
   state: "{{ (states('sensor.freezer_mini_fridge_routers_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Washer power cost
   state: "{{ (states('sensor.washer_power')|float * states('sensor.effective_energy_cost_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.washer_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Washer power cost savings
   state: "{{ (states('sensor.washer_power')|float * states('sensor.energy_savings_from_solar_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.washer_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Dryer power cost
   state: "{{ (states('sensor.dryer_power')|float * states('sensor.effective_energy_cost_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Dryer power cost savings
   state: "{{ (states('sensor.dryer_power')|float * states('sensor.energy_savings_from_solar_per_kwh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: TV, speakers, PC, Home Assistant, router relay, security hub power cost
   state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub power cost savings
   state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Water heater, oven & stove, guest suite, garage, all other power cost
   state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other power cost savings
   # assume water heater usage when solar available, use controlled load costs
   state: >
@@ -200,41 +355,90 @@
       states('sensor.power_meter_relative_autonomy')|float / 100
     }}
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: >
+    {{
+      has_value('input_number.energy_cost_green_power') and
+      has_value('input_number.energy_cost_controlled_load') and
+      has_value('sensor.power_meter_relative_autonomy')
+    }}
 
 - name: Office desk, computer & monitor, cooler, fish tank power cost
   state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Office desk, computer & monitor, cooler, fish tank power cost savings
   state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Phone chargers power cost
   state: "{{ (states('sensor.phone_chargers_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.phone_chargers_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Phone chargers power cost savings
   state: "{{ (states('sensor.phone_chargers_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.phone_chargers_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Sensors power cost
   state: "{{ (states('sensor.sensors_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.sensors_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Sensors power cost savings
   state: "{{ (states('sensor.sensors_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.sensors_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Paludarium, picture frame, camera power cost
   state: "{{ (states('sensor.paludarium_picture_frame_camera_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Paludarium, picture frame, camera power cost savings
   state: "{{ (states('sensor.paludarium_picture_frame_camera_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Standby power cost
   state: "{{ (states('sensor.all_standby_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_standby_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
 - name: Standby power cost savings
   state: "{{ (states('sensor.all_standby_power')|float * states('sensor.energy_savings_from_solar_per_wh')|float)|round(9) }}"
   unit_of_measurement: $/h
+  device_class: monetary
+  state_class: measurement
+  icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.all_standby_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Dan's phone charger energy
   state: >
@@ -257,54 +461,103 @@
   unit_of_measurement: kWh
   device_class: energy
   state_class: total_increasing
+  icon: mdi:lightning-bolt
   attributes:
     last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float }}"
     last_update_time: "{{ as_timestamp(now()) }}"
 
-- name: Total energy cost today 
-  state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
+- name: Total energy cost today
+  state: >
+    {%-
+      if has_value('sensor.total_energy_cost_today_without_service_fee') and
+      has_value('input_number.energy_cost_service')
+    -%}
+      {{-
+        (states('sensor.total_energy_cost_today_without_service_fee')|float + 
+        states('input_number.energy_cost_service')|float)|round(2) 
+      -}}
+    {%- else -%}
+      {{- this.state -}}
+    {%- endif -%}
   unit_of_measurement: $
+  device_class: monetary
   state_class: total_increasing
   icon: mdi:currency-usd
 
 - name: Days since solar installation
   state: "{{ (today_at() - as_datetime('2024-09-05T00+10:00')).days }}"
   unit_of_measurement: days
+  state_class: total_increasing
+  icon: mdi:calendar-start
 - name: Average daily solar production
-  state: "{{- (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}"
+  state: >
+    {%-
+      if has_value('sensor.inverter_total_energy') and
+      has_value('sensor.days_since_solar_installation')
+    -%}
+      {{- (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}
+    {%- else -%}
+      {{- this.state -}}
+    {%- endif -%}
   unit_of_measurement: kWh/day
+  device_class: energy
+  state_class: measurement
   icon: mdi:solar-power-variant
 - name: Average daily solar export
-  state: "{{- (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}"
+  state: >
+    {%-
+      if has_value('sensor.smart_meter_real_energy_produced') and
+      has_value('sensor.days_since_solar_installation')
+    -%}
+      {{- (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) -}}
+    {%- else -%}
+      {{- this.state -}}
+    {%- endif -%}
   unit_of_measurement: kWh/day
+  device_class: energy
+  state_class: measurement
   icon: mdi:transmission-tower-import
 - name: Average daily solar storage
-  state: >
-    {{- 0 -}}
+  state: "{{- 0 -}}"
   unit_of_measurement: kWh/day
+  device_class: energy_storage
+  state_class: measurement
   icon: mdi:battery-charging
-  # TODO: update once battery is actually installed
 
+  # TODO: update once battery is actually installed
 - name: Solar return on investment
   state: >
-    {%- set install_costs = 8889.98 -%}
-    {%- set cost_savings_incorrect_start_offset = 506.89 -%}
-    {{- (states('sensor.total_energy_cost_savings')|float - install_costs - cost_savings_incorrect_start_offset)|round(2) -}}
+    {%- if has_value('sensor.total_energy_cost_savings') -%}
+      {%- set install_costs = 8889.98 -%}
+      {%- set cost_savings_incorrect_start_offset = 506.89 -%}
+      {{- (states('sensor.total_energy_cost_savings')|float - install_costs - cost_savings_incorrect_start_offset)|round(2) -}}
+    {%- else -%}
+      {{- this.state -}}
+    {%- endif -%}
   unit_of_measurement: $
+  device_class: monetary
   state_class: total
   icon: mdi:currency-usd
 - name: Solar years to break even
   state: >
     {{- (states('sensor.solar_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) -}}
   unit_of_measurement: years
+  state_class: measurement
   icon: mdi:calendar
+  availability: >
+    {{- has_value('sensor.solar_return_on_investment') and has_value('sensor.total_energy_cost_savings_monthly') -}}
   # TODO: update to yearly instead of monthly after the first year
 - name: Battery return on investment
   state: >
-    {%- set install_costs = 8000 -%}
-    {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
-    {{- (savings_per_day * states('sensor.days_since_solar_installation')|float - install_costs)|round(2) -}}
+    {%- if has_value('sensor.grid_energy_cost_per_kwh') and has_value('days_since_solar_installation') -%}
+      {%- set install_costs = 8000 -%}
+      {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
+      {{- (savings_per_day * states('sensor.days_since_solar_installation')|float - install_costs)|round(2) -}}
+    {%- else -%}
+      {{- this.state -}}
+    {%- endif -%}
   unit_of_measurement: $
+  device_class: monetary
   state_class: total
   icon: mdi:currency-usd
   # TODO: update once battery is actually installed
@@ -313,19 +566,31 @@
     {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
     {{- (states('sensor.battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
   unit_of_measurement: years
+  state_class: measurement
   icon: mdi:calendar
+  availability: >
+    {{- has_value('sensor.battery_return_on_investment') and has_value('sensor.grid_energy_cost_per_kwh') -}}
   # TODO: update to yearly instead of monthly after the first year
   # TODO: update once battery is actually installed
 - name: Solar and battery return on investment
   state: "{{ states('sensor.solar_return_on_investment')|float + states('sensor.battery_return_on_investment')|float }}"
   unit_of_measurement: $
+  device_class: monetary
   state_class: total
   icon: mdi:currency-usd
+  availability: "{{ has_value('sensor.solar_return_on_investment') and has_value('sensor.battery_return_on_investment') }}"
 - name: Solar and battery years to break even
   state: >
     {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float + states('sensor.total_energy_cost_savings_monthly')|float / 30 -%}
     {{- (states('sensor.solar_and_battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
   unit_of_measurement: years
+  state_class: measurement
   icon: mdi:calendar
+  availability: >
+    {{-
+      has_value('sensor.solar_and_battery_return_on_investment') and
+      has_value('sensor.grid_energy_cost_per_kwh') and
+      has_value('sensor.total_energy_cost_savings_monthly')
+    -}}
   # TODO: update to yearly instead of monthly after the first year
   # TODO: update once battery is actually installed

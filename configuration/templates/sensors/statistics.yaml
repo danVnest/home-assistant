@@ -2,11 +2,17 @@
   state: "{{ (state_attr('binary_sensor.bedroom_bed_occupied', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement
+  icon: mdi:percent
+  availability: "{{ state_attr('binary_sensor.bedroom_bed_occupied', 'probability') is not none }}"
 - name: Rachel asleep probability
   state: "{{ (state_attr('binary_sensor.rachel_asleep', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement
+  icon: mdi:percent
+  availability: "{{ state_attr('binary_sensor.rachel_asleep', 'probability') is not none }}"
 - name: Dan asleep probability
   state: "{{ (state_attr('binary_sensor.dan_asleep', 'probability') * 100)|round() }}"
   unit_of_measurement: "%"
   state_class: measurement
+  icon: mdi:percent
+  availability: "{{ state_attr('binary_sensor.dan_asleep', 'probability') is not none }}"
