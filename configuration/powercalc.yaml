@@ -213,11 +213,9 @@ sensors:
           - entity_id: switch.kitchen_switch
             power_sensor_id: sensor.kitchen_switch_power
             ignore_unavailable_state: true
-      - entity_id: sensor.dummy
-        power_sensor_id: sensor.washer_power
+      - power_sensor_id: sensor.washer_power
         energy_sensor_id: sensor.washer_energy
-      - entity_id: sensor.dummy
-        power_sensor_id: sensor.dryer_power
+      - power_sensor_id: sensor.dryer_power
         energy_sensor_id: sensor.dryer_energy
       - create_group: Office desk, computer & monitor, cooler, fish tank
         entities:
@@ -229,13 +227,13 @@ sensors:
             fixed: # measured average with a smart switch
               power: 80
             standby_power: 0.2
-          - name: Fish tank
+          - entity_id: sensor.dummy
+            name: Fish tank
             fixed: # measured average with a smart switch
               power: "{{ 4 if today_at('10:00') < now() < today_at('17:00') else 2 }}"
       - create_group: Phone chargers
         entities:
-          - entity_id: sensor.dummy
-            power_sensor_id: sensor.dan_s_phone_charger_power
+          - power_sensor_id: sensor.dan_s_phone_charger_power
             energy_sensor_id: sensor.dan_s_phone_charger_energy
           - entity_id: device_tracker.rachel_s_phone
             name: Rachel's phone charger
