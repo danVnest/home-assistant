@@ -76,7 +76,7 @@ sensors:
         fixed: # measured with a smart switch
           power: >
             {{
-              26 if state_attr('humidifier.bedroom', 'humidity') > state_attr('humidifier.bedroom', 'current_humidity') else 15.6
+              26 if state_attr('humidifier.bedroom', 'humidity')|default(0) > state_attr('humidifier.bedroom', 'current_humidity')|default(0) else 15.6
               + 3 if states('light.bedroom_humidifier') == 'on' else 0
             }}
         standby_power: 0.5 # estimate
@@ -85,7 +85,7 @@ sensors:
         fixed: # measured with a smart switch
           power: >
             {{
-              26 if state_attr('humidifier.nursery', 'humidity') > state_attr('humidifier.nursery', 'current_humidity') else 15.6
+              26 if state_attr('humidifier.nursery', 'humidity')|default(0) > state_attr('humidifier.nursery', 'current_humidity')|default(0) else 15.6
               + 3 if states('light.nursery_humidifier') == 'on' else 0
             }}
         standby_power: 0.5 # estimate
@@ -171,14 +171,14 @@ sensors:
               power: >
                 {%-
                   set volume = state_attr('media_player.tv_speakers', 'volume_level')|float(0)
-                  if not state_attr('media_player.tv_speakers', 'is_volume_muted') else 0
+                  if not state_attr('media_player.tv_speakers', 'is_volume_muted')|default(False) else 0
                 -%}
-                {%- if state_attr('media_player.tv', 'sound_output') == "external_arc" -%}
+                {%- if state_attr('media_player.tv', 'sound_output')|default == "external_arc" -%}
                   {{- 12 + 4 * volume * (1 + 6 * volume) if states('sensor.webostvservice_play_state') == "on" else 12 -}}
                 {%-
-                  elif state_attr('media_player.tv_speakers', 'source') == "Bluetooth" and
+                  elif state_attr('media_player.tv_speakers', 'source')|default == "Bluetooth" and
                   '24:E8:53:AB:AC:DF (LG_Speaker_SP11RA_2463)' in
-                  state_attr('sensor.rachel_s_phone_bluetooth_connection', 'connected_paired_devices') and
+                  state_attr('sensor.rachel_s_phone_bluetooth_connection', 'connected_paired_devices')|default and
                   states('binary_sensor.rachel_s_phone_music_active') == "on"
                 -%}
                   {{- 12 + 4 * volume * (1 + 6 * volume) -}}
@@ -240,13 +240,13 @@ sensors:
             fixed:
               power: 0
               states_power: # assumes 1.2W input per 1W charge
-                home: "{{ max(0, 1.2 * states('sensor.rachel_s_phone_battery_power')|float) }}"
+                home: "{{ max(0, 1.2 * states('sensor.rachel_s_phone_battery_power')|float(0)) }}"
           - entity_id: device_tracker.rachel_s_tablet
             name: Rachel's tablet charger
             fixed:
               power: 0
               states_power: # assumes 1.2W input per 1W charge
-                home: "{{ max(0, 1.2 * states('sensor.rachel_s_tablet_battery_power')|float) }}"
+                home: "{{ max(0, 1.2 * states('sensor.rachel_s_tablet_battery_power')|float(0)) }}"
       - create_group: Sensors
         entities:
           - name: Motion sensors
@@ -268,9 +268,4 @@ sensors:
   - entity_id: sensor.dummy
     name: Water heater, oven & stove, guest suite, garage, all other
     fixed:
-      power: >
-        {%- if has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.tracked_power') -%}
-          {{- max(0, states('sensor.power_meter_power_load_consumed')|float - states('sensor.tracked_power')|float) -}}
-        {%- else -%}
-          0
-        {%- endif -%}
+      power: "{{ max(0, states('sensor.power_meter_power_load_consumed')|float(0) - states('sensor.tracked_power')|float(0)) }}"
