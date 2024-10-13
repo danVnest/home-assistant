@@ -6,6 +6,13 @@
     }}
   delay_on: 0:00:05
   delay_off: 0:00:05
+  device_class: occupancy
+  icon: mdi:monitor
+  availability: >
+    {{
+      has_value('binary_sensor.office_presence_sensor_occupancy') and
+      has_value('sensor.office_presence_sensor_distance')
+    }}
 - name: Dan's computer active at home # TODO: maybe not required anymore
   unique_id: dan_s_computer_active_at_home
   state: >
@@ -13,11 +20,23 @@
       states('binary_sensor.dan_s_computer_active') == 'on' and
       states('device_tracker.dan_s_computer') == 'home'
     }}
+  icon: mdi:monitor
+  availability: >
+    {{
+      has_value('binary_sensor.dan_s_computer_active') and
+      has_value('device_tracker.dan_s_computer')
+    }}
 - name: Desk occupied and computer active
   state: >
     {{
       states('binary_sensor.desk_occupied') == 'on' and
       states('binary_sensor.dan_s_computer_active_at_home') == 'on'
+    }}
+  icon: mdi:monitor
+  availability: >
+    {{
+      has_value('binary_sensor.desk_occupied') and
+      has_value('binary_sensor.dan_s_computer_active_at_home')
     }}
 - name: Office pet bed occupied within last 5 minutes
   state: >
@@ -27,6 +46,13 @@
     }}
   delay_on: 0:00:10
   delay_off: 0:05
+  device_class: occupancy
+  icon: mdi:dog-side
+  availability: >
+    {{
+      has_value('binary_sensor.office_presence_sensor_occupancy') and
+      has_value('sensor.office_presence_sensor_distance')
+    }}
 
 - name: Bedroom occupied
   state: >
@@ -34,30 +60,62 @@
       states('binary_sensor.bedroom_presence_sensor_occupancy') == 'on' or
       states('binary_sensor.bedroom_bed_occupied') == 'on'
     }}
+  device_class: occupancy
+  icon: mdi:motion-sensor
+  availability: >
+    {{
+      has_value('binary_sensor.bedroom_presence_sensor_occupancy') and
+      has_value('binary_sensor.bedroom_bed_occupied')
+    }}
 - name: Bedroom presence sensor distance in bed range
   state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance')|float < 2.5 }}"
+  device_class: occupancy
   delay_off: 0:00:15
+  icon: mdi:bed
+  availability: "{{ has_value('sensor.bedroom_presence_sensor_distance') }}"
 - name: Anyone asleep
   state: >
     {{
       states('binary_sensor.dan_asleep') == 'on' or
       states('binary_sensor.rachel_asleep') == 'on'
     }}
+  icon: mdi:sleep
+  availability: >
+    {{
+      has_value('binary_sensor.dan_asleep') and
+      has_value('binary_sensor.rachel_asleep')
+    }}
 - name: Rachel was asleep within last 5 minutes
   state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
   delay_off: 0:05
+  icon: mdi:sleep
+  availability: "{{ has_value('binary_sensor.rachel_asleep') }}"
 - name: Rachel's phone's sleep confidence high
   unique_id: rachel_s_phone_sleep_confidence_high
   state: "{{ states('sensor.rachel_s_phone_sleep_confidence')|float > 75 }}"
+  icon: mdi:sleep
+  availability: "{{ has_value('sensor.rachel_s_phone_sleep_confidence') }}"
 - name: Rachel's phone still
   unique_id: rachel_s_phone_still
   state: "{{ states('sensor.rachel_s_phone_detected_activity') == 'still' }}"
+  # TODO: add device_class: moving and switch sensor from _still to _moving?
+  icon: mdi:cellphone
+  availability: "{{ has_value('sensor.rachel_s_phone_detected_activity') }}"
 - name: Dan's phone still
   unique_id: dan_s_phone_still
   state: "{{ states('sensor.dan_s_phone_activity') == 'Stationary' }}"
+  # TODO: add device_class: moving and switch sensor from _still to _moving?
+  icon: mdi:cellphone
+  availability: "{{ has_value('sensor.dan_s_phone_activity') }}"
 - name: Dan's phone unplugged
   unique_id: dan_s_phone_unplugged
   state: "{{ states('sensor.dan_s_phone_battery_state') == 'Not Charging' }}"
+  # TODO: add device_class: plug and switch sensor from _unplugged to plugged?
+  icon: mdi:cellphone-dock
+  availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
 
 - name: Kitchen door motion # TODO: maybe not required anymore
   state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
+  device_class: motion
+  icon: mdi:door
+  availability: "{{ states.binary_sensor.kitchen_door.last_changed|default != '' }}"
