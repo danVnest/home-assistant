@@ -2,26 +2,30 @@
   name: Rachel hours asleep
   entity_id: binary_sensor.rachel_asleep
   state: "on"
-  end: "{{ today_at('12:00') }}"
+  end: "{{ (now() + timedelta(hours=5)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
   duration: "24:00"
 - platform: history_stats
   name: Rachel hours asleep yesterday
   entity_id: binary_sensor.rachel_asleep
   state: "on"
-  end: "{{ today_at('12:00') - timedelta(days=1) }}"
+  end: "{{ (now() - timedelta(hours=19)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
   duration: "24:00"
 - platform: history_stats
   name: Dan hours asleep
   entity_id: binary_sensor.dan_asleep
   state: "on"
-  end: "{{ today_at('12:00') }}"
+  end: "{{ (now() + timedelta(hours=5)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
   duration: "24:00"
 - platform: history_stats
   name: Dan hours asleep yesterday
   entity_id: binary_sensor.dan_asleep
   state: "on"
-  end: "{{ today_at('12:00') - timedelta(days=1) }}"
-  duration: "24:00"
+  end: "{{ (now() - timedelta(hours=19)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
+  duration:
+    hours: 24
+# TODO: do history_stats on each of these to average over longer time period!
+# TODO: also measure variation over longer time period and possibly remove those that vary too much from the bayesian sensor
+# TODO: only show long-term ratios in UI once they settle
 # For sleep statistics, assume asleep from 11PM to 6AM
 - platform: history_stats
   name: Bedroom occupancy ratio while asleep # unused
