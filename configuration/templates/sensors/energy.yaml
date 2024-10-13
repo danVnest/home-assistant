@@ -389,6 +389,7 @@
   availability: "{{ has_value('sensor.all_standby_power') and has_value('sensor.energy_savings_from_solar_per_wh') }}"
 
 - name: Dan's phone charger energy
+  unique_id: dan_s_phone_charger_energy
   state: >
     {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
     {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
@@ -1323,3 +1324,24 @@
   state_class: measurement
   icon: mdi:currency-usd
   availability: "{{ has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_year') }}"
+
+- name: Washer energy
+  unique_id: washer_energy
+  state: "{{ states('sensor.washer_energy_without_refresh') }}"
+  unit_of_measurement: kWh
+  device_class: energy
+  state_class: total_increasing
+  icon: mdi:lightning-bolt
+  attributes:
+    refreshed: "{{ now() }}"
+  availability: "{{ has_value('sensor.washer_energy_without_refresh') }}"
+- name: Dryer energy
+  unique_id: dryer_energy
+  state: "{{ states('sensor.dryer_energy_without_refresh') }}"
+  unit_of_measurement: kWh
+  device_class: energy
+  state_class: total_increasing
+  icon: mdi:lightning-bolt
+  attributes:
+    refreshed: "{{ now() }}"
+  availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"

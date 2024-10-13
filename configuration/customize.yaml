@@ -5,3 +5,7 @@ customize:
     entity_picture: /local/dan.png
   device_tracker.rachel_s_phone:
     entity_picture: /local/rachel.png
+  sensor.dan_s_phone_charger_power:
+   unit_of_measurement: kW
+   device_class: power
+   state_class: measurement
