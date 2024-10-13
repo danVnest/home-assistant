@@ -393,7 +393,7 @@
     {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
     {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
       {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
-      {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(current_battery_level) -%}
+      {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
       {%- if current_battery_level > last_battery_level -%}
         {%- set battery_capacity = 0.0167 -%}
         {%- set charging_efficiency = 1.1 -%}
@@ -411,14 +411,14 @@
   state_class: total_increasing
   icon: mdi:lightning-bolt
   attributes:
-    last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float }}"
+    last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
     last_update_time: "{{ as_timestamp(now()) }}"
 
 - name: Total energy cost today
   state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
   unit_of_measurement: $
   device_class: monetary
-  state_class: total_increasing
+  state_class: total
   icon: mdi:currency-usd
   availability: "{{ has_value('sensor.total_energy_cost_today_without_service_fee') and has_value('input_number.energy_cost_service') }}"
 
@@ -507,819 +507,819 @@
       has_value('sensor.grid_energy_cost_per_kwh') and
       has_value('sensor.total_energy_cost_savings_monthly')
     -}}
+
   # TODO: update to yearly instead of monthly after the first year
   # TODO: update once battery is actually installed
-  
 - name: Total energy cost weekly
-  state: "{{- (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float + 7 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+  state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float + 7 * states('input_number.energy_cost_service')|float)|round(2) -}}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_week') and has_value('input_number.energy_cost_service') -}}"
+  availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_week') and has_value('input_number.energy_cost_service') -}}"
 - name: Total energy cost monthly
-  state: "{{- (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_month')|float + 30 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+  state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_month')|float + 30 * states('input_number.energy_cost_service')|float)|round(2) -}}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_month') and has_value('input_number.energy_cost_service') -}}"
+  availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_month') and has_value('input_number.energy_cost_service') -}}"
 - name: Total energy cost yearly
-  state: "{{- (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_year')|float + 365 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+  state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_year')|float + 365 * states('input_number.energy_cost_service')|float)|round(2) -}}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_year') and has_value('input_number.energy_cost_service') -}}"
+  availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_year') and has_value('input_number.energy_cost_service') -}}"
 - name: Total energy cost savings weekly
-  state: "{{- (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_week') }}"
 - name: Total energy cost savings monthly
-  state: "{{- (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_month') }}"
 - name: Total energy cost savings yearly
-  state: "{{- (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_year') }}"
 
 - name: Lights energy cost weekly
-  state: "{{- (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_week') }}"
 - name: Lights energy cost monthly
-  state: "{{- (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_month') }}"
 - name: Lights energy cost yearly
-  state: "{{- (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost') and has_value('sensor.lights_energy_cost_last_year') }}"
 - name: Lights energy cost savings weekly
-  state: "{{- (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_week') }}"
 - name: Lights energy cost savings monthly
-  state: "{{- (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_month') }}"
 - name: Lights energy cost savings yearly
-  state: "{{- (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.lights_energy_cost_savings')|float - states('sensor.lights_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.lights_energy_cost_savings') and has_value('sensor.lights_energy_cost_savings_last_year') }}"
 
 - name: Living room aircon energy cost weekly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_week') }}"
 - name: Living room aircon energy cost monthly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_month') }}"
 - name: Living room aircon energy cost yearly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost')|float - states('sensor.living_room_aircon_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost') and has_value('sensor.living_room_aircon_energy_cost_last_year') }}"
 - name: Living room aircon energy cost savings weekly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_week') }}"
 - name: Living room aircon energy cost savings monthly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_month') }}"
 - name: Living room aircon energy cost savings yearly
-  state: "{{- (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.living_room_aircon_energy_cost_savings')|float - states('sensor.living_room_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.living_room_aircon_energy_cost_savings') and has_value('sensor.living_room_aircon_energy_cost_savings_last_year') }}"
 
 - name: Dining room aircon energy cost weekly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_week') }}"
 - name: Dining room aircon energy cost monthly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_month') }}"
 - name: Dining room aircon energy cost yearly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost')|float - states('sensor.dining_room_aircon_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost') and has_value('sensor.dining_room_aircon_energy_cost_last_year') }}"
 - name: Dining room aircon energy cost savings weekly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_week') }}"
 - name: Dining room aircon energy cost savings monthly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_month') }}"
 - name: Dining room aircon energy cost savings yearly
-  state: "{{- (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dining_room_aircon_energy_cost_savings')|float - states('sensor.dining_room_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.dining_room_aircon_energy_cost_savings') and has_value('sensor.dining_room_aircon_energy_cost_savings_last_year') }}"
 
 - name: Bedroom aircon energy cost weekly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_week') }}"
 - name: Bedroom aircon energy cost monthly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_month') }}"
 - name: Bedroom aircon energy cost yearly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost')|float - states('sensor.bedroom_aircon_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost') and has_value('sensor.bedroom_aircon_energy_cost_last_year') }}"
 - name: Bedroom aircon energy cost savings weekly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_week') }}"
 - name: Bedroom aircon energy cost savings monthly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_month') }}"
 - name: Bedroom aircon energy cost savings yearly
-  state: "{{- (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.bedroom_aircon_energy_cost_savings')|float - states('sensor.bedroom_aircon_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.bedroom_aircon_energy_cost_savings') and has_value('sensor.bedroom_aircon_energy_cost_savings_last_year') }}"
 
 - name: Office heater energy cost weekly
-  state: "{{- (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_week') }}"
 - name: Office heater energy cost monthly
-  state: "{{- (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_month') }}"
 - name: Office heater energy cost yearly
-  state: "{{- (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost')|float - states('sensor.office_heater_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost') and has_value('sensor.office_heater_energy_cost_last_year') }}"
 - name: Office heater energy cost savings weekly
-  state: "{{- (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_week') }}"
 - name: Office heater energy cost savings monthly
-  state: "{{- (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_month') }}"
 - name: Office heater energy cost savings yearly
-  state: "{{- (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_heater_energy_cost_savings')|float - states('sensor.office_heater_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.office_heater_energy_cost_savings') and has_value('sensor.office_heater_energy_cost_savings_last_year') }}"
 
 - name: Nursery heater energy cost weekly
-  state: "{{- (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_week') }}"
 - name: Nursery heater energy cost monthly
-  state: "{{- (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_month') }}"
 - name: Nursery heater energy cost yearly
-  state: "{{- (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost')|float - states('sensor.nursery_heater_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost') and has_value('sensor.nursery_heater_energy_cost_last_year') }}"
 - name: Nursery heater energy cost savings weekly
-  state: "{{- (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_week') }}"
 - name: Nursery heater energy cost savings monthly
-  state: "{{- (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_month') }}"
 - name: Nursery heater energy cost savings yearly
-  state: "{{- (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.nursery_heater_energy_cost_savings')|float - states('sensor.nursery_heater_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.nursery_heater_energy_cost_savings') and has_value('sensor.nursery_heater_energy_cost_savings_last_year') }}"
 
 - name: Fans energy cost weekly
-  state: "{{- (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_week') }}"
 - name: Fans energy cost monthly
-  state: "{{- (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_month') }}"
 - name: Fans energy cost yearly
-  state: "{{- (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost')|float - states('sensor.fans_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost') and has_value('sensor.fans_energy_cost_last_year') }}"
 - name: Fans energy cost savings weekly
-  state: "{{- (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_week') }}"
 - name: Fans energy cost savings monthly
-  state: "{{- (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_month') }}"
 - name: Fans energy cost savings yearly
-  state: "{{- (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.fans_energy_cost_savings')|float - states('sensor.fans_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.fans_energy_cost_savings') and has_value('sensor.fans_energy_cost_savings_last_year') }}"
 
 - name: Humidifiers energy cost weekly
-  state: "{{- (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_week') }}"
 - name: Humidifiers energy cost monthly
-  state: "{{- (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_month') }}"
 - name: Humidifiers energy cost yearly
-  state: "{{- (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost')|float - states('sensor.humidifiers_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost') and has_value('sensor.humidifiers_energy_cost_last_year') }}"
 - name: Humidifiers energy cost savings weekly
-  state: "{{- (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_week') }}"
 - name: Humidifiers energy cost savings monthly
-  state: "{{- (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_month') }}"
 - name: Humidifiers energy cost savings yearly
-  state: "{{- (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.humidifiers_energy_cost_savings')|float - states('sensor.humidifiers_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.humidifiers_energy_cost_savings') and has_value('sensor.humidifiers_energy_cost_savings_last_year') }}"
 
 - name: Kitchen appliances energy cost weekly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_week') }}"
 - name: Kitchen appliances energy cost monthly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_month') }}"
 - name: Kitchen appliances energy cost yearly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost')|float - states('sensor.kitchen_appliances_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost') and has_value('sensor.kitchen_appliances_energy_cost_last_year') }}"
 - name: Kitchen appliances energy cost savings weekly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_week') }}"
 - name: Kitchen appliances energy cost savings monthly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_month') }}"
 - name: Kitchen appliances energy cost savings yearly
-  state: "{{- (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.kitchen_appliances_energy_cost_savings')|float - states('sensor.kitchen_appliances_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.kitchen_appliances_energy_cost_savings') and has_value('sensor.kitchen_appliances_energy_cost_savings_last_year') }}"
 
 - name: Dishwasher energy cost weekly
-  state: "{{- (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_week') }}"
 - name: Dishwasher energy cost monthly
-  state: "{{- (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_month') }}"
 - name: Dishwasher energy cost yearly
-  state: "{{- (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost')|float - states('sensor.dishwasher_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost') and has_value('sensor.dishwasher_energy_cost_last_year') }}"
 - name: Dishwasher energy cost savings weekly
-  state: "{{- (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_week') }}"
 - name: Dishwasher energy cost savings monthly
-  state: "{{- (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_month') }}"
 - name: Dishwasher energy cost savings yearly
-  state: "{{- (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dishwasher_energy_cost_savings')|float - states('sensor.dishwasher_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.dishwasher_energy_cost_savings') and has_value('sensor.dishwasher_energy_cost_savings_last_year') }}"
 
 - name: Fridge energy cost weekly
-  state: "{{- (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_week') }}"
 - name: Fridge energy cost monthly
-  state: "{{- (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_month') }}"
 - name: Fridge energy cost yearly
-  state: "{{- (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost')|float - states('sensor.fridge_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost') and has_value('sensor.fridge_energy_cost_last_year') }}"
 - name: Fridge energy cost savings weekly
-  state: "{{- (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_week') }}"
 - name: Fridge energy cost savings monthly
-  state: "{{- (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_month') }}"
 - name: Fridge energy cost savings yearly
-  state: "{{- (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.fridge_energy_cost_savings')|float - states('sensor.fridge_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_year') }}"
 
 - name: Freezer, mini fridge, routers energy cost weekly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_week') }}"
 - name: Freezer, mini fridge, routers energy cost monthly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_month') }}"
 - name: Freezer, mini fridge, routers energy cost yearly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_year') }}"
 - name: Freezer, mini fridge, routers energy cost savings weekly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week') }}"
 - name: Freezer, mini fridge, routers energy cost savings monthly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month') }}"
 - name: Freezer, mini fridge, routers energy cost savings yearly
-  state: "{{- (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year') }}"
 
 - name: Washer energy cost weekly
-  state: "{{- (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_week') }}"
 - name: Washer energy cost monthly
-  state: "{{- (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_month') }}"
 - name: Washer energy cost yearly
-  state: "{{- (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost')|float - states('sensor.washer_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost') and has_value('sensor.washer_energy_cost_last_year') }}"
 - name: Washer energy cost savings weekly
-  state: "{{- (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_week') }}"
 - name: Washer energy cost savings monthly
-  state: "{{- (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_month') }}"
 - name: Washer energy cost savings yearly
-  state: "{{- (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.washer_energy_cost_savings')|float - states('sensor.washer_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.washer_energy_cost_savings') and has_value('sensor.washer_energy_cost_savings_last_year') }}"
 
 - name: Dryer energy cost weekly
-  state: "{{- (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_week') }}"
 - name: Dryer energy cost monthly
-  state: "{{- (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_month') }}"
 - name: Dryer energy cost yearly
-  state: "{{- (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost')|float - states('sensor.dryer_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost') and has_value('sensor.dryer_energy_cost_last_year') }}"
 - name: Dryer energy cost savings weekly
-  state: "{{- (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_week') }}"
 - name: Dryer energy cost savings monthly
-  state: "{{- (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_month') }}"
 - name: Dryer energy cost savings yearly
-  state: "{{- (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.dryer_energy_cost_savings')|float - states('sensor.dryer_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.dryer_energy_cost_savings') and has_value('sensor.dryer_energy_cost_savings_last_year') }}"
 
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost weekly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_week') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost monthly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_month') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost yearly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_last_year') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings weekly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_week') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings monthly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_month') }}"
 - name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings yearly
-  state: "{{- (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings')|float - states('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings') and has_value('sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_last_year') }}"
 
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost weekly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_week') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost monthly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_month') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost yearly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_last_year') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings weekly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_week') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings monthly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_month') }}"
 - name: Water heater, oven & stove, guest suite, garage, all other energy cost savings yearly
-  state: "{{- (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings')|float - states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings') and has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_last_year') }}"
 
 - name: Office desk, computer & monitor, cooler, fish tank energy cost weekly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_week') }}"
 - name: Office desk, computer & monitor, cooler, fish tank energy cost monthly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_month') }}"
 - name: Office desk, computer & monitor, cooler, fish tank energy cost yearly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_last_year') }}"
 - name: Office desk, computer & monitor, cooler, fish tank energy cost savings weekly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_week') }}"
 - name: Office desk, computer & monitor, cooler, fish tank energy cost savings monthly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_month') }}"
 - name: Office desk, computer & monitor, cooler, fish tank energy cost savings yearly
-  state: "{{- (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings')|float - states('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings') and has_value('sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_last_year') }}"
 
 - name: Phone chargers energy cost weekly
-  state: "{{- (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_week') }}"
 - name: Phone chargers energy cost monthly
-  state: "{{- (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_month') }}"
 - name: Phone chargers energy cost yearly
-  state: "{{- (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost')|float - states('sensor.phone_chargers_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost') and has_value('sensor.phone_chargers_energy_cost_last_year') }}"
 - name: Phone chargers energy cost savings weekly
-  state: "{{- (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_week') }}"
 - name: Phone chargers energy cost savings monthly
-  state: "{{- (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_month') }}"
 - name: Phone chargers energy cost savings yearly
-  state: "{{- (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.phone_chargers_energy_cost_savings')|float - states('sensor.phone_chargers_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.phone_chargers_energy_cost_savings') and has_value('sensor.phone_chargers_energy_cost_savings_last_year') }}"
 
 - name: Sensors energy cost weekly
-  state: "{{- (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_week') }}"
 - name: Sensors energy cost monthly
-  state: "{{- (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_month') }}"
 - name: Sensors energy cost yearly
-  state: "{{- (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost')|float - states('sensor.sensors_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost') and has_value('sensor.sensors_energy_cost_last_year') }}"
 - name: Sensors energy cost savings weekly
-  state: "{{- (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_week') }}"
 - name: Sensors energy cost savings monthly
-  state: "{{- (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_month') }}"
 - name: Sensors energy cost savings yearly
-  state: "{{- (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.sensors_energy_cost_savings')|float - states('sensor.sensors_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.sensors_energy_cost_savings') and has_value('sensor.sensors_energy_cost_savings_last_year') }}"
 
 - name: Paludarium, picture frame, camera energy cost weekly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_week') }}"
 - name: Paludarium, picture frame, camera energy cost monthly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_month') }}"
 - name: Paludarium, picture frame, camera energy cost yearly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_last_year') }}"
 - name: Paludarium, picture frame, camera energy cost savings weekly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_week') }}"
 - name: Paludarium, picture frame, camera energy cost savings monthly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_month') }}"
 - name: Paludarium, picture frame, camera energy cost savings yearly
-  state: "{{- (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.paludarium_picture_frame_camera_energy_cost_savings')|float - states('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_year') }}"
 
 - name: Standby energy cost weekly
-  state: "{{- (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_week') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_week') }}"
 - name: Standby energy cost monthly
-  state: "{{- (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_month') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_month') }}"
 - name: Standby energy cost yearly
-  state: "{{- (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost')|float - states('sensor.standby_energy_cost_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_year') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost') and has_value('sensor.standby_energy_cost_last_year') }}"
 - name: Standby energy cost savings weekly
-  state: "{{- (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_week')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_week')|float)|round(2) }}"
   unit_of_measurement: $/week
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_week') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_week') }}"
 - name: Standby energy cost savings monthly
-  state: "{{- (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_month')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_month')|float)|round(2) }}"
   unit_of_measurement: $/month
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_month') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_month') }}"
 - name: Standby energy cost savings yearly
-  state: "{{- (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_year')|float)|round(2) }}"
+  state: "{{ (states('sensor.standby_energy_cost_savings')|float - states('sensor.standby_energy_cost_savings_last_year')|float)|round(2) }}"
   unit_of_measurement: $/year
   state_class: measurement
   icon: mdi:currency-usd
-  availability: "{{- has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_year') }}"
+  availability: "{{ has_value('sensor.standby_energy_cost_savings') and has_value('sensor.standby_energy_cost_savings_last_year') }}"

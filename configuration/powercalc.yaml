@@ -76,7 +76,7 @@ sensors:
         fixed: # measured with a smart switch
           power: >
             {{
-              26 if state_attr('humidifier.bedroom', 'humidity')|default(0) > state_attr('humidifier.bedroom', 'current_humidity')|default(0) else 15.6
+              26 if state_attr('humidifier.bedroom', 'humidity')|float(0) > state_attr('humidifier.bedroom', 'current_humidity')|float(0) else 15.6
               + 3 if states('light.bedroom_humidifier') == 'on' else 0
             }}
         standby_power: 0.5 # estimate
@@ -85,7 +85,7 @@ sensors:
         fixed: # measured with a smart switch
           power: >
             {{
-              26 if state_attr('humidifier.nursery', 'humidity')|default(0) > state_attr('humidifier.nursery', 'current_humidity')|default(0) else 15.6
+              26 if state_attr('humidifier.nursery', 'humidity')|float(0) > state_attr('humidifier.nursery', 'current_humidity')|float(0) else 15.6
               + 3 if states('light.nursery_humidifier') == 'on' else 0
             }}
         standby_power: 0.5 # estimate
