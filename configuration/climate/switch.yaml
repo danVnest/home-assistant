@@ -5,11 +5,11 @@ switch:
       friendly_name: Nursery heater
       value_template: "{{ states('climate.nursery_heater') == 'heat' }}"
       turn_on:
-        service: climate.turn_on
+        action: climate.turn_on
         target:
           entity_id: climate.nursery_heater
       turn_off:
-        service: climate.turn_off
+        action: climate.turn_off
         target:
           entity_id: climate.nursery_heater
     office_heater:
@@ -20,11 +20,11 @@ switch:
         states('sensor.office_heater_power')|float(0) > 250
         }}
       turn_on:
-        service: switch.turn_on
+        action: switch.turn_on
         target:
           entity_id: switch.office_heater_dumb
       turn_off:
-        service: climate.turn_off
+        action: climate.turn_off
         target:
           entity_id: switch.office_heater_dumb
 
@@ -32,22 +32,22 @@ switch:
       friendly_name: Bedroom humidifier
       value_template: "{{ states('humidifier.bedroom') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
-        service: humidifier.turn_on
+        action: humidifier.turn_on
         target:
           entity_id: humidifier.bedroom
       turn_off:
-        service: humidifier.turn_off
+        action: humidifier.turn_off
         target:
           entity_id: humidifier.bedroom
     nursery_humidifier:
       friendly_name: Nursery humidifier
       value_template: "{{ states('humidifier.nursery') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
-        service: humidifier.turn_on
+        action: humidifier.turn_on
         target:
           entity_id: humidifier.nursery
       turn_off:
-        service: humidifier.turn_off
+        action: humidifier.turn_off
         target:
           entity_id: humidifier.nursery
 
@@ -55,11 +55,11 @@ switch:
       friendly_name: Living room aircon
       value_template: "{{ states('climate.living_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
-        service: climate.turn_on
+        action: climate.turn_on
         target:
           entity_id: climate.living_room_aircon
       turn_off:
-        service: climate.turn_off
+        action: climate.turn_off
         target:
           entity_id: climate.living_room_aircon
 
@@ -67,11 +67,11 @@ switch:
       friendly_name: Dining room aircon
       value_template: "{{ states('climate.dining_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
-        service: climate.turn_on
+        action: climate.turn_on
         target:
           entity_id: climate.dining_room_aircon
       turn_off:
-        service: climate.turn_off
+        action: climate.turn_off
         target:
           entity_id: climate.dining_room_aircon
 
@@ -79,10 +79,10 @@ switch:
       friendly_name: Bedroom aircon
       value_template: "{{ states('climate.bedroom_aircon') not in ('off', 'unavailable', 'unknown') }}"
       turn_on:
-        service: climate.turn_on
+        action: climate.turn_on
         target:
           entity_id: climate.bedroom_aircon
       turn_off:
-        service: climate.turn_off
+        action: climate.turn_off
         target:
           entity_id: climate.bedroom_aircon

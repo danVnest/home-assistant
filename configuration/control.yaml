@@ -87,11 +87,11 @@ template:
 automation:
   - alias: Turn TV on if not already on
     description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
-    trigger:
-      - platform: webostv.turn_on
+    triggers:
+      - trigger: webostv.turn_on
         entity_id: media_player.tv
-    action:
-      - service: wake_on_lan.send_magic_packet
+    actions:
+      - action: wake_on_lan.send_magic_packet
         data:
           mac: !secret tv_mac
   # TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
@@ -100,12 +100,12 @@ automation:
 
   - alias: Automatic theme change
     description: "Automatically change the theme between light and dark based on sun position"
-    trigger:
-      - platform: homeassistant
+    triggers:
+      - trigger: homeassistant
         event: start
-      - platform: state
+      - trigger: state
         entity_id: sun.sun
-    action:
+    actions:
       - service_template: frontend.set_theme
         data_template:
           name: >
