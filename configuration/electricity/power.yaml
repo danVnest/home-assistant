@@ -291,6 +291,6 @@ sensor:
 homeassistant:
   customize:
     sensor.dan_s_phone_charger_power:
-    unit_of_measurement: kW
-    device_class: power
-    state_class: measurement
+      unit_of_measurement: kW
+      device_class: power
+      state_class: measurement
