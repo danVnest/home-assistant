@@ -1,50 +1,49 @@
-
-
-energy_cost_first_100kwh_of_month:
-  name: Energy cost (1st 100kWh/month)
-  min: 0.1
-  max: 1
-  step: 0.0001
-  unit_of_measurement: $/kWh
-  mode: box
-  icon: mdi:currency-usd
-energy_cost_after_first_100kwh_of_month:
-  name: Energy cost (after 1st 100kWh/month)
-  min: 0.1
-  max: 1
-  step: 0.0001
-  mode: box
-  unit_of_measurement: $/kWh
-  icon: mdi:currency-usd
-energy_cost_controlled_load:
-  name: Controlled load cost
-  min: 0.1
-  max: 1
-  step: 0.0001
-  mode: box
-  unit_of_measurement: $/kWh
-  icon: mdi:currency-usd
-energy_cost_green_power:
-  name: Green power cost
-  min: 0.01
-  max: 1
-  step: 0.0001
-  mode: box
-  unit_of_measurement: $/kWh
-  icon: mdi:currency-usd
-energy_cost_service:
-  name: Daily energy service cost
-  min: 0.1
-  max: 10
-  step: 0.001
-  mode: box
-  unit_of_measurement: $/day
-  icon: mdi:currency-usd
-energy_export_price:
-  name: Energy export price
-  min: 0.01
-  max: 1
-  step: 0.0001
-  mode: box
-  unit_of_measurement: $/kWh
-  icon: mdi:currency-usd
+input_number:
+  energy_cost_first_100kwh_of_month:
+    name: Energy cost (1st 100kWh/month)
+    min: 0.1
+    max: 1
+    step: 0.0001
+    unit_of_measurement: $/kWh
+    mode: box
+    icon: mdi:currency-usd
+  energy_cost_after_first_100kwh_of_month:
+    name: Energy cost (after 1st 100kWh/month)
+    min: 0.1
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: $/kWh
+    icon: mdi:currency-usd
+  energy_cost_controlled_load:
+    name: Controlled load cost
+    min: 0.1
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: $/kWh
+    icon: mdi:currency-usd
+  energy_cost_green_power:
+    name: Green power cost
+    min: 0.01
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: $/kWh
+    icon: mdi:currency-usd
+  energy_cost_service:
+    name: Daily energy service cost
+    min: 0.1
+    max: 10
+    step: 0.001
+    mode: box
+    unit_of_measurement: $/day
+    icon: mdi:currency-usd
+  energy_export_price:
+    name: Energy export price
+    min: 0.01
+    max: 1
+    step: 0.0001
+    mode: box
+    unit_of_measurement: $/kWh
+    icon: mdi:currency-usd

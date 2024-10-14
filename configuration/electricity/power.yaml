@@ -288,8 +288,9 @@ sensor:
     unit: kW
     time_window: 00:15:00
 
-customize:
-  sensor.dan_s_phone_charger_power:
-   unit_of_measurement: kW
-   device_class: power
-   state_class: measurement
+homeassistant:
+  customize:
+    sensor.dan_s_phone_charger_power:
+    unit_of_measurement: kW
+    device_class: power
+    state_class: measurement

@@ -1,6 +1,6 @@
 
 template:
-  - sensor:
+  sensor:
     - name: Solar return on investment
       state: >
         {% set install_costs = 8889.98 %}

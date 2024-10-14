@@ -1,285 +1,286 @@
-- platform: integration
-  name: Total energy cost
-  source: sensor.total_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Total energy cost savings
-  source: sensor.total_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+sensor:
+  - platform: integration
+    name: Total energy cost
+    source: sensor.total_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Total energy cost savings
+    source: sensor.total_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Lights energy cost
-  source: sensor.lights_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Lights energy cost savings
-  source: sensor.lights_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Lights energy cost
+    source: sensor.lights_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Lights energy cost savings
+    source: sensor.lights_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Living room aircon energy cost
-  source: sensor.living_room_aircon_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Living room aircon energy cost savings
-  source: sensor.living_room_aircon_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Living room aircon energy cost
+    source: sensor.living_room_aircon_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Living room aircon energy cost savings
+    source: sensor.living_room_aircon_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Dining room aircon energy cost
-  source: sensor.dining_room_aircon_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Dining room aircon energy cost savings
-  source: sensor.dining_room_aircon_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Dining room aircon energy cost
+    source: sensor.dining_room_aircon_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Dining room aircon energy cost savings
+    source: sensor.dining_room_aircon_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Bedroom aircon energy cost
-  source: sensor.bedroom_aircon_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Bedroom aircon energy cost savings
-  source: sensor.bedroom_aircon_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Bedroom aircon energy cost
+    source: sensor.bedroom_aircon_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Bedroom aircon energy cost savings
+    source: sensor.bedroom_aircon_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Office heater energy cost
-  source: sensor.office_heater_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Office heater energy cost savings
-  source: sensor.office_heater_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Office heater energy cost
+    source: sensor.office_heater_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Office heater energy cost savings
+    source: sensor.office_heater_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Nursery heater energy cost
-  source: sensor.nursery_heater_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Nursery heater energy cost savings
-  source: sensor.nursery_heater_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Nursery heater energy cost
+    source: sensor.nursery_heater_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Nursery heater energy cost savings
+    source: sensor.nursery_heater_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Fans energy cost
-  source: sensor.fans_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Fans energy cost savings
-  source: sensor.fans_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Fans energy cost
+    source: sensor.fans_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Fans energy cost savings
+    source: sensor.fans_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Humidifiers energy cost
-  source: sensor.humidifiers_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Humidifiers energy cost savings
-  source: sensor.humidifiers_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Humidifiers energy cost
+    source: sensor.humidifiers_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Humidifiers energy cost savings
+    source: sensor.humidifiers_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Kitchen appliances energy cost
-  source: sensor.kitchen_appliances_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Kitchen appliances energy cost savings
-  source: sensor.kitchen_appliances_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Kitchen appliances energy cost
+    source: sensor.kitchen_appliances_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Kitchen appliances energy cost savings
+    source: sensor.kitchen_appliances_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Dishwasher energy cost
-  source: sensor.dishwasher_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Dishwasher energy cost savings
-  source: sensor.dishwasher_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Dishwasher energy cost
+    source: sensor.dishwasher_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Dishwasher energy cost savings
+    source: sensor.dishwasher_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Fridge energy cost
-  source: sensor.fridge_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Fridge energy cost savings
-  source: sensor.fridge_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Fridge energy cost
+    source: sensor.fridge_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Fridge energy cost savings
+    source: sensor.fridge_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Freezer, mini fridge, routers energy cost
-  source: sensor.freezer_mini_fridge_routers_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Freezer, mini fridge, routers energy cost savings
-  source: sensor.freezer_mini_fridge_routers_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Freezer, mini fridge, routers energy cost
+    source: sensor.freezer_mini_fridge_routers_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Freezer, mini fridge, routers energy cost savings
+    source: sensor.freezer_mini_fridge_routers_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Washer energy cost
-  source: sensor.washer_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Washer energy cost savings
-  source: sensor.washer_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Washer energy cost
+    source: sensor.washer_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Washer energy cost savings
+    source: sensor.washer_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Dryer energy cost
-  source: sensor.dryer_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Dryer energy cost savings
-  source: sensor.dryer_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Dryer energy cost
+    source: sensor.dryer_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Dryer energy cost savings
+    source: sensor.dryer_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost
-  source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings
-  source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost
+    source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings
+    source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost
-  source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Water heater, oven & stove, guest suite, garage, all other energy cost savings
-  source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Water heater, oven & stove, guest suite, garage, all other energy cost
+    source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Water heater, oven & stove, guest suite, garage, all other energy cost savings
+    source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Office desk, computer & monitor, cooler, fish tank energy cost
-  source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Office desk, computer & monitor, cooler, fish tank energy cost savings
-  source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Office desk, computer & monitor, cooler, fish tank energy cost
+    source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Office desk, computer & monitor, cooler, fish tank energy cost savings
+    source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Phone chargers energy cost
-  source: sensor.phone_chargers_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Phone chargers energy cost savings
-  source: sensor.phone_chargers_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Phone chargers energy cost
+    source: sensor.phone_chargers_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Phone chargers energy cost savings
+    source: sensor.phone_chargers_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Sensors energy cost
-  source: sensor.sensors_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Sensors energy cost savings
-  source: sensor.sensors_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Sensors energy cost
+    source: sensor.sensors_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Sensors energy cost savings
+    source: sensor.sensors_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Paludarium, picture frame, camera energy cost
-  source: sensor.paludarium_picture_frame_camera_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Paludarium, picture frame, camera energy cost savings
-  source: sensor.paludarium_picture_frame_camera_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Paludarium, picture frame, camera energy cost
+    source: sensor.paludarium_picture_frame_camera_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Paludarium, picture frame, camera energy cost savings
+    source: sensor.paludarium_picture_frame_camera_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
 
-- platform: integration
-  name: Standby energy cost
-  source: sensor.standby_power_cost
-  method: left
-  max_sub_interval:
-    minutes: 1
-- platform: integration
-  name: Standby energy cost savings
-  source: sensor.standby_power_cost_savings
-  method: left
-  max_sub_interval:
-    minutes: 1
+  - platform: integration
+    name: Standby energy cost
+    source: sensor.standby_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Standby energy cost savings
+    source: sensor.standby_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1

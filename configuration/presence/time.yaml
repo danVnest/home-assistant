@@ -1,4 +1,4 @@
-sensor:
+binary_sensor:
   - platform: tod
     name: Rachel's typical sleep time
     unique_id: rachel_s_sleep_time
@@ -11,7 +11,7 @@ sensor:
     before: "7:00"
 
 template:
-  - binary_sensor:
+  binary_sensor:
     - name: Rachel tired
       state: "{{ (states('sensor.rachel_hours_asleep')|float) < 7 }}"
       icon: mdi:sleep

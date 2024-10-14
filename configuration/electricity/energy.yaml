@@ -14,7 +14,7 @@ utility_meter:
     cycle: monthly
 
 template:
-  - sensor:
+  sensor:
     - name: Average daily solar production
       state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
       unit_of_measurement: kWh/day

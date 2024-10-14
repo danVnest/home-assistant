@@ -1,5 +1,5 @@
 template:
-  - sensor:
+  sensor:
     - name: Weighted average inside apparent temperature
       state: >
         {%- set value_weight_array = [

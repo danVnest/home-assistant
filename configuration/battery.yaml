@@ -1,5 +1,5 @@
 template:
-  - sensor:
+  sensor:
     - name: Soil sensor vegetable garden sun battery level
       state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('vegetable_garden_sun') }}"
       unit_of_measurement: "%"

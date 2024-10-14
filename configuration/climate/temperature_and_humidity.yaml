@@ -1,5 +1,5 @@
 template:
-  - sensor:
+  sensor:
     - name: Bedroom temperature
       state: >
         {%- set value_weight_array = [
@@ -214,7 +214,6 @@ template:
         {%- endif -%}
       unit_of_measurement: "°C"
       device_class: temperature
-      state_class: measurement
       icon: mdi:sun-thermometer-outline
       availability: >
         {{ 

@@ -1,5 +1,5 @@
 template:
-  - sensor:
+  sensor:
     - name: Bedroom bed occupied probability
       state: "{{ (state_attr('binary_sensor.bedroom_bed_occupied', 'probability') * 100)|round() }}"
       unit_of_measurement: "%"

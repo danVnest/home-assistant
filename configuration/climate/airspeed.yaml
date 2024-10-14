@@ -1,5 +1,5 @@
 template:
-  - sensor:
+  sensor:
     - name: Bathroom airspeed
       state: "{{ 0 }}"
       unit_of_measurement: "m/s"

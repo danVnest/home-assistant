@@ -1,11 +1,12 @@
-customize:
-  zone.home:
-    radius: 300
-  device_tracker.dan_s_phone:
-    entity_picture: /local/dan.png
-  device_tracker.rachel_s_phone:
-    entity_picture: /local/rachel.png
-    
+homeassistant:
+  customize:
+    zone.home:
+      radius: 300
+    device_tracker.dan_s_phone:
+      entity_picture: /local/dan.png
+    device_tracker.rachel_s_phone:
+      entity_picture: /local/rachel.png
+
 binary_sensor:
   # TODO: https://app.asana.com/0/1207020279479204/1205852232324004/f
   - platform: bayesian
@@ -41,7 +42,6 @@ binary_sensor:
   #     # time since previous nap?
   #     # light status?
   #     # room illuminance?
-
   # # the following are guesses - go check history and quantify - use statistics???
   # - platform: bayesian
   #   name: Nursery occupied
@@ -57,13 +57,11 @@ binary_sensor:
   #       prob_given_true: 0.95 # expected error
   #       prob_given_false: 0.2 # sometimes doesn't detect stationary person
   #       to_state: on
-
   #     - platform: state
   #       entity_id: sensor.nursery_presence_sensor_occupancy_status
   #       prob_given_true: 0.95 #
   #       prob_given_false: 0.5 # ≈50% of occupancy is stationary
   #       to_state: Movement # THIS ISN'T RIGHT
-
   #     - platform: "state"
   #       entity_id: "sensor.bedroom_motion"
   #       prob_given_true: 0.5 # My sensor history shows when I am in bed the sensor picks me up about half the time
@@ -80,9 +78,8 @@ binary_sensor:
   #       prob_given_false: 0.1 # When I am awake, I occasionally AC charge my phone
   #       to_state: "ac"
 
-
-template:  
-  - binary_sensor:
+template:
+  binary_sensor:
     - name: Desk occupied
       state: >
         {{

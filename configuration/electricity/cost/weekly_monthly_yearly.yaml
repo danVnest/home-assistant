@@ -688,7 +688,7 @@ sensor:
         unit_of_measurement: $
 
 template:
-  - sensor:
+  sensor:
     - name: Total energy cost weekly
       state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float + 7 * states('input_number.energy_cost_service')|float)|round(2) -}}"
       unit_of_measurement: $/week

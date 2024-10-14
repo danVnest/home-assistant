@@ -47,7 +47,7 @@ counter:
     restore: false
 
 template:
-  - binary_sensor:
+  binary_sensor:
     - name: Display day card # TODO: maybe not required anymore
       state: >
         {{
@@ -83,7 +83,7 @@ template:
       device_class: running
       availability: "{{ has_value('sensor.dryer_completion_time') }}"
       icon: mdi:tumble-dryer
-    
+
 automation:
   - alias: Turn TV on if not already on
     description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
