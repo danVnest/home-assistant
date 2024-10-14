@@ -1770,11 +1770,11 @@
                           "name": "Grid if used"
                         },
                         {
-                          "entity": "sensor.energy_savings_from_solar_per_kwh",
+                          "entity": "sensor.savings_from_solar_per_kwh",
                           "name": "Saving with solar now"
                         },
                         {
-                          "entity": "sensor.energy_savings_from_battery_per_kwh",
+                          "entity": "sensor.savings_from_battery_per_kwh",
                           "name": "Saving with battery now"
                         },
                         {

@@ -1,0 +1,228 @@
+group:
+  any_aircon:
+    name: Any aircon
+    entities:
+      - switch.living_room_aircon
+      - switch.dining_room_aircon
+      - switch.bedroom_aircon
+    icon: mdi:air-conditioner
+  all_aircon:
+    name: All aircon
+    entities:
+      - switch.living_room_aircon
+      - switch.dining_room_aircon
+      - switch.bedroom_aircon
+    all: true
+    icon: mdi:air-conditioner
+  any_fans:
+    name: Any fans
+    entities:
+      - fan.bedroom
+      - fan.nursery
+      - fan.office
+    icon: mdi:fan
+  all_fans:
+    name: All fans
+    entities:
+      - fan.bedroom
+      - fan.nursery
+      - fan.office
+    all: true
+    icon: mdi:fan
+  any_heaters:
+    name: Any heaters
+    entities:
+      - switch.nursery_heater
+      - switch.office_heater
+    icon: mdi:radiator
+  all_heaters:
+    name: All heaters
+    entities:
+      - switch.nursery_heater
+      - switch.office_heater
+    all: true
+    icon: mdi:radiator
+  any_humidifiers:
+    name: Any humidifiers
+    entities:
+      - switch.nursery_humidifier
+      - switch.bedroom_humidifier
+    icon: mdi:air-humidifier
+  all_humidifiers:
+    name: All humidifiers
+    entities:
+      - switch.nursery_humidifier
+      - switch.bedroom_humidifier
+    all: true
+    icon: mdi:air-humidifier
+  any_climate_control:
+    name: Climate control
+    entities:
+      - input_boolean.control_living_room_aircon
+      - input_boolean.control_dining_room_aircon
+      - input_boolean.control_bedroom_aircon
+      - input_boolean.control_nursery_fan
+      - input_boolean.control_office_fan
+      - input_boolean.control_bedroom_fan
+      - input_boolean.control_nursery_heater
+      - input_boolean.control_office_heater
+      - input_boolean.control_bedroom_humidifier
+      - input_boolean.control_nursery_humidifier
+    icon: mdi:home-thermometer
+  all_climate_control:
+    name: Climate control
+    entities:
+      - input_boolean.control_living_room_aircon
+      - input_boolean.control_dining_room_aircon
+      - input_boolean.control_bedroom_aircon
+      - input_boolean.control_nursery_fan
+      - input_boolean.control_office_fan
+      - input_boolean.control_bedroom_fan
+      - input_boolean.control_nursery_heater
+      - input_boolean.control_office_heater
+      - input_boolean.control_bedroom_humidifier
+      - input_boolean.control_nursery_humidifier
+    icon: mdi:home-thermometer
+    all: true
+
+input_boolean:
+  control_living_room_aircon:
+    name: Living room aircon
+    icon: mdi:air-conditioner
+  control_dining_room_aircon:
+    name: Dining room aircon
+    icon: mdi:air-conditioner
+  control_bedroom_aircon:
+    name: Bedroom aircon
+    icon: mdi:air-conditioner
+  control_nursery_fan:
+    name: Nursery fan
+    icon: mdi:fan
+  control_office_fan:
+    name: Office fan
+    icon: mdi:fan
+  control_bedroom_fan:
+    name: Bedroom fan
+    icon: mdi:fan
+  control_nursery_heater:
+    name: Nursery heater
+    icon: mdi:radiator
+  control_office_heater:
+    name: Office heater
+    icon: mdi:radiator
+  control_bedroom_humidifier:
+    name: Bedroom humidifier
+    icon: mdi:air-humidifier
+  control_nursery_humidifier:
+    name: Nursery humidifier
+    icon: mdi:air-humidifier
+
+input_number:
+  cooling_target_temperature:
+    name: Cool down to
+    min: 15
+    max: 25
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-chevron-down
+  heating_target_temperature:
+    name: Heat up to
+    min: 15
+    max: 25
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-chevron-up
+  sleep_cooling_target_temperature:
+    name: Cool down to
+    min: 15
+    max: 25
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-chevron-down
+  sleep_heating_target_temperature:
+    name: Heat up to
+    min: 15
+    max: 25
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-chevron-up
+  high_temperature_aircon_trigger:
+    name: Aircon cools once above
+    min: 20
+    max: 40
+    step: 0.5
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-high
+  low_temperature_aircon_trigger:
+    name: Aircon heats once below
+    min: 0
+    max: 20
+    step: 0.5
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-low
+  sleep_high_temperature_aircon_trigger:
+    name: Aircon cools once above
+    min: 20
+    max: 40
+    step: 0.5
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-high
+  sleep_low_temperature_aircon_trigger:
+    name: Aircon heats once below
+    min: 0
+    max: 20
+    step: 0.5
+    unit_of_measurement: °C
+    mode: box
+    icon: mdi:thermometer-low
+  humidifier_target:
+    name: Target humidity
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  aircon_door_check_delay:
+    name: Aircon off if door open
+    min: 1
+    max: 10
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer
+  aircon_vacating_delay:
+    name: Aircon off if room empty
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer
+  fan_vacating_delay:
+    name: Fan off if room empty
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer
+  heater_vacating_delay:
+    name: Heater off if room empty
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer
+  humidifier_vacating_delay:
+    name: Humidifier off if room empty
+    min: 1
+    max: 60
+    step: 1
+    unit_of_measurement: min
+    mode: box
+    icon: mdi:timer

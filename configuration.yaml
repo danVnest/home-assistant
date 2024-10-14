@@ -1,22 +1,3 @@
-# Entities
-binary_sensor: !include_dir_merge_list ./configuration/binary_sensors/
-counter: !include ./configuration/counters.yaml
-group: !include ./configuration/groups.yaml
-homeassistant: !include ./configuration/customize.yaml
-input_boolean: !include ./configuration/inputs/boolean.yaml
-input_datetime: !include ./configuration/inputs/datetime.yaml
-input_number: !include ./configuration/inputs/number.yaml
-input_select: !include ./configuration/inputs/select.yaml
-powercalc: !include ./configuration/powercalc.yaml
-sensor: !include_dir_merge_list ./configuration/sensors/
-switch: !include ./configuration/switches.yaml
-template:
-  binary_sensor: !include_dir_merge_list ./configuration/templates/binary/
-  sensor: !include_dir_merge_list ./configuration/templates/sensors/
-utility_meter: !include ./configuration/utility_meters.yaml
-
-# System
-automation: !include ./configuration/automations.yaml
 config:
 energy:
 frontend:
@@ -29,6 +10,8 @@ frontend:
     - /local/community/mini-graph-card/mini-graph-card-bundle.js
     - /local/community/power-flow-card-plus/power-flow-card-plus.js
 history:
+homeassistant:
+  packages: !include_dir_named configuration
 homeassistant_alerts:
 http:
   ip_ban_enabled: true

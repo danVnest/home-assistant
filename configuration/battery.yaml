@@ -1,0 +1,58 @@
+template:
+  - sensor:
+    - name: Soil sensor vegetable garden sun battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('vegetable_garden_sun') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_vegetable_garden_sun') }}"
+    - name: Soil sensor vegetable garden shade battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('vegetable_garden_shade') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_vegetable_garden_shade') }}"
+    - name: Soil sensor front deck battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('front_deck') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_front_deck') }}"
+    - name: Soil sensor back deck battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('back_deck') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_back_deck') }}"
+    - name: Soil sensor carport pots battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('carport_pots') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_carport_pots') }}"
+    - name: Soil sensor dining room battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('dining_room') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_dining_room') }}"
+    - name: Soil sensor living room battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('living_room') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_living_room') }}"
+    - name: Soil sensor office battery level
+      state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('office') }}"
+      unit_of_measurement: "%"
+      device_class: battery
+      state_class: measurement
+      icon: mdi:battery
+      availability: "{{ has_value('sensor.soil_battery_voltage_office') }}"

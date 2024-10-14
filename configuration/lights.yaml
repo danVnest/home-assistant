@@ -1,0 +1,252 @@
+group:
+  entryway_lights:
+    name: Entryway lights
+    entities:
+      - light.entryway
+      - light.stairway
+    icon: mdi:lightbulb-multiple
+  kitchen_lights:
+    name: Kitchen lights
+    entities:
+      - light.kitchen
+      - light.kitchen_strip
+    icon: mdi:lightbulb-multiple
+  tv_lights:
+    name: TV lights
+    entities:
+      - light.tv_left
+      - light.tv_middle
+      - light.tv_right
+    icon: mdi:lightbulb-group
+  dining_room_lights:
+    name: Dining room lights
+    entities:
+      - light.dining_room_left
+      - light.dining_room_right
+    icon: mdi:lightbulb-multiple
+  all_lights:
+    name: All lights
+    entities:
+      - light.entryway
+      - light.stairway
+      - light.kitchen
+      - light.kitchen_strip
+      - light.tv_left
+      - light.tv_middle
+      - light.tv_right
+      - light.dining_room_left
+      - light.dining_room_right
+      - light.hall
+      - light.bathroom
+      - light.bedroom
+      - light.office
+      - light.nursery
+    icon: mdi:lightbulb-group
+  any_light_control:
+    name: Light control
+    entities:
+      - input_boolean.control_entryway_lights
+      - input_boolean.control_kitchen_light
+      - input_boolean.control_kitchen_strip_light
+      - input_boolean.control_tv_lights
+      - input_boolean.control_dining_room_lights
+      - input_boolean.control_hall_light
+      - input_boolean.control_bathroom_light
+      - input_boolean.control_bedroom_light
+      - input_boolean.control_nursery_light
+      - input_boolean.control_office_light
+    icon: mdi:home-lightbulb
+  all_light_control:
+    name: Light control
+    entities:
+      - input_boolean.control_entryway_lights
+      - input_boolean.control_kitchen_light
+      - input_boolean.control_kitchen_strip_light
+      - input_boolean.control_tv_lights
+      - input_boolean.control_dining_room_lights
+      - input_boolean.control_hall_light
+      - input_boolean.control_bathroom_light
+      - input_boolean.control_bedroom_light
+      - input_boolean.control_nursery_light
+      - input_boolean.control_office_light
+    icon: mdi:home-lightbulb
+    all: true
+
+input_boolean:
+  control_entryway_lights:
+    name: Entryway
+    icon: mdi:lightbulb-multiple
+  control_kitchen_light:
+    name: Kitchen
+    icon: mdi:lightbulb-variant
+  control_kitchen_strip_light:
+    name: Kitchen strip
+    icon: mdi:wall-sconce-flat
+  control_tv_lights:
+    name: TV
+    icon: mdi:lightbulb-group
+  control_dining_room_lights:
+    name: Dining room
+    icon: mdi:lightbulb-multiple
+  control_hall_light:
+    name: Hall
+    icon: mdi:lightbulb-variant
+  control_office_light:
+    name: Office
+    icon: mdi:light-recessed
+  control_bedroom_light:
+    name: Bedroom
+    icon: mdi:light-recessed
+  control_nursery_light:
+    name: Nursery
+    icon: mdi:light-recessed
+  control_bathroom_light:
+    name: Bathroom
+    icon: mdi:lightbulb-variant
+
+input_number:
+  initial_circadian_brightness:
+    name: Initial brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-80
+  initial_circadian_kelvin:
+    name: Initial kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant
+  final_circadian_brightness:
+    name: Final brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-40
+  final_circadian_kelvin:
+    name: Final kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant-outline
+  circadian_initial_sunset_offset:
+    name: Initial sunset offset
+    min: -3
+    max: 3
+    step: 0.5
+    mode: box
+    icon: mdi:weather-sunset-down
+  night_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-80
+  night_motion_kelvin:
+    name: Motion kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant
+  night_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+    icon: mdi:timer-cog
+  night_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  tv_brightness:
+    name: Brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-40
+  tv_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-80
+  tv_kelvin:
+    name: Kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant
+  tv_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+    icon: mdi:timer-cog
+  tv_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  sleep_motion_brightness:
+    name: Motion brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-80
+  sleep_motion_kelvin:
+    name: Motion kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant
+  sleep_transition_period:
+    name: Transition period
+    min: 30
+    max: 300
+    step: 15
+    icon: mdi:timer-cog
+  sleep_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  morning_brightness:
+    name: Brightness
+    min: 25
+    max: 255
+    step: 10
+    icon: mdi:lightbulb-on-80
+  morning_kelvin:
+    name: Kelvin
+    min: 2000
+    max: 4500
+    step: 250
+    icon: mdi:lightbulb-variant
+  morning_vacating_delay:
+    name: Vacating delay
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  office_vacating_delay:
+    name: Office
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  bedroom_vacating_delay:
+    name: Bedroom
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer
+  bathroom_vacating_delay:
+    name: Bathroom
+    min: 0
+    max: 300
+    step: 15
+    icon: mdi:timer

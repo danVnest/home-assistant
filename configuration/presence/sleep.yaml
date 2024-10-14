@@ -1,0 +1,153 @@
+binary_sensor:
+  - platform: bayesian
+    name: Rachel asleep # TODO: change bayesian sensor name to Rachel in bed or Rachel asleep in bed? We don't really want to detect sleep if away. Or is this implied?
+    prior: 0.292 # 7 hours per night = 7/24
+    observations:
+      - platform: state
+        entity_id: binary_sensor.bedroom_bed_occupied
+        to_state: "on"
+        prob_given_true: 0.95 # likely the bedroom bed is detected as occupied given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # chance bedroom is occupied given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: light.bedroom
+        to_state: "off"
+        prob_given_true: 0.99 # very likely the light is off given Rachel is asleep # UPDATE FROM HISTORY_STATS - bedroom light is almost never on when Rachel is asleep
+        prob_given_false: 0.6 # chance light is off given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.rachel_s_phone_still
+        to_state: "on"
+        prob_given_true: 0.99 # very likely Rachel's phone is still given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.5 # chance Rachel's phone is still given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.rachel_s_phone_sleep_confidence_high
+        to_state: "on"
+        prob_given_true: 0.95 # likely Rachel's phone will be confident Rachel is asleep given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # Rachel sometimes leaves her phone around and it becomes confident she's asleep when she's awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.rachel_s_sleep_time
+        to_state: "on"
+        prob_given_true: 0.7 # chance it is within typical sleeping hours given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # chance it is within typical sleeping hours given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: input_select.scene
+        prob_given_true: 0.95 # likely scene is Sleep given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.2 # chance scene is Sleep given Rachel is awake # UPDATE FROM HISTORY_STATS
+        to_state: "Sleep"
+      - platform: state
+        entity_id: input_select.scene
+        prob_given_true: 0.25 # chance scene is Morning given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.2 # chance scene is Morning given Rachel is awake # UPDATE FROM HISTORY_STATS
+        to_state: "Morning"
+        # TODO: do we need mirrored sensor states for non binary sensors? how to capture all other scenes?
+      - platform: state
+        entity_id: person.rachel
+        to_state: "home" # TODO: change bayesian sensor name to Rachel in bed or Rachel asleep in bed? We don't really want to detect sleep if away
+        prob_given_true: 0.99 # very likely Rachel is home given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.7 # chance Rachel is home given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.dan_asleep
+        to_state: "on"
+        prob_given_true: 0.7 # chance Dan is asleep given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.1 # chance Dan is asleep given Rachel is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: sensor.rachel_tired # perhaps rename to rachel_sleep_needs_met
+        to_state: "on"
+        prob_given_true: 0.2 # chance Rachel is tired given Rachel is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.7 # chance Rachel is tired given Rachel is awake # UPDATE FROM HISTORY_STATS
+      # time of night - split into groups, e.g. 9-10pm, 10-11pm, 12-6am, 6-7am, 7-8am, 9-10am
+      # sleep or morning scene?
+      # activity in rest of house (especially nursery)
+      # light status?
+      # room illuminance?
+      # has Rachel slept at all yet? more likely to be asleep if she was previously
+
+  - platform: bayesian
+    name: Dan asleep # TODO: change bayesian sensor name to Dan asleep in bed? We don't really want to detect sleep if away
+    prior: 0.292 # 7 hours per night = 7/24
+    observations:
+      - platform: state
+        entity_id: binary_sensor.bedroom_bed_occupied
+        to_state: "on"
+        prob_given_true: 0.95 # likely the bedroom bed is detected as occupied given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # chance bedroom is occupied given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: light.bedroom
+        to_state: "off"
+        prob_given_true: 0.99 # very likely the light is off given Dan is asleep # UPDATE FROM HISTORY_STATS - bedroom light is almost never on when Rachel is asleep
+        prob_given_false: 0.6 # chance light is off given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: sensor.dan_s_phone_still
+        to_state: "on"
+        prob_given_true: 0.99 # very likely Dan's phone is still given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.5 # chance Dan's phone is still given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.dan_s_phone_unplugged
+        to_state: "off"
+        prob_given_true: 0.95 # likely Dan's phone is plugged in given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.1 # unlikely Dan's phone is plugged in given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.dan_s_computer_active
+        to_state: "off"
+        prob_given_true: 0.95 # likely Dan's computer isn't active given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.5 # chance Dan's computer isn't active given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.dan_s_sleep_time
+        to_state: "on"
+        prob_given_true: 0.7 # chance it is within typical sleeping hours given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # chance it is within typical sleeping hours given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: input_select.scene
+        prob_given_true: 0.95 # likely scene is Sleep given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.3 # chance scene is Sleep given Dan is awake # UPDATE FROM HISTORY_STATS
+        to_state: "Sleep"
+      - platform: state
+        entity_id: input_select.scene
+        prob_given_true: 0.25 # chance scene is Morning given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.2 # chance scene is Morning given Dan is awake # UPDATE FROM HISTORY_STATS
+        to_state: "Morning"
+        # TODO: do we need mirrored sensor states for non binary sensors? how to capture all other scenes?
+      - platform: state
+        entity_id: person.dan
+        to_state: "home"
+        prob_given_true: 0.99 # very likely Dan is home given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.8 # chance Dan is home given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.rachel_asleep
+        to_state: "on"
+        prob_given_true: 0.8 # chance Rachel is asleep given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.25 # chance Rachel is asleep given Dan is awake # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: sensor.dan_tired # perhaps rename to dan_sleep_needs_met
+        to_state: "on"
+        prob_given_true: 0.2 # chance Dan is tired given Dan is asleep # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.7 # chance Dan is tired given Dan is awake # UPDATE FROM HISTORY_STATS
+  #     # time of day/night?
+  #     # time since previous nap?
+  #     # light status?
+  #     # room illuminance?
+  # PC IN USE? TV ON?
+
+template:
+  binary_sensor:
+    - name: Anyone asleep
+      state: >
+        {{
+          states('binary_sensor.dan_asleep') == 'on' or
+          states('binary_sensor.rachel_asleep') == 'on'
+        }}
+      icon: mdi:sleep
+      availability: >
+        {{
+          has_value('binary_sensor.dan_asleep') and
+          has_value('binary_sensor.rachel_asleep')
+        }}
+    - name: Rachel was asleep within last 5 minutes
+      state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
+      delay_off: 0:05
+      icon: mdi:sleep
+      availability: "{{ has_value('binary_sensor.rachel_asleep') }}"
+    - name: Rachel's phone's sleep confidence high
+      unique_id: rachel_s_phone_sleep_confidence_high
+      state: "{{ states('sensor.rachel_s_phone_sleep_confidence')|float > 75 }}"
+      icon: mdi:sleep
+      availability: "{{ has_value('sensor.rachel_s_phone_sleep_confidence') }}"

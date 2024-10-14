@@ -1,0 +1,184 @@
+customize:
+  zone.home:
+    radius: 300
+  device_tracker.dan_s_phone:
+    entity_picture: /local/dan.png
+  device_tracker.rachel_s_phone:
+    entity_picture: /local/rachel.png
+    
+binary_sensor:
+  # TODO: https://app.asana.com/0/1207020279479204/1205852232324004/f
+  - platform: bayesian
+    name: Bedroom bed occupied
+    prior: 0.417 # ≈10 hours per day = 9/24
+    observations:
+      - platform: state
+        entity_id: binary_sensor.bedroom_presence_sensor_distance_in_bed_range
+        to_state: "on"
+        prob_given_true: 0.8 # chance of sensor detecting in range given the bed is occupied # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.01 # chance of sensor detecting in range given the bed is unoccupied # UPDATE FROM HISTORY_STATS
+      - platform: state
+        entity_id: binary_sensor.anyone_asleep
+        to_state: "on"
+        prob_given_true: 0.6 # could also be awake in bed # UPDATE FROM HISTORY_STATS
+        prob_given_false: 0.01 # very unlikely that someone is detected asleep given the bed is unoccupied # UPDATE FROM HISTORY_STATS
+      # count of bedroom changes in the past X minutes - helps counter false clears?
+      # time since last movement detection?
+      # TODO: could also/instead check the anyone_asleep probability? Might not be high enough for 'on', but could indicate bed occupied
+
+  # - platform: bayesian
+  #   name: Nursery cot occupied
+  #   prior: 0.29 # ≈2 hours during day, ≈5 hours at night = 7/24
+  #   observations:
+  #     - platform: state
+  #       entity_id: binary_sensor.nursery_presence_sensor_occupancy
+  #       prob_given_true: 0.95 # expected error
+  #       prob_given_false: 0.2 # sometimes doesn't detect stationary person
+  #       to_state: on
+  #     # nursery distance?
+  #     # time since last movement detection? (adjust in sensor instead?)
+  #     # time of day/night?
+  #     # time since previous nap?
+  #     # light status?
+  #     # room illuminance?
+
+  # # the following are guesses - go check history and quantify - use statistics???
+  # - platform: bayesian
+  #   name: Nursery occupied
+  #   prior: 0.29 # ≈2 hours during day, ≈5 hours at night = 7/24
+  #   observations:
+  #     - platform: state
+  #       entity_id: binary_sensor.nursery_cot_occupied
+  #       prob_given_true: 0.95 # expected error
+  #       prob_given_false: 0.2 # asleep ≈20% of the time
+  #       to_state: on
+  #     - platform: state
+  #       entity_id: binary_sensor.nursery_presence_sensor_occupancy
+  #       prob_given_true: 0.95 # expected error
+  #       prob_given_false: 0.2 # sometimes doesn't detect stationary person
+  #       to_state: on
+
+  #     - platform: state
+  #       entity_id: sensor.nursery_presence_sensor_occupancy_status
+  #       prob_given_true: 0.95 #
+  #       prob_given_false: 0.5 # ≈50% of occupancy is stationary
+  #       to_state: Movement # THIS ISN'T RIGHT
+
+  #     - platform: "state"
+  #       entity_id: "sensor.bedroom_motion"
+  #       prob_given_true: 0.5 # My sensor history shows when I am in bed the sensor picks me up about half the time
+  #       prob_given_false: 0.1 # My sensor history shows I spend about 10% of my waking hours in my bedroom
+  #       to_state: "on"
+  #     - platform: "state"
+  #       entity_id: "sun.sun"
+  #       prob_given_true: 0.7 # If I am in bed then there is a good chance the sun will be down, but in the summer mornings I may still be in bed
+  #       prob_given_false: 0.45 # If I am am awake then there is a reasonable chance the sun will be below the horizon - especially in winter
+  #       to_state: "below_horizon"
+  #     - platform: "state"
+  #       entity_id: "sensor.android_charger_type"
+  #       prob_given_true: 0.95 # When I am in bed, I nearly always plug my phone in to charge
+  #       prob_given_false: 0.1 # When I am awake, I occasionally AC charge my phone
+  #       to_state: "ac"
+
+
+template:  
+  - binary_sensor:
+    - name: Desk occupied
+      state: >
+        {{
+          states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
+          states('sensor.office_presence_sensor_distance')|float < 1.5
+        }}
+      delay_on: 0:00:05
+      delay_off: 0:00:05
+      device_class: occupancy
+      icon: mdi:monitor
+      availability: >
+        {{
+          has_value('binary_sensor.office_presence_sensor_occupancy') and
+          has_value('sensor.office_presence_sensor_distance')
+        }}
+    - name: Dan's computer active at home # TODO: maybe not required anymore
+      unique_id: dan_s_computer_active_at_home
+      state: >
+        {{
+          states('binary_sensor.dan_s_computer_active') == 'on' and
+          states('device_tracker.dan_s_computer') == 'home'
+        }}
+      icon: mdi:monitor
+      availability: >
+        {{
+          has_value('binary_sensor.dan_s_computer_active') and
+          has_value('device_tracker.dan_s_computer')
+        }}
+    - name: Desk occupied and computer active
+      state: >
+        {{
+          states('binary_sensor.desk_occupied') == 'on' and
+          states('binary_sensor.dan_s_computer_active_at_home') == 'on'
+        }}
+      icon: mdi:monitor
+      availability: >
+        {{
+          has_value('binary_sensor.desk_occupied') and
+          has_value('binary_sensor.dan_s_computer_active_at_home')
+        }}
+    - name: Office pet bed occupied within last 5 minutes
+      state: >
+        {{
+          states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
+          states('sensor.office_presence_sensor_distance')|float > 2.3
+        }}
+      delay_on: 0:00:10
+      delay_off: 0:05
+      device_class: occupancy
+      icon: mdi:dog-side
+      availability: >
+        {{
+          has_value('binary_sensor.office_presence_sensor_occupancy') and
+          has_value('sensor.office_presence_sensor_distance')
+        }}
+
+    - name: Bedroom occupied
+      state: >
+        {{
+          states('binary_sensor.bedroom_presence_sensor_occupancy') == 'on' or
+          states('binary_sensor.bedroom_bed_occupied') == 'on'
+        }}
+      device_class: occupancy
+      icon: mdi:motion-sensor
+      availability: >
+        {{
+          has_value('binary_sensor.bedroom_presence_sensor_occupancy') and
+          has_value('binary_sensor.bedroom_bed_occupied')
+        }}
+    - name: Bedroom presence sensor distance in bed range
+      state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance')|float < 2.5 }}"
+      device_class: occupancy
+      delay_off: 0:00:15
+      icon: mdi:bed
+      availability: "{{ has_value('sensor.bedroom_presence_sensor_distance') }}"
+    - name: Rachel's phone still
+      unique_id: rachel_s_phone_still
+      state: "{{ states('sensor.rachel_s_phone_detected_activity') == 'still' }}"
+      # TODO: add device_class: moving and switch sensor from _still to _moving?
+      icon: mdi:cellphone
+      availability: "{{ has_value('sensor.rachel_s_phone_detected_activity') }}"
+    - name: Dan's phone still
+      unique_id: dan_s_phone_still
+      state: "{{ states('sensor.dan_s_phone_activity') == 'Stationary' }}"
+      # TODO: add device_class: moving and switch sensor from _still to _moving?
+      icon: mdi:cellphone
+      availability: "{{ has_value('sensor.dan_s_phone_activity') }}"
+    - name: Dan's phone unplugged
+      unique_id: dan_s_phone_unplugged
+      state: "{{ states('sensor.dan_s_phone_battery_state') == 'Not Charging' }}"
+      # TODO: add device_class: plug and switch sensor from _unplugged to plugged?
+      icon: mdi:cellphone-dock
+      availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
+
+    - name: Kitchen door motion # TODO: maybe not required anymore
+      state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
+      device_class: motion
+      icon: mdi:door
+      availability: "{{ states.binary_sensor.kitchen_door.last_changed|default != '' }}"

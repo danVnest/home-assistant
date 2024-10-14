@@ -1,0 +1,116 @@
+input_select:
+  scene:
+    name: Scene
+    options:
+      - Day
+      - Night
+      - Bright
+      - Sleep
+      - Morning
+      - TV
+      - Away (Day)
+      - Away (Night)
+    icon: mdi:home-lightning-bolt
+
+input_boolean:
+  pets_home_alone:
+    name: Pets home alone
+    icon: mdi:dog-side
+  development_mode:
+    name: Development Mode
+    icon: mdi:dev-to
+
+input_datetime:
+  morning_time:
+    name: Morning time
+    has_time: true
+    icon: mdi:alarm
+  nursery_time:
+    name: Nursery time
+    has_time: true
+    icon: mdi:cradle
+  bed_time:
+    name: Bed time
+    has_time: true
+    icon: mdi:bed-clock
+  circadian_end_time:
+    name: End time
+    has_time: true
+    icon: mdi:clock-end
+
+counter:
+  warnings:
+    name: Warnings
+    restore: false
+  errors:
+    name: Errors
+    restore: false
+
+template:
+  - binary_sensor:
+    - name: Display day card # TODO: maybe not required anymore
+      state: >
+        {{
+          states('input_select.scene') != 'Sleep' and
+          today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')|float(0)) > now()
+        }}
+      icon: mdi:sun-clock
+    - name: TV playing # TODO: update
+      state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
+      icon: mdi:play-pause
+      device_class: running
+      availability: "{{ has_value('sensor.webostvservice_play_state') }}"
+    - name: Owlet attached # TODO: update
+      state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
+      icon: mdi:foot-print
+    - name: Dark outside
+      state: >
+        {{
+          states('sensor.weather_station_illuminance')|float < 5000 or 
+          states('sun.sun') == 'below_horizon'
+        }}
+      delay_off: 0:05
+      icon: mdi:theme-light-dark
+      device_class: running
+      availability: "{{ has_value('sensor.weather_station_illuminance') and has_value('sun.sun') }}"
+    - name: Washer running
+      state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
+      device_class: running
+      availability: "{{ has_value('sensor.washer_completion_time') }}"
+      icon: mdi:washing-machine
+    - name: Dryer running
+      state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
+      device_class: running
+      availability: "{{ has_value('sensor.dryer_completion_time') }}"
+      icon: mdi:tumble-dryer
+    
+automation:
+  - alias: Turn TV on if not already on
+    description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
+    trigger:
+      - platform: webostv.turn_on
+        entity_id: media_player.tv
+    action:
+      - service: wake_on_lan.send_magic_packet
+        data:
+          mac: !secret tv_mac
+  # TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
+  # Maybe set up homekit here on zwave setup completion? Or maybe do this here:
+  # https://app.asana.com/0/1207020279479204/1207033183175579/f
+
+  - alias: Automatic theme change
+    description: "Automatically change the theme between light and dark based on sun position"
+    trigger:
+      - platform: homeassistant
+        event: start
+      - platform: state
+        entity_id: sun.sun
+    action:
+      - service_template: frontend.set_theme
+        data_template:
+          name: >
+            {% if is_state('sun.sun', 'above_horizon') %}
+              ios-light-mode-light-green
+            {% else %}
+              ios-dark-mode-dark-green
+            {% endif %}

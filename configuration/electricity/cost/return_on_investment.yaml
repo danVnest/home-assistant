@@ -1,0 +1,68 @@
+
+template:
+  - sensor:
+    - name: Solar return on investment
+      state: >
+        {% set install_costs = 8889.98 %}
+        {% set cost_savings_incorrect_start_offset = 506.89 %}
+        {{ (states('sensor.total_energy_cost_savings')|float - install_costs - cost_savings_incorrect_start_offset)|round(2) }}
+      unit_of_measurement: $
+      device_class: monetary
+      state_class: total
+      icon: mdi:currency-usd
+      availability: "{{ has_value('sensor.total_energy_cost_savings') }}"
+    - name: Solar years to break even
+      state: >
+        {{- (states('sensor.solar_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) -}}
+      unit_of_measurement: years
+      state_class: measurement
+      icon: mdi:calendar
+      availability: >
+        {{- has_value('sensor.solar_return_on_investment') and has_value('sensor.total_energy_cost_savings_monthly') -}}
+      # TODO: update to yearly instead of monthly after the first year
+
+    - name: Battery return on investment
+      state: >
+        {% set install_costs = 8000 %}
+        {% set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float %}
+        {{ (savings_per_day * states('sensor.days_since_solar_installation')|float - install_costs)|round(2) }}
+      unit_of_measurement: $
+      device_class: monetary
+      state_class: total
+      icon: mdi:currency-usd
+      availability: "{{ has_value('sensor.grid_energy_cost_per_kwh') and has_value('sensor.days_since_solar_installation') }}"
+      # TODO: update once battery is actually installed
+    - name: Battery years to break even
+      state: >
+        {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float -%}
+        {{- (states('sensor.battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
+      unit_of_measurement: years
+      state_class: measurement
+      icon: mdi:calendar
+      availability: >
+        {{- has_value('sensor.battery_return_on_investment') and has_value('sensor.grid_energy_cost_per_kwh') -}}
+      # TODO: update to yearly instead of monthly after the first year
+      # TODO: update once battery is actually installed
+
+    - name: Solar and battery return on investment
+      state: "{{ states('sensor.solar_return_on_investment')|float + states('sensor.battery_return_on_investment')|float }}"
+      unit_of_measurement: $
+      device_class: monetary
+      state_class: total
+      icon: mdi:currency-usd
+      availability: "{{ has_value('sensor.solar_return_on_investment') and has_value('sensor.battery_return_on_investment') }}"
+    - name: Solar and battery years to break even
+      state: >
+        {%- set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float + states('sensor.total_energy_cost_savings_monthly')|float / 30 -%}
+        {{- (states('sensor.solar_and_battery_return_on_investment')|float / savings_per_day / -365)|round(1) -}}
+      unit_of_measurement: years
+      state_class: measurement
+      icon: mdi:calendar
+      availability: >
+        {{-
+          has_value('sensor.solar_and_battery_return_on_investment') and
+          has_value('sensor.grid_energy_cost_per_kwh') and
+          has_value('sensor.total_energy_cost_savings_monthly')
+        -}}
+      # TODO: update to yearly instead of monthly after the first year
+      # TODO: update once battery is actually installed
