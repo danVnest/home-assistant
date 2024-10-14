@@ -18,19 +18,19 @@ template:
     - name: Average daily solar production
       state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
       unit_of_measurement: kWh/day
-      state_class: measurement
+      state_class: total
       icon: mdi:solar-power-variant
       availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.days_since_solar_installation') }}"
     - name: Average daily solar export
       state: "{{ (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
       unit_of_measurement: kWh/day
-      state_class: measurement
+      state_class: total
       icon: mdi:transmission-tower-import
       availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
     - name: Average daily solar storage
       state: "{{ 0 }}"
       unit_of_measurement: kWh/day
-      state_class: measurement
+      state_class: total
       icon: mdi:battery-charging
       # TODO: update once battery is actually installed
     - name: Days since solar installation
