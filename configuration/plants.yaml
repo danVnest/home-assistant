@@ -1,0 +1,48 @@
+template:
+  - binary_sensor:
+      - name: Plants need watering
+        state: >
+          {{
+            states('input_datetime.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=10) or
+            states('sensor.dry_plants')|int > 0
+          }}
+        icon: mdi:watering-can
+        availability: "{{ has_value('input_datetime.plants_last_watered') and has_value('sensor.dry_plants') }}"
+  - sensor:
+      - name: Dry plants
+        state: >
+          {%- set threshold = 30 -%}
+          {%- set sensors = [
+            states('sensor.soil_moisture_back_deck')|int(0),
+            states('sensor.soil_moisture_dining_room')|int(0),
+            states('sensor.soil_moisture_office')|int(0),
+            states('sensor.soil_moisture_living_room')|int(0)
+          ] -%}
+          {{- sensors|select('lt', threshold)|list|count -}}
+        icon: mdi:grass
+      - name: Plants last watered
+        state: "{{ states('input_datetime.plants_last_watered')|as_datetime|time_since + ' ago'}}"
+        icon: mdi:clock
+        availability: "{{ has_value('input_datetime.plants_last_watered') }}"
+
+input_datetime:
+  plants_last_watered:
+    name: Plants last watered
+    has_date: true
+    has_time: true
+    icon: mdi:clock
+
+automation:
+  - alias: Reset plants last watered
+    triggers:
+      trigger: state
+      entity_id: sensor.dry_plants
+    condition:
+      condition: template
+      value_template: "{{ trigger.to_state.state|int(999) < trigger.from_state.state|int(0) }}"
+    actions:
+      - action: input_datetime.set_datetime
+        target:
+          entity_id: input_datetime.plants_last_watered
+        data:
+          datetime: "{{ now().timestamp() }}"
