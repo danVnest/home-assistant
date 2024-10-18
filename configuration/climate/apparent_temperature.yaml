@@ -1,36 +1,36 @@
 template:
-  sensor:
-    - name: Weighted average inside apparent temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1},
-          {'value': states('sensor.bedroom_apparent_temperature'), 'weight':3},
-          {'value': states('sensor.dining_room_apparent_temperature'), 'weight':1},
-          {'value': states('sensor.entryway_apparent_temperature'), 'weight':1},
-          {'value': states('sensor.kitchen_apparent_temperature'), 'weight':1},
-          {'value': states('sensor.living_room_apparent_temperature'), 'weight':4},
-          {'value': states('sensor.nursery_apparent_temperature'), 'weight':2},
-          {'value': states('sensor.office_apparent_temperature'), 'weight':1},
-          {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:home-thermometer
-      availability: >
-        {{
-          has_value('sensor.bathroom_apparent_temperature') or
-          has_value('sensor.bedroom_apparent_temperature') or
-          has_value('sensor.dining_room_apparent_temperature') or
-          has_value('sensor.entryway_apparent_temperature') or
-          has_value('sensor.kitchen_apparent_temperature') or
-          has_value('sensor.living_room_apparent_temperature') or
-          has_value('sensor.nursery_apparent_temperature') or
-          has_value('sensor.office_apparent_temperature') or
-          has_value('sensor.bathroom_apparent_temperature')
-        }}
+  - sensor:
+      - name: Weighted average inside apparent temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1},
+            {'value': states('sensor.bedroom_apparent_temperature'), 'weight':3},
+            {'value': states('sensor.dining_room_apparent_temperature'), 'weight':1},
+            {'value': states('sensor.entryway_apparent_temperature'), 'weight':1},
+            {'value': states('sensor.kitchen_apparent_temperature'), 'weight':1},
+            {'value': states('sensor.living_room_apparent_temperature'), 'weight':4},
+            {'value': states('sensor.nursery_apparent_temperature'), 'weight':2},
+            {'value': states('sensor.office_apparent_temperature'), 'weight':1},
+            {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:home-thermometer
+        availability: >
+          {{
+            has_value('sensor.bathroom_apparent_temperature') or
+            has_value('sensor.bedroom_apparent_temperature') or
+            has_value('sensor.dining_room_apparent_temperature') or
+            has_value('sensor.entryway_apparent_temperature') or
+            has_value('sensor.kitchen_apparent_temperature') or
+            has_value('sensor.living_room_apparent_temperature') or
+            has_value('sensor.nursery_apparent_temperature') or
+            has_value('sensor.office_apparent_temperature') or
+            has_value('sensor.bathroom_apparent_temperature')
+          }}
 
 sensor:
   - platform: apparent_temperature

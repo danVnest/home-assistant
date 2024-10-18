@@ -11,12 +11,12 @@ binary_sensor:
     before: "7:00"
 
 template:
-  binary_sensor:
-    - name: Rachel tired
-      state: "{{ (states('sensor.rachel_hours_asleep')|float) < 7 }}"
-      icon: mdi:sleep
-      availability: "{{ has_value('sensor.rachel_hours_asleep') }}"
-    - name: Dan tired
-      state: "{{ (states('sensor.dan_hours_asleep')|float) < 6.5 }}"
-      icon: mdi:sleep
-      availability: "{{ has_value('sensor.dan_hours_asleep') }}"
+  - binary_sensor:
+      - name: Rachel tired
+        state: "{{ (states('sensor.rachel_hours_asleep')|float) < 7 }}"
+        icon: mdi:sleep
+        availability: "{{ has_value('sensor.rachel_hours_asleep') }}"
+      - name: Dan tired
+        state: "{{ (states('sensor.dan_hours_asleep')|float) < 6.5 }}"
+        icon: mdi:sleep
+        availability: "{{ has_value('sensor.dan_hours_asleep') }}"

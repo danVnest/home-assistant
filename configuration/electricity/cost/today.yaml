@@ -1,12 +1,12 @@
 template:
-  sensor:
-    - name: Total energy cost today
-      state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
-      unit_of_measurement: $
-      device_class: monetary
-      state_class: total
-      icon: mdi:currency-usd
-      availability: "{{ has_value('sensor.total_energy_cost_today_without_service_fee') and has_value('input_number.energy_cost_service') }}"
+  - sensor:
+      - name: Total energy cost today
+        state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
+        unit_of_measurement: $
+        device_class: monetary
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_today_without_service_fee') and has_value('input_number.energy_cost_service') }}"
 
 utility_meter:
   total_energy_cost_today_without_service_fee:
@@ -158,12 +158,12 @@ utility_meter:
     name: Dryer energy cost savings today
     source: sensor.dryer_energy_cost_savings
     cycle: daily
-  tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_today:
-    name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings today
+  ? tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_today
+  : name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings today
     source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
     cycle: daily
-  water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_today:
-    name: Water heater, oven & stove, guest suite, garage, all other energy cost savings today
+  ? water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_today
+  : name: Water heater, oven & stove, guest suite, garage, all other energy cost savings today
     source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings
     cycle: daily
   office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_today:

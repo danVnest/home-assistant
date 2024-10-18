@@ -128,26 +128,26 @@ binary_sensor:
   # PC IN USE? TV ON?
 
 template:
-  binary_sensor:
-    - name: Anyone asleep
-      state: >
-        {{
-          states('binary_sensor.dan_asleep') == 'on' or
-          states('binary_sensor.rachel_asleep') == 'on'
-        }}
-      icon: mdi:sleep
-      availability: >
-        {{
-          has_value('binary_sensor.dan_asleep') and
-          has_value('binary_sensor.rachel_asleep')
-        }}
-    - name: Rachel was asleep within last 5 minutes
-      state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
-      delay_off: 0:05
-      icon: mdi:sleep
-      availability: "{{ has_value('binary_sensor.rachel_asleep') }}"
-    - name: Rachel's phone's sleep confidence high
-      unique_id: rachel_s_phone_sleep_confidence_high
-      state: "{{ states('sensor.rachel_s_phone_sleep_confidence')|float > 75 }}"
-      icon: mdi:sleep
-      availability: "{{ has_value('sensor.rachel_s_phone_sleep_confidence') }}"
+  - binary_sensor:
+      - name: Anyone asleep
+        state: >
+          {{
+            states('binary_sensor.dan_asleep') == 'on' or
+            states('binary_sensor.rachel_asleep') == 'on'
+          }}
+        icon: mdi:sleep
+        availability: >
+          {{
+            has_value('binary_sensor.dan_asleep') and
+            has_value('binary_sensor.rachel_asleep')
+          }}
+      - name: Rachel was asleep within last 5 minutes
+        state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
+        delay_off: 0:05
+        icon: mdi:sleep
+        availability: "{{ has_value('binary_sensor.rachel_asleep') }}"
+      - name: Rachel's phone's sleep confidence high
+        unique_id: rachel_s_phone_sleep_confidence_high
+        state: "{{ states('sensor.rachel_s_phone_sleep_confidence')|float > 75 }}"
+        icon: mdi:sleep
+        availability: "{{ has_value('sensor.rachel_s_phone_sleep_confidence') }}"

@@ -47,42 +47,42 @@ counter:
     restore: false
 
 template:
-  binary_sensor:
-    - name: Display day card # TODO: maybe not required anymore
-      state: >
-        {{
-          states('input_select.scene') != 'Sleep' and
-          today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')|float(0)) > now()
-        }}
-      icon: mdi:sun-clock
-    - name: TV playing # TODO: update
-      state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
-      icon: mdi:play-pause
-      device_class: running
-      availability: "{{ has_value('sensor.webostvservice_play_state') }}"
-    - name: Owlet attached # TODO: update
-      state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
-      icon: mdi:foot-print
-    - name: Dark outside
-      state: >
-        {{
-          states('sensor.weather_station_illuminance')|float < 5000 or 
-          states('sun.sun') == 'below_horizon'
-        }}
-      delay_off: 0:05
-      icon: mdi:theme-light-dark
-      device_class: running
-      availability: "{{ has_value('sensor.weather_station_illuminance') and has_value('sun.sun') }}"
-    - name: Washer running
-      state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
-      device_class: running
-      availability: "{{ has_value('sensor.washer_completion_time') }}"
-      icon: mdi:washing-machine
-    - name: Dryer running
-      state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
-      device_class: running
-      availability: "{{ has_value('sensor.dryer_completion_time') }}"
-      icon: mdi:tumble-dryer
+  - binary_sensor:
+      - name: Display day card # TODO: maybe not required anymore
+        state: >
+          {{
+            states('input_select.scene') != 'Sleep' and
+            today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')|float(0)) > now()
+          }}
+        icon: mdi:sun-clock
+      - name: TV playing # TODO: update
+        state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
+        icon: mdi:play-pause
+        device_class: running
+        availability: "{{ has_value('sensor.webostvservice_play_state') }}"
+      - name: Owlet attached # TODO: update
+        state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
+        icon: mdi:foot-print
+      - name: Dark outside
+        state: >
+          {{
+            states('sensor.weather_station_illuminance')|float < 5000 or 
+            states('sun.sun') == 'below_horizon'
+          }}
+        delay_off: 0:05
+        icon: mdi:theme-light-dark
+        device_class: running
+        availability: "{{ has_value('sensor.weather_station_illuminance') and has_value('sun.sun') }}"
+      - name: Washer running
+        state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
+        device_class: running
+        availability: "{{ has_value('sensor.washer_completion_time') }}"
+        icon: mdi:washing-machine
+      - name: Dryer running
+        state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
+        device_class: running
+        availability: "{{ has_value('sensor.dryer_completion_time') }}"
+        icon: mdi:tumble-dryer
 
 automation:
   - alias: Turn TV on if not already on
@@ -106,8 +106,8 @@ automation:
       - trigger: state
         entity_id: sun.sun
     actions:
-      - service_template: frontend.set_theme
-        data_template:
+      - action: frontend.set_theme
+        data:
           name: >
             {% if is_state('sun.sun', 'above_horizon') %}
               ios-light-mode-light-green

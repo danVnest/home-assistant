@@ -1,228 +1,193 @@
 template:
-  sensor:
-    - name: Bedroom temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.bedroom_aircon', 'current_temperature'), 'weight':2},
-          {'value': states('sensor.bedroom_humidifier_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      state_class: measurement
-      icon: mdi:thermometer
-      availability: >
-        {{
-          state_attr('climate.bedroom_aircon', 'current_temperature') is not none or
-          has_value('sensor.bedroom_humidifier_temperature')
-        }}
-    - name: Bedroom humidity
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.bedroom_aircon', 'current_humidity'), 'weight':2},
-          {'value': states('sensor.bedroom_humidifier_humidity'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: >
-        {{
-          state_attr('climate.bedroom_aircon', 'current_humidity') is not none or
-          has_value('sensor.bedroom_humidifier_humidity')
-        }}
+  - sensor:
+      - name: Bedroom temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.bedroom_aircon', 'current_temperature'), 'weight':2},
+            {'value': states('sensor.bedroom_humidifier_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        state_class: measurement
+        icon: mdi:thermometer
+        availability: >
+          {{
+            state_attr('climate.bedroom_aircon', 'current_temperature') is not none or
+            has_value('sensor.bedroom_humidifier_temperature')
+          }}
+      - name: Bedroom humidity
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.bedroom_aircon', 'current_humidity'), 'weight':2},
+            {'value': states('sensor.bedroom_humidifier_humidity'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: >
+          {{
+            state_attr('climate.bedroom_aircon', 'current_humidity') is not none or
+            has_value('sensor.bedroom_humidifier_humidity')
+          }}
 
-    - name: Dining room temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
-          {'value': states('sensor.dining_room_multisensor_temperature'), 'weight':1},
-          {'value': states('sensor.dog_bed_area_sensor_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:thermometer
-      availability: >
-        {{
-          state_attr('climate.bedroom_aircon', 'current_temperature') is not none or
-          has_value('sensor.dining_room_multisensor_temperature') or
-          has_value('sensor.dog_bed_area_sensor_temperature')
-        }}
-    - name: Dining room humidity
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
-          {'value': states('sensor.dining_room_multisensor_humidity'), 'weight':1},
-          {'value': states('sensor.dog_bed_area_sensor_humidity'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: >
-        {{
-          state_attr('climate.bedroom_aircon', 'current_humidity') is not none or
-          has_value('sensor.dining_room_multisensor_humidity') or
-          has_value('sensor.dog_bed_area_sensor_humidity')
-        }}
+      - name: Dining room temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
+            {'value': states('sensor.dining_room_multisensor_temperature'), 'weight':1},
+            {'value': states('sensor.dog_bed_area_sensor_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:thermometer
+        availability: >
+          {{
+            state_attr('climate.bedroom_aircon', 'current_temperature') is not none or
+            has_value('sensor.dining_room_multisensor_temperature') or
+            has_value('sensor.dog_bed_area_sensor_temperature')
+          }}
+      - name: Dining room humidity
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
+            {'value': states('sensor.dining_room_multisensor_humidity'), 'weight':1},
+            {'value': states('sensor.dog_bed_area_sensor_humidity'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: >
+          {{
+            state_attr('climate.bedroom_aircon', 'current_humidity') is not none or
+            has_value('sensor.dining_room_multisensor_humidity') or
+            has_value('sensor.dog_bed_area_sensor_humidity')
+          }}
 
-    - name: Kitchen temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
-          {'value': states('sensor.soil_sensor_hub_indoor_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:thermometer
-      availability: >
-        {{
-          state_attr('climate.living_room_aircon', 'current_temperature') is not none or
-          has_value('sensor.soil_sensor_hub_indoor_temperature')
-        }}
-    - name: Kitchen humidity
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
-          {'value': states('sensor.soil_sensor_hub_indoor_humidity'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: >
-        {{
-          state_attr('climate.living_room_aircon', 'current_humidity') is not none or
-          has_value('sensor.soil_sensor_hub_indoor_humidity')
-        }}
+      - name: Kitchen temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
+            {'value': states('sensor.soil_sensor_hub_indoor_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:thermometer
+        availability: >
+          {{
+            state_attr('climate.living_room_aircon', 'current_temperature') is not none or
+            has_value('sensor.soil_sensor_hub_indoor_temperature')
+          }}
+      - name: Kitchen humidity
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
+            {'value': states('sensor.soil_sensor_hub_indoor_humidity'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: >
+          {{
+            state_attr('climate.living_room_aircon', 'current_humidity') is not none or
+            has_value('sensor.soil_sensor_hub_indoor_humidity')
+          }}
 
-    - name: Living room temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
-          {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
-          {'value': states('sensor.hall_multisensor_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:thermometer
-      availability: >
-        {{
-          state_attr('climate.living_room_aircon', 'current_temperature') is not none or
-          state_attr('climate.dining_room_aircon', 'current_temperature') is not none or
-          has_value('sensor.hall_multisensor_temperature')
-        }}
-    - name: Living room humidity
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
-          {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
-          {'value': states('sensor.hall_multisensor_humidity'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: >
-        {{
-          state_attr('climate.living_room_aircon', 'current_humidity') is not none or
-          state_attr('climate.dining_room_aircon', 'current_humidity') is not none or
-          has_value('sensor.hall_multisensor_humidity')
-        }}
+      - name: Living room temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
+            {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
+            {'value': states('sensor.hall_multisensor_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:thermometer
+        availability: >
+          {{
+            state_attr('climate.living_room_aircon', 'current_temperature') is not none or
+            state_attr('climate.dining_room_aircon', 'current_temperature') is not none or
+            has_value('sensor.hall_multisensor_temperature')
+          }}
+      - name: Living room humidity
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
+            {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
+            {'value': states('sensor.hall_multisensor_humidity'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: >
+          {{
+            state_attr('climate.living_room_aircon', 'current_humidity') is not none or
+            state_attr('climate.dining_room_aircon', 'current_humidity') is not none or
+            has_value('sensor.hall_multisensor_humidity')
+          }}
 
-    - name: Nursery temperature
-      state: >
-        {%- set value_weight_array = [
-          {'value': state_attr('climate.nursery_heater', 'current_temperature'), 'weight':1},
-          {'value': states('sensor.nursery_sensor_temperature'), 'weight':1},
-          {'value': states('sensor.nursery_humidifier_temperature'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:thermometer
-      availability: >
-        {{
-          state_attr('climate.nursery_heater', 'current_temperature') is not none or
-          has_value('sensor.nursery_sensor_temperature') or
-          has_value('sensor.nursery_humidifier_temperature')
-        }}
-    - name: Nursery humidity
-      state: >
-        {%- set value_weight_array = [
-          {'value': states('sensor.nursery_sensor_humidity'), 'weight':1},
-          {'value': states('sensor.nursery_humidifier_humidity'), 'weight':1}]
-        -%}
-        {%- from 'custom_templates.jinja' import weighted_average -%}
-        {{- weighted_average(value_weight_array) -}}
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: >
-        {{
-          has_value('sensor.nursery_sensor_temperature') or
-          has_value('sensor.nursery_humidifier_temperature')
-        }}
+      - name: Nursery temperature
+        state: >
+          {%- set value_weight_array = [
+            {'value': state_attr('climate.nursery_heater', 'current_temperature'), 'weight':1},
+            {'value': states('sensor.nursery_sensor_temperature'), 'weight':1},
+            {'value': states('sensor.nursery_humidifier_temperature'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:thermometer
+        availability: >
+          {{
+            state_attr('climate.nursery_heater', 'current_temperature') is not none or
+            has_value('sensor.nursery_sensor_temperature') or
+            has_value('sensor.nursery_humidifier_temperature')
+          }}
+      - name: Nursery humidity
+        state: >
+          {%- set value_weight_array = [
+            {'value': states('sensor.nursery_sensor_humidity'), 'weight':1},
+            {'value': states('sensor.nursery_humidifier_humidity'), 'weight':1}]
+          -%}
+          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {{- weighted_average(value_weight_array) -}}
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: >
+          {{
+            has_value('sensor.nursery_sensor_temperature') or
+            has_value('sensor.nursery_humidifier_temperature')
+          }}
 
-    - name: Office humidity
-      state: "{{ (states('sensor.office_sensor_humidity')|float)|round(1) }}"
-      unit_of_measurement: "%"
-      device_class: humidity
-      state_class: measurement
-      icon: mdi:water
-      availability: "{{ has_value('sensor.office_sensor_humidity') }}"
-
-    - name: Extreme forecast
-      state: >
-        {%- set forecasts = (
-          states('sensor.outside_apparent_temperature_2h_forecast')|float,
-          states('sensor.outside_apparent_temperature_4h_forecast')|float,
-          states('sensor.outside_apparent_temperature_6h_forecast')|float,
-          states('sensor.outside_apparent_temperature_8h_forecast')|float,
-          states('sensor.outside_apparent_temperature_10h_forecast')|float,
-        ) -%}
-        {%- set max_forecast = forecasts|max -%}
-        {%- if max_forecast >= states('input_number.high_temperature_aircon_trigger')|float -%}
-          {{ max_forecast }}
-        {%- else -%}
-          {%- set min_forecast = forecasts|min -%}
-          {%- if min_forecast <= states('input_number.low_temperature_aircon_trigger')|float -%}
-            {{ min_forecast }}
-          {%- else -%}
-            None
-          {%- endif -%}
-        {%- endif -%}
-      unit_of_measurement: "°C"
-      device_class: temperature
-      state_class: measurement
-      icon: mdi:sun-thermometer-outline
-      availability: >
-        {{ 
-          has_value('sensor.outside_apparent_temperature_2h_forecast') and
-          has_value('sensor.outside_apparent_temperature_4h_forecast') and
-          has_value('sensor.outside_apparent_temperature_6h_forecast') and
-          has_value('sensor.outside_apparent_temperature_8h_forecast') and
-          has_value('sensor.outside_apparent_temperature_10h_forecast') and
-          has_value('input_number.high_temperature_aircon_trigger') and
-          has_value('input_number.low_temperature_aircon_trigger')
-        }}
+      - name: Office humidity
+        state: "{{ (states('sensor.office_sensor_humidity')|float)|round(1) }}"
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water
+        availability: "{{ has_value('sensor.office_sensor_humidity') }}"

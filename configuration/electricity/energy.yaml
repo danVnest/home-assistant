@@ -14,75 +14,75 @@ utility_meter:
     cycle: monthly
 
 template:
-  sensor:
-    - name: Average daily solar production
-      state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
-      unit_of_measurement: kWh/day
-      state_class: total
-      icon: mdi:solar-power-variant
-      availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.days_since_solar_installation') }}"
-    - name: Average daily solar export
-      state: "{{ (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
-      unit_of_measurement: kWh/day
-      state_class: total
-      icon: mdi:transmission-tower-import
-      availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
-    - name: Average daily solar storage
-      state: "{{ 0 }}"
-      unit_of_measurement: kWh/day
-      state_class: total
-      icon: mdi:battery-charging
-      # TODO: update once battery is actually installed
-    - name: Days since solar installation
-      state: "{{ (today_at() - as_datetime('2024-09-05T00+10:00')).days }}"
-      unit_of_measurement: days
-      state_class: total_increasing
-      icon: mdi:calendar-start
+  - sensor:
+      - name: Average daily solar production
+        state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:solar-power-variant
+        availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Average daily solar export
+        state: "{{ (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:transmission-tower-import
+        availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Average daily solar storage
+        state: "{{ 0 }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:battery-charging
+        # TODO: update once battery is actually installed
+      - name: Days since solar installation
+        state: "{{ (today_at() - as_datetime('2024-09-05T00+10:00')).days }}"
+        unit_of_measurement: days
+        state_class: total_increasing
+        icon: mdi:calendar-start
 
-    - name: Dan's phone charger energy
-      unique_id: dan_s_phone_charger_energy
-      state: >
-        {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
-        {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
-          {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
-          {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
-          {%- if current_battery_level > last_battery_level -%}
-            {%- set battery_capacity = 0.0167 -%}
-            {%- set charging_efficiency = 1.1 -%}
-            {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
-          {%- elif current_battery_level in (80, 100) and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") -%}
-            {%- set now_timestamp = as_timestamp(now()) -%}
-            {%- set time_since_last_update = now_timestamp - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}  
-            {%- set trickle_charge_power = 0.0005 -%}
-            {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
+      - name: Dan's phone charger energy
+        unique_id: dan_s_phone_charger_energy
+        state: >
+          {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
+          {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
+            {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
+            {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
+            {%- if current_battery_level > last_battery_level -%}
+              {%- set battery_capacity = 0.0167 -%}
+              {%- set charging_efficiency = 1.1 -%}
+              {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
+            {%- elif current_battery_level in (80, 100) and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") -%}
+              {%- set now_timestamp = as_timestamp(now()) -%}
+              {%- set time_since_last_update = now_timestamp - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}  
+              {%- set trickle_charge_power = 0.0005 -%}
+              {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
+            {%- endif -%}
           {%- endif -%}
-        {%- endif -%}
-        {{- energy -}}
-      unit_of_measurement: kWh
-      device_class: energy
-      state_class: total_increasing
-      icon: mdi:lightning-bolt
-      attributes:
-        last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
-        last_update_time: "{{ as_timestamp(now()) }}"
+          {{- energy -}}
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
+          last_update_time: "{{ as_timestamp(now()) }}"
 
-    - name: Washer energy
-      unique_id: washer_energy
-      state: "{{ states('sensor.washer_energy_without_refresh') }}"
-      unit_of_measurement: kWh
-      device_class: energy
-      state_class: total_increasing
-      icon: mdi:lightning-bolt
-      attributes:
-        refreshed: "{{ now() }}"
-      availability: "{{ has_value('sensor.washer_energy_without_refresh') }}"
-    - name: Dryer energy
-      unique_id: dryer_energy
-      state: "{{ states('sensor.dryer_energy_without_refresh') }}"
-      unit_of_measurement: kWh
-      device_class: energy
-      state_class: total_increasing
-      icon: mdi:lightning-bolt
-      attributes:
-        refreshed: "{{ now() }}"
-      availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"
+      - name: Washer energy
+        unique_id: washer_energy
+        state: "{{ states('sensor.washer_energy_without_refresh') }}"
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          refreshed: "{{ now() }}"
+        availability: "{{ has_value('sensor.washer_energy_without_refresh') }}"
+      - name: Dryer energy
+        unique_id: dryer_energy
+        state: "{{ states('sensor.dryer_energy_without_refresh') }}"
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          refreshed: "{{ now() }}"
+        availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"
