@@ -68,7 +68,7 @@ group:
       - input_boolean.control_office_heater
       - input_boolean.control_bedroom_humidifier
       - input_boolean.control_nursery_humidifier
-    icon: mdi:home-thermometer
+    icon: mdi:thermometer-auto
   all_climate_control:
     name: Climate control
     entities:
@@ -82,9 +82,20 @@ group:
       - input_boolean.control_office_heater
       - input_boolean.control_bedroom_humidifier
       - input_boolean.control_nursery_humidifier
-    icon: mdi:home-thermometer
+    icon: mdi:thermometer-auto
     all: true
 
+template:
+  - sensor:
+      - name: Climate device count
+        state: "{{ expand('group.all_climate_control') | list | count }}"
+        icon: mdi:dots-grid
+        availability: "{{ has_value('group.all_climate_control') }}"
+      - name: Climate device automatic control count
+        state: "{{ expand('group.all_climate_control') | selectattr('state','eq','on') | list | count }}"
+        icon: mdi:dots-square
+        availability: "{{ has_value('group.all_climate_control') }}"
+        
 input_boolean:
   control_living_room_aircon:
     name: Living room aircon

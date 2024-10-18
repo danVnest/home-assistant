@@ -72,6 +72,17 @@ group:
     icon: mdi:home-lightbulb
     all: true
 
+template:
+  - sensor:
+      - name: Light count
+        state: "{{ expand('group.all_light_control') | list | count }}"
+        icon: mdi:dots-grid
+        availability: "{{ has_value('group.all_light_control') }}"
+      - name: Light automatic control count
+        state: "{{ expand('group.all_light_control') | selectattr('state','eq','on') | list | count }}"
+        icon: mdi:dots-square
+        availability: "{{ has_value('group.all_light_control') }}"
+        
 input_boolean:
   control_entryway_lights:
     name: Entryway
