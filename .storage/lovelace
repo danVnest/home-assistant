@@ -8,163 +8,8 @@
       "background": "var(--background-image)",
       "views": [
         {
-          "path": "status_and_suggestions",
-          "title": "Status & Suggestions",
-          "icon": "mdi:home-assistant",
-          "cards": [
-            {
-              "entities": [
-                {
-                  "entity": "input_select.scene"
-                },
-                {
-                  "entity": "input_boolean.pets_home_alone"
-                },
-                {
-                  "entity": "lock.door_lock"
-                }
-              ],
-              "show_header_toggle": false,
-              "title": "Control",
-              "type": "entities",
-              "state_color": true
-            },
-            {
-              "card": {
-                "entities": [
-                  {
-                    "entity": "sensor.washer_completion_time",
-                    "name": "Washing will finish"
-                  }
-                ],
-                "show_header_toggle": false,
-                "type": "entities",
-                "state_color": true
-              },
-              "conditions": [
-                {
-                  "entity": "switch.washer",
-                  "state": "on"
-                }
-              ],
-              "type": "conditional"
-            },
-            {
-              "card": {
-                "entities": [
-                  {
-                    "entity": "sensor.dryer_completion_time",
-                    "name": "Drying will finish"
-                  }
-                ],
-                "show_header_toggle": false,
-                "type": "entities",
-                "state_color": true
-              },
-              "conditions": [
-                {
-                  "entity": "switch.dryer",
-                  "state": "on"
-                }
-              ],
-              "type": "conditional"
-            },
-            {
-              "type": "entity-filter",
-              "entities": [
-                {
-                  "entity": "sensor.weighted_average_inside_apparent_temperature",
-                  "name": "Inside"
-                },
-                {
-                  "entity": "sensor.outside_apparent_temperature",
-                  "name": "Outside"
-                },
-                {
-                  "entity": "sensor.bathroom_apparent_temperature",
-                  "name": "Bedroom"
-                },
-                {
-                  "entity": "sensor.dining_room_apparent_temperature",
-                  "name": "Dining room"
-                },
-                {
-                  "entity": "sensor.dog_bed_area_apparent_temperature",
-                  "name": "Kitchen"
-                },
-                {
-                  "entity": "sensor.living_room_apparent_temperature",
-                  "name": "Living room"
-                },
-                {
-                  "entity": "sensor.nursery_apparent_temperature",
-                  "name": "Nursery"
-                },
-                {
-                  "entity": "sensor.office_apparent_temperature",
-                  "name": "Office"
-                }
-              ],
-              "conditions": [
-                {
-                  "condition": "or",
-                  "conditions": [
-                    {
-                      "condition": "numeric_state",
-                      "above": "input_number.high_temperature_aircon_trigger"
-                    },
-                    {
-                      "condition": "numeric_state",
-                      "below": "input_number.low_temperature_aircon_trigger"
-                    }
-                  ]
-                }
-              ],
-              "card": {
-                "type": "entities",
-                "title": "Undesired temperatures"
-              }
-            },
-            {
-              "content": "**Lighting** and **climate** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in other tabs. The system will automatically switch between different scenes. You can also manually select a preferred scene in this app, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger before anyone wakes up (at the time specified in the settings here), providing dim kitchen lighting plus climate control to the whole house (rather than just the bedroom). Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient lighting in the house is sufficient, and thus turns off all lighting.\n- ***Night*** is triggered when there is insufficient lighting, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm.\n- ***Sleep*** turns off all lighting in the house. If climate control is enabled, only the bedroom is monitored and controlled. This scene has to be manually triggered.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness and has to be manually triggered.\n- ***Away (Night/Day)*** turns off all lights (except one obvious one at night for security purposes) and disables climate control. Automatically triggered when both of us have left the house.\n\nThe **buttons** in the kitchen and bedroom will essentially toggle lighting when clicked, intelligently changing the scene based on the current conditions. The bedroom button also allows you to first switch from ***Night*** to ***Sleep*** while keeping the bedroom light on, then when clicked again it will turn the bedroom light off (properly entering ***Sleep***). Holding either button for a few seconds will toggle the aircon.",
-              "type": "markdown"
-            },
-            {
-              "cards": [
-                {
-                  "entities": [
-                    {
-                      "entity": "input_datetime.morning_time"
-                    },
-                    {
-                      "entity": "input_datetime.nursery_time"
-                    },
-                    {
-                      "entity": "input_datetime.bed_time"
-                    }
-                  ],
-                  "show_header_toggle": false,
-                  "title": "Times",
-                  "type": "entities",
-                  "state_color": true
-                },
-                {
-                  "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. More information in the **Instructions** tab.",
-                  "type": "markdown"
-                }
-              ],
-              "type": "vertical-stack"
-            }
-          ],
-          "visible": [
-            {
-              "user": "037b9dab7fb04176b342f8c42a79bb17"
-            }
-          ]
-        },
-        {
-          "title": "Overview",
-          "path": "overview",
+          "title": "Dashboards",
+          "path": "dashboards",
           "icon": "mdi:home-assistant",
           "sections": [
             {
@@ -172,57 +17,227 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "Overview",
-                  "heading_style": "title",
-                  "icon": "mdi:home-assistant"
-                },
-                {
-                  "type": "entity",
-                  "entity": "input_select.scene",
-                  "state_color": false,
-                  "layout_options": {
-                    "grid_columns": 2,
-                    "grid_rows": 2
-                  }
-                },
-                {
-                  "show_name": true,
-                  "show_icon": true,
-                  "type": "button",
-                  "tap_action": {
-                    "action": "toggle"
-                  },
-                  "entity": "lock.door_lock",
-                  "show_state": true,
-                  "name": "Front Door",
-                  "icon_height": "50px"
-                },
-                {
-                  "type": "tile",
-                  "entity": "input_boolean.pets_home_alone",
-                  "vertical": true,
-                  "hide_state": false,
-                  "visibility": [
+                  "heading": "Status",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:home-assistant",
+                  "badges": [
                     {
-                      "condition": "or",
-                      "conditions": [
-                        {
-                          "condition": "state",
-                          "entity": "input_select.scene",
-                          "state": "Away (Day)"
-                        },
-                        {
-                          "condition": "state",
-                          "entity": "input_select.scene",
-                          "state": "Away (Night)"
-                        }
-                      ]
+                      "type": "entity",
+                      "show_state": true,
+                      "show_icon": true,
+                      "entity": "sensor.texts",
+                      "name": "Guide",
+                      "state_content": "name",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "#guide"
+                      },
+                      "icon": "mdi:text-box"
                     }
                   ]
                 },
                 {
-                  "type": "markdown",
-                  "content": "This dashboard provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the Lights, Climate, and Electricity dashboards (navigate to these with the icons at the top of the screen).\n\n<details><summary><i>Press here for details on how the system works</i></summary>\n\n**Lighting** and **climate** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in the other dashboards. The system will automatically switch between different scenes. You can also manually select a preferred scene in this app, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger before anyone wakes up (at the time specified in the settings here), providing dim kitchen lighting plus climate control to the whole house (rather than just the bedroom). Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient lighting in the house is sufficient, and thus turns off all lighting.\n- ***Night*** is triggered when there is insufficient lighting, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm.\n- ***Sleep*** turns off all lighting in the house. If climate control is enabled, only the bedroom is monitored and controlled. This scene has to be manually triggered.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness and has to be manually triggered.\n- ***Away (Night/Day)*** turns off all lights (except one obvious one at night for security purposes) and disables climate control. Automatically triggered when both of us have left the house.\n\nThe **buttons** in the kitchen and bedroom will essentially toggle lighting when clicked, intelligently changing the scene based on the current conditions. The bedroom button also allows you to first switch from ***Night*** to ***Sleep*** while keeping the bedroom light on, then when clicked again it will turn the bedroom light off (properly entering ***Sleep***). Holding either button for a few seconds will toggle the aircon.\n</details>"
+                  "type": "custom:bubble-card",
+                  "card_type": "select",
+                  "entity": "input_select.scene",
+                  "show_last_changed": true,
+                  "sub_button": [
+                    {
+                      "entity": "input_boolean.pets_home_alone",
+                      "show_name": true
+                    }
+                  ],
+                  "card_layout": "large",
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 1
+                  },
+                  "styles": "${card.querySelector('.bubble-name').innerText = hass.states['input_select.scene'].state + \" scene\"} ${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['input_select.scene'].state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}, .bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n"
+                },
+                {
+                  "type": "tile",
+                  "entity": "lock.door_lock",
+                  "state_content": [
+                    "last_changed"
+                  ],
+                  "name": "Front door",
+                  "card_mod": {
+                    "style": {
+                      "ha-tile-info$": ".primary:after {\n  content: \"{{ ' ' + states('lock.door_lock')}}\";\n}"
+                    }
+                  },
+                  "layout_options": {
+                    "grid_columns": "full"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "lock.door_lock",
+                  "show_state": true,
+                  "show_last_changed": true,
+                  "name": "Front door",
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "switch.back_deck_camera_enabled",
+                      "name": "Back deck",
+                      "show_name": true,
+                      "show_last_changed": false,
+                      "show_state": false,
+                      "icon": "mdi:cctv"
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}",
+                  "visibility": [
+                    {
+                      "condition": "user",
+                      "users": []
+                    }
+                  ]
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.washer_completion_time",
+                  "name": "Washing done",
+                  "icon": "mdi:washing-machine",
+                  "color": "accent",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.washer_running",
+                      "state": "on"
+                    }
+                  ]
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.washer_completion_time",
+                  "name": "Washing done",
+                  "icon": "mdi:washing-machine",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.washer_running",
+                      "state": "off"
+                    }
+                  ]
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.dryer_completion_time",
+                  "name": "Drying done",
+                  "icon": "mdi:tumble-dryer",
+                  "color": "accent",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.dryer_running",
+                      "state": "on"
+                    }
+                  ]
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.dryer_completion_time",
+                  "name": "Drying done",
+                  "icon": "mdi:tumble-dryer",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.dryer_running",
+                      "state": "off"
+                    }
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "binary_sensor.plants_need_watering",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.dry_plants",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.plants_last_watered",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.plants_need_watering",
+                      "state": "on"
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} ${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText =  (hass.states['sensor.dry_plants'].state / 4 * 100).toFixed(0) + '% are dry' } ${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "name": "Press for the system guide",
+                  "icon": "mdi:text-box",
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#guide"
+                    },
+                    "double_tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#guide"
+                    },
+                    "hold_action": {
+                      "action": "navigate",
+                      "navigation_path": "#guide"
+                    }
+                  },
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#guide"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#guide"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#guide"
+                  },
+                  "card_layout": "large",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border: 2px solid var(--accent-color);\n  border-radius: var(--ha-card-border-radius) !important;\n  box-sizing: border-box;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-size: 16px;\n  font-weight: 500 !important;\n}\n"
+                },
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#guide",
+                      "button_type": "name",
+                      "name": "Guide",
+                      "icon": "mdi:text-box",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container, .bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "This Home Assistant system is designed to operate as autonomously as possible, so you hopefully don't need to use manual controls very often.\n\nCurrently, the main tasks/devices that require manual control are:\n- setting the sleep scene when everyone is in bed\n- nursery light & fan\n- back deck light\n- bathroom vent fan\n- toilet light/vent fan\n- downstairs lights & aircon (except the entryway lights)\n\n\nFor everything else, this dashboard provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the <ha-icon icon=\"mdi:thermometer\"></ha-icon>**Climate**, <ha-icon icon=\"mdi:lightbulb-variant\"></ha-icon>**Lights**, <ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**, <ha-icon icon=\"mdi:lightning-bolt\"></ha-icon>**Electricity** and <ha-icon icon=\"mdi:grass\"></ha-icon>**Plants** dashboards (navigate to these with the icons at the top of the screen).\n\nPressing on icons or text will show relevant history graphs and/or controls. Anything with an <span>orange border</span> will show something different when pressed - usually a collection of other relevant information.\n\n<center><h3>For more information, select a topic:</h3></center>\n<details><summary><i>Automatic control</i></summary>\n\n**Climate** and **lighting** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in the other dashboards. The system will automatically switch between different scenes. You can also manually select a preferred scene.\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger before anyone wakes up (at the time specified in the settings here), providing dim kitchen lighting plus climate control to the whole house (rather than just the bedroom). Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient lighting in the house is sufficient, and thus turns off all lighting.\n- ***Night*** is triggered when there is insufficient lighting, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm.\n- ***Sleep*** turns off all lighting in the house. If climate control is enabled, only the bedroom is monitored and controlled. This scene has to be manually triggered.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness and has to be manually triggered.\n- ***Away (Night/Day)*** turns off all lights (except one obvious one at night for security purposes) and disables climate control. Automatically triggered when both of us have left the house.\n</details>\n<details><summary><i>Manual control</i></summary>\n\nYou can manually control devices with their physical remotes/switches/buttons, or through this app.\nControls are provided for **lights**, **aircon**, **fans**, **heaters**, **humidifiers**, **door locks**, and the **garden watering system**. \n\nAutomatic controls should provide almost all the functionality you need, but manual control is of course useful when required.\n\nAutomatic control may be disabled when you manually adjust a device if there is a logic conflict. You can manually re-enable automatic control in this app, or disable control if you want to ensure the current device state is maintained.\n \n</details>\n<details><summary><i>Smart buttons</i></summary>\n\nThe **buttons** in the kitchen and bedroom will essentially toggle lighting when clicked, intelligently changing the scene based on the current conditions. The bedroom button also allows you to first switch from ***Night*** to ***Sleep*** while keeping the bedroom light on, then when clicked again it will turn the bedroom light off (properly entering ***Sleep***). Holding either button for a few seconds will toggle the aircon.\n</details>\n<details><summary><i>Voice control</i></summary>\n\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\n\n, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nIn order to use Google, you will need to connect your Google Assistant to IFTTT and add applets with webhooks to Home Assistant corresponding to each command.\n\nTODO: CHANGE ABOVE TO LIST OF QUOTES\nTODO: consider inbuilt LLM voice control?\n\n</details>",
+                      "card_mod": {
+                        "style": {
+                          "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
+                        }
+                      }
+                    }
+                  ]
                 }
               ],
               "column_span": 1
@@ -233,116 +248,153 @@
                 {
                   "type": "heading",
                   "heading": "Climate",
-                  "heading_style": "title",
+                  "heading_style": "subtitle",
                   "icon": "mdi:thermometer"
                 },
                 {
-                  "type": "entity-filter",
-                  "card": {
-                    "type": "glance"
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Outside",
+                  "entity": "sensor.outside_apparent_temperature",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
                   },
-                  "show_name": true,
-                  "entities": [
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
                     {
-                      "entity": "sensor.weighted_average_inside_apparent_temperature",
-                      "name": "Inside"
+                      "entity": "sensor.extreme_forecast_text",
+                      "icon": "mdi:thermometer",
+                      "show_state": true,
+                      "show_background": false
                     },
                     {
-                      "entity": "sensor.outside_apparent_temperature",
-                      "name": "Outside"
-                    },
-                    {
-                      "entity": "sensor.extreme_forecast",
-                      "name": "Forecast"
+                      "entity": "sensor.next_rain_forecast_text",
+                      "show_state": true,
+                      "show_background": false
                     }
                   ],
-                  "conditions": [
-                    {
-                      "condition": "state",
-                      "state_not": "unknown"
-                    }
-                  ]
+                  "styles": "${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'mdi:weather-sunny';\n    case 'clear-night':\n      return 'mdi:weather-night';\n    case 'rain':\n      return 'mdi:weather-rainy';\n    case 'snow':\n      return 'mdi:weather-snowy';\n    case 'sleet':\n      return 'mdi:weather-snowy-rainy';\n    case 'wind':\n      return 'mdi:weather-windy';\n    case 'fog':\n      return 'mdi:weather-fog';\n    case 'cloudy':\n      return 'mdi:weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'mdi:weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'mdi:weather-night-partly-cloudy';\n  }\n})())}, .bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n"
                 },
                 {
-                  "entities": [
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Inside",
+                  "entity": "sensor.weighted_average_inside_apparent_temperature",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.living_room_apparent_temperature",
+                      "icon": "mdi:sofa",
+                      "show_state": true
+                    },
+                    {
+                      "entity": "sensor.kitchen_apparent_temperature",
+                      "icon": "mdi:fridge",
+                      "show_state": true
+                    },
+                    {
+                      "entity": "sensor.dog_bed_area_apparent_temperature",
+                      "icon": "mdi:dog-side",
+                      "show_state": true
+                    },
+                    {
+                      "entity": "sensor.office_apparent_temperature",
+                      "icon": "mdi:desktop-classic",
+                      "show_state": true
+                    },
                     {
                       "entity": "sensor.bedroom_apparent_temperature",
-                      "name": "Bedroom"
+                      "icon": "mdi:bed",
+                      "show_state": true
                     },
                     {
                       "entity": "sensor.nursery_apparent_temperature",
-                      "name": "Nursery"
-                    },
-                    {
-                      "entity": "sensor.dining_room_apparent_temperature",
-                      "name": "Dog bed area"
+                      "icon": "mdi:cradle",
+                      "show_state": true
                     }
                   ],
-                  "show_name": true,
-                  "type": "glance"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
                 },
                 {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "entities": [
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Control",
+                  "button_type": "state",
+                  "entity": "group.any_climate_control",
+                  "show_state": true,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
                     {
                       "entity": "group.any_aircon",
-                      "name": "Aircon"
+                      "name": "Aircon",
+                      "show_name": true
                     },
                     {
                       "entity": "group.any_fans",
-                      "name": "Fans"
+                      "name": "Fans",
+                      "show_name": true
                     },
                     {
                       "entity": "group.any_heaters",
-                      "name": "Heaters"
+                      "name": "Heaters",
+                      "show_name": true
                     },
                     {
                       "entity": "group.any_humidifiers",
-                      "name": "Humidifiers"
+                      "name": "Humidifiers",
+                      "show_name": true
                     }
                   ],
-                  "state_color": true
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic'}\n"
                 },
                 {
-                  "content": "Manually controlling aircon, fans, or heaters may disable **automatic control** for those devices. You can toggle **automatic control** of all/individual devices below.",
-                  "type": "markdown"
-                },
-                {
-                  "type": "tile",
-                  "entity": "group.any_climate_control",
-                  "name": "Automatic"
-                },
-                {
-                  "type": "entity-filter",
-                  "entities": [
-                    "input_boolean.control_living_room_aircon",
-                    "input_boolean.control_dining_room_aircon",
-                    "input_boolean.control_bedroom_aircon",
-                    "input_boolean.control_nursery_fan",
-                    "input_boolean.control_office_fan",
-                    "input_boolean.control_bedroom_fan",
-                    "input_boolean.control_nursery_heater",
-                    "input_boolean.control_office_heater",
-                    "input_boolean.control_bedroom_humidifier",
-                    "input_boolean.control_nursery_humidifier"
-                  ],
-                  "conditions": [
+                  "type": "vertical-stack",
+                  "cards": [
                     {
-                      "condition": "state",
-                      "state": "off"
-                    }
-                  ],
-                  "card": {
-                    "type": "entities"
-                  },
-                  "visibility": [
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#weather",
+                      "button_type": "name",
+                      "name": "Weather",
+                      "icon": "mdi:text-box",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container, .bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                    },
                     {
-                      "condition": "state",
-                      "entity": "group.any_climate_control",
-                      "state": "on"
+                      "type": "weather-forecast",
+                      "show_current": false,
+                      "show_forecast": true,
+                      "entity": "weather.pirateweather",
+                      "forecast_type": "daily"
+                    },
+                    {
+                      "type": "tile",
+                      "entity": "sensor.pirateweather_nearest_storm_distance",
+                      "name": "Nearest storm"
                     }
                   ]
                 }
@@ -355,97 +407,78 @@
                 {
                   "type": "heading",
                   "heading": "Lights",
-                  "heading_style": "title",
+                  "heading_style": "subtitle",
                   "icon": "mdi:lightbulb-variant"
                 },
                 {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "state_color": true,
-                  "entities": [
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Control",
+                  "button_type": "state",
+                  "entity": "group.any_light_control",
+                  "show_state": true,
+                  "card_layout": "large",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "name",
+                  "entity": "light.office",
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
                     {
                       "entity": "group.all_lights",
-                      "name": "Any / all"
-                    },
-                    {
-                      "entity": "group.entryway_lights",
-                      "name": "Entryway"
-                    },
-                    {
-                      "entity": "group.kitchen_lights",
-                      "name": "Kitchen"
-                    },
-                    {
-                      "entity": "group.tv_lights",
-                      "name": "TV"
-                    },
-                    {
-                      "entity": "group.dining_room_lights",
-                      "name": "Dining room"
+                      "name": "All",
+                      "show_name": true
                     },
                     {
                       "entity": "light.hall",
-                      "name": "Hall"
+                      "name": "Hall",
+                      "show_name": true
+                    },
+                    {
+                      "entity": "group.entryway_lights",
+                      "name": "Entryway",
+                      "show_name": true
                     },
                     {
                       "entity": "light.bathroom",
-                      "name": "Bathroom"
+                      "name": "Bathroom",
+                      "show_name": true
+                    },
+                    {
+                      "entity": "group.kitchen_lights",
+                      "name": "Kitchen",
+                      "show_name": true
                     },
                     {
                       "entity": "light.bedroom",
-                      "name": "Bedroom"
+                      "name": "Bedroom",
+                      "show_name": true
+                    },
+                    {
+                      "entity": "group.tv_lights",
+                      "name": "TV",
+                      "show_name": true
                     },
                     {
                       "entity": "light.nursery",
-                      "name": "Nursery"
+                      "name": "Nursery",
+                      "show_name": true
+                    },
+                    {
+                      "entity": "group.dining_room_lights",
+                      "name": "Dining",
+                      "show_name": true
                     },
                     {
                       "entity": "light.office",
-                      "name": "Office"
-                    }
-                  ]
-                },
-                {
-                  "content": "Manually controlling lights may disable **automatic control** for those lights. You can toggle **automatic control** of all/individual lights below.",
-                  "type": "markdown"
-                },
-                {
-                  "type": "tile",
-                  "entity": "group.any_light_control",
-                  "name": "Automatic"
-                },
-                {
-                  "type": "entity-filter",
-                  "entities": [
-                    "input_boolean.control_entryway_lights",
-                    "input_boolean.control_kitchen_light",
-                    "input_boolean.control_kitchen_strip_light",
-                    "input_boolean.control_tv_lights",
-                    "input_boolean.control_dining_room_lights",
-                    "input_boolean.control_hall_light",
-                    "input_boolean.control_bathroom_light",
-                    "input_boolean.control_bedroom_light",
-                    "input_boolean.control_nursery_light",
-                    "input_boolean.control_office_light"
-                  ],
-                  "conditions": [
-                    {
-                      "condition": "state",
-                      "state": "off"
+                      "name": "Office",
+                      "show_name": true
                     }
                   ],
-                  "card": {
-                    "type": "entities"
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "group.any_light_control",
-                      "state": "on"
-                    }
-                  ]
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
                 }
               ]
             },
@@ -454,126 +487,26 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "Washing"
+                  "heading": "Presence",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:cctv"
                 },
                 {
-                  "type": "tile",
-                  "entity": "sensor.washer_completion_time",
-                  "name": "Washing done",
-                  "icon": "mdi:washing-machine",
-                  "color": "accent",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.washer_running",
-                      "state": "on"
-                    }
-                  ]
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.washer_completion_time",
-                  "name": "Washing done",
-                  "icon": "mdi:washing-machine",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.washer_running",
-                      "state": "off"
-                    }
-                  ]
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.dryer_completion_time",
-                  "name": "Drying done",
-                  "icon": "mdi:tumble-dryer",
-                  "color": "accent",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.dryer_running",
-                      "state": "on"
-                    }
-                  ]
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.dryer_completion_time",
-                  "name": "Drying done",
-                  "icon": "mdi:tumble-dryer",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.dryer_running",
-                      "state": "off"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Plants"
-                },
-                {
+                  "type": "map",
                   "entities": [
                     {
-                      "entity": "sensor.soil_moisture_vegetable_garden_sun",
-                      "name": "Vegetable garden (sun)"
+                      "entity": "person.dan"
                     },
                     {
-                      "entity": "sensor.soil_moisture_vegetable_garden_shade",
-                      "name": "Vegetable garden (shade)"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_front_deck",
-                      "name": "Front deck"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_back_deck",
-                      "name": "Back deck"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_carport_pots",
-                      "name": "Carport pots"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_dining_room",
-                      "name": "Dining room"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_living_room",
-                      "name": "Living room"
-                    },
-                    {
-                      "entity": "sensor.soil_moisture_office",
-                      "name": "Office"
+                      "entity": "person.rachel"
                     }
                   ],
-                  "hours_to_show": 240,
-                  "refresh_interval": 0,
-                  "type": "history-graph",
-                  "logarithmic_scale": false
-                },
-                {
-                  "type": "tile",
-                  "entity": "switch.vege_garden_lawn_rain_delay"
-                },
-                {
-                  "type": "tile",
-                  "entity": "switch.smart_hose_tap_timer_rain_delay"
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.vege_garden_lawn_battery_level"
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.smart_hose_tap_timer_battery_level"
+                  "theme_mode": "auto",
+                  "hours_to_show": 1,
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 2
+                  }
                 }
               ]
             },
@@ -610,230 +543,20 @@
                   "type": "vertical-stack"
                 }
               ],
-              "column_span": 1
+              "column_span": 1,
+              "visibility": [
+                {
+                  "condition": "user",
+                  "users": []
+                }
+              ]
             }
           ],
           "cards": [],
-          "dense_section_placement": true,
+          "dense_section_placement": false,
           "type": "sections",
-          "max_columns": 10
-        },
-        {
-          "path": "lights",
-          "title": "Lights",
-          "icon": "mdi:lightbulb-variant",
-          "cards": [
-            {
-              "cards": [
-                {
-                  "type": "glance",
-                  "entities": [
-                    {
-                      "entity": "group.all_lights",
-                      "name": "Any / all"
-                    },
-                    {
-                      "entity": "group.entryway_lights",
-                      "name": "Entryway"
-                    },
-                    {
-                      "entity": "group.kitchen_lights",
-                      "name": "Kitchen"
-                    },
-                    {
-                      "entity": "group.tv_lights",
-                      "name": "TV"
-                    },
-                    {
-                      "entity": "group.dining_room_lights",
-                      "name": "Dining"
-                    },
-                    {
-                      "entity": "light.hall",
-                      "name": "Hall"
-                    },
-                    {
-                      "entity": "light.bathroom",
-                      "name": "Bathroom"
-                    },
-                    {
-                      "entity": "light.bedroom",
-                      "name": "Bedroom"
-                    },
-                    {
-                      "entity": "light.nursery",
-                      "name": "Nursery"
-                    },
-                    {
-                      "entity": "light.office",
-                      "name": "Office"
-                    }
-                  ],
-                  "show_icon": true,
-                  "show_name": true,
-                  "show_state": false,
-                  "title": "Lights",
-                  "state_color": true
-                },
-                {
-                  "content": "Manually controlling lights may disable **automatic control** for those lights. You can toggle **automatic control** of all/individual lights below.",
-                  "type": "markdown"
-                },
-                {
-                  "type": "entities",
-                  "title": "Automatic light control",
-                  "entities": [
-                    "input_boolean.control_entryway_lights",
-                    "input_boolean.control_kitchen_light",
-                    "input_boolean.control_kitchen_strip_light",
-                    "input_boolean.control_tv_lights",
-                    "input_boolean.control_dining_room_lights",
-                    "input_boolean.control_hall_light",
-                    "input_boolean.control_bathroom_light",
-                    "input_boolean.control_bedroom_light",
-                    "input_boolean.control_nursery_light",
-                    "input_boolean.control_office_light"
-                  ],
-                  "show_header_toggle": true
-                },
-                {
-                  "type": "markdown",
-                  "content": "Lighting in the entryway, kitchen, office and bedroom will automatically brighten when someone enters, and dim shortly after they leave (depending on scene settings). Automatic bedroom lighting is disabled as soon as the ***Sleep*** scene starts, only enabling again when the bedroom **button** is clicked or after illuminance levels peak (i.e. after blinds are first opened in the morning).\n\nNOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC CONTROL DISABLED"
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "cards": [
-                {
-                  "entities": [
-                    {
-                      "entity": "input_number.initial_circadian_brightness"
-                    },
-                    {
-                      "entity": "input_number.initial_circadian_kelvin"
-                    },
-                    {
-                      "entity": "input_number.final_circadian_brightness"
-                    },
-                    {
-                      "entity": "input_number.final_circadian_kelvin"
-                    },
-                    {
-                      "entity": "input_number.circadian_initial_sunset_offset"
-                    },
-                    {
-                      "entity": "input_datetime.circadian_end_time"
-                    }
-                  ],
-                  "title": "Circadian Rhythm",
-                  "type": "entities",
-                  "state_color": false
-                },
-                {
-                  "content": "Lighting at night will gradually transition between the initial and final brightness and colour values specified here.\n\nInitial circadian settings occur after sunset (specified in hours by *initial sunset offset*) and reaches the final values at *end time*.",
-                  "type": "markdown"
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "cards": [
-                {
-                  "content": "Values here specify the *brightness* and colour temperature of lighting in different scenes. Colour temperature ranges from warm white (2000 *kelvin*) to cold white (4500 *kelvin*).\n\n*Motion* indicates the value is specific to when the room is occupied (otherwise defaulting to the normal values specified, the current circadian value, off, or maximum - depending on the scene).\n\n*Vacating delay* specifies how long the light will wait after someone leaves the room before reverting to its previous state.\n\nIf a *transition period* is available the light will smoothly change over that period to the motion brightness and kelvin specified or implied.",
-                  "type": "markdown"
-                },
-                {
-                  "entities": [
-                    {
-                      "entity": "input_number.night_motion_brightness"
-                    },
-                    {
-                      "entity": "input_number.night_motion_kelvin"
-                    },
-                    {
-                      "entity": "input_number.night_transition_period"
-                    },
-                    {
-                      "entity": "input_number.night_vacating_delay"
-                    }
-                  ],
-                  "title": "Night",
-                  "type": "entities"
-                },
-                {
-                  "entities": [
-                    {
-                      "entity": "input_number.tv_brightness"
-                    },
-                    {
-                      "entity": "input_number.tv_kelvin"
-                    },
-                    {
-                      "entity": "input_number.tv_motion_brightness"
-                    },
-                    {
-                      "entity": "input_number.tv_transition_period"
-                    },
-                    {
-                      "entity": "input_number.tv_vacating_delay"
-                    }
-                  ],
-                  "title": "TV",
-                  "type": "entities"
-                },
-                {
-                  "entities": [
-                    {
-                      "entity": "input_number.sleep_motion_brightness"
-                    },
-                    {
-                      "entity": "input_number.sleep_motion_kelvin"
-                    },
-                    {
-                      "entity": "input_number.sleep_transition_period"
-                    },
-                    {
-                      "entity": "input_number.sleep_vacating_delay"
-                    }
-                  ],
-                  "title": "Sleep",
-                  "type": "entities"
-                },
-                {
-                  "entities": [
-                    {
-                      "entity": "input_number.morning_brightness"
-                    },
-                    {
-                      "entity": "input_number.morning_kelvin"
-                    },
-                    {
-                      "entity": "input_number.morning_vacating_delay"
-                    }
-                  ],
-                  "title": "Morning",
-                  "type": "entities"
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "entities": [
-                {
-                  "entity": "input_number.office_vacating_delay"
-                },
-                {
-                  "entity": "input_number.bedroom_vacating_delay"
-                },
-                {
-                  "entity": "input_number.bathroom_vacating_delay"
-                }
-              ],
-              "title": "Room Vacating Delays",
-              "type": "entities"
-            }
-          ]
+          "max_columns": 3,
+          "badges": []
         },
         {
           "title": "Climate",
@@ -1187,6 +910,223 @@
           ]
         },
         {
+          "path": "lights",
+          "title": "Lights",
+          "icon": "mdi:lightbulb-variant",
+          "cards": [
+            {
+              "cards": [
+                {
+                  "type": "glance",
+                  "entities": [
+                    {
+                      "entity": "group.all_lights",
+                      "name": "Any / all"
+                    },
+                    {
+                      "entity": "group.entryway_lights",
+                      "name": "Entryway"
+                    },
+                    {
+                      "entity": "group.kitchen_lights",
+                      "name": "Kitchen"
+                    },
+                    {
+                      "entity": "group.tv_lights",
+                      "name": "TV"
+                    },
+                    {
+                      "entity": "group.dining_room_lights",
+                      "name": "Dining"
+                    },
+                    {
+                      "entity": "light.hall",
+                      "name": "Hall"
+                    },
+                    {
+                      "entity": "light.bathroom",
+                      "name": "Bathroom"
+                    },
+                    {
+                      "entity": "light.bedroom",
+                      "name": "Bedroom"
+                    },
+                    {
+                      "entity": "light.nursery",
+                      "name": "Nursery"
+                    },
+                    {
+                      "entity": "light.office",
+                      "name": "Office"
+                    }
+                  ],
+                  "show_icon": true,
+                  "show_name": true,
+                  "show_state": false,
+                  "title": "Lights",
+                  "state_color": true
+                },
+                {
+                  "content": "Manually controlling lights may disable **automatic control** for those lights. You can toggle **automatic control** of all/individual lights below.",
+                  "type": "markdown"
+                },
+                {
+                  "type": "entities",
+                  "title": "Automatic light control",
+                  "entities": [
+                    "input_boolean.control_entryway_lights",
+                    "input_boolean.control_kitchen_light",
+                    "input_boolean.control_kitchen_strip_light",
+                    "input_boolean.control_tv_lights",
+                    "input_boolean.control_dining_room_lights",
+                    "input_boolean.control_hall_light",
+                    "input_boolean.control_bathroom_light",
+                    "input_boolean.control_bedroom_light",
+                    "input_boolean.control_nursery_light",
+                    "input_boolean.control_office_light"
+                  ],
+                  "show_header_toggle": true
+                },
+                {
+                  "type": "markdown",
+                  "content": "Lighting in the entryway, kitchen, office and bedroom will automatically brighten when someone enters, and dim shortly after they leave (depending on scene settings). Automatic bedroom lighting is disabled as soon as the ***Sleep*** scene starts, only enabling again when the bedroom **button** is clicked or after illuminance levels peak (i.e. after blinds are first opened in the morning).\n\nNOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC CONTROL DISABLED"
+                }
+              ],
+              "type": "vertical-stack"
+            },
+            {
+              "cards": [
+                {
+                  "entities": [
+                    {
+                      "entity": "input_number.initial_circadian_brightness"
+                    },
+                    {
+                      "entity": "input_number.initial_circadian_kelvin"
+                    },
+                    {
+                      "entity": "input_number.final_circadian_brightness"
+                    },
+                    {
+                      "entity": "input_number.final_circadian_kelvin"
+                    },
+                    {
+                      "entity": "input_number.circadian_initial_sunset_offset"
+                    },
+                    {
+                      "entity": "input_datetime.circadian_end_time"
+                    }
+                  ],
+                  "title": "Circadian Rhythm",
+                  "type": "entities",
+                  "state_color": false
+                },
+                {
+                  "content": "Lighting at night will gradually transition between the initial and final brightness and colour values specified here.\n\nInitial circadian settings occur after sunset (specified in hours by *initial sunset offset*) and reaches the final values at *end time*.",
+                  "type": "markdown"
+                }
+              ],
+              "type": "vertical-stack"
+            },
+            {
+              "cards": [
+                {
+                  "content": "Values here specify the *brightness* and colour temperature of lighting in different scenes. Colour temperature ranges from warm white (2000 *kelvin*) to cold white (4500 *kelvin*).\n\n*Motion* indicates the value is specific to when the room is occupied (otherwise defaulting to the normal values specified, the current circadian value, off, or maximum - depending on the scene).\n\n*Vacating delay* specifies how long the light will wait after someone leaves the room before reverting to its previous state.\n\nIf a *transition period* is available the light will smoothly change over that period to the motion brightness and kelvin specified or implied.",
+                  "type": "markdown"
+                },
+                {
+                  "entities": [
+                    {
+                      "entity": "input_number.night_motion_brightness"
+                    },
+                    {
+                      "entity": "input_number.night_motion_kelvin"
+                    },
+                    {
+                      "entity": "input_number.night_transition_period"
+                    },
+                    {
+                      "entity": "input_number.night_vacating_delay"
+                    }
+                  ],
+                  "title": "Night",
+                  "type": "entities"
+                },
+                {
+                  "entities": [
+                    {
+                      "entity": "input_number.tv_brightness"
+                    },
+                    {
+                      "entity": "input_number.tv_kelvin"
+                    },
+                    {
+                      "entity": "input_number.tv_motion_brightness"
+                    },
+                    {
+                      "entity": "input_number.tv_transition_period"
+                    },
+                    {
+                      "entity": "input_number.tv_vacating_delay"
+                    }
+                  ],
+                  "title": "TV",
+                  "type": "entities"
+                },
+                {
+                  "entities": [
+                    {
+                      "entity": "input_number.sleep_motion_brightness"
+                    },
+                    {
+                      "entity": "input_number.sleep_motion_kelvin"
+                    },
+                    {
+                      "entity": "input_number.sleep_transition_period"
+                    },
+                    {
+                      "entity": "input_number.sleep_vacating_delay"
+                    }
+                  ],
+                  "title": "Sleep",
+                  "type": "entities"
+                },
+                {
+                  "entities": [
+                    {
+                      "entity": "input_number.morning_brightness"
+                    },
+                    {
+                      "entity": "input_number.morning_kelvin"
+                    },
+                    {
+                      "entity": "input_number.morning_vacating_delay"
+                    }
+                  ],
+                  "title": "Morning",
+                  "type": "entities"
+                }
+              ],
+              "type": "vertical-stack"
+            },
+            {
+              "entities": [
+                {
+                  "entity": "input_number.office_vacating_delay"
+                },
+                {
+                  "entity": "input_number.bedroom_vacating_delay"
+                },
+                {
+                  "entity": "input_number.bathroom_vacating_delay"
+                }
+              ],
+              "title": "Room Vacating Delays",
+              "type": "entities"
+            }
+          ]
+        },
+        {
           "title": "Presence",
           "path": "presence",
           "icon": "mdi:cctv",
@@ -1408,7 +1348,9 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "Power"
+                  "heading": "Power",
+                  "heading_style": "title",
+                  "icon": "mdi:flash"
                 },
                 {
                   "type": "custom:power-flow-card-plus",
@@ -1643,7 +1585,7 @@
                 },
                 {
                   "type": "markdown",
-                  "content": "**Power** shows the current electricity usage across the home, while energy shows electricity usage over time.\n**Energy** shows today’s usage by default, but you can change the day or time period using the controls shown.\n\nPower and energy is tracked in the groups shown based on sensors and logic.\n<details><summary><i>Press here for more information on two noteworthy groups</i></summary>\n\n- *Water heater, oven & stove, guest suite, garage, all other*: components of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n- *Standby*: the total estimated power usage of all devices in standby. This total is only shown for reference as each component’s power is already included in other groups. When the standby power drops it is because a component is no longer in standby mode.\n</details>"
+                  "content": "**Power** shows the current electricity usage across the home, while **energy** shows electricity usage over time.\nEnergy shows today’s usage by default, but you can change the day or time period using the controls shown.\n\nPower and energy is tracked in the groups shown based on sensors and logic.\n<details><summary><i>Press here for more information on two noteworthy groups</i></summary>\n\n- *Water heater, oven & stove, guest suite, garage, all other*: components of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n- *Standby*: the total estimated power usage of all devices in standby. This total is only shown for reference as each component’s power is already included in other groups. When the standby power drops it is because a component is no longer in standby mode.\n</details>"
                 }
               ],
               "column_span": 1
@@ -1653,7 +1595,9 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "Energy"
+                  "heading": "Energy",
+                  "heading_style": "title",
+                  "icon": "mdi:lightning-bolt"
                 },
                 {
                   "type": "energy-distribution"
@@ -1706,8 +1650,11 @@
                       }
                     },
                     {
+                      "show_name": true,
+                      "show_icon": true,
+                      "show_state": true,
                       "type": "glance",
-                      "title": "Daily average solar",
+                      "title": "Average solar",
                       "entities": [
                         {
                           "entity": "sensor.average_daily_solar_production",
@@ -1819,400 +1766,49 @@
           "cards": []
         },
         {
-          "title": "Statistics",
-          "path": "statistics",
-          "icon": "mdi:chart-box",
+          "title": "Plants",
+          "path": "plants",
+          "icon": "mdi:grass",
           "cards": [
             {
-              "type": "entities",
               "entities": [
                 {
-                  "entity": "binary_sensor.rachel_asleep"
+                  "entity": "sensor.soil_moisture_vegetable_garden_sun",
+                  "name": "Vegetable garden (sun)"
                 },
                 {
-                  "entity": "sensor.rachel_asleep_probability"
+                  "entity": "sensor.soil_moisture_vegetable_garden_shade",
+                  "name": "Vegetable garden (shade)"
                 },
                 {
-                  "entity": "sensor.rachel_hours_asleep"
+                  "entity": "sensor.soil_moisture_front_deck",
+                  "name": "Front deck"
                 },
                 {
-                  "entity": "sensor.rachel_hours_asleep_yesterday"
+                  "entity": "sensor.soil_moisture_back_deck",
+                  "name": "Back deck"
+                },
+                {
+                  "entity": "sensor.soil_moisture_carport_pots",
+                  "name": "Carport pots"
+                },
+                {
+                  "entity": "sensor.soil_moisture_dining_room",
+                  "name": "Dining room"
+                },
+                {
+                  "entity": "sensor.soil_moisture_living_room",
+                  "name": "Living room"
+                },
+                {
+                  "entity": "sensor.soil_moisture_office",
+                  "name": "Office"
                 }
-              ]
-            },
-            {
-              "type": "entities",
-              "entities": [
-                {
-                  "entity": "binary_sensor.dan_asleep"
-                },
-                {
-                  "entity": "sensor.dan_asleep_probability"
-                },
-                {
-                  "entity": "sensor.dan_hours_asleep"
-                },
-                {
-                  "entity": "sensor.dan_hours_asleep_yesterday"
-                }
-              ]
-            },
-            {
-              "type": "entities",
-              "entities": [
-                {
-                  "entity": "sensor.bedroom_bed_occupied_probability"
-                }
-              ]
-            },
-            {
+              ],
+              "hours_to_show": 240,
+              "refresh_interval": 0,
               "type": "history-graph",
-              "entities": [
-                {
-                  "entity": "binary_sensor.rachel_asleep"
-                },
-                {
-                  "entity": "sensor.rachel_asleep_probability"
-                },
-                {
-                  "entity": "binary_sensor.dan_asleep"
-                },
-                {
-                  "entity": "sensor.dan_asleep_probability"
-                },
-                {
-                  "entity": "binary_sensor.bedroom_bed_occupied"
-                },
-                {
-                  "entity": "sensor.bedroom_bed_occupied_probability"
-                }
-              ],
-              "hours_to_show": 72
-            },
-            {
-              "chart_type": "bar",
-              "period": "month",
-              "type": "statistics-graph",
-              "entities": [
-                "sensor.anyone_asleep_ratio_while_asleep",
-                "sensor.bedroom_occupancy_ratio_while_asleep",
-                "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep",
-                "sensor.anyone_asleep_ratio_while_asleep",
-                "sensor.bedroom_bed_occupied_ratio_while_asleep",
-                "sensor.bedroom_light_off_ratio_while_asleep",
-                "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep",
-                "sensor.rachel_s_phone_s_still_ratio_while_asleep",
-                "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep",
-                "sensor.dan_s_phone_still_ratio_while_asleep",
-                "sensor.dan_s_phone_plugged_in_ratio_while_asleep",
-                "sensor.anyone_asleep_ratio_while_awake",
-                "sensor.bedroom_occupancy_ratio_while_awake",
-                "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake",
-                "sensor.anyone_asleep_ratio_while_awake",
-                "sensor.bedroom_bed_occupied_ratio_while_awake",
-                "sensor.bedroom_light_off_ratio_while_awake",
-                "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake",
-                "sensor.rachel_s_phone_s_still_ratio_while_awake",
-                "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake",
-                "sensor.dan_s_phone_still_ratio_while_awake",
-                "sensor.dan_s_phone_plugged_in_ratio_while_awake"
-              ],
-              "stat_types": [
-                "mean",
-                "min",
-                "max"
-              ],
-              "title": "Long term statistics",
-              "logarithmic_scale": false,
-              "hide_legend": false
-            },
-            {
-              "type": "entities",
-              "title": "While asleep",
-              "entities": [
-                {
-                  "entity": "sensor.bedroom_occupancy_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.anyone_asleep_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.bedroom_bed_occupied_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.bedroom_light_off_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.rachel_s_phone_s_still_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.dan_s_phone_still_ratio_while_asleep"
-                },
-                {
-                  "entity": "sensor.dan_s_phone_plugged_in_ratio_while_asleep"
-                }
-              ]
-            },
-            {
-              "type": "entities",
-              "title": "While awake",
-              "entities": [
-                {
-                  "entity": "sensor.bedroom_occupancy_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.anyone_asleep_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.bedroom_bed_occupied_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.bedroom_light_off_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.rachel_s_phone_s_still_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.dan_s_phone_still_ratio_while_awake"
-                },
-                {
-                  "entity": "sensor.dan_s_phone_plugged_in_ratio_while_awake"
-                }
-              ]
-            }
-          ],
-          "visible": [
-            {
-              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
-            },
-            {
-              "user": "037b9dab7fb04176b342f8c42a79bb17"
-            }
-          ]
-        },
-        {
-          "title": "Instructions",
-          "path": "instructions",
-          "icon": "mdi:text-box",
-          "cards": [
-            {
-              "type": "markdown",
-              "content": "\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\nIn order to use Google, you will need to connect your Google Assistant to IFTTT and add applets with webhooks to Home Assistant corresponding to each command.\n\nCHANGE ABOVE TO LIST OF QUOTES",
-              "title": "Voice control"
-            }
-          ],
-          "subview": false,
-          "visible": [
-            {
-              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
-            },
-            {
-              "user": "037b9dab7fb04176b342f8c42a79bb17"
-            }
-          ]
-        },
-        {
-          "path": "development",
-          "title": "Development",
-          "visible": [
-            {
-              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
-            },
-            {
-              "user": "d678a59ca9604e2ba14c3ac3705ba943"
-            }
-          ],
-          "icon": "mdi:cog",
-          "badges": [
-            {
-              "type": "custom:auto-entities",
-              "card": {
-                "type": "glance"
-              },
-              "filter": {
-                "include": [
-                  "update"
-                ]
-              },
-              "show_empty": false
-            }
-          ],
-          "cards": [
-            {
-              "entities": [
-                {
-                  "entity": "input_select.scene"
-                },
-                {
-                  "entity": "group.climate_control"
-                },
-                {
-                  "entity": "group.any_aircon"
-                },
-                {
-                  "entity": "group.any_fans"
-                },
-                {
-                  "entity": "group.any_heaters"
-                },
-                {
-                  "entity": "group.any_humidifiers"
-                },
-                {
-                  "entity": "input_boolean.pets_home_alone"
-                }
-              ],
-              "hours_to_show": 36,
-              "refresh_interval": 0,
-              "title": "Control History",
-              "type": "history-graph"
-            },
-            {
-              "type": "entities",
-              "entities": [
-                "input_boolean.development_mode"
-              ]
-            },
-            {
-              "entities": [
-                {
-                  "entity": "counter.warnings"
-                },
-                {
-                  "entity": "counter.errors"
-                }
-              ],
-              "hours_to_show": 72,
-              "refresh_interval": 0,
-              "title": "Warnings & Errors",
-              "type": "history-graph"
-            },
-            {
-              "entities": [
-                {
-                  "entity": "sensor.front_door_camera_battery_level",
-                  "name": "Front door camera"
-                },
-                {
-                  "entity": "sensor.back_door_camera_battery_level",
-                  "name": "Back door camera"
-                },
-                {
-                  "entity": "sensor.entryway_camera_battery_level",
-                  "name": "Entryway camera"
-                },
-                {
-                  "entity": "sensor.door_lock_battery_level",
-                  "name": "Lock"
-                },
-                {
-                  "entity": "sensor.entryway_multisensor_battery_level",
-                  "name": "Entryway multisensor"
-                },
-                {
-                  "entity": "sensor.hall_multisensor_battery_level",
-                  "name": "Hall multisensor"
-                },
-                {
-                  "entity": "sensor.bathroom_multisensor_battery_level",
-                  "name": "Bathroom multisensor"
-                },
-                {
-                  "entity": "sensor.dining_room_multisensor_battery_level",
-                  "name": "Dining room multisensor"
-                },
-                {
-                  "entity": "sensor.kitchen_door_sensor_battery_level",
-                  "name": "Kitchen door"
-                },
-                {
-                  "entity": "sensor.kitchen_button_battery_level",
-                  "name": "Kitchen button"
-                },
-                {
-                  "entity": "sensor.bedroom_button_battery_level",
-                  "name": "Bedroom button"
-                },
-                {
-                  "entity": "sensor.nest_protect_entryway_battery_level",
-                  "name": "Entryway fire alarm"
-                },
-                {
-                  "entity": "sensor.nest_protect_living_room_battery_level",
-                  "name": "Living room fire alarm"
-                },
-                {
-                  "entity": "sensor.nest_protect_garage_battery_level",
-                  "name": "Garage fire alarm"
-                },
-                {
-                  "entity": "sensor.toothbrush_battery_level",
-                  "name": "Toothbrush"
-                },
-                {
-                  "entity": "sensor.soil_sensor_vegetable_garden_sun_battery_level",
-                  "name": "Vegetable garden (sun) soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_vegetable_garden_shade_battery_level",
-                  "name": "Vegetable garden (shade) soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_front_deck_battery_level",
-                  "name": "Front deck soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_back_deck_battery_level",
-                  "name": "Back deck soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_carport_pots_battery_level",
-                  "name": "Carport pots soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_dining_room_battery_level",
-                  "name": "Dining room soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_living_room_battery_level",
-                  "name": "Living room soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_office_battery_level",
-                  "name": "Office soil sensor"
-                }
-              ],
-              "refresh_interval": 0,
-              "title": "Battery Levels",
-              "type": "history-graph",
-              "logarithmic_scale": false,
-              "hours_to_show": 240
-            },
-            {
-              "entity": "media_player.tv",
-              "type": "media-control"
-            },
-            {
-              "type": "media-control",
-              "entity": "media_player.tv_speakers"
+              "logarithmic_scale": false
             }
           ]
         }
