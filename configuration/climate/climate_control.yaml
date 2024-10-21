@@ -95,6 +95,20 @@ template:
         state: "{{ expand('group.all_climate_control') | selectattr('state','eq','on') | list | count }}"
         icon: mdi:dots-square
         availability: "{{ has_value('group.all_climate_control') }}"
+      - name: Humidifiers status text
+        state: >
+          {% set bedroom = state_attr('humidifier.bedroom', 'humidifier.fault') != 0 %}
+          {% set nursery = state_attr('humidifier.nursery', 'humidifier.fault') != 0 %}
+          {% if bedroom and nursery %}
+          Both humidifiers are empty
+          {% elif bedroom %}
+          Bedroom humidifier is empty
+          {% elif nursery %}
+          Nursery humidifier is empty
+          {% else %}
+          Humidifiers are functional
+          {% endif %}
+        icon: mdi:air-humidifier-off
         
 input_boolean:
   control_living_room_aircon:

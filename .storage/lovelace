@@ -464,7 +464,24 @@
                       "show_name": true
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + 'devices are automatic'}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} ${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic'}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.humidifiers_status_text",
+                  "show_state": false,
+                  "show_last_changed": true,
+                  "card_layout": "large",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "sensor.humidifiers_status_text",
+                      "state_not": "Humidifiers are functional"
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText = state }\n"
                 },
                 {
                   "type": "vertical-stack",
