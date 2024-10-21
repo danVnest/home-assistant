@@ -37,6 +37,25 @@
                   ]
                 },
                 {
+                  "type": "tile",
+                  "entity": "binary_sensor.internet",
+                  "name": "WARNING: Internet is disconnected, functionality limited",
+                  "state_content": "last_changed",
+                  "icon": "mdi:close-network",
+                  "color": "red",
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 1
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.internet",
+                      "state_not": "on"
+                    }
+                  ]
+                },
+                {
                   "type": "custom:bubble-card",
                   "card_type": "select",
                   "entity": "input_select.scene",
