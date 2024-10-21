@@ -579,12 +579,43 @@
                       "entity": "person.rachel"
                     }
                   ],
-                  "theme_mode": "auto",
+                  "theme_mode": "light",
                   "hours_to_show": 1,
                   "layout_options": {
                     "grid_columns": 4,
                     "grid_rows": 2
-                  }
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "sun.sun",
+                      "state": "above_horizon"
+                    }
+                  ]
+                },
+                {
+                  "type": "map",
+                  "entities": [
+                    {
+                      "entity": "person.dan"
+                    },
+                    {
+                      "entity": "person.rachel"
+                    }
+                  ],
+                  "theme_mode": "dark",
+                  "hours_to_show": 1,
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 2
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "sun.sun",
+                      "state_not": "above_horizon"
+                    }
+                  ]
                 }
               ]
             },
