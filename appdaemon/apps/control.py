@@ -73,13 +73,13 @@ class Control(App):
             "nest_protect_garage",
             "owlet",
             "toothbrush",
-            "soil_sensor_vegetable_garden_sun",
-            "soil_sensor_vegetable_garden_shade",
-            "soil_sensor_front_deck",
+            "soil_sensor_entryway",
+            "soil_sensor_guest_suite",
+            "soil_sensor_stairway",
             "soil_sensor_back_deck",
-            "soil_sensor_carport_pots",
-            "soil_sensor_dining_room",
             "soil_sensor_living_room",
+            "soil_sensor_dining_room",
+            "soil_sensor_bathroom",
             "soil_sensor_office",
         ):
             self.listen_state(

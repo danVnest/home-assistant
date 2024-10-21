@@ -13,12 +13,17 @@ template:
         state: >
           {%- set threshold = 30 -%}
           {%- set sensors = [
+            states('sensor.soil_moisture_entryway')|int(0),
+            states('sensor.soil_moisture_guest_suite')|int(0),
+            states('sensor.soil_moisture_stairway')|int(0),
             states('sensor.soil_moisture_back_deck')|int(0),
+            states('sensor.soil_moisture_living_room')|int(0),
             states('sensor.soil_moisture_dining_room')|int(0),
-            states('sensor.soil_moisture_office')|int(0),
-            states('sensor.soil_moisture_living_room')|int(0)
+            states('sensor.soil_moisture_bathroom')|int(0),
+            states('sensor.soil_moisture_office')|int(0)
           ] -%}
-          {{- sensors|select('lt', threshold)|list|count -}}
+          {{- (100 * sensors|select('lt', threshold)|list|count / sensors|count )|round -}}
+        unit_of_measurement: "%"
         icon: mdi:grass
       - name: Plants last watered
         state: "{{ states('input_datetime.plants_last_watered')|as_datetime|time_since + ' ago'}}"
@@ -45,4 +50,4 @@ automation:
         target:
           entity_id: input_datetime.plants_last_watered
         data:
-          datetime: "{{ now().timestamp() }}"
+          datetime: "{{ now() }}"
