@@ -526,17 +526,6 @@
                 {
                   "type": "custom:bubble-card",
                   "card_type": "button",
-                  "name": "Control",
-                  "button_type": "state",
-                  "entity": "group.any_light_control",
-                  "show_state": true,
-                  "card_layout": "large",
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n",
-                  "icon": "mdi:lightbulb-auto"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
                   "button_type": "name",
                   "entity": "light.office",
                   "card_layout": "large-2-rows",
@@ -593,6 +582,17 @@
                     }
                   ],
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Control",
+                  "button_type": "state",
+                  "entity": "group.any_light_control",
+                  "show_state": true,
+                  "card_layout": "large",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n",
+                  "icon": "mdi:lightbulb-auto"
                 }
               ]
             },
