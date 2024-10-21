@@ -24,6 +24,7 @@ template:
         availability: "{{ has_value('sensor.grid_energy_cost_per_kwh') }}"
 
       - name: Savings from solar per kWh
+        unique_id: savings_from_solar_per_kwh
         state: >
           {{
             states('input_number.energy_cost_green_power')|float +
