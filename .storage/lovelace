@@ -52,7 +52,7 @@
                     "grid_columns": 4,
                     "grid_rows": 1
                   },
-                  "styles": "${card.querySelector('.bubble-name').innerText = hass.states['input_select.scene'].state + \" scene\"} ${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['input_select.scene'].state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}, .bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n"
+                  "styles": ".bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
                 },
                 {
                   "type": "tile",
@@ -89,7 +89,7 @@
                       "icon": "mdi:cctv"
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n",
                   "visibility": [
                     {
                       "condition": "user",
@@ -189,7 +189,7 @@
                       "state": "on"
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} ${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText =  hass.states['sensor.dry_plants'].state + '% are dry' } ${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -224,7 +224,13 @@
                     "navigation_path": "#guide"
                   },
                   "card_layout": "large",
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border: 2px solid var(--accent-color);\n  border-radius: var(--ha-card-border-radius) !important;\n  box-sizing: border-box;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-size: 16px;\n  font-weight: 500 !important;\n}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border: 2px solid var(--accent-color);\n  border-radius: var(--ha-card-border-radius) !important;\n  box-sizing: border-box;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-size: 16px;\n  font-weight: 500 !important;\n}\n",
+                  "visibility": [
+                    {
+                      "condition": "user",
+                      "users": []
+                    }
+                  ]
                 },
                 {
                   "type": "vertical-stack",
@@ -238,7 +244,7 @@
                       "icon": "mdi:text-box",
                       "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container, .bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
                     },
                     {
                       "type": "markdown",
@@ -263,7 +269,7 @@
                       "icon": "mdi:grass",
                       "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container, .bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
                     },
                     {
                       "type": "history-graph",
@@ -354,7 +360,7 @@
                       "show_background": false
                     }
                   ],
-                  "styles": "${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'mdi:weather-sunny';\n    case 'clear-night':\n      return 'mdi:weather-night';\n    case 'rain':\n      return 'mdi:weather-rainy';\n    case 'snow':\n      return 'mdi:weather-snowy';\n    case 'sleet':\n      return 'mdi:weather-snowy-rainy';\n    case 'wind':\n      return 'mdi:weather-windy';\n    case 'fog':\n      return 'mdi:weather-fog';\n    case 'cloudy':\n      return 'mdi:weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'mdi:weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'mdi:weather-night-partly-cloudy';\n  }\n})())}, .bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'mdi:weather-sunny';\n    case 'clear-night':\n      return 'mdi:weather-night';\n    case 'rain':\n      return 'mdi:weather-rainy';\n    case 'snow':\n      return 'mdi:weather-snowy';\n    case 'sleet':\n      return 'mdi:weather-snowy-rainy';\n    case 'wind':\n      return 'mdi:weather-windy';\n    case 'fog':\n      return 'mdi:weather-fog';\n    case 'cloudy':\n      return 'mdi:weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'mdi:weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'mdi:weather-night-partly-cloudy';\n  }\n})())}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -439,7 +445,7 @@
                       "show_name": true
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic'}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + 'devices are automatic'}\n"
                 },
                 {
                   "type": "vertical-stack",
@@ -453,7 +459,7 @@
                       "icon": "mdi:text-box",
                       "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container, .bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
                     },
                     {
                       "type": "weather-forecast",
@@ -489,7 +495,8 @@
                   "entity": "group.any_light_control",
                   "show_state": true,
                   "card_layout": "large",
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n",
+                  "icon": "mdi:lightbulb-auto"
                 },
                 {
                   "type": "custom:bubble-card",
