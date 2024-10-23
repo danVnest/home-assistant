@@ -105,32 +105,180 @@
                   },
                   "layout_options": {
                     "grid_columns": "full"
-                  }
+                  },
+                  "visibility": [
+                    {
+                      "condition": "user",
+                      "users": []
+                    }
+                  ]
                 },
                 {
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "lock.door_lock",
-                  "show_state": true,
+                  "show_state": false,
                   "show_last_changed": true,
                   "name": "Front door",
                   "card_layout": "large-2-rows",
                   "sub_button": [
                     {
-                      "entity": "switch.back_deck_camera_enabled",
-                      "name": "Back deck",
-                      "show_name": true,
-                      "show_last_changed": false,
-                      "show_state": false,
-                      "icon": "mdi:cctv"
+                      "entity": "sensor.security_monitoring",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      }
+                    },
+                    {
+                      "entity": "sensor.security_monitoring_count_text",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      }
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .rows-2 .bubble-sub-button-container {\n  display: ${['Sleep','Away (Day)','Away (Night)'].includes(hass.states['input_select.scene'].state) ? '' : 'none'} !important;\n  border-radius: var(--ha-card-border-radius) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  padding-left: 5px !important;\n  padding-right: 0px !important;\n  margin-right: -3px !important;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                },
+                {
+                  "type": "map",
+                  "entities": [
+                    {
+                      "entity": "person.dan"
+                    },
+                    {
+                      "entity": "person.rachel"
+                    }
+                  ],
+                  "theme_mode": "light",
+                  "hours_to_show": 1,
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 2
+                  },
                   "visibility": [
                     {
-                      "condition": "user",
-                      "users": []
+                      "condition": "state",
+                      "entity": "sun.sun",
+                      "state": "above_horizon"
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "15ff7a86d4ae4d38a60003ad4064ff78"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.rachel",
+                              "state_not": "home"
+                            }
+                          ]
+                        },
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "9a175674be354863afb9634adc4b8980"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.dan",
+                              "state_not": "home"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "map",
+                  "entities": [
+                    {
+                      "entity": "person.dan"
+                    },
+                    {
+                      "entity": "person.rachel"
+                    }
+                  ],
+                  "theme_mode": "dark",
+                  "hours_to_show": 1,
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 2
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "sun.sun",
+                      "state_not": "above_horizon"
+                    },
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "15ff7a86d4ae4d38a60003ad4064ff78"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.rachel",
+                              "state_not": "home"
+                            }
+                          ]
+                        },
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "9a175674be354863afb9634adc4b8980"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.dan",
+                              "state_not": "home"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 },
@@ -486,65 +634,6 @@
                   "card_layout": "large",
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n",
                   "icon": "mdi:lightbulb-auto"
-                }
-              ]
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Presence",
-                  "heading_style": "subtitle",
-                  "icon": "mdi:cctv"
-                },
-                {
-                  "type": "map",
-                  "entities": [
-                    {
-                      "entity": "person.dan"
-                    },
-                    {
-                      "entity": "person.rachel"
-                    }
-                  ],
-                  "theme_mode": "light",
-                  "hours_to_show": 1,
-                  "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 2
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "sun.sun",
-                      "state": "above_horizon"
-                    }
-                  ]
-                },
-                {
-                  "type": "map",
-                  "entities": [
-                    {
-                      "entity": "person.dan"
-                    },
-                    {
-                      "entity": "person.rachel"
-                    }
-                  ],
-                  "theme_mode": "dark",
-                  "hours_to_show": 1,
-                  "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 2
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "sun.sun",
-                      "state_not": "above_horizon"
-                    }
-                  ]
                 }
               ]
             },
