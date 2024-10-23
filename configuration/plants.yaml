@@ -54,49 +54,49 @@ binary_sensor:
   - platform: threshold
     name: Soil moist entryway
     entity_id: sensor.soil_moisture_entryway
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist guest suite
     entity_id: sensor.soil_moisture_guest_suite
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist stairway
     entity_id: sensor.soil_moisture_stairway
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist back deck
     entity_id: sensor.soil_moisture_back_deck
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist living room
     entity_id: sensor.soil_moisture_living_room
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist dining room
     entity_id: sensor.soil_moisture_dining_room
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist bathroom
     entity_id: sensor.soil_moisture_bathroom
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
   - platform: threshold
     name: Soil moist office
     entity_id: sensor.soil_moisture_office
-    higher: 40
+    upper: 40
     hysteresis: 10
     device_class: moisture
 
