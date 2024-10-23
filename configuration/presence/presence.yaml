@@ -174,8 +174,18 @@ template:
         icon: mdi:cellphone-dock
         availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
 
-      - name: Kitchen door motion # TODO: maybe not required anymore
+      - name: Kitchen door motion
         state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
         device_class: motion
         icon: mdi:door
         availability: "{{ states.binary_sensor.kitchen_door.last_changed|default != '' }}"
+      - name: Dining room balcony door motion
+        state: "{{ now() - states.binary_sensor.dining_room_balcony_door.last_changed < timedelta(seconds=30) }}"
+        device_class: motion
+        icon: mdi:door
+        availability: "{{ states.binary_sensor.dining_room_balcony_door.last_changed|default != '' }}"
+      - name: Bedroom balcony door motion
+        state: "{{ now() - states.binary_sensor.bedroom_balcony_door.last_changed < timedelta(seconds=30) }}"
+        device_class: motion
+        icon: mdi:door
+        availability: "{{ states.binary_sensor.bedroom_balcony_door.last_changed|default != '' }}"

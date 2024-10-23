@@ -74,6 +74,8 @@ class Presence(App):
         self.rooms["kitchen"].add_sensor("kitchen_door_motion")
         self.rooms["living_room"].add_sensor("tv_playing")
         self.rooms["living_room"].add_sensor("hall_multisensor_motion")
+        self.rooms["dining_room"].add_sensor("dining_room_balcony_door_motion")
+        self.rooms["bedroom"].add_sensor("bedroom_balcony_door_motion")
         self.rooms["office"].add_sensor("dan_s_computer_active_at_home")
         self.rooms["nursery"].add_sensor("owlet_attached")
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175551/f
