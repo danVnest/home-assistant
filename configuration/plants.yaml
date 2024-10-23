@@ -11,24 +11,94 @@ template:
   - sensor:
       - name: Dry plants
         state: >
-          {%- set threshold = 30 -%}
-          {%- set sensors = [
-            states('sensor.soil_moisture_entryway')|int(0),
-            states('sensor.soil_moisture_guest_suite')|int(0),
-            states('sensor.soil_moisture_stairway')|int(0),
-            states('sensor.soil_moisture_back_deck')|int(0),
-            states('sensor.soil_moisture_living_room')|int(0),
-            states('sensor.soil_moisture_dining_room')|int(0),
-            states('sensor.soil_moisture_bathroom')|int(0),
-            states('sensor.soil_moisture_office')|int(0)
-          ] -%}
-          {{- (100 * sensors|select('lt', threshold)|list|count / sensors|count )|round -}}
+           {%- set sensors = [
+              'binary_sensor.soil_moist_entryway',
+              'binary_sensor.soil_moist_guest_suite',
+              'binary_sensor.soil_moist_stairway',
+              'binary_sensor.soil_moist_back_deck',
+              'binary_sensor.soil_moist_living_room',
+              'binary_sensor.soil_moist_dining_room',
+              'binary_sensor.soil_moist_bathroom',
+              'binary_sensor.soil_moist_office'
+            ] -%}
+            {{- (100 * (sensors|count - sensors|select('is_state', 'on')|list|count) / sensors|count)|round -}}
         unit_of_measurement: "%"
         icon: mdi:grass
+  - sensor:
+      - name: Average plant soil moisture
+        state: >
+          {%- set var = namespace(list = []) -%}
+          {%- for room in ['entryway', 'guest_suite', 'stairway', 'back_deck', 'living_room', 'dining_room', 'bathroom', 'office'] if has_value('sensor.soil_moisture_' + room) -%}
+            {%- set var.list = var.list + [states('sensor.soil_moisture_' + room)|int] -%}
+          {%- endfor -%}
+          {{- var.list|average|round -}}
+        unit_of_measurement: "%"
+        icon: mdi:grass
+        availability: >
+          {{
+            has_value('sensor.soil_moisture_entryway') or
+            has_value('sensor.soil_moisture_guest_suite') or
+            has_value('sensor.soil_moisture_stairway') or
+            has_value('sensor.soil_moisture_back_deck') or
+            has_value('sensor.soil_moisture_living_room') or
+            has_value('sensor.soil_moisture_dining_room') or
+            has_value('sensor.soil_moisture_bathroom') or
+            has_value('sensor.soil_moisture_office')
+          }}
       - name: Plants last watered
         state: "{{ states('input_datetime.plants_last_watered')|as_datetime|time_since + ' ago'}}"
         icon: mdi:clock
         availability: "{{ has_value('input_datetime.plants_last_watered') }}"
+
+binary_sensor:
+  - platform: threshold
+    name: Soil moist entryway
+    entity_id: sensor.soil_moisture_entryway
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist guest suite
+    entity_id: sensor.soil_moisture_guest_suite
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist stairway
+    entity_id: sensor.soil_moisture_stairway
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist back deck
+    entity_id: sensor.soil_moisture_back_deck
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist living room
+    entity_id: sensor.soil_moisture_living_room
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist dining room
+    entity_id: sensor.soil_moisture_dining_room
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist bathroom
+    entity_id: sensor.soil_moisture_bathroom
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
+  - platform: threshold
+    name: Soil moist office
+    entity_id: sensor.soil_moisture_office
+    higher: 40
+    hysteresis: 10
+    device_class: moisture
 
 input_datetime:
   plants_last_watered:
