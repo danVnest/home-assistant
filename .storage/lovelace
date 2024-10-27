@@ -71,7 +71,57 @@
                       "entity": "binary_sensor.internet",
                       "state_not": "on"
                     }
-                  ]
+                  ],
+                  "card_mod": {
+                    "style": {
+                      "ha-tile-info$": "state-display:before {\n  content: 'since';\n}\n"
+                    }
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "binary_sensor.plants_need_watering",
+                  "name": "Low battery",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.dry_plants",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.plants_last_watered",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.plants_need_watering",
+                      "state": "on"
+                    },
+                    {
+                      "condition": "user",
+                      "users": []
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1897,6 +1947,43 @@
           "path": "plants",
           "icon": "mdi:grass",
           "cards": [
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "binary_sensor.soil_moist_entryway",
+                  "name": "Entryway"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_guest_suite",
+                  "name": "Guest suite"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_stairway",
+                  "name": "Stairway"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_back_deck",
+                  "name": "Back deck"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_living_room",
+                  "name": "Living room"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_dining_room",
+                  "name": "Dining room"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_bathroom",
+                  "name": "Bathroom"
+                },
+                {
+                  "entity": "binary_sensor.soil_moist_office",
+                  "name": "Office"
+                }
+              ]
+            },
             {
               "entities": [
                 {
