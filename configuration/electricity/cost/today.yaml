@@ -1,17 +1,11 @@
-template:
-  - sensor:
-      - name: Total energy cost today
-        state: "{{ (states('sensor.total_energy_cost_today_without_service_fee')|float + states('input_number.energy_cost_service')|float)|round(2) }}"
-        unit_of_measurement: $
-        device_class: monetary
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost_today_without_service_fee') and has_value('input_number.energy_cost_service') }}"
-
 utility_meter:
-  total_energy_cost_today_without_service_fee:
-    name: Total energy cost today without service fee
+  total_energy_cost_today:
+    name: Total energy cost today
     source: sensor.total_energy_cost
+    cycle: daily
+  electricity_provider_service_energy_cost_today:
+    name: Electricity provider service energy cost today
+    source: sensor.electricity_provider_service_energy_cost
     cycle: daily
   lights_energy_cost_today:
     name: Lights energy cost today
@@ -186,3 +180,12 @@ utility_meter:
     name: Standby energy cost savings today
     source: sensor.standby_energy_cost_savings
     cycle: daily
+
+template:
+  - sensor:
+      - name: Electricity provider service energy cost savings today
+        state: "0"
+        unit_of_measurement: $
+        device_class: monetary
+        state_class: total
+        icon: mdi:currency-usd

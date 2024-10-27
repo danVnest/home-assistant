@@ -36,6 +36,22 @@ sensor:
         measurement: '"$"'
         unit_of_measurement: $
 
+      - name: Electricity provider service energy cost last week
+        where: '"entity_id" = ''electricity_provider_service_energy_cost'' AND time >= now() - 7d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Electricity provider service energy cost last month
+        where: '"entity_id" = ''electricity_provider_service_energy_cost'' AND time >= now() - 30d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Electricity provider service energy cost last year
+        where: '"entity_id" = ''electricity_provider_service_energy_cost'' AND time >= now() - 365d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+
       - name: Lights energy cost last week
         where: '"entity_id" = ''lights_energy_cost'' AND time >= now() - 7d'
         group_function: first
@@ -690,23 +706,23 @@ sensor:
 template:
   - sensor:
       - name: Total energy cost weekly
-        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float + 7 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float)|round(2) -}}"
         unit_of_measurement: $/week
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_week') and has_value('input_number.energy_cost_service') -}}"
+        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_week') -}}"
       - name: Total energy cost monthly
-        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_month')|float + 30 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_month')|float)|round(2) -}}"
         unit_of_measurement: $/month
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_month') and has_value('input_number.energy_cost_service') -}}"
+        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_month') -}}"
       - name: Total energy cost yearly
-        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_year')|float + 365 * states('input_number.energy_cost_service')|float)|round(2) -}}"
+        state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_year')|float)|round(2) -}}"
         unit_of_measurement: $/year
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_year') and has_value('input_number.energy_cost_service') -}}"
+        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.total_energy_cost_last_year') -}}"
       - name: Total energy cost savings weekly
         state: "{{ (states('sensor.total_energy_cost_savings')|float - states('sensor.total_energy_cost_savings_last_week')|float)|round(2) }}"
         unit_of_measurement: $/week
@@ -725,6 +741,40 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_year') }}"
+
+      - name: Electricity provider service energy cost weekly
+        state: "{{ (states('sensor.electricity_provider_service_energy_cost')|float - states('sensor.electricity_provider_service_energy_cost_last_week')|float)|round(2) }}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.electricity_provider_service_energy_cost') and has_value('sensor.electricity_provider_service_energy_cost_last_week') }}"
+      - name: Electricity provider service energy cost monthly
+        state: "{{ (states('sensor.electricity_provider_service_energy_cost')|float - states('sensor.electricity_provider_service_energy_cost_last_month')|float)|round(2) }}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.electricity_provider_service_energy_cost') and has_value('sensor.electricity_provider_service_energy_cost_last_month') }}"
+      - name: Electricity provider service energy cost yearly
+        state: "{{ (states('sensor.electricity_provider_service_energy_cost')|float - states('sensor.electricity_provider_service_energy_cost_last_year')|float)|round(2) }}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.electricity_provider_service_energy_cost') and has_value('sensor.electricity_provider_service_energy_cost_last_year') }}"
+      - name: Electricity provider service energy cost savings weekly
+        state: "0"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+      - name: Electricity provider service energy cost savings monthly
+        state: "0"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+      - name: Electricity provider service energy cost savings yearly
+        state: "0"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
 
       - name: Lights energy cost weekly
         state: "{{ (states('sensor.lights_energy_cost')|float - states('sensor.lights_energy_cost_last_week')|float)|round(2) }}"

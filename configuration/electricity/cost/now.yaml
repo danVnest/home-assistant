@@ -81,12 +81,24 @@ template:
         availability: "{{ has_value('sensor.effective_energy_cost_per_kwh') }}"
 
       - name: Total power cost
-        state: "{{ (states('sensor.power_meter_power_load_consumed')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
+        state: >
+          {{
+            (states('sensor.power_meter_power_load_consumed')|float * 
+            states('sensor.effective_energy_cost_per_wh')|float +
+            states('sensor.electricity_provider_service_power_cost')|float
+            )|round(9)
+            
+          }}
         #TODO: this doesn't take into account controlled load pricing
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.effective_energy_cost_per_wh') }}"
+        availability: >
+          {{
+            has_value('sensor.power_meter_power_load_consumed') and
+            has_value('sensor.effective_energy_cost_per_wh') and
+            has_value('sensor.electricity_provider_service_power_cost')
+          }}
       - name: Total power cost savings
         state: >
           {{
@@ -106,6 +118,18 @@ template:
             has_value('sensor.power_meter_power_grid_export') and
             has_value('input_number.energy_export_price')
           }}
+
+      - name: Electricity provider service power cost
+        state: "{{ states('input_number.energy_cost_service')|float / 24 }}"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+        availability: "{{ has_value('input_number.energy_cost_service') }}"
+      - name: Electricity provider service power cost savings
+        state: "0"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
 
       - name: Lights power cost
         state: "{{ (states('sensor.all_light_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"

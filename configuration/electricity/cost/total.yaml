@@ -13,6 +13,13 @@ sensor:
       minutes: 1
 
   - platform: integration
+    name: Electricity provider service energy cost
+    source: sensor.electricity_provider_service_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
     name: Lights energy cost
     source: sensor.lights_power_cost
     method: left
