@@ -1824,7 +1824,7 @@
                   "cards": [
                     {
                       "type": "markdown",
-                      "content": "Energy costs are determined by the energy's source (grid and/or solar). The energy used is multiplied by the grid rates shown below, where the proportion of grid and solar energy contributes to costs and savings respectively. Savings represent how much extra would have needed to be spent if the solar system had never been installed.\n\n- *Yearly, monthly, and weekly* costs/savings are rolling totals, so a change indicates more/less usage than the previous period. As solar was only recently installed, the yearly value will increase until a year has past.\n- *Today’s* costs/savings reset to $0 at midnight.\n- *Real-time* costs/savings are based on current power usage if it would be maintained for an hour.\n\nThe graphs show how costs change over their respective time periods, and are colour coded by <font color=#0066cc>low</font>, <font color=#c1bb3c>moderate</font>, and <font color=#ff4d00>high</font> costs. Likewise, the savings for that time period are also plotted in <font color=darkgreen>green</font>.\n\nGroups are shown in order of highest to lowest weekly cost.\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Total*\nCosts include fixed daily electricity provider costs, and savings include reimbursement for exported energy.\n\n- *Electricity provider service*\nThe fixed daily service costs charged by the provider, totalled per timeframe.\n\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n\n- *Standby*\nTotal estimated costs and savings of all devices in standby. This total is only shown for reference as each component is already included in other groups.\n</details>",
+                      "content": "Energy costs are determined by the energy's source (grid and/or solar). The energy used is multiplied by the grid rates shown below, where the proportion of grid and solar energy contributes to costs and savings respectively. Savings represent how much extra would have needed to be spent if the solar system had never been installed.\n\n- *Yearly, monthly, and weekly* costs/savings are rolling totals, so a change indicates more/less usage than the previous period. As solar was only recently installed, the yearly value will increase until a year has past.\n- *Today’s* costs/savings reset to $0 at midnight.\n- *Real-time* costs/savings are based on current power usage if it would be maintained for an hour.\n\nThe graphs show how costs change over their respective time periods, and are colour coded by <font color=#0066cc>low</font>, <font color=#c1bb3c>moderate</font>, and <font color=#ff4d00>high</font> costs. Likewise, the savings for that time period are also plotted in <font color=darkgreen>green</font>.\n\nGroups are shown in order of highest to lowest weekly cost.\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Total*\nCosts include fixed daily electricity provider costs, and savings include reimbursement for exported energy.\n\n- *Electricity provider service*\nThe fixed daily service costs charged by the provider, totalled per timeframe.\n\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n\n- *Standby*\nTotal estimated costs and savings of all devices in standby. This total is only shown for reference as each component is already included in other groups.\n</details>\n\nThe return on investment below includes a calculation for a battery as if it had already been installed. The number of years to beat investment are calculated by comparing how long it would take for savings accrued (minus install costs) to be higher than if the install costs had been invested at 6% p.a. If -100 years is shown this indicates that investment always outperforms. Note that this ignores the increase in house value the installation provides.",
                       "card_mod": {
                         "style": {
                           "ha-markdown$": "font {\n  text-shadow: 0.5px 0.5px 0.5px var(--primary-text-color), 0 0 2px var(--rgb-card-background-color), 0 0 5px var(--rgb-card-background-color);\n}\nsummary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
@@ -1854,7 +1854,12 @@
                     },
                     {
                       "type": "entities",
+                      "title": "Return on investment",
                       "entities": [
+                        {
+                          "type": "section",
+                          "label": "Total"
+                        },
                         {
                           "entity": "sensor.solar_and_battery_return_on_investment",
                           "name": "Savings (minus install cost)"
@@ -1862,6 +1867,10 @@
                         {
                           "entity": "sensor.solar_and_battery_years_to_break_even",
                           "name": "Break even in"
+                        },
+                        {
+                          "entity": "sensor.solar_and_battery_years_to_beat_investment",
+                          "name": "Beat investment in"
                         },
                         {
                           "type": "section",
@@ -1876,19 +1885,31 @@
                           "name": "Break even in"
                         },
                         {
+                          "entity": "sensor.solar_years_to_beat_investment",
+                          "name": "Beat investment in"
+                        },
+                        {
                           "type": "section",
                           "label": "Battery only"
                         },
                         {
                           "entity": "sensor.battery_return_on_investment",
-                          "name": "Savings (as if already installed)"
+                          "name": "Would have saved (minus install cost)"
                         },
                         {
                           "entity": "sensor.battery_years_to_break_even",
                           "name": "Would break even in"
+                        },
+                        {
+                          "entity": "sensor.battery_years_to_beat_investment",
+                          "name": "Would beat investment in"
                         }
                       ],
-                      "title": "Return on investment"
+                      "card_mod": {
+                        "style": {
+                          ".type-section$": ".divider {\n  display: none;\n}\n"
+                        }
+                      }
                     },
                     {
                       "type": "entities",
