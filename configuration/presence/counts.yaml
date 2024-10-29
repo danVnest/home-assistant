@@ -3,7 +3,7 @@ template:
       - name: Security monitoring
         state: >
           {%- if states('input_select.scene') in ['Away (Day)', 'Away (Night)', 'Sleep', 'unknown', 'unavailable'] -%}
-            {%- if 'Away' in states('input_select.scene') and states('input_boolean.pets_home_alone') == 'on' -%}
+            {%- if 'Away' in states('input_select.scene') and states('input_boolean.pets_home_alone') == 'off' -%}
               all sensors
             {%- else -%}
               outdoor sensors
@@ -99,42 +99,42 @@ sensor:
     entity_id: binary_sensor.front_door_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count entryway
     entity_id: binary_sensor.entryway_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count living room
     entity_id: binary_sensor.living_room_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count garage
     entity_id: binary_sensor.garage_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count back deck
     entity_id: binary_sensor.back_deck_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count back door
     entity_id: binary_sensor.back_door_person_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -142,28 +142,28 @@ sensor:
     entity_id: binary_sensor.doorbell_ringing
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count kitchen door
     entity_id: binary_sensor.kitchen_door_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count dining room balcony door
     entity_id: binary_sensor.dining_room_balcony_door_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Person detected count bedroom balcony door
     entity_id: binary_sensor.bedroom_balcony_door_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -171,42 +171,42 @@ sensor:
     entity_id: binary_sensor.front_door_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count entryway
     entity_id: binary_sensor.entryway_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count living room
     entity_id: binary_sensor.living_room_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count garage
     entity_id: binary_sensor.garage_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count back deck
     entity_id: binary_sensor.back_deck_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count back door
     entity_id: binary_sensor.back_door_motion_detected
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
 
   # TODO: reduce mmWave sensor sensitivity or replace with bayesian sensors
@@ -215,28 +215,28 @@ sensor:
     entity_id: binary_sensor.kitchen_presence_sensor_occupancy
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count bedroom
     entity_id: binary_sensor.bedroom_presence_sensor_occupancy
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count nursery
     entity_id: binary_sensor.nursery_presence_sensor_occupancy
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count office
     entity_id: binary_sensor.office_presence_sensor_occupancy
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
 
   - platform: history_stats
@@ -244,26 +244,26 @@ sensor:
     entity_id: binary_sensor.entryway_multisensor_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count dining room multisensor
     entity_id: binary_sensor.dining_room_multisensor_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count hall multisensor
     entity_id: binary_sensor.hall_multisensor_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
   - platform: history_stats
     name: Motion detected count bathroom multisensor
     entity_id: binary_sensor.bathroom_multisensor_motion
     state: "on"
     type: count
-    start: "{{ states('input_datetime.security_monitoring_start_time') }}"
+    start: "{{ states('input_datetime.security_monitoring_start_time') if has_value('input_datetime.security_monitoring_start_time') else today_at() }}"
     end: "{{ now() }}"
