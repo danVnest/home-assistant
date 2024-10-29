@@ -1972,89 +1972,261 @@
           "title": "Plants",
           "path": "plants",
           "icon": "mdi:grass",
-          "cards": [
+          "type": "sections",
+          "sections": [
             {
-              "type": "entities",
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "binary_sensor.soil_moist_entryway",
-                  "name": "Entryway"
+                  "type": "heading",
+                  "heading": "Plants",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:grass"
                 },
                 {
-                  "entity": "binary_sensor.soil_moist_guest_suite",
-                  "name": "Guest suite"
+                  "type": "custom:auto-entities",
+                  "card": {
+                    "type": "glance",
+                    "title": "Soil",
+                    "state_color": false,
+                    "columns": 4,
+                    "card_mod": {
+                      "style": {
+                        ".entity$": {
+                          ".": "div:not(.name) {\n  font-size: 12px !important;\n}\nstate-badge {\n  margin: -3px !important;\n  --mdc-icon-size: 30px !important;\n}\n",
+                          "state-badge$": "ha-state-icon[data-state=off] {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important;\n} ha-state-icon[data-state=on] {\n  color: color-mix(in srgb, var(--state-icon-color), blue) !important;\n}\n"
+                        }
+                      }
+                    }
+                  },
+                  "entities": [
+                    {
+                      "entity": "binary_sensor.soil_moist_entryway",
+                      "name": "Entryway",
+                      "icon": "mdi:door"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_guest_suite",
+                      "name": "Guest suite",
+                      "icon": "mdi:washing-machine"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_stairway",
+                      "name": "Stairway",
+                      "icon": "mdi:stairs"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_back_deck",
+                      "name": "Back deck",
+                      "icon": "mdi:grill"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_living_room",
+                      "name": "Living room",
+                      "icon": "mdi:sofa"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_dining_room",
+                      "name": "Dining room",
+                      "icon": "mdi:table-chair"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_bathroom",
+                      "name": "Bathroom",
+                      "icon": "mdi:shower-head"
+                    },
+                    {
+                      "entity": "binary_sensor.soil_moist_office",
+                      "name": "Office",
+                      "icon": "mdi:desktop-classic"
+                    }
+                  ],
+                  "sort": {
+                    "method": "state"
+                  },
+                  "filter": null
                 },
                 {
-                  "entity": "binary_sensor.soil_moist_stairway",
-                  "name": "Stairway"
+                  "type": "markdown",
+                  "content": "A selection of (mostly) indoor plants that require manual watering are monitored with soil moisture sensors. These sensors give an indication of when different areas of the house or types of plants become dry.\n\nPlants are reported as dry if their moisture level measures below 30%.\n\nThe soil moisture sensors seem to provide quite a range of values depending on their position and the soil type. They have been calibrated, but if you notice the following please report to Dan so he can recalibrate:\n- a plant sensor is reporting dry when in fact the soil still feels moist\n- a plant sensor is reporting high moisture when in fact the soil feels dry"
                 },
                 {
-                  "entity": "binary_sensor.soil_moist_back_deck",
-                  "name": "Back deck"
-                },
-                {
-                  "entity": "binary_sensor.soil_moist_living_room",
-                  "name": "Living room"
-                },
-                {
-                  "entity": "binary_sensor.soil_moist_dining_room",
-                  "name": "Dining room"
-                },
-                {
-                  "entity": "binary_sensor.soil_moist_bathroom",
-                  "name": "Bathroom"
-                },
-                {
-                  "entity": "binary_sensor.soil_moist_office",
-                  "name": "Office"
+                  "type": "history-graph",
+                  "title": "Soil moisture history",
+                  "hours_to_show": 240,
+                  "refresh_interval": 0,
+                  "entities": [
+                    {
+                      "entity": "sensor.soil_moisture_entryway",
+                      "name": "Entryway"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_guest_suite",
+                      "name": "Guest suite"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_stairway",
+                      "name": "Stairway"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_back_deck",
+                      "name": "Back deck"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_living_room",
+                      "name": "Living room"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_dining_room",
+                      "name": "Dining room"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_bathroom",
+                      "name": "Bathroom"
+                    },
+                    {
+                      "entity": "sensor.soil_moisture_office",
+                      "name": "Office"
+                    }
+                  ]
                 }
               ]
             },
             {
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "sensor.soil_moisture_entryway",
-                  "name": "Entryway"
+                  "type": "heading",
+                  "heading": "Garden",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:sprout"
                 },
                 {
-                  "entity": "sensor.soil_moisture_guest_suite",
-                  "name": "Guest suite"
+                  "type": "entities",
+                  "title": "Watering",
+                  "show_header_toggle": false,
+                  "entities": [
+                    {
+                      "type": "custom:template-entity-row",
+                      "entity": "switch.front_and_back_side_water",
+                      "name": "Front & back side",
+                      "icon": "mdi:grass",
+                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('front_and_back_side') }}",
+                      "toggle": true
+                    },
+                    {
+                      "type": "custom:template-entity-row",
+                      "entity": "switch.ferns_water",
+                      "name": "Ferns",
+                      "icon": "mdi:palm-tree",
+                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('ferns') }}",
+                      "toggle": true
+                    },
+                    {
+                      "type": "custom:template-entity-row",
+                      "entity": "switch.back_fence_water",
+                      "name": "Back fence",
+                      "icon": "mdi:fence",
+                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('back_fence') }}",
+                      "toggle": true
+                    },
+                    {
+                      "type": "custom:template-entity-row",
+                      "entity": "switch.vegetable_garden_water",
+                      "name": "Vegetable garden",
+                      "icon": "mdi:sprout",
+                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('vegetable_garden') }}",
+                      "toggle": true
+                    },
+                    {
+                      "type": "custom:template-entity-row",
+                      "entity": "switch.lawn_water",
+                      "name": "Lawn",
+                      "icon": "mdi:wave",
+                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('lawn') }}",
+                      "toggle": true
+                    }
+                  ]
                 },
                 {
-                  "entity": "sensor.soil_moisture_stairway",
-                  "name": "Stairway"
+                  "type": "markdown",
+                  "content": "These garden areas are watered automatically based on prior, current, and forecast weather conditions, as well as watering history, soil, and plant type.\n\nIn addition, you can manually water garden sections with the buttons above if you think it is necessary. Each manual watering session lasts for ≈10 minutes. It's best not to water more than one section at once as the water pressure is reduced (so not all plants will get enough water). You can also toggle automatic watering and rain delays below. A rain delay will delay automatic watering for 1 day.\n\nTo ensure adequate watering without wastage, it is recommended to periodically check the following:\n\n- move the lawn sprinkler to cover drier parts of the lawn\n- the plants look healthy and their soil feels sufficiently moist in each section\n- the taps to the automatic watering controllers are fully on\n- there are no leaks at the taps or connections to the watering controllers\n\nUnfortunately some of these controls can get stuck (e.g. watering buttons will stay on once they've finished, or pressed buttons will immediately revert and ignore the command). In these cases, you'll need to open the b-hyve app to make everything sync and work again."
                 },
                 {
-                  "entity": "sensor.soil_moisture_back_deck",
-                  "name": "Back deck"
+                  "type": "entities",
+                  "title": "Automatic watering",
+                  "show_header_toggle": false,
+                  "entities": [
+                    {
+                      "entity": "switch.side_tap_smart_watering_program",
+                      "name": "Side tap",
+                      "icon": "mdi:water-pump"
+                    },
+                    {
+                      "entity": "switch.back_tap_smart_watering_program",
+                      "name": "Back tap",
+                      "icon": "mdi:water-pump"
+                    }
+                  ],
+                  "layout_options": {
+                    "grid_columns": 2,
+                    "grid_rows": "auto"
+                  }
                 },
                 {
-                  "entity": "sensor.soil_moisture_living_room",
-                  "name": "Living room"
+                  "type": "entities",
+                  "title": "Rain delay",
+                  "show_header_toggle": false,
+                  "entities": [
+                    {
+                      "entity": "switch.side_tap_rain_delay",
+                      "name": "Side tap",
+                      "icon": "mdi:weather-rainy"
+                    },
+                    {
+                      "entity": "switch.back_tap_rain_delay",
+                      "name": "Back tap",
+                      "icon": "mdi:weather-rainy"
+                    }
+                  ],
+                  "layout_options": {
+                    "grid_columns": 2,
+                    "grid_rows": "auto"
+                  }
                 },
                 {
-                  "entity": "sensor.soil_moisture_dining_room",
-                  "name": "Dining room"
-                },
-                {
-                  "entity": "sensor.soil_moisture_bathroom",
-                  "name": "Bathroom"
-                },
-                {
-                  "entity": "sensor.soil_moisture_office",
-                  "name": "Office"
+                  "type": "history-graph",
+                  "title": "Days since watered history",
+                  "hours_to_show": 240,
+                  "refresh_interval": 0,
+                  "entities": [
+                    {
+                      "entity": "sensor.front_and_back_side_days_since_watered",
+                      "name": "Front & back side"
+                    },
+                    {
+                      "entity": "sensor.ferns_days_since_watered",
+                      "name": "Ferns"
+                    },
+                    {
+                      "entity": "sensor.back_fence_days_since_watered",
+                      "name": "Back fence"
+                    },
+                    {
+                      "entity": "sensor.vegetable_garden_days_since_watered",
+                      "name": "Vegetable garden"
+                    },
+                    {
+                      "entity": "sensor.lawn_days_since_watered",
+                      "name": "Lawn"
+                    }
+                  ]
                 }
-              ],
-              "hours_to_show": 240,
-              "refresh_interval": 0,
-              "type": "history-graph",
-              "logarithmic_scale": false
-            },
-            {
-              "type": "markdown",
-              "content": "Plants are reported as dry if their moisture level measures below 30%.\n\nThe soil moisture sensors seem to provide quite a range of values depending on their position and the soil type. They have been calibrated, but if you notice the following please report to Dan so he can recalibrate:\n- a plant sensor is reporting dry when in fact the soil is still moist\n- a plant sensor is reporting high moisture when in fact the soil feels dry"
+              ]
             }
-          ]
+          ],
+          "max_columns": 4,
+          "cards": []
         },
         {
           "title": "Guide",
