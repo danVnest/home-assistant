@@ -39,12 +39,43 @@ template:
         state_class: total
         icon: mdi:transmission-tower-import
         availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Average daily battery export
+        state: "{{ 0 }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:transmission-tower-import
+        # TODO: add daily battery export once battery is installed with VPP
       - name: Average daily solar storage
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-charging
-        # TODO: update once battery is actually installed
+        # TODO: update once battery is installed
+      - name: Average daily energy consumption
+        state: "{{ (states('sensor.total_energy_consumed')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-lightning-bolt
+        availability: "{{ has_value('sensor.total_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Average daily solar consumption
+        state: "{{ states('sensor.average_daily_solar_production')|float - states('sensor.average_daily_solar_export')|float  }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-sound-in
+        availability: "{{ has_value('sensor.average_daily_solar_production') and has_value('sensor.average_daily_solar_export') }}"
+        # TODO: update once battery is installed
+      - name: Average daily battery consumption
+        state: "{{ 0 }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-battery
+        # TODO: update once battery is installed
+      - name: Average daily grid consumption
+        state: "{{ (states('sensor.smart_meter_real_energy_consumed')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-import-outline
+        availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
       - name: Days since solar installation
         state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
