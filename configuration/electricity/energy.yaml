@@ -46,7 +46,7 @@ template:
         icon: mdi:battery-charging
         # TODO: update once battery is actually installed
       - name: Days since solar installation
-        state: "{{ (today_at() - as_datetime('2024-09-05T00+10:00')).days }}"
+        state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:calendar-start
