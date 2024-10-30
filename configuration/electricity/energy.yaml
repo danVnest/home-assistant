@@ -1,8 +1,3 @@
-sensor:
-  - platform: integration
-    name: Total energy consumed
-    source: sensor.power_meter_power_load_consumed
-
 utility_meter:
   monthly_energy_consumed:
     name: Monthly energy consumed
@@ -15,6 +10,23 @@ utility_meter:
 
 template:
   - sensor:
+      - name: Total energy consumed
+        state: >
+          {{
+            states('sensor.inverter_total_energy')|float -
+            states('sensor.smart_meter_real_energy_produced')|float + 
+            states('sensor.smart_meter_real_energy_consumed')|float
+          }}
+        unit_of_measurement: Wh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:home-lightning-bolt
+        availability: >
+          {{
+            has_value('sensor.inverter_total_energy') and
+            has_value('sensor.smart_meter_real_energy_produced') and
+            has_value('sensor.smart_meter_real_energy_consumed')
+          }}
       - name: Average daily solar production
         state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
