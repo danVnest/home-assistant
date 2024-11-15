@@ -1858,15 +1858,45 @@
                 {
                   "type": "heading",
                   "heading": "Power",
-                  "heading_style": "title",
-                  "icon": "mdi:flash"
+                  "heading_style": "subtitle",
+                  "icon": "mdi:flash",
+                  "badges": [
+                    {
+                      "type": "entity",
+                      "show_state": true,
+                      "show_icon": true,
+                      "entity": "sensor.texts",
+                      "name": "Guide",
+                      "state_content": "name",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/guide"
+                      },
+                      "icon": "mdi:text-box"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 0px) and (max-width: 767px)"
+                    }
+                  ]
+                },
+                {
+                  "type": "heading",
+                  "heading": "Power",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:flash",
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 768px)"
+                    }
+                  ]
                 },
                 {
                   "type": "custom:power-flow-card-plus",
                   "entities": {
-                    "battery": {
-                      "state_of_charge": "sensor.soil_sensor_vegetable_garden_sun_battery_level"
-                    },
                     "grid": {
                       "entity": "sensor.power_meter_power_grid",
                       "secondary_info": {
@@ -2110,7 +2140,7 @@
                 {
                   "type": "heading",
                   "heading": "Energy",
-                  "heading_style": "title",
+                  "heading_style": "subtitle",
                   "icon": "mdi:lightning-bolt"
                 },
                 {
@@ -2133,7 +2163,9 @@
               "cards": [
                 {
                   "type": "heading",
-                  "heading": "Costs"
+                  "heading": "Costs",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:currency-usd"
                 },
                 {
                   "type": "custom:mod-card",
@@ -2338,7 +2370,40 @@
                   "type": "heading",
                   "heading": "Plants",
                   "heading_style": "subtitle",
-                  "icon": "mdi:grass"
+                  "icon": "mdi:grass",
+                  "badges": [
+                    {
+                      "type": "entity",
+                      "show_state": true,
+                      "show_icon": true,
+                      "entity": "sensor.texts",
+                      "name": "Guide",
+                      "state_content": "name",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/guide"
+                      },
+                      "icon": "mdi:text-box"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 0px) and (max-width: 767px)"
+                    }
+                  ]
+                },
+                {
+                  "type": "heading",
+                  "heading": "Plants",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:grass",
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 768px)"
+                    }
+                  ]
                 },
                 {
                   "type": "custom:auto-entities",
