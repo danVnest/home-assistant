@@ -1,0 +1,212 @@
+group:
+  frozen_device_10_minute_check_entities:
+    name: Frozen device 10 minute check entities
+    # entities that always change at least once every 10 minutes
+    entities:
+      - sensor.outside_apparent_temperature
+      - sensor.bedroom_presence_sensor_esp_temperature
+      - sensor.kitchen_presence_sensor_esp_temperature
+      - sensor.nursery_presence_sensor_esp_temperature
+      - sensor.office_presence_sensor_esp_temperature
+      - sensor.smart_meter_real_power
+      - sensor.power_meter_power_grid
+      # TODO: add more device checks
+  frozen_device_12_hour_check_entities:
+    name: Frozen device 12 hour check entities
+    # entities that always change at least once every 12 hours
+    entities:
+      - sensor.entryway_multisensor_temperature
+      - sensor.hall_multisensor_temperature
+      - sensor.dining_room_multisensor_temperature
+      - sensor.bathroom_multisensor_temperature
+      - sensor.office_sensor_temperature
+      - sensor.dog_bed_area_sensor_temperature
+      - sensor.nursery_sensor_temperature
+      # TODO: add more device checks
+
+template:
+  - sensor:
+      - name: Device issues
+        state: "{{ states('sensor.unavailable_entities')|int(1) + states('sensor.frozen_devices')|int(1) }}"
+        state_class: total
+        icon: mdi:alert-circle
+      - name: Unavailable entities
+        state: >
+          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {{ entities|count if entities != none else none }}
+        attributes:
+          entity_id: >
+            {% set delay_seconds = 60 %}
+            {{ states
+                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image', 'input_button', 'input_text', 'remote', 'tts', 'scene', 'stt'])
+                |rejectattr('entity_id', 'in', integration_entities('iBeacon Tracker'))
+                |rejectattr('last_changed', 'ge', (now().timestamp() - delay_seconds)|as_datetime)
+                |map(attribute='entity_id')|reject('has_value')|list|sort
+            }}
+        state_class: measurement
+        unit_of_measurement: entities
+        icon: mdi:alert-circle
+      - name: Frozen devices
+        state: >
+          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {{ entities|count if entities != none else none }}
+        attributes:
+          entity_id: >
+            {{ 
+              expand(
+                expand('group.frozen_device_10_minute_check_entities')|selectattr('last_updated', 'le', (now().timestamp() - 10 * 60)|as_datetime),
+                expand('group.frozen_device_12_hour_check_entities')|selectattr('last_updated', 'le', (now().timestamp() - 12 * 60 * 60)|as_datetime)
+              )|map(attribute='entity_id')|select('has_value')|list|sort
+            }}
+        state_class: measurement
+        unit_of_measurement: entities
+        icon: mdi:help-circle
+      - name: Low batteries
+        state: >
+          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {% set unavailable = state_attr(this.entity_id, 'unavailable')|int(0) %}
+          {{ (entities|count - unavailable) if entities != none else none }}
+        attributes:
+          entity_id: >
+            {% set low_battery_threshold = 25 %}
+            {% set entities = states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list|sort %}
+            {% set battery_levels = entities|map('states')|map('float', 0)|list %}
+            {{ zip(entities, battery_levels)|selectattr(1, '<=', low_battery_threshold)|map(attribute=0)|list }}
+          unavailable: "{{ state_attr(this.entity_id, 'entity_id')|reject('has_value')|list|count }}"
+        state_class: measurement
+        unit_of_measurement: devices
+        icon: mdi:battery-low
+      - name: Charging batteries
+        state: >
+          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {{ entities|count if entities != none else none }}
+        attributes:
+          entity_id: >
+            {% set entities = states.sensor|selectattr('entity_id', 'search', 'charging_status$|battery_state$')|map(attribute='entity_id')|list|sort %}
+            {% set status = entities|map('states')|list %}
+            {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'Full'])|map(attribute=0)|list %}
+            {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}
+          above_90: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('gt', 90)|list|count }}"
+          below_50: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('lt', 50)|list|count }}"
+        state_class: measurement
+        unit_of_measurement: devices
+        icon: mdi:battery-charging
+
+      - name: Nursery temperature sensor battery level
+        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('nursery') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.nursery_temperature_sensor_battery_state') }}"
+      - name: Office temperature sensor battery level
+        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('office') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.office_temperature_sensor_battery_state') }}"
+      - name: Dog bed area temperature sensor battery level
+        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dog_bed_area') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.dog_bed_area_temperature_sensor_battery_state') }}"
+      - name: Soil sensor entryway battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('entryway') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_entryway') }}"
+      - name: Soil sensor guest suite battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('guest_suite') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_guest_suite') }}"
+      - name: Soil sensor stairway battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('stairway') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_stairway') }}"
+      - name: Soil sensor back deck battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('back_deck') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_back_deck') }}"
+      - name: Soil sensor living room battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('living_room') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_living_room') }}"
+      - name: Soil sensor dining room battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('dining_room') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_dining_room') }}"
+      - name: Soil sensor bathroom battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('bathroom') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_bathroom') }}"
+      - name: Soil sensor office battery level
+        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('office') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.soil_battery_voltage_office') }}"
+
+automation:
+  # from https://github.com/jazzyisj/unavailable-entities-sensor
+  # TODO: update the following to include frozen?
+  - id: unavailable_entities_system_notification
+    alias: Unavailable entities system notification
+    description: Show unavailable entities in a persistent system notification
+    mode: restart
+    triggers:
+      - trigger: state
+        entity_id: sensor.unavailable_entities
+        attribute: entity_id
+        to: ~
+    condition:
+      - condition: template
+        alias: Sensor state is and was a valid numerical value
+        value_template: "{{ is_number(trigger.from_state.state) and is_number(trigger.to_state.state) }}"
+    actions:
+      - action: persistent_notification.create
+        data:
+          notification_id: unavailable_entities
+          title: Unavailable Entities
+          message: >
+            {% set ns = namespace(result=[]) %}
+            {% for s in expand(state_attr('sensor.unavailable_entities', 'entity_id')) %}
+              {% set ns.result = ns.result + [
+                  device_attr(s.entity_id, "name") ~ "|" ~ device_id(s.entity_id) ~ "|- **" ~ s.name ~ "**\n"
+                  ~ "  - *entity_id*: " ~ s.entity_id ~ "\n"
+                  ~ "  - *state*: " ~ s.state ~ "\n"
+                ]
+              %}
+            {% endfor %}
+            {% set ns.result = ns.result | sort %}
+            {% set lastdev = namespace( id="" ) %}
+            {% set tarr = ns.result %}
+            {% set ns.result = [] %}
+            {% for item in tarr %}
+              {% set dev = namespace( id="" ) %}
+              {% set entity = namespace( data="" ) %}
+              {% set dev.id = item.split("|")[1] %}
+              {% set entity.data = item.split("|")[2] %}
+              {% if lastdev.id != dev.id %}
+                {% if dev.id != 'None' %}
+                  {% set ns.result = ns.result + [ "**<a href=\"/config/devices/device/" ~ dev.id ~ "\">" ~ device_attr(dev.id, "name") ~ "</a>**" ] %}
+                {% else %}
+                  {% set ns.result = ns.result + [ "**Non-Device Entities**" ] %}
+                {% endif %}
+                {% set lastdev.id = dev.id %}
+              {% endif %}
+              {% set ns.result = ns.result + [ entity.data ] %}
+            {% endfor %}
+            {{ ns.result | join('\n') }}

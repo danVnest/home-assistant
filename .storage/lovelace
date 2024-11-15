@@ -57,7 +57,7 @@
                 {
                   "type": "tile",
                   "entity": "binary_sensor.internet",
-                  "name": "WARNING: Internet is disconnected, functionality limited",
+                  "name": "WARNING: Internet is disconnected - functionality limited",
                   "state_content": "last_changed",
                   "icon": "mdi:close-network",
                   "color": "red",
@@ -74,7 +74,7 @@
                   ],
                   "card_mod": {
                     "style": {
-                      "ha-tile-info$": "state-display:before {\n  content: 'since';\n}\n"
+                      "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
                     }
                   }
                 },
@@ -82,46 +82,47 @@
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "binary_sensor.plants_need_watering",
-                  "name": "Low battery",
+                  "entity": "sensor.device_issues",
                   "show_state": false,
                   "card_layout": "large-2-rows",
                   "tap_action": {
                     "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
+                    "navigation_path": "#device-issues"
                   },
                   "double_tap_action": {
                     "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
+                    "navigation_path": "#device-issues"
                   },
                   "hold_action": {
                     "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
+                    "navigation_path": "#device-issues"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#device-issues"
+                    }
                   },
                   "sub_button": [
                     {
-                      "entity": "sensor.dry_plants",
+                      "entity": "sensor.unavailable_entities",
                       "show_state": true,
                       "show_background": false
                     },
                     {
-                      "entity": "sensor.plants_last_watered",
+                      "entity": "sensor.frozen_devices",
                       "show_state": true,
                       "show_background": false
                     }
                   ],
                   "visibility": [
                     {
-                      "condition": "state",
-                      "entity": "binary_sensor.plants_need_watering",
-                      "state": "on"
-                    },
-                    {
-                      "condition": "user",
-                      "users": []
+                      "condition": "numeric_state",
+                      "entity": "sensor.device_issues",
+                      "above": 0
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_devices'].state + ' frozen' }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -425,6 +426,107 @@
                     }
                   ],
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.low_batteries",
+                  "show_state": true,
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#low-batteries"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.low_batteries",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.low_batteries",
+                      "show_state": false,
+                      "show_background": false,
+                      "show_attribute": true,
+                      "attribute": "unavailable",
+                      "icon": "mdi:battery-unknown"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.low_batteries",
+                      "above": 0
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.charging_batteries",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#charging-batteries"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "charged",
+                      "icon": "mdi:battery"
+                    },
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "below_50",
+                      "icon": "mdi:battery-50"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.charging_batteries",
+                      "above": 0
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['below_50'] + ' below 50%' }\n"
                 }
               ],
               "column_span": 1
@@ -727,12 +829,242 @@
                   "users": []
                 }
               ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#device-issues",
+                      "button_type": "name",
+                      "name": "Device issues",
+                      "icon": "mdi:alert-circle",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n"
+                    },
+                    {
+                      "type": "tile",
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected - reconnect to fix issues",
+                      "state_content": "last_changed",
+                      "icon": "mdi:close-network",
+                      "color": "red",
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.internet",
+                          "state_not": "on"
+                        }
+                      ],
+                      "card_mod": {
+                        "style": {
+                          "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
+                        }
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n2. Check the device is plugged in or has sufficient battery charge\n\n3. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n4. Try reloading home assistant [ADD BUTTON]\n\n5. Try restarting home assistant [ADD BUTTON]\n\n6. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details>",
+                      "card_mod": {
+                        "style": {
+                          "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"
+                        }
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{{\n  (state_attr('sensor.unavailable_entities', 'entity_id') +\n  state_attr('sensor.frozen_devices', 'entity_id'))\n  [:15]\n}}\n"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 240,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{{\n  (state_attr('sensor.unavailable_entities', 'entity_id') +\n  state_attr('sensor.frozen_devices', 'entity_id'))\n  [:15]\n}}\n"
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "There are {{ states('sensor.device_issues')|int(1) - 15 }} additional device issues.\nResolve the above first to see more.",
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.device_issues",
+                          "above": 15
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#low-batteries",
+                      "button_type": "name",
+                      "name": "Low batteries",
+                      "icon": "mdi:battery-low",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n"
+                    },
+                    {
+                      "type": "tile",
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected - batteries may be unavailable",
+                      "state_content": "last_changed",
+                      "icon": "mdi:close-network",
+                      "color": "red",
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.internet",
+                          "state_not": "on"
+                        }
+                      ],
+                      "card_mod": {
+                        "style": {
+                          "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
+                        }
+                      }
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "Once a battery is too flat for the device to function its battery level may not be reported, and as such appear as \"unavailable\". This can also occur when a battery is ok but the device can't connect. It can be worth checking other device issues first in this case.\n\nBatteries with low levels are still functional, but it is recommended to charge or replace them soon to keep the system functional."
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('sensor.low_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "method": "state"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 240,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('sensor.low_batteries', 'entity_id') }}"
+                      }
+                    },
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "sensor.device_issues",
+                      "show_state": false,
+                      "card_layout": "large-2-rows",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "sub_button": [
+                        {
+                          "entity": "sensor.unavailable_entities",
+                          "show_state": true,
+                          "show_background": false
+                        },
+                        {
+                          "entity": "sensor.frozen_devices",
+                          "show_state": true,
+                          "show_background": false
+                        }
+                      ],
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.device_issues",
+                          "above": 0
+                        }
+                      ],
+                      "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_devices'].state + ' frozen' }\n"
+                    }
+                  ]
+                },
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#charging-batteries",
+                      "button_type": "name",
+                      "name": "Charging batteries",
+                      "icon": "mdi:battery-charging",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n}\n"
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "Devices with integrated batteries that report their charge status are displayed here. You will be notified when a device is fully charged."
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('sensor.charging_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "method": "state"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 6,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('sensor.charging_batteries', 'entity_id') }}"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ],
           "cards": [],
-          "dense_section_placement": false,
+          "dense_section_placement": true,
           "type": "sections",
-          "max_columns": 3,
+          "max_columns": 2,
           "badges": []
         },
         {
