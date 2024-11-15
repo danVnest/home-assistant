@@ -1,9 +1,32 @@
 ---
+customisations:
+  card-mod-card-yaml: |
+    $: |
+      h1.card-header {
+        --ha-card-header-font-size: 16px !important;
+        line-height: 20px !important;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+      h1.card-header > a {
+        padding-left: 10px !important;
+      }
+    .: |
+      h1.card-header {
+        --ha-card-header-font-size: 16px !important;
+        line-height: 20px !important;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+      h1.card-header > a {
+        padding-left: 10px !important;
+      }
 # From https://github.com/basnijholt/lovelace-ios-themes
 #
 # iOS Light Mode Theme - blue-red
 #
 ios-light-mode-blue-red-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-blue-red.jpg')"
   lovelace-background: var(--background-image)
@@ -93,6 +116,7 @@ ios-light-mode-blue-red-alternative:
 # iOS Light Mode Theme - blue-red
 #
 ios-light-mode-blue-red:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-blue-red.jpg')"
   lovelace-background: var(--background-image)
@@ -182,6 +206,7 @@ ios-light-mode-blue-red:
 # iOS Dark Mode Theme - blue-red
 #
 ios-dark-mode-blue-red-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-blue-red.jpg')"
   lovelace-background: var(--background-image)
@@ -271,6 +296,7 @@ ios-dark-mode-blue-red-alternative:
 # iOS Dark Mode Theme - blue-red
 #
 ios-dark-mode-blue-red:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-blue-red.jpg')"
   lovelace-background: var(--background-image)
@@ -360,6 +386,7 @@ ios-dark-mode-blue-red:
 # iOS Light Mode Theme - dark-blue
 #
 ios-light-mode-dark-blue-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-dark-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -449,6 +476,7 @@ ios-light-mode-dark-blue-alternative:
 # iOS Light Mode Theme - dark-blue
 #
 ios-light-mode-dark-blue:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-dark-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -538,6 +566,7 @@ ios-light-mode-dark-blue:
 # iOS Dark Mode Theme - dark-blue
 #
 ios-dark-mode-dark-blue-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-dark-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -627,6 +656,7 @@ ios-dark-mode-dark-blue-alternative:
 # iOS Dark Mode Theme - dark-blue
 #
 ios-dark-mode-dark-blue:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-dark-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -716,6 +746,7 @@ ios-dark-mode-dark-blue:
 # iOS Light Mode Theme - dark-green
 #
 ios-light-mode-dark-green-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-dark-green.jpg')"
   lovelace-background: var(--background-image)
@@ -805,6 +836,7 @@ ios-light-mode-dark-green-alternative:
 # iOS Light Mode Theme - dark-green
 #
 ios-light-mode-dark-green:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-dark-green.jpg')"
   lovelace-background: var(--background-image)
@@ -894,6 +926,7 @@ ios-light-mode-dark-green:
 # iOS Dark Mode Theme - dark-green
 #
 ios-dark-mode-dark-green-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-dark-green.jpg')"
   lovelace-background: var(--background-image)
@@ -983,6 +1016,7 @@ ios-dark-mode-dark-green-alternative:
 # iOS Dark Mode Theme - dark-green
 #
 ios-dark-mode-dark-green:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-dark-green.jpg')"
   lovelace-background: var(--background-image)
@@ -1072,6 +1106,7 @@ ios-dark-mode-dark-green:
 # iOS Light Mode Theme - light-blue
 #
 ios-light-mode-light-blue-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-light-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -1161,6 +1196,7 @@ ios-light-mode-light-blue-alternative:
 # iOS Light Mode Theme - light-blue
 #
 ios-light-mode-light-blue:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-light-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -1250,6 +1286,7 @@ ios-light-mode-light-blue:
 # iOS Dark Mode Theme - light-blue
 #
 ios-dark-mode-light-blue-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-light-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -1339,6 +1376,7 @@ ios-dark-mode-light-blue-alternative:
 # iOS Dark Mode Theme - light-blue
 #
 ios-dark-mode-light-blue:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-light-blue.jpg')"
   lovelace-background: var(--background-image)
@@ -1428,6 +1466,8 @@ ios-dark-mode-light-blue:
 # iOS Light Mode Theme - light-green
 #
 ios-light-mode-light-green-alternative:
+  card-mod-theme: customisations
+  ha-card-header-font-size: 16px
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-light-green.jpg')"
   lovelace-background: var(--background-image)
@@ -1517,6 +1557,7 @@ ios-light-mode-light-green-alternative:
 # iOS Light Mode Theme - light-green
 #
 ios-light-mode-light-green:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-light-green.jpg')"
   lovelace-background: var(--background-image)
@@ -1606,6 +1647,7 @@ ios-light-mode-light-green:
 # iOS Dark Mode Theme - light-green
 #
 ios-dark-mode-light-green-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-light-green.jpg')"
   lovelace-background: var(--background-image)
@@ -1695,6 +1737,7 @@ ios-dark-mode-light-green-alternative:
 # iOS Dark Mode Theme - light-green
 #
 ios-dark-mode-light-green:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-light-green.jpg')"
   lovelace-background: var(--background-image)
@@ -1784,6 +1827,7 @@ ios-dark-mode-light-green:
 # iOS Light Mode Theme - orange
 #
 ios-light-mode-orange-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-orange.jpg')"
   lovelace-background: var(--background-image)
@@ -1873,6 +1917,7 @@ ios-light-mode-orange-alternative:
 # iOS Light Mode Theme - orange
 #
 ios-light-mode-orange:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-orange.jpg')"
   lovelace-background: var(--background-image)
@@ -1962,6 +2007,7 @@ ios-light-mode-orange:
 # iOS Dark Mode Theme - orange
 #
 ios-dark-mode-orange-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-orange.jpg')"
   lovelace-background: var(--background-image)
@@ -2051,6 +2097,7 @@ ios-dark-mode-orange-alternative:
 # iOS Dark Mode Theme - orange
 #
 ios-dark-mode-orange:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-orange.jpg')"
   lovelace-background: var(--background-image)
@@ -2140,6 +2187,7 @@ ios-dark-mode-orange:
 # iOS Light Mode Theme - red
 #
 ios-light-mode-red-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-red.jpg')"
   lovelace-background: var(--background-image)
@@ -2229,6 +2277,7 @@ ios-light-mode-red-alternative:
 # iOS Light Mode Theme - red
 #
 ios-light-mode-red:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-red.jpg')"
   lovelace-background: var(--background-image)
@@ -2318,6 +2367,7 @@ ios-light-mode-red:
 # iOS Dark Mode Theme - red
 #
 ios-dark-mode-red-alternative:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('/local/ios-themes/homekit-bg-red.jpg')"
   lovelace-background: var(--background-image)
@@ -2407,6 +2457,7 @@ ios-dark-mode-red-alternative:
 # iOS Dark Mode Theme - red
 #
 ios-dark-mode-red:
+  card-mod-theme: customisations
   # Global
   background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-red.jpg')"
   lovelace-background: var(--background-image)
