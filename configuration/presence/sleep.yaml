@@ -1,6 +1,7 @@
 binary_sensor:
   - platform: bayesian
     name: Rachel asleep # TODO: change bayesian sensor name to Rachel in bed or Rachel asleep in bed? We don't really want to detect sleep if away. Or is this implied?
+    unique_id: rachel_asleep
     prior: 0.292 # 7 hours per night = 7/24
     observations:
       - platform: state
@@ -63,6 +64,7 @@ binary_sensor:
 
   - platform: bayesian
     name: Dan asleep # TODO: change bayesian sensor name to Dan asleep in bed? We don't really want to detect sleep if away
+    unique_id: dan_asleep
     prior: 0.292 # 7 hours per night = 7/24
     observations:
       - platform: state
@@ -130,6 +132,7 @@ binary_sensor:
 template:
   - binary_sensor:
       - name: Anyone asleep
+        unique_id: anyone_asleep
         state: >
           {{
             states('binary_sensor.dan_asleep') == 'on' or
@@ -142,6 +145,7 @@ template:
             has_value('binary_sensor.rachel_asleep')
           }}
       - name: Rachel was asleep within last 5 minutes
+        unique_id: rachel_was_asleep_within_5_minutes
         state: "{{ states('binary_sensor.rachel_asleep') == 'on' }}"
         delay_off: 0:05
         icon: mdi:sleep

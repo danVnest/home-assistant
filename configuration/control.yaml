@@ -49,6 +49,7 @@ counter:
 template:
   - binary_sensor:
       - name: Display day card # TODO: maybe not required anymore
+        unique_id: display_day_card
         state: >
           {{
             states('input_select.scene') != 'Sleep' and
@@ -56,14 +57,17 @@ template:
           }}
         icon: mdi:sun-clock
       - name: TV playing # TODO: update
+        unique_id: tv_playing
         state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
         icon: mdi:play-pause
         device_class: running
         availability: "{{ has_value('sensor.webostvservice_play_state') }}"
       - name: Owlet attached # TODO: update
+        unique_id: owlet_attached
         state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
         icon: mdi:foot-print
       - name: Dark outside
+        unique_id: dark_outside
         state: >
           {{
             states('sensor.weather_station_illuminance')|float < 5000 or 
@@ -74,11 +78,13 @@ template:
         device_class: running
         availability: "{{ has_value('sensor.weather_station_illuminance') and has_value('sun.sun') }}"
       - name: Washer running
+        unique_id: washer_running
         state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
         device_class: running
         availability: "{{ has_value('sensor.washer_completion_time') }}"
         icon: mdi:washing-machine
       - name: Dryer running
+        unique_id: dryer_running
         state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
         device_class: running
         availability: "{{ has_value('sensor.dryer_completion_time') }}"
@@ -86,6 +92,7 @@ template:
 
 automation:
   - alias: Turn TV on if not already on
+    id: turn_tv_on_if_not_already_on
     description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
     triggers:
       - trigger: webostv.turn_on
@@ -99,6 +106,7 @@ automation:
   # https://app.asana.com/0/1207020279479204/1207033183175579/f
 
   - alias: Automatic theme change
+    id: automatic_theme_change
     description: "Automatically change the theme between light and dark based on sun position"
     triggers:
       - trigger: homeassistant

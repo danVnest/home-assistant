@@ -1,12 +1,14 @@
 sensor:
   - platform: integration
     name: Total energy cost
+    unique_id: total_energy_cost
     source: sensor.total_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Total energy cost savings
+    unique_id: total_energy_cost_savings
     source: sensor.total_power_cost_savings
     method: left
     max_sub_interval:
@@ -14,6 +16,7 @@ sensor:
 
   - platform: integration
     name: Electricity provider service energy cost
+    unique_id: electricity_provider_service_energy_cost
     source: sensor.electricity_provider_service_power_cost
     method: left
     max_sub_interval:
@@ -21,12 +24,14 @@ sensor:
 
   - platform: integration
     name: Lights energy cost
+    unique_id: lights_energy_cost
     source: sensor.lights_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Lights energy cost savings
+    unique_id: lights_energy_cost_savings
     source: sensor.lights_power_cost_savings
     method: left
     max_sub_interval:
@@ -34,12 +39,14 @@ sensor:
 
   - platform: integration
     name: Living room aircon energy cost
+    unique_id: living_room_aircon_energy_cost
     source: sensor.living_room_aircon_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Living room aircon energy cost savings
+    unique_id: living_room_aircon_energy_cost_savings
     source: sensor.living_room_aircon_power_cost_savings
     method: left
     max_sub_interval:
@@ -47,12 +54,14 @@ sensor:
 
   - platform: integration
     name: Dining room aircon energy cost
+    unique_id: dining_room_aircon_energy_cost
     source: sensor.dining_room_aircon_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Dining room aircon energy cost savings
+    unique_id: dining_room_aircon_energy_cost_savings
     source: sensor.dining_room_aircon_power_cost_savings
     method: left
     max_sub_interval:
@@ -60,12 +69,14 @@ sensor:
 
   - platform: integration
     name: Bedroom aircon energy cost
+    unique_id: bedroom_aircon_energy_cost
     source: sensor.bedroom_aircon_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Bedroom aircon energy cost savings
+    unique_id: bedroom_aircon_energy_cost_savings
     source: sensor.bedroom_aircon_power_cost_savings
     method: left
     max_sub_interval:
@@ -73,12 +84,14 @@ sensor:
 
   - platform: integration
     name: Office heater energy cost
+    unique_id: office_heater_energy_cost
     source: sensor.office_heater_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Office heater energy cost savings
+    unique_id: office_heater_energy_cost_savings
     source: sensor.office_heater_power_cost_savings
     method: left
     max_sub_interval:
@@ -86,12 +99,14 @@ sensor:
 
   - platform: integration
     name: Nursery heater energy cost
+    unique_id: nursery_heater_energy_cost
     source: sensor.nursery_heater_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Nursery heater energy cost savings
+    unique_id: nursery_heater_energy_cost_savings
     source: sensor.nursery_heater_power_cost_savings
     method: left
     max_sub_interval:
@@ -99,12 +114,14 @@ sensor:
 
   - platform: integration
     name: Fans energy cost
+    unique_id: fans_energy_cost
     source: sensor.fans_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Fans energy cost savings
+    unique_id: fans_energy_cost_savings
     source: sensor.fans_power_cost_savings
     method: left
     max_sub_interval:
@@ -112,12 +129,14 @@ sensor:
 
   - platform: integration
     name: Humidifiers energy cost
+    unique_id: humidifiers_energy_cost
     source: sensor.humidifiers_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Humidifiers energy cost savings
+    unique_id: humidifiers_energy_cost_savings
     source: sensor.humidifiers_power_cost_savings
     method: left
     max_sub_interval:
@@ -125,12 +144,14 @@ sensor:
 
   - platform: integration
     name: Kitchen appliances energy cost
+    unique_id: kitchen_appliances_energy_cost
     source: sensor.kitchen_appliances_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Kitchen appliances energy cost savings
+    unique_id: kitchen_appliances_energy_cost_savings
     source: sensor.kitchen_appliances_power_cost_savings
     method: left
     max_sub_interval:
@@ -138,12 +159,14 @@ sensor:
 
   - platform: integration
     name: Dishwasher energy cost
+    unique_id: dishwasher_energy_cost
     source: sensor.dishwasher_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Dishwasher energy cost savings
+    unique_id: dishwasher_energy_cost_savings
     source: sensor.dishwasher_power_cost_savings
     method: left
     max_sub_interval:
@@ -151,12 +174,14 @@ sensor:
 
   - platform: integration
     name: Fridge energy cost
+    unique_id: fridge_energy_cost
     source: sensor.fridge_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Fridge energy cost savings
+    unique_id: fridge_energy_cost_savings
     source: sensor.fridge_power_cost_savings
     method: left
     max_sub_interval:
@@ -164,12 +189,14 @@ sensor:
 
   - platform: integration
     name: Freezer, mini fridge, routers energy cost
+    unique_id: freezer_mini_fridge_routers_energy_cost
     source: sensor.freezer_mini_fridge_routers_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Freezer, mini fridge, routers energy cost savings
+    unique_id: freezer_mini_fridge_routers_energy_cost_savings
     source: sensor.freezer_mini_fridge_routers_power_cost_savings
     method: left
     max_sub_interval:
@@ -177,12 +204,14 @@ sensor:
 
   - platform: integration
     name: Washer energy cost
+    unique_id: washer_energy_cost
     source: sensor.washer_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Washer energy cost savings
+    unique_id: washer_energy_cost_savings
     source: sensor.washer_power_cost_savings
     method: left
     max_sub_interval:
@@ -190,12 +219,14 @@ sensor:
 
   - platform: integration
     name: Dryer energy cost
+    unique_id: dryer_energy_cost
     source: sensor.dryer_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Dryer energy cost savings
+    unique_id: dryer_energy_cost_savings
     source: sensor.dryer_power_cost_savings
     method: left
     max_sub_interval:
@@ -203,12 +234,14 @@ sensor:
 
   - platform: integration
     name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost
+    unique_id: tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost
     source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings
+    unique_id: tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
     source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost_savings
     method: left
     max_sub_interval:
@@ -216,12 +249,14 @@ sensor:
 
   - platform: integration
     name: Water heater, oven & stove, guest suite, garage, all other energy cost
+    unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
     source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Water heater, oven & stove, guest suite, garage, all other energy cost savings
+    unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings
     source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost_savings
     method: left
     max_sub_interval:
@@ -229,12 +264,14 @@ sensor:
 
   - platform: integration
     name: Office desk, computer & monitor, cooler, fish tank energy cost
+    unique_id: office_desk_computer_monitor_cooler_fish_tank_energy_cost
     source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Office desk, computer & monitor, cooler, fish tank energy cost savings
+    unique_id: office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings
     source: sensor.office_desk_computer_monitor_cooler_fish_tank_power_cost_savings
     method: left
     max_sub_interval:
@@ -242,12 +279,14 @@ sensor:
 
   - platform: integration
     name: Phone chargers energy cost
+    unique_id: phone_chargers_energy_cost
     source: sensor.phone_chargers_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Phone chargers energy cost savings
+    unique_id: phone_chargers_energy_cost_savings
     source: sensor.phone_chargers_power_cost_savings
     method: left
     max_sub_interval:
@@ -255,12 +294,14 @@ sensor:
 
   - platform: integration
     name: Sensors energy cost
+    unique_id: sensors_energy_cost
     source: sensor.sensors_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Sensors energy cost savings
+    unique_id: sensors_energy_cost_savings
     source: sensor.sensors_power_cost_savings
     method: left
     max_sub_interval:
@@ -268,12 +309,14 @@ sensor:
 
   - platform: integration
     name: Paludarium, picture frame, camera energy cost
+    unique_id: paludarium_picture_frame_camera_energy_cost
     source: sensor.paludarium_picture_frame_camera_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Paludarium, picture frame, camera energy cost savings
+    unique_id: paludarium_picture_frame_camera_energy_cost_savings
     source: sensor.paludarium_picture_frame_camera_power_cost_savings
     method: left
     max_sub_interval:
@@ -281,12 +324,14 @@ sensor:
 
   - platform: integration
     name: Standby energy cost
+    unique_id: standby_energy_cost
     source: sensor.standby_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
     name: Standby energy cost savings
+    unique_id: standby_energy_cost_savings
     source: sensor.standby_power_cost_savings
     method: left
     max_sub_interval:

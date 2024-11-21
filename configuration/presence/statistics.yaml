@@ -1,18 +1,21 @@
 template:
   - sensor:
       - name: Bedroom bed occupied probability
+        unique_id: bedroom_bed_occupied_probability
         state: "{{ (state_attr('binary_sensor.bedroom_bed_occupied', 'probability') * 100)|round() }}"
         unit_of_measurement: "%"
         state_class: measurement
         icon: mdi:percent
         availability: "{{ state_attr('binary_sensor.bedroom_bed_occupied', 'probability') is not none }}"
       - name: Rachel asleep probability
+        unique_id: rachel_asleep_probability
         state: "{{ (state_attr('binary_sensor.rachel_asleep', 'probability') * 100)|round() }}"
         unit_of_measurement: "%"
         state_class: measurement
         icon: mdi:percent
         availability: "{{ state_attr('binary_sensor.rachel_asleep', 'probability') is not none }}"
       - name: Dan asleep probability
+        unique_id: dan_asleep_probability
         state: "{{ (state_attr('binary_sensor.dan_asleep', 'probability') * 100)|round() }}"
         unit_of_measurement: "%"
         state_class: measurement
@@ -22,24 +25,28 @@ template:
 sensor:
   - platform: history_stats
     name: Rachel hours asleep
+    unique_id: rachel_hours_asleep
     entity_id: binary_sensor.rachel_asleep
     state: "on"
     end: "{{ (now() + timedelta(hours=5)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
     duration: "24:00"
   - platform: history_stats
     name: Rachel hours asleep yesterday
+    unique_id: rachel_hours_asleep_yesterday
     entity_id: binary_sensor.rachel_asleep
     state: "on"
     end: "{{ (now() - timedelta(hours=19)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
     duration: "24:00"
   - platform: history_stats
     name: Dan hours asleep
+    unique_id: dan_hours_asleep
     entity_id: binary_sensor.dan_asleep
     state: "on"
     end: "{{ (now() + timedelta(hours=5)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
     duration: "24:00"
   - platform: history_stats
     name: Dan hours asleep yesterday
+    unique_id: dan_hours_asleep_yesterday
     entity_id: binary_sensor.dan_asleep
     state: "on"
     end: "{{ (now() - timedelta(hours=19)).replace(hour=19, minute=0, second=0, microsecond=0) }}"
@@ -51,6 +58,7 @@ sensor:
   # For sleep statistics, assume asleep from 11PM to 6AM
   - platform: history_stats
     name: Bedroom occupancy ratio while asleep # unused
+    unique_id: bedroom_occupancy_ratio_while_asleep
     entity_id: binary_sensor.bedroom_presence_sensor_occupancy
     state: "on"
     type: ratio
@@ -58,6 +66,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Bedroom presence sensor distance in bed range ratio while asleep
+    unique_id: bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep
     entity_id: binary_sensor.bedroom_presence_sensor_distance_in_bed_range
     state: "on"
     type: ratio
@@ -65,6 +74,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Anyone asleep ratio while asleep
+    unique_id: anyone_asleep_ratio_while_asleep
     entity_id: binary_sensor.anyone_asleep
     state: "on"
     type: ratio
@@ -72,6 +82,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Bedroom bed occupied ratio while asleep
+    unique_id: bedroom_bed_occupied_ratio_while_asleep
     entity_id: binary_sensor.bedroom_bed_occupied
     state: "on"
     type: ratio
@@ -79,6 +90,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Bedroom light off ratio while asleep
+    unique_id: bedroom_light_off_ratio_while_asleep
     entity_id: light.bedroom
     state: "off"
     type: ratio
@@ -86,6 +98,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Rachel was asleep within the last 5 minutes ratio while asleep # unused
+    unique_id: rachel_was_asleep_within_last_5_minutes_ratio_while_asleep
     entity_id: binary_sensor.rachel_was_asleep_within_last_5_minutes
     state: "on"
     type: ratio
@@ -93,6 +106,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Rachel's phone's still ratio while asleep
+    unique_id: rachel_phone_still_ratio_while_asleep
     entity_id: binary_sensor.rachel_s_phone_s_still
     state: "on"
     type: ratio
@@ -100,6 +114,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Rachel's phone's sleep confidence high ratio while asleep
+    unique_id: rachel_phone_sleep_confidence_high_ratio_while_asleep
     entity_id: binary_sensor.rachel_s_phone_s_sleep_confidence_high
     state: "on"
     type: ratio
@@ -107,6 +122,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Dan's phone still ratio while asleep
+    unique_id: dan_phone_still_ratio_while_asleep
     entity_id: binary_sensor.dan_s_phone_still
     state: "on"
     type: ratio
@@ -114,6 +130,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Dan's phone plugged in ratio while asleep
+    unique_id: dan_phone_plugged_in_ratio_while_asleep
     entity_id: binary_sensor.dan_s_phone_unplugged
     state: "off"
     type: ratio
@@ -121,6 +138,7 @@ sensor:
     duration: "07:00"
   - platform: history_stats
     name: Dan's computer inactive ratio while asleep
+    unique_id: dan_computer_inactive_ratio_while_asleep
     entity_id: binary_sensor.dan_s_computer_active
     state: "off"
     type: ratio
@@ -129,6 +147,7 @@ sensor:
   # For wake statistics, assume awake from 9AM to 9PM
   - platform: history_stats
     name: Bedroom occupancy ratio while awake # unused
+    unique_id: bedroom_occupancy_ratio_while_awake
     entity_id: binary_sensor.bedroom_presence_sensor_occupancy
     state: "on"
     type: ratio
@@ -136,6 +155,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Bedroom presence sensor distance in bed range ratio while awake
+    unique_id: bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake
     entity_id: binary_sensor.bedroom_presence_sensor_distance_in_bed_range
     state: "on"
     type: ratio
@@ -143,6 +163,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Anyone asleep ratio while awake
+    unique_id: anyone_asleep_ratio_while_awake
     entity_id: binary_sensor.anyone_asleep
     state: "on"
     type: ratio
@@ -150,6 +171,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Bedroom bed occupied ratio while awake
+    unique_id: bedroom_bed_occupied_ratio_while_awake
     entity_id: binary_sensor.bedroom_bed_occupied
     state: "on"
     type: ratio
@@ -157,6 +179,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Bedroom light off ratio while awake
+    unique_id: bedroom_light_off_ratio_while_awake
     entity_id: light.bedroom
     state: "off"
     type: ratio
@@ -164,6 +187,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Rachel was asleep within the last 5 minutes ratio while awake # unused
+    unique_id: rachel_was_asleep_within_last_5_minutes_ratio_while_awake
     entity_id: binary_sensor.rachel_was_asleep_within_last_5_minutes
     state: "on"
     type: ratio
@@ -171,6 +195,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Rachel's phone's still ratio while awake
+    unique_id: rachel_phone_still_ratio_while_awake
     entity_id: binary_sensor.rachel_s_phone_s_still
     state: "on"
     type: ratio
@@ -178,6 +203,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Rachel's phone's sleep confidence high ratio while awake
+    unique_id: rachel_phone_sleep_confidence_high_ratio_while_awake
     entity_id: binary_sensor.rachel_s_phone_s_sleep_confidence_high
     state: "on"
     type: ratio
@@ -185,6 +211,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Dan's phone still ratio while awake
+    unique_id: dan_phone_still_ratio_while_awake
     entity_id: binary_sensor.dan_s_phone_still
     state: "on"
     type: ratio
@@ -192,6 +219,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Dan's phone plugged in ratio while awake
+    unique_id: dan_phone_plugged_in_ratio_while_awake
     entity_id: binary_sensor.dan_s_phone_unplugged
     state: "off"
     type: ratio
@@ -199,6 +227,7 @@ sensor:
     duration: "12:00"
   - platform: history_stats
     name: Dan's computer inactive ratio while awake
+    unique_id: dan_computer_inactive_ratio_while_awake
     entity_id: binary_sensor.dan_s_computer_active
     state: "off"
     type: ratio

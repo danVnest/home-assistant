@@ -1,6 +1,7 @@
 template:
   - binary_sensor:
       - name: Plants need watering
+        unique_id: plants_need_watering
         state: >
           {{
             states('input_datetime.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=10) or
@@ -10,6 +11,7 @@ template:
         availability: "{{ has_value('input_datetime.plants_last_watered') and has_value('sensor.dry_plants') }}"
   - sensor:
       - name: Dry plants
+        unique_id: dry_plants
         state: >
           {%- set sensors = [
              'binary_sensor.soil_moist_entryway',
@@ -36,35 +38,41 @@ template:
             has_value('binary_sensor.soil_moist_office')
           }}
       - name: Plants last watered
+        unique_id: plants_last_watered
         state: "{{ states('input_datetime.plants_last_watered')|as_datetime|time_since + ' ago'}}"
         icon: mdi:clock
         availability: "{{ has_value('input_datetime.plants_last_watered') }}"
 
       - name: Front and back side days since watered
+        unique_id: front_and_back_side_days_since_watered
         state: "{{ ((now() - states('sensor.front_and_back_side_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:clock
         availability: "{{ has_value('sensor.front_and_back_side_last_watered') }}"
       - name: Ferns days since watered
+        unique_id: ferns_days_since_watered
         state: "{{ ((now() - states('sensor.ferns_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:clock
         availability: "{{ has_value('sensor.ferns_last_watered') }}"
       - name: Back fence days since watered
+        unique_id: back_fence_days_since_watered
         state: "{{ ((now() - states('sensor.back_fence_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:clock
         availability: "{{ has_value('sensor.back_fence_last_watered') }}"
       - name: Vegetable garden days since watered
+        unique_id: vegetable_garden_days_since_watered
         state: "{{ ((now() - states('sensor.vegetable_garden_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:clock
         availability: "{{ has_value('sensor.vegetable_garden_last_watered') }}"
       - name: Lawn days since watered
+        unique_id: lawn_days_since_watered
         state: "{{ ((now() - states('sensor.lawn_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
@@ -130,6 +138,7 @@ input_datetime:
 
 automation:
   - alias: Reset plants last watered
+    id: reset_plants_last_watered
     triggers:
       trigger: state
       entity_id: sensor.dry_plants

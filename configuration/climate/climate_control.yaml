@@ -88,14 +88,17 @@ group:
 template:
   - sensor:
       - name: Climate device count
+        unique_id: climate_device_count
         state: "{{ expand('group.all_climate_control') | list | count }}"
         icon: mdi:dots-grid
         availability: "{{ has_value('group.all_climate_control') }}"
       - name: Climate device automatic control count
+        unique_id: climate_device_automatic_control_count
         state: "{{ expand('group.all_climate_control') | selectattr('state','eq','on') | list | count }}"
         icon: mdi:dots-square
         availability: "{{ has_value('group.all_climate_control') }}"
       - name: Humidifiers status text
+        unique_id: humidifiers_status_text
         state: >
           {% set bedroom = state_attr('humidifier.bedroom', 'humidifier.fault') != 0 %}
           {% set nursery = state_attr('humidifier.nursery', 'humidifier.fault') != 0 %}
@@ -109,7 +112,7 @@ template:
           Humidifiers are functional
           {% endif %}
         icon: mdi:air-humidifier-off
-        
+
 input_boolean:
   control_living_room_aircon:
     name: Living room aircon

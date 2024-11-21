@@ -1,6 +1,7 @@
 template:
   - sensor:
       - name: Weighted average inside apparent temperature
+        unique_id: weighted_average_inside_apparent_temperature
         state: >
           {%- set value_weight_array = [
             {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1},

@@ -11,6 +11,7 @@ binary_sensor:
   # TODO: https://app.asana.com/0/1207020279479204/1205852232324004/f
   - platform: bayesian
     name: Bedroom bed occupied
+    unique_id: bedroom_bed_occupied
     prior: 0.417 # ≈10 hours per day = 9/24
     observations:
       - platform: state
@@ -29,6 +30,7 @@ binary_sensor:
 
   # - platform: bayesian
   #   name: Nursery cot occupied
+  #   unique_id: nursery_cot_occupied
   #   prior: 0.29 # ≈2 hours during day, ≈5 hours at night = 7/24
   #   observations:
   #     - platform: state
@@ -45,6 +47,7 @@ binary_sensor:
   # # the following are guesses - go check history and quantify - use statistics???
   # - platform: bayesian
   #   name: Nursery occupied
+  #   unique_id: nursery_occupied
   #   prior: 0.29 # ≈2 hours during day, ≈5 hours at night = 7/24
   #   observations:
   #     - platform: state
@@ -81,6 +84,7 @@ binary_sensor:
 template:
   - binary_sensor:
       - name: Desk occupied
+        unique_id: desk_occupied
         state: >
           {{
             states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
@@ -109,6 +113,7 @@ template:
             has_value('device_tracker.dan_s_computer')
           }}
       - name: Desk occupied and computer active
+        unique_id: desk_occupied_and_computer_active
         state: >
           {{
             states('binary_sensor.desk_occupied') == 'on' and
@@ -121,6 +126,7 @@ template:
             has_value('binary_sensor.dan_s_computer_active_at_home')
           }}
       - name: Office pet bed occupied within last 5 minutes
+        unique_id: office_pet_bed_occupied_within_last_5_minutes
         state: >
           {{
             states('binary_sensor.office_presence_sensor_occupancy') == 'on' and
@@ -137,6 +143,7 @@ template:
           }}
 
       - name: Bedroom occupied
+        unique_id: bedroom_occupied
         state: >
           {{
             states('binary_sensor.bedroom_presence_sensor_occupancy') == 'on' or
@@ -150,6 +157,7 @@ template:
             has_value('binary_sensor.bedroom_bed_occupied')
           }}
       - name: Bedroom presence sensor distance in bed range
+        unique_id: bedroom_presence_sensor_distance_in_bed_range
         state: "{{ 0 < states('sensor.bedroom_presence_sensor_distance')|float < 2.5 }}"
         device_class: occupancy
         delay_off: 0:00:15
@@ -175,16 +183,19 @@ template:
         availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
 
       - name: Kitchen door motion
+        unique_id: kitchen_door_motion
         state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
         device_class: motion
         icon: mdi:door
         availability: "{{ states.binary_sensor.kitchen_door.last_changed|default != '' }}"
       - name: Dining room balcony door motion
+        unique_id: dining_room_balcony_door_motion
         state: "{{ now() - states.binary_sensor.dining_room_balcony_door.last_changed < timedelta(seconds=30) }}"
         device_class: motion
         icon: mdi:door
         availability: "{{ states.binary_sensor.dining_room_balcony_door.last_changed|default != '' }}"
       - name: Bedroom balcony door motion
+        unique_id: bedroom_balcony_door_motion
         state: "{{ now() - states.binary_sensor.bedroom_balcony_door.last_changed < timedelta(seconds=30) }}"
         device_class: motion
         icon: mdi:door

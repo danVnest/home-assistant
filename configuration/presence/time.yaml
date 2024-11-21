@@ -13,10 +13,12 @@ binary_sensor:
 template:
   - binary_sensor:
       - name: Rachel tired
+        unique_id: rachel_tired
         state: "{{ (states('sensor.rachel_hours_asleep')|float) < 7 }}"
         icon: mdi:sleep
         availability: "{{ has_value('sensor.rachel_hours_asleep') }}"
       - name: Dan tired
+        unique_id: dan_tired
         state: "{{ (states('sensor.dan_hours_asleep')|float) < 6.5 }}"
         icon: mdi:sleep
         availability: "{{ has_value('sensor.dan_hours_asleep') }}"

@@ -1,6 +1,7 @@
 template:
   - sensor:
       - name: Solar return on investment
+        unique_id: solar_return_on_investment
         state: >
           {% set install_costs = 8889.98 %}
           {% set cost_savings_incorrect_start_offset = 506.89 %}
@@ -11,12 +12,14 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') }}"
       - name: Solar years to break even
+        unique_id: solar_years_to_break_even
         state: "{{ (states('sensor.solar_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) }}"
         unit_of_measurement: years
         state_class: measurement
         icon: mdi:calendar
         availability: "{{ has_value('sensor.solar_return_on_investment') and has_value('sensor.total_energy_cost_savings_monthly') }}"
       - name: Solar years to beat investment
+        unique_id: solar_years_to_beat_investment
         state: >
           {% set install_costs = 8889.98 %}
           {% set annual_return_rate = 0.06 %}
@@ -42,6 +45,7 @@ template:
         icon: mdi:calendar
         availability: "{{ has_value('sensor.total_energy_cost_savings_monthly') and has_value('sensor.solar_years_to_break_even') }}"
       - name: Battery return on investment
+        unique_id: battery_return_on_investment
         state: >
           {% set install_costs = 8000 %}
           {% set battery_capacity = 10 %}
@@ -53,6 +57,7 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.grid_energy_cost_per_kwh') and has_value('sensor.days_since_solar_installation') }}"
       - name: Battery years to break even
+        unique_id: battery_years_to_break_even
         state: >
           {% set battery_capacity = 10 %}
           {% set savings_per_day = battery_capacity * states('sensor.grid_energy_cost_per_kwh')|float %}
@@ -62,6 +67,7 @@ template:
         icon: mdi:calendar
         availability: "{{ has_value('sensor.battery_return_on_investment') and has_value('sensor.grid_energy_cost_per_kwh') }}"
       - name: Battery years to beat investment
+        unique_id: battery_years_to_beat_investment
         state: >
           {% set install_costs = 8000 %}
           {% set annual_return_rate = 0.06 %}
@@ -88,6 +94,7 @@ template:
         icon: mdi:calendar
         availability: "{{ has_value('sensor.grid_energy_cost_per_kwh') and has_value('sensor.battery_years_to_break_even') }}"
       - name: Solar and battery return on investment
+        unique_id: solar_and_battery_return_on_investment
         state: "{{ states('sensor.solar_return_on_investment')|float + states('sensor.battery_return_on_investment')|float }}"
         unit_of_measurement: $
         device_class: monetary
@@ -95,6 +102,7 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.solar_return_on_investment') and has_value('sensor.battery_return_on_investment') }}"
       - name: Solar and battery years to break even
+        unique_id: solar_and_battery_years_to_break_even
         state: >
           {% set savings_per_day = 10 * states('sensor.grid_energy_cost_per_kwh')|float + states('sensor.total_energy_cost_savings_monthly')|float / 30 %}
           {{ (states('sensor.solar_and_battery_return_on_investment')|float / savings_per_day / -365)|round(1) }}
@@ -108,6 +116,7 @@ template:
             has_value('sensor.total_energy_cost_savings_monthly')
           }}
       - name: Solar and battery years to beat investment
+        unique_id: solar_and_battery_years_to_beat_investment
         state: >
           {% set install_costs = 8889.98 + 8000 %}
           {% set annual_return_rate = 0.06 %}

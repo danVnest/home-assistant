@@ -1,16 +1,19 @@
 utility_meter:
   monthly_energy_consumed:
     name: Monthly energy consumed
+    unique_id: monthly_energy_consumed
     source: sensor.total_energy_consumed
     cycle: monthly
   monthly_energy_from_grid:
     name: Monthly energy from grid
+    unique_id: monthly_energy_from_grid
     source: sensor.smart_meter_real_energy_consumed
     cycle: monthly
 
 template:
   - sensor:
       - name: Total energy consumed
+        unique_id: total_energy_consumed
         state: >
           {{
             states('sensor.inverter_total_energy')|float -
@@ -28,36 +31,42 @@ template:
             has_value('sensor.smart_meter_real_energy_consumed')
           }}
       - name: Average daily solar production
+        unique_id: average_daily_solar_production
         state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:solar-power-variant
         availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.days_since_solar_installation') }}"
       - name: Average daily solar export
+        unique_id: average_daily_solar_export
         state: "{{ (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:transmission-tower-import
         availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
       - name: Average daily battery export
+        unique_id: average_daily_battery_export
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:transmission-tower-import
         # TODO: add daily battery export once battery is installed with VPP
       - name: Average daily solar storage
+        unique_id: average_daily_solar_storage
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-charging
         # TODO: update once battery is installed
       - name: Average daily energy consumption
+        unique_id: average_daily_energy_consumption
         state: "{{ (states('sensor.total_energy_consumed')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-lightning-bolt
         availability: "{{ has_value('sensor.total_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
       - name: Average daily solar consumption
+        unique_id: average_daily_solar_consumption
         state: "{{ states('sensor.average_daily_solar_production')|float - states('sensor.average_daily_solar_export')|float  }}"
         unit_of_measurement: kWh/day
         state_class: total
@@ -65,18 +74,21 @@ template:
         availability: "{{ has_value('sensor.average_daily_solar_production') and has_value('sensor.average_daily_solar_export') }}"
         # TODO: update once battery is installed
       - name: Average daily battery consumption
+        unique_id: average_daily_battery_consumption
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-battery
         # TODO: update once battery is installed
       - name: Average daily grid consumption
+        unique_id: average_daily_grid_consumption
         state: "{{ (states('sensor.smart_meter_real_energy_consumed')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-import-outline
         availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
       - name: Days since solar installation
+        unique_id: days_since_solar_installation
         state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing

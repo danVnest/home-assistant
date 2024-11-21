@@ -1,6 +1,7 @@
 template:
   - sensor:
       - name: Extreme forecast
+        unique_id: extreme_forecast
         state: >
           {%- set forecasts = (
             states('sensor.outside_apparent_temperature_2h_forecast')|float,
@@ -35,6 +36,7 @@ template:
             has_value('input_number.low_temperature_aircon_trigger')
           }}
       - name: Extreme forecast text
+        unique_id: extreme_forecast_text
         state: >
           {% set extreme = states('sensor.extreme_forecast') -%}
           {%- if has_value('sensor.extreme_forecast') -%}
@@ -51,6 +53,7 @@ template:
           {%- endif -%}
         icon: mdi:sun-thermometer-outline
       - name: Next rain forecast text
+        unique_id: next_rain_forecast_text
         state: >
           {%- if states('sensor.weather_station_precipitation_intensity')|float(0) > 0.1 -%}
             raining now

@@ -27,10 +27,12 @@ group:
 template:
   - sensor:
       - name: Device issues
+        unique_id: device_issues
         state: "{{ states('sensor.unavailable_entities')|int(1) + states('sensor.frozen_devices')|int(1) }}"
         state_class: total
         icon: mdi:alert-circle
       - name: Unavailable entities
+        unique_id: unavailable_entities
         state: >
           {% set entities = state_attr(this.entity_id, 'entity_id') %}
           {{ entities|count if entities != none else none }}
@@ -47,6 +49,7 @@ template:
         unit_of_measurement: entities
         icon: mdi:alert-circle
       - name: Frozen devices
+        unique_id: frozen_devices
         state: >
           {% set entities = state_attr(this.entity_id, 'entity_id') %}
           {{ entities|count if entities != none else none }}
@@ -62,6 +65,7 @@ template:
         unit_of_measurement: entities
         icon: mdi:help-circle
       - name: Low batteries
+        unique_id: low_batteries
         state: >
           {% set entities = state_attr(this.entity_id, 'entity_id') %}
           {% set unavailable = state_attr(this.entity_id, 'unavailable')|int(0) %}
@@ -77,6 +81,7 @@ template:
         unit_of_measurement: devices
         icon: mdi:battery-low
       - name: Charging batteries
+        unique_id: charging_batteries
         state: >
           {% set entities = state_attr(this.entity_id, 'entity_id') %}
           {{ entities|count if entities != none else none }}
@@ -93,67 +98,76 @@ template:
         icon: mdi:battery-charging
 
       - name: Nursery temperature sensor battery level
+        unique_id: nursery_temperature_sensor_battery_level
         state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('nursery') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.nursery_temperature_sensor_battery_state') }}"
       - name: Office temperature sensor battery level
+        unique_id: office_temperature_sensor_battery_level
         state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('office') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.office_temperature_sensor_battery_state') }}"
       - name: Dog bed area temperature sensor battery level
+        unique_id: dog_bed_area_temperature_sensor_battery_level
         state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dog_bed_area') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.dog_bed_area_temperature_sensor_battery_state') }}"
       - name: Soil sensor entryway battery level
+        unique_id: soil_sensor_entryway_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('entryway') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_entryway') }}"
       - name: Soil sensor guest suite battery level
+        unique_id: soil_sensor_guest_suite_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('guest_suite') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_guest_suite') }}"
       - name: Soil sensor stairway battery level
+        unique_id: soil_sensor_stairway_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('stairway') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_stairway') }}"
       - name: Soil sensor back deck battery level
+        unique_id: soil_sensor_back_deck_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('back_deck') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_back_deck') }}"
       - name: Soil sensor living room battery level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('living_room') }}"
+        unique_id: soil_sensor_living_room_battery_level
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_living_room') }}"
       - name: Soil sensor dining room battery level
+        unique_id: soil_sensor_dining_room_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('dining_room') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_dining_room') }}"
       - name: Soil sensor bathroom battery level
+        unique_id: soil_sensor_bathroom_battery_level
         state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('bathroom') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_bathroom') }}"
       - name: Soil sensor office battery level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('office') }}"
+        unique_id: soil_sensor_office_battery_level
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
@@ -162,8 +176,8 @@ template:
 automation:
   # from https://github.com/jazzyisj/unavailable-entities-sensor
   # TODO: update the following to include frozen?
-  - id: unavailable_entities_system_notification
-    alias: Unavailable entities system notification
+  - alias: Unavailable entities system notification
+    id: unavailable_entities_system_notification
     description: Show unavailable entities in a persistent system notification
     mode: restart
     triggers:

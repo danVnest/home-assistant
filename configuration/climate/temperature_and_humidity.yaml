@@ -1,6 +1,7 @@
 template:
   - sensor:
       - name: Bedroom temperature
+        unique_id: bedroom_temperature
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.bedroom_aircon', 'current_temperature'), 'weight':2},
@@ -17,6 +18,7 @@ template:
             has_value('sensor.bedroom_humidifier_temperature')
           }}
       - name: Bedroom humidity
+        unique_id: bedroom_humidity
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.bedroom_aircon', 'current_humidity'), 'weight':2},
@@ -35,6 +37,7 @@ template:
           }}
 
       - name: Dining room temperature
+        unique_id: dining_room_temperature
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
@@ -54,6 +57,7 @@ template:
             has_value('sensor.dog_bed_area_sensor_temperature')
           }}
       - name: Dining room humidity
+        unique_id: dining_room_humidity
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
@@ -74,6 +78,7 @@ template:
           }}
 
       - name: Kitchen temperature
+        unique_id: kitchen_temperature
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
@@ -91,6 +96,7 @@ template:
             has_value('sensor.soil_sensor_hub_indoor_temperature')
           }}
       - name: Kitchen humidity
+        unique_id: kitchen_humidity
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
@@ -109,6 +115,7 @@ template:
           }}
 
       - name: Living room temperature
+        unique_id: living_room_temperature
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
@@ -128,6 +135,7 @@ template:
             has_value('sensor.hall_multisensor_temperature')
           }}
       - name: Living room humidity
+        unique_id: living_room_humidity
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
@@ -148,6 +156,7 @@ template:
           }}
 
       - name: Nursery temperature
+        unique_id: nursery_temperature
         state: >
           {%- set value_weight_array = [
             {'value': state_attr('climate.nursery_heater', 'current_temperature'), 'weight':1},
@@ -167,6 +176,7 @@ template:
             has_value('sensor.nursery_humidifier_temperature')
           }}
       - name: Nursery humidity
+        unique_id: nursery_humidity
         state: >
           {%- set value_weight_array = [
             {'value': states('sensor.nursery_sensor_humidity'), 'weight':1},
@@ -185,6 +195,7 @@ template:
           }}
 
       - name: Office humidity
+        unique_id: office_humidity
         state: "{{ (states('sensor.office_sensor_humidity')|float)|round(1) }}"
         unit_of_measurement: "%"
         device_class: humidity
