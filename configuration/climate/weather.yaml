@@ -38,7 +38,7 @@ template:
       - name: Extreme forecast text
         unique_id: extreme_forecast_text
         state: >
-          {% set extreme = states('sensor.extreme_forecast') -%}
+          {%- set extreme = states('sensor.extreme_forecast') -%}
           {%- if has_value('sensor.extreme_forecast') -%}
             {%- for hour in ['2','4','6','8','10'] -%}
               {%- if states('sensor.outside_apparent_temperature_' + hour + 'h_forecast') == extreme -%}
@@ -46,7 +46,7 @@ template:
                 {%- break -%}
               {%- endif -%}
             {%- endfor -%}
-          {%- elif extreme is none -%}
+          {%- elif extreme == "unknown" -%}
             nice for 10 hours
           {%- else -%}
             extreme forecast unavailable
