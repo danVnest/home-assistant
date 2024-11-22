@@ -83,50 +83,50 @@ binary_sensor:
   - platform: threshold
     name: Soil moist entryway
     entity_id: sensor.soil_moisture_entryway
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist guest suite
     entity_id: sensor.soil_moisture_guest_suite
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist stairway
     entity_id: sensor.soil_moisture_stairway
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist back deck
     entity_id: sensor.soil_moisture_back_deck
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist living room
     entity_id: sensor.soil_moisture_living_room
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist dining room
     entity_id: sensor.soil_moisture_dining_room
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist bathroom
     entity_id: sensor.soil_moisture_bathroom
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
   - platform: threshold
     name: Soil moist office
     entity_id: sensor.soil_moisture_office
-    upper: 40
-    hysteresis: 10
+    upper: 30
+    hysteresis: 5
     device_class: moisture
 
 input_datetime:
@@ -142,13 +142,12 @@ automation:
     triggers:
       trigger: state
       entity_id: sensor.dry_plants
-    condition:
-      condition: template
-      value_template: >
-        {{
-          trigger.to_state.state|int(100) == 0 and
-          trigger.from_state.state not in ['unknown', 'unavailable', none]
-        }}
+      to: "0"
+      not_from:
+        - "0"
+        - "unknown"
+        - "unavaiable"
+        - none
     actions:
       - action: input_datetime.set_datetime
         target:
