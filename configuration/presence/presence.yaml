@@ -168,7 +168,7 @@ template:
         state: "{{ states('sensor.rachel_s_phone_detected_activity') == 'still' }}"
         # TODO: add device_class: moving and switch sensor from _still to _moving?
         icon: mdi:cellphone
-        availability: "{{ has_value('sensor.rachel_s_phone_detected_activity') }}"
+        availability: "{{ states('sensor.rachel_s_phone_detected_activity') != 'unavailable' }}"
       - name: Dan's phone still
         unique_id: dan_s_phone_still
         state: "{{ states('sensor.dan_s_phone_activity') == 'Stationary' }}"
