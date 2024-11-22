@@ -57,7 +57,7 @@
                 {
                   "type": "tile",
                   "entity": "binary_sensor.internet",
-                  "name": "WARNING: Internet is disconnected - functionality limited",
+                  "name": "WARNING: Internet is disconnected",
                   "state_content": "last_changed",
                   "icon": "mdi:close-network",
                   "color": "red",
@@ -74,7 +74,7 @@
                   ],
                   "card_mod": {
                     "style": {
-                      "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
+                      "ha-tile-info$": "state-display:before {\n  content: 'System functionality limited since';\n}\n"
                     }
                   }
                 },
@@ -136,33 +136,18 @@
                     }
                   ],
                   "card_layout": "large",
-                  "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 1
-                  },
-                  "styles": ".bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n.bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
-                },
-                {
-                  "type": "tile",
-                  "entity": "lock.door_lock",
-                  "state_content": [
-                    "last_changed"
-                  ],
-                  "name": "Front door",
-                  "card_mod": {
-                    "style": {
-                      "ha-tile-info$": ".primary:after {\n  content: \"{{ ' ' + states('lock.door_lock')}}\";\n}"
-                    }
-                  },
-                  "layout_options": {
-                    "grid_columns": "full"
-                  },
                   "visibility": [
                     {
-                      "condition": "user",
-                      "users": []
+                      "condition": "state",
+                      "entity": "input_select.scene",
+                      "state": [
+                        "Sleep",
+                        "Away (Day)",
+                        "Away (Night)"
+                      ]
                     }
-                  ]
+                  ],
+                  "styles": ".bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n.bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -209,7 +194,67 @@
                       }
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .rows-2 .bubble-sub-button-container {\n  display: ${['Sleep','Away (Day)','Away (Night)'].includes(hass.states['input_select.scene'].state) ? '' : 'none'} !important;\n  border-radius: var(--ha-card-border-radius) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  padding-left: 5px !important;\n  padding-right: 0px !important;\n  margin-right: -3px !important;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "input_select.scene",
+                      "state": [
+                        "Sleep",
+                        "Away (Day)",
+                        "Away (Night)"
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .rows-2 .bubble-sub-button-container {\n  border-radius: var(--ha-card-border-radius) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  padding-left: 5px !important;\n  padding-right: 0px !important;\n  margin-right: -3px !important;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "select",
+                  "entity": "input_select.scene",
+                  "show_last_changed": true,
+                  "card_layout": "large",
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "input_select.scene",
+                      "state_not": [
+                        "Sleep",
+                        "Away (Day)",
+                        "Away (Night)"
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-select-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "lock.door_lock",
+                  "show_state": false,
+                  "show_last_changed": true,
+                  "name": "Front door",
+                  "card_layout": "large-2-rows",
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "input_select.scene",
+                      "state_not": [
+                        "Sleep",
+                        "Away (Day)",
+                        "Away (Night)"
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n}\n"
                 },
                 {
                   "type": "map",
@@ -406,6 +451,12 @@
                     "action": "navigate",
                     "navigation_path": "/lovelace/plants"
                   },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/lovelace/plants"
+                    }
+                  },
                   "sub_button": [
                     {
                       "entity": "sensor.dry_plants",
@@ -528,184 +579,7 @@
                   ],
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['below_50'] + ' below 50%' }\n"
                 }
-              ],
-              "column_span": 1
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Climate",
-                  "heading_style": "subtitle",
-                  "icon": "mdi:thermometer"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "name": "Outside",
-                  "entity": "sensor.outside_apparent_temperature",
-                  "tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "double_tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "hold_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "sensor.extreme_forecast_text",
-                      "icon": "mdi:thermometer",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.next_rain_forecast_text",
-                      "show_state": true,
-                      "show_background": false
-                    }
-                  ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'mdi:weather-sunny';\n    case 'clear-night':\n      return 'mdi:weather-night';\n    case 'rain':\n      return 'mdi:weather-rainy';\n    case 'snow':\n      return 'mdi:weather-snowy';\n    case 'sleet':\n      return 'mdi:weather-snowy-rainy';\n    case 'wind':\n      return 'mdi:weather-windy';\n    case 'fog':\n      return 'mdi:weather-fog';\n    case 'cloudy':\n      return 'mdi:weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'mdi:weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'mdi:weather-night-partly-cloudy';\n  }\n})())}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "name": "Inside",
-                  "entity": "sensor.weighted_average_inside_apparent_temperature",
-                  "tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "double_tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "hold_action": {
-                    "action": "navigate",
-                    "navigation_path": "#weather"
-                  },
-                  "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "sensor.living_room_apparent_temperature",
-                      "icon": "mdi:sofa",
-                      "show_state": true
-                    },
-                    {
-                      "entity": "sensor.kitchen_apparent_temperature",
-                      "icon": "mdi:fridge",
-                      "show_state": true
-                    },
-                    {
-                      "entity": "sensor.dog_bed_area_apparent_temperature",
-                      "icon": "mdi:dog-side",
-                      "show_state": true
-                    },
-                    {
-                      "entity": "sensor.office_apparent_temperature",
-                      "icon": "mdi:desktop-classic",
-                      "show_state": true
-                    },
-                    {
-                      "entity": "sensor.bedroom_apparent_temperature",
-                      "icon": "mdi:bed",
-                      "show_state": true
-                    },
-                    {
-                      "entity": "sensor.nursery_apparent_temperature",
-                      "icon": "mdi:cradle",
-                      "show_state": true
-                    }
-                  ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "name": "Control",
-                  "button_type": "state",
-                  "entity": "group.any_climate_control",
-                  "show_state": true,
-                  "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "group.any_aircon",
-                      "name": "Aircon",
-                      "show_name": true
-                    },
-                    {
-                      "entity": "group.any_fans",
-                      "name": "Fans",
-                      "show_name": true
-                    },
-                    {
-                      "entity": "group.any_heaters",
-                      "name": "Heaters",
-                      "show_name": true
-                    },
-                    {
-                      "entity": "group.any_humidifiers",
-                      "name": "Humidifiers",
-                      "show_name": true
-                    }
-                  ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} ${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic'}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "sensor.humidifiers_status_text",
-                  "show_state": false,
-                  "show_last_changed": true,
-                  "card_layout": "large",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "sensor.humidifiers_status_text",
-                      "state_not": "Humidifiers are functional"
-                    }
-                  ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText = state }\n"
-                },
-                {
-                  "type": "vertical-stack",
-                  "cards": [
-                    {
-                      "type": "custom:bubble-card",
-                      "card_type": "pop-up",
-                      "hash": "#weather",
-                      "button_type": "name",
-                      "name": "Weather",
-                      "icon": "mdi:text-box",
-                      "show_name": true,
-                      "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
-                    },
-                    {
-                      "type": "weather-forecast",
-                      "show_current": false,
-                      "show_forecast": true,
-                      "entity": "weather.pirateweather",
-                      "forecast_type": "daily"
-                    },
-                    {
-                      "type": "tile",
-                      "entity": "sensor.pirateweather_nearest_storm_distance",
-                      "name": "Nearest storm"
-                    }
-                  ]
-                }
-              ],
-              "column_span": 1
+              ]
             },
             {
               "type": "grid",
@@ -774,7 +648,7 @@
                       "show_name": true
                     }
                   ],
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_hall_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${hass.states['input_boolean.control_bedroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${hass.states['input_boolean.control_nursery_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-9 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;  \n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -784,10 +658,229 @@
                   "entity": "group.any_light_control",
                   "show_state": true,
                   "card_layout": "large",
-                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic'}\n",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.any_light_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic (outlined in green)'}\n",
                   "icon": "mdi:lightbulb-auto"
                 }
               ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:thermometer"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Aircon",
+                  "button_type": "state",
+                  "entity": "group.any_aircon",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "climate.living_room_aircon",
+                      "icon": "mdi:sofa"
+                    },
+                    {
+                      "entity": "climate.dining_room_aircon",
+                      "icon": "mdi:table-chair"
+                    },
+                    {
+                      "entity": "climate.bedroom_aircon",
+                      "icon": "mdi:bed"
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.all_aircon_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button { \n  width: 100%;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_living_room_aircon'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_dining_room_aircon'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_bedroom_aircon'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Fans",
+                  "button_type": "state",
+                  "entity": "group.any_fans",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "fan.bedroom",
+                      "icon": "mdi:bed"
+                    },
+                    {
+                      "entity": "fan.nursery",
+                      "icon": "mdi:cradle"
+                    },
+                    {
+                      "entity": "fan.office",
+                      "icon": "mdi:desktop-classic"
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.all_fan_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button { \n  width: 100%;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_bedroom_fan'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_nursery_fan'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_office_fan'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Heaters",
+                  "button_type": "state",
+                  "entity": "group.any_heaters",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "climate.nursery_heater",
+                      "icon": "mdi:cradle"
+                    },
+                    {
+                      "entity": "switch.office_heater",
+                      "icon": "mdi:desktop-classic"
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.all_heater_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button { \n  width: 100%;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_nursery_heater'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_office_heater'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Humidifiers",
+                  "button_type": "state",
+                  "entity": "group.any_humidifiers",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "humidifier.bedroom",
+                      "icon": "mdi:bed"
+                    },
+                    {
+                      "entity": "humidifier.nursery",
+                      "icon": "mdi:cradle"
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": 1
+                  },
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.all_humidifier_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button { \n  width: 100%;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_bedroom_humidifier'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_nursery_humidifier'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.humidifiers_status_text'].state != \"Humidifiers are functional\" ? hass.states['sensor.humidifiers_status_text'].state : \"\" }\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Control",
+                  "button_type": "state",
+                  "entity": "group.any_climate_control",
+                  "show_state": true,
+                  "card_layout": "large-2-rows",
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid green !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} ${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic (outlined in green)'}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Outside",
+                  "entity": "sensor.outside_apparent_temperature",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.extreme_forecast_text",
+                      "icon": "mdi:thermometer",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.next_rain_forecast_text",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${icon.setAttribute(\"icon\", (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'mdi:weather-sunny';\n    case 'clear-night':\n      return 'mdi:weather-night';\n    case 'rain':\n      return 'mdi:weather-rainy';\n    case 'snow':\n      return 'mdi:weather-snowy';\n    case 'sleet':\n      return 'mdi:weather-snowy-rainy';\n    case 'wind':\n      return 'mdi:weather-windy';\n    case 'fog':\n      return 'mdi:weather-fog';\n    case 'cloudy':\n      return 'mdi:weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'mdi:weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'mdi:weather-night-partly-cloudy';\n  }\n})())}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Inside",
+                  "entity": "sensor.weighted_average_inside_apparent_temperature",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.living_room_apparent_temperature",
+                      "icon": "mdi:sofa",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.kitchen_apparent_temperature",
+                      "icon": "mdi:fridge",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.dog_bed_area_apparent_temperature",
+                      "icon": "mdi:dog-side",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.office_apparent_temperature",
+                      "icon": "mdi:desktop-classic",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.bedroom_apparent_temperature",
+                      "icon": "mdi:bed",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.nursery_apparent_temperature",
+                      "icon": "mdi:cradle",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n"
+                }
+              ],
+              "column_span": 1
             },
             {
               "type": "grid",
@@ -815,7 +908,7 @@
                       "state_color": true
                     },
                     {
-                      "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. More information in the **Instructions** tab.",
+                      "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
                       "type": "markdown"
                     }
                   ],
@@ -882,7 +975,7 @@
                         "type": "entities"
                       },
                       "filter": {
-                        "template": "{{\n  (state_attr('sensor.unavailable_entities', 'entity_id') +\n  state_attr('sensor.frozen_devices', 'entity_id'))\n  [:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('sensor.unavailable_entities', 'entity_id') %}\n{% set frozen_devices = state_attr('sensor.frozen_devices', 'entity_id') %}\n{{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_devices if frozen_devices is not none else [])\n  )[:15]\n}}\n"
                       }
                     },
                     {
@@ -894,7 +987,7 @@
                         "refresh_interval": 0
                       },
                       "filter": {
-                        "template": "{{\n  (state_attr('sensor.unavailable_entities', 'entity_id') +\n  state_attr('sensor.frozen_devices', 'entity_id'))\n  [:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('sensor.unavailable_entities', 'entity_id') %}\n{% set frozen_devices = state_attr('sensor.frozen_devices', 'entity_id') %}\n{{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_devices if frozen_devices is not none else [])\n  )[:15]\n}}\n"
                       }
                     },
                     {
@@ -1055,6 +1148,34 @@
                       "filter": {
                         "template": "{{ state_attr('sensor.charging_batteries', 'entity_id') }}"
                       }
+                    }
+                  ]
+                },
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "pop-up",
+                      "hash": "#weather",
+                      "button_type": "name",
+                      "name": "Weather",
+                      "icon": "mdi:text-box",
+                      "show_name": true,
+                      "card_layout": "large",
+                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                    },
+                    {
+                      "type": "weather-forecast",
+                      "show_current": false,
+                      "show_forecast": true,
+                      "entity": "weather.pirateweather",
+                      "forecast_type": "daily"
+                    },
+                    {
+                      "type": "tile",
+                      "entity": "sensor.pirateweather_nearest_storm_distance",
+                      "name": "Nearest storm"
                     }
                   ]
                 }
@@ -2470,7 +2591,7 @@
                 },
                 {
                   "type": "markdown",
-                  "content": "A selection of (mostly) indoor plants that require manual watering are monitored with soil moisture sensors. These sensors give an indication of when different areas of the house or types of plants become dry.\n\nPlants are reported as dry if their moisture level measures below 30%.\n\nThe soil moisture sensors seem to provide quite a range of values depending on their position and the soil type. They have been calibrated, but if you notice the following please report to Dan so he can recalibrate:\n- a plant sensor is reporting dry when in fact the soil still feels moist\n- a plant sensor is reporting high moisture when in fact the soil feels dry"
+                  "content": "A selection of (mostly) indoor plants that require manual watering are monitored with soil moisture sensors. These sensors give an indication of when different areas of the house or types of plants become dry.\n\nPlants are reported as dry if their moisture level measures below 25%.\n\nThe soil moisture sensors seem to provide quite a range of values depending on their position and the soil type. They have been calibrated, but if you notice the following please report to Dan so he can recalibrate:\n- a plant sensor is reporting dry when in fact the soil still feels moist\n- a plant sensor is reporting high moisture when in fact the soil feels dry"
                 },
                 {
                   "type": "history-graph",

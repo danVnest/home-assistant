@@ -84,6 +84,36 @@ group:
       - input_boolean.control_nursery_humidifier
     icon: mdi:thermometer-auto
     all: true
+  all_aircon_control:
+    name: Aircon control
+    entities:
+      - input_boolean.control_living_room_aircon
+      - input_boolean.control_dining_room_aircon
+      - input_boolean.control_bedroom_aircon
+    icon: mdi:thermometer-auto
+    all: true
+  all_fan_control:
+    name: Fan control
+    entities:
+      - input_boolean.control_nursery_fan
+      - input_boolean.control_office_fan
+      - input_boolean.control_bedroom_fan
+    icon: mdi:thermometer-auto
+    all: true
+  all_heater_control:
+    name: Heater control
+    entities:
+      - input_boolean.control_nursery_heater
+      - input_boolean.control_office_heater
+    icon: mdi:thermometer-auto
+    all: true
+  all_humidifier_control:
+    name: Humidifier control
+    entities:
+      - input_boolean.control_bedroom_humidifier
+      - input_boolean.control_nursery_humidifier
+    icon: mdi:thermometer-auto
+    all: true
 
 template:
   - sensor:
