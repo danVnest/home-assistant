@@ -126,6 +126,36 @@
                 },
                 {
                   "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.system_issues_in_the_last_hour",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.errors_in_the_last_hour",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:alert-circle"
+                    },
+                    {
+                      "entity": "sensor.warnings_in_the_last_hour",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:help-circle"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.errors_in_the_last_hour",
+                      "above": 0
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['counter.errors'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['counter.warnings'].state === '1.0' ? '': 's') }\n"
+                },
+                {
+                  "type": "custom:bubble-card",
                   "card_type": "select",
                   "entity": "input_select.scene",
                   "show_last_changed": true,
@@ -483,7 +513,7 @@
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "sensor.low_batteries",
-                  "show_state": true,
+                  "show_state": false,
                   "card_layout": "large-2-rows",
                   "tap_action": {
                     "action": "navigate",
@@ -656,7 +686,7 @@
                   "name": "Control",
                   "button_type": "state",
                   "entity": "group.any_light_control",
-                  "show_state": true,
+                  "show_state": false,
                   "card_layout": "large",
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: ${hass.states['group.any_light_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.light_automatic_control_count'].state + '/' + hass.states['sensor.light_count'].state + ' lights are automatic (outlined in green)'}\n",
                   "icon": "mdi:lightbulb-auto"
@@ -671,6 +701,73 @@
                   "heading": "Climate",
                   "heading_style": "subtitle",
                   "icon": "mdi:thermometer"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "WARNING: Aircon filters need cleaning",
+                  "button_type": "state",
+                  "entity": "group.any_climate_control",
+                  "show_state": false,
+                  "card_layout": "large",
+                  "sub_button": [
+                    {
+                      "entity": "binary_sensor.living_room_aircon_filter_clean_required",
+                      "icon": "mdi:sofa",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "button.press",
+                        "target": {
+                          "entity_id": "button.living_room_aircon_reset_filter"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "binary_sensor.dining_room_aircon_filter_clean_required",
+                      "icon": "mdi:table-chair",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "button.press",
+                        "target": {
+                          "entity_id": "button.dining_room_aircon_reset_filter"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "binary_sensor.bedroom_aircon_filter_clean_required",
+                      "icon": "mdi:bed",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "button.press",
+                        "target": {
+                          "entity_id": "button.bedroom_aircon_reset_filter"
+                        }
+                      }
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.living_room_aircon_filter_clean_required",
+                          "state": "on"
+                        },
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.dining_room_aircon_filter_clean_required",
+                          "state": "on"
+                        },
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.bedroom_room_aircon_filter_clean_required",
+                          "state": "on"
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid green !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-1 {\n${card.querySelector('.bubble-state').innerText = 'Press button after cleaning ➔' }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -782,7 +879,7 @@
                   "name": "Control",
                   "button_type": "state",
                   "entity": "group.any_climate_control",
-                  "show_state": true,
+                  "show_state": false,
                   "card_layout": "large-2-rows",
                   "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid green !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} ${card.querySelector('.bubble-state').innerText = hass.states['sensor.climate_device_automatic_control_count'].state + '/' + hass.states['sensor.climate_device_count'].state + ' devices are automatic (outlined in green)'}\n"
                 },
@@ -962,7 +1059,7 @@
                     },
                     {
                       "type": "markdown",
-                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n2. Check the device is plugged in or has sufficient battery charge\n\n3. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n4. Try reloading home assistant [ADD BUTTON]\n\n5. Try restarting home assistant [ADD BUTTON]\n\n6. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details>",
+                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n1. If the system was recently restarted or reconnected, wait up to 10 minutes or so for configuration to complete\n\n1. Check the device is plugged in or has sufficient battery charge\n\n1. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n1. Try reloading home assistant [ADD BUTTON]\n\n1. Try restarting home assistant [ADD BUTTON]\n\n1. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details>",
                       "card_mod": {
                         "style": {
                           "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"

@@ -38,14 +38,6 @@ input_datetime:
     has_time: true
     icon: mdi:clock-end
 
-counter:
-  warnings:
-    name: Warnings
-    restore: false
-  errors:
-    name: Errors
-    restore: false
-
 template:
   - binary_sensor:
       - name: Display day card # TODO: maybe not required anymore
