@@ -12,6 +12,7 @@ sensor:
     unique_id: errors_in_the_last_hour
     entity_id: counter.errors
     state_characteristic: change
+    keep_last_sample: true
     max_age:
       hours: 1
   - platform: statistics
@@ -19,6 +20,7 @@ sensor:
     unique_id: warnings_in_the_last_hour
     entity_id: counter.warnings
     state_characteristic: change
+    keep_last_sample: true
     max_age:
       hours: 1
 
