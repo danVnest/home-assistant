@@ -136,10 +136,10 @@ template:
           entity_id: >
             {% set entities = states.sensor|selectattr('entity_id', 'search', 'charging_status$|battery_state$')|map(attribute='entity_id')|list|sort %}
             {% set status = entities|map('states')|list %}
-            {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'Full'])|map(attribute=0)|list %}
+            {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'full', 'Full'])|map(attribute=0)|list %}
             {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}
-          above_90: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('gt', 90)|list|count }}"
-          below_50: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('lt', 50)|list|count }}"
+          above_90: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('ge', 90)|list|count }}"
+          above_50: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('ge', 50)|select('lt', 90)|list|count }}"
         state_class: measurement
         unit_of_measurement: devices
         icon: mdi:battery-charging
