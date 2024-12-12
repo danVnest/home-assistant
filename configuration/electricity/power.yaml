@@ -10,19 +10,19 @@ powercalc:
         - entity_id: switch.living_room_aircon
           fixed:
             power: >
-              {% from 'custom_templates.jinja' import aircon_power %}
+              {% from 'climate.jinja' import aircon_power %}
               {{ aircon_power('living_room') }}
           standby_power: 3 # estimated aircon + Sensibo
         - entity_id: switch.dining_room_aircon
           fixed:
             power: >
-              {% from 'custom_templates.jinja' import aircon_power %}
+              {% from 'climate.jinja' import aircon_power %}
               {{ aircon_power('dining_room') }}
           standby_power: 2 # estimated aircon
         - entity_id: switch.bedroom_aircon
           fixed:
             power: >
-              {% from 'custom_templates.jinja' import aircon_power %}
+              {% from 'climate.jinja' import aircon_power %}
               {{ aircon_power('bedroom') }}
           standby_power: 3 # estimated aircon + Sensibo
         - entity_id: fan.bedroom

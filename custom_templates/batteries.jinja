@@ -1,0 +1,17 @@
+{%- macro temperature_sensor_battery(location) -%}
+    {%- set entity_id = 'sensor.' + location + '_temperature_sensor_battery_state' -%}
+    {%- if states(entity_id) == 'high' -%}
+        90
+    {%- elif states(entity_id) == 'middle' -%}
+        50
+    {%- elif states(entity_id) == 'low' -%}
+        20
+    {%- else -%}
+        {{- states(entity_id) -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro soil_sensor_battery(location) -%}
+    {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
+    {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
+{%- endmacro -%}

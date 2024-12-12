@@ -14,7 +14,7 @@ template:
             {'value': states('sensor.office_apparent_temperature'), 'weight':1},
             {'value': states('sensor.bathroom_apparent_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         device_class: temperature

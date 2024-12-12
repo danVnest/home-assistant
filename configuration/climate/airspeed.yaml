@@ -10,7 +10,7 @@ template:
       - name: Bedroom aircon airspeed
         unique_id: bedroom_aircon_airspeed
         state: >
-          {% from 'custom_templates.jinja' import aircon_airspeed %}
+          {% from 'climate.jinja' import aircon_airspeed %}
           {{ aircon_airspeed('bedroom') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed
@@ -26,7 +26,7 @@ template:
       - name: Bedroom fan airspeed
         unique_id: bedroom_fan_airspeed
         state: >
-          {% from 'custom_templates.jinja' import fan_airspeed  %}
+          {% from 'climate.jinja' import fan_airspeed  %}
           {{ fan_airspeed('bedroom') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed
@@ -49,7 +49,7 @@ template:
       - name: Dining room aircon airspeed
         unique_id: dining_room_aircon_airspeed
         state: >
-          {% from 'custom_templates.jinja' import aircon_airspeed %}
+          {% from 'climate.jinja' import aircon_airspeed %}
           {{ aircon_airspeed('dining_room') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed
@@ -95,7 +95,7 @@ template:
       - name: Living room aircon airspeed
         unique_id: living_room_aircon_airspeed
         state: >
-          {% from 'custom_templates.jinja' import aircon_airspeed %}
+          {% from 'climate.jinja' import aircon_airspeed %}
           {{ aircon_airspeed('living_room') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed
@@ -119,7 +119,7 @@ template:
       - name: Nursery airspeed
         unique_id: nursery_airspeed
         state: >
-          {% from 'custom_templates.jinja' import fan_airspeed %}
+          {% from 'climate.jinja' import fan_airspeed %}
           {{ fan_airspeed('nursery') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed
@@ -134,7 +134,7 @@ template:
       - name: Office airspeed
         unique_id: office_airspeed
         state: >
-          {% from 'custom_templates.jinja' import fan_airspeed %}
+          {% from 'climate.jinja' import fan_airspeed %}
           {{ fan_airspeed('office') }}
         unit_of_measurement: "m/s"
         device_class: wind_speed

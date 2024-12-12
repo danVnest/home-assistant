@@ -1,0 +1,17 @@
+{%- macro next_water(area) -%}
+    {%- if states('switch.' + area + '_water') != 'on' -%}
+      {%- set program = state_attr('switch.' + area + '_water', 'program_e') -%}
+      {%- set next_water = 'not scheduled' -%}
+      {%- if ((program|default([]))['watering_program']|default([]))[0]|default('!') != '!' -%}
+        {%- set next_water = program['watering_program'][0]|as_datetime -%}
+        {%- set next_water = ('in ' + next_water|time_until) if next_water > now() else 'not scheduled' -%}
+      {%- endif -%}
+      {{-
+        next_water +
+        (' (watered ' + states('sensor.' + area + '_last_watered')|as_datetime|time_since + ' ago)')
+        if has_value('sensor.' + area + '_last_watered') else ''
+      -}}
+    {%- else -%}
+      watering now
+    {%- endif -%}
+{%- endmacro -%}

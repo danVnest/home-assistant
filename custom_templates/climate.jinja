@@ -1,33 +1,5 @@
-{%- macro weighted_average(value_weight_array) -%}
-    {%- set var = namespace(sum = 0, count = 0) -%}
-    {%- for item in value_weight_array if item.value not in ("unknown", "unavailable", none) -%}
-        {%- set var.sum = var.sum + item.weight * item.value|float -%}
-        {%- set var.count = var.count + item.weight -%}
-    {%- endfor -%}
-    {{- (var.sum / var.count)|round(1) -}}
-{%- endmacro -%}
-
-{%- macro temperature_sensor_battery(location) -%}
-    {%- set entity_id = 'sensor.' + location + '_temperature_sensor_battery_state' -%}
-    {%- if states(entity_id) == 'high' -%}
-        90
-    {%- elif states(entity_id) == 'middle' -%}
-        50
-    {%- elif states(entity_id) == 'low' -%}
-        20
-    {%- else -%}
-        {{- states(entity_id) -}}
-    {%- endif -%}
-{%- endmacro -%}
-
-{%- macro soil_sensor_battery(location) -%}
-    {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
-    {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
-{%- endmacro -%}
-
 {%- macro fan_airspeed(room) -%}
     {%- set entity_id = 'fan.' + room -%}
-    {%- set max_airspeed = 10 if state_attr(entity_id, 'direction') == "forward" else 3 -%}
     {%- if states(entity_id) == "on" -%}
         {{- max_airspeed * state_attr(entity_id, 'percentage') / 100 -}}
     {%- else -%}
@@ -39,8 +11,6 @@
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
     {%- set mode = states(entity_id) -%}
     {%- if mode != "off" -%}
-        {%- set max_airspeed = 5 -%}
-        {%- set max_fan_temp_diff = 7 -%}
         {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
         {%- if fan_strength == 'quiet' -%}
             {%- set fan_strength = 0.1 -%}
@@ -71,8 +41,6 @@
 
 {%- macro aircon_power(room) -%}
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
-    {%- set max_power_temp_diff = 7 -%}
-    {%- set max_airspeed = 5 -%}
     {%- set mode = states(entity_id) -%}
     {%- set temperature_difference = state_attr(entity_id, 'current_temperature')|float(0) - state_attr(entity_id, 'temperature')|float(0) -%}
     {%- if mode == "heat" -%}
@@ -83,22 +51,4 @@
     {%- set compressor_power = (200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff))) if mode != "fan_only" else 0 -%}
     {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed')|float(0) / max_airspeed -%}
     {{- compressor_power + fan_power -}}
-{%- endmacro -%}
-
-{%- macro next_water(area) -%}
-    {%- if states('switch.' + area + '_water') != 'on' -%}
-      {%- set program = state_attr('switch.' + area + '_water', 'program_e') -%}
-      {%- set next_water = 'not scheduled' -%}
-      {%- if ((program|default([]))['watering_program']|default([]))[0]|default('!') != '!' -%}
-        {%- set next_water = program['watering_program'][0]|as_datetime -%}
-        {%- set next_water = ('in ' + next_water|time_until) if next_water > now() else 'not scheduled' -%}
-      {%- endif -%}
-      {{-
-        next_water +
-        (' (watered ' + states('sensor.' + area + '_last_watered')|as_datetime|time_since + ' ago)')
-        if has_value('sensor.' + area + '_last_watered') else ''
-      -}}
-    {%- else -%}
-      watering now
-    {%- endif -%}
 {%- endmacro -%}

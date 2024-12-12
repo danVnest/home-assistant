@@ -3024,7 +3024,7 @@
                       "entity": "switch.front_and_back_side_water",
                       "name": "Front & back side",
                       "icon": "mdi:grass",
-                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('front_and_back_side') }}",
+                      "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('front_and_back_side') }}",
                       "toggle": true
                     },
                     {
@@ -3032,7 +3032,7 @@
                       "entity": "switch.ferns_water",
                       "name": "Ferns",
                       "icon": "mdi:palm-tree",
-                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('ferns') }}",
+                      "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('ferns') }}",
                       "toggle": true
                     },
                     {
@@ -3040,7 +3040,7 @@
                       "entity": "switch.back_fence_water",
                       "name": "Back fence",
                       "icon": "mdi:fence",
-                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('back_fence') }}",
+                      "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('back_fence') }}",
                       "toggle": true
                     },
                     {
@@ -3048,7 +3048,7 @@
                       "entity": "switch.vegetable_garden_water",
                       "name": "Vegetable garden",
                       "icon": "mdi:sprout",
-                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('vegetable_garden') }}",
+                      "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('vegetable_garden') }}",
                       "toggle": true
                     },
                     {
@@ -3056,7 +3056,7 @@
                       "entity": "switch.lawn_water",
                       "name": "Lawn",
                       "icon": "mdi:wave",
-                      "secondary": "{% from 'custom_templates.jinja' import next_water %}{{ next_water('lawn') }}",
+                      "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('lawn') }}",
                       "toggle": true
                     }
                   ]

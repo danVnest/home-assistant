@@ -146,75 +146,77 @@ template:
 
       - name: Nursery temperature sensor battery level
         unique_id: nursery_temperature_sensor_battery_level
-        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('nursery') }}"
+        state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('nursery') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.nursery_temperature_sensor_battery_state') }}"
       - name: Office temperature sensor battery level
         unique_id: office_temperature_sensor_battery_level
-        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('office') }}"
+        state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('office') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.office_temperature_sensor_battery_state') }}"
       - name: Dog bed area temperature sensor battery level
         unique_id: dog_bed_area_temperature_sensor_battery_level
-        state: "{% from 'custom_templates.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dog_bed_area') }}"
+        state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dog_bed_area') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.dog_bed_area_temperature_sensor_battery_state') }}"
       - name: Soil sensor entryway battery level
         unique_id: soil_sensor_entryway_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('entryway') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('entryway') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_entryway') }}"
       - name: Soil sensor guest suite battery level
         unique_id: soil_sensor_guest_suite_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('guest_suite') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('guest_suite') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_guest_suite') }}"
       - name: Soil sensor stairway battery level
         unique_id: soil_sensor_stairway_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('stairway') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('stairway') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_stairway') }}"
       - name: Soil sensor back deck battery level
         unique_id: soil_sensor_back_deck_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('back_deck') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('back_deck') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_back_deck') }}"
       - name: Soil sensor living room battery level
         unique_id: soil_sensor_living_room_battery_level
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('living_room') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_living_room') }}"
       - name: Soil sensor dining room battery level
         unique_id: soil_sensor_dining_room_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('dining_room') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('dining_room') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_dining_room') }}"
       - name: Soil sensor bathroom battery level
         unique_id: soil_sensor_bathroom_battery_level
-        state: "{% from 'custom_templates.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('bathroom') }}"
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('bathroom') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_bathroom') }}"
       - name: Soil sensor office battery level
         unique_id: soil_sensor_office_battery_level
+        state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('office') }}"
         unit_of_measurement: "%"
         device_class: battery
         state_class: measurement

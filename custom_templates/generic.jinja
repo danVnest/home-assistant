@@ -1,0 +1,8 @@
+{%- macro weighted_average(value_weight_array) -%}
+    {%- set var = namespace(sum = 0, count = 0) -%}
+    {%- for item in value_weight_array if item.value not in ("unknown", "unavailable", none) -%}
+        {%- set var.sum = var.sum + item.weight * item.value|float -%}
+        {%- set var.count = var.count + item.weight -%}
+    {%- endfor -%}
+    {{- (var.sum / var.count)|round(1) -}}
+{%- endmacro -%}

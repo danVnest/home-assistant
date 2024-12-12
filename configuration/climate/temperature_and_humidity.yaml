@@ -7,7 +7,7 @@ template:
             {'value': state_attr('climate.bedroom_aircon', 'current_temperature'), 'weight':2},
             {'value': states('sensor.bedroom_humidifier_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         state_class: measurement
@@ -24,7 +24,7 @@ template:
             {'value': state_attr('climate.bedroom_aircon', 'current_humidity'), 'weight':2},
             {'value': states('sensor.bedroom_humidifier_humidity'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "%"
         device_class: humidity
@@ -44,7 +44,7 @@ template:
             {'value': states('sensor.dining_room_multisensor_temperature'), 'weight':1},
             {'value': states('sensor.dog_bed_area_sensor_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         device_class: temperature
@@ -64,7 +64,7 @@ template:
             {'value': states('sensor.dining_room_multisensor_humidity'), 'weight':1},
             {'value': states('sensor.dog_bed_area_sensor_humidity'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "%"
         device_class: humidity
@@ -84,7 +84,7 @@ template:
             {'value': state_attr('climate.living_room_aircon', 'current_temperature'), 'weight':1},
             {'value': states('sensor.soil_sensor_hub_indoor_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         device_class: temperature
@@ -102,7 +102,7 @@ template:
             {'value': state_attr('climate.living_room_aircon', 'current_humidity'), 'weight':1},
             {'value': states('sensor.soil_sensor_hub_indoor_humidity'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "%"
         device_class: humidity
@@ -122,7 +122,7 @@ template:
             {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
             {'value': states('sensor.hall_multisensor_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         device_class: temperature
@@ -142,7 +142,7 @@ template:
             {'value': state_attr('climate.dining_room_aircon', 'current_humidity'), 'weight':1},
             {'value': states('sensor.hall_multisensor_humidity'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "%"
         device_class: humidity
@@ -163,7 +163,7 @@ template:
             {'value': states('sensor.nursery_sensor_temperature'), 'weight':1},
             {'value': states('sensor.nursery_humidifier_temperature'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "°C"
         device_class: temperature
@@ -182,7 +182,7 @@ template:
             {'value': states('sensor.nursery_sensor_humidity'), 'weight':1},
             {'value': states('sensor.nursery_humidifier_humidity'), 'weight':1}]
           -%}
-          {%- from 'custom_templates.jinja' import weighted_average -%}
+          {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
         unit_of_measurement: "%"
         device_class: humidity
