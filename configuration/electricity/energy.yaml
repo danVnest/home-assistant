@@ -103,13 +103,15 @@ template:
             {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
             {%- if current_battery_level > last_battery_level -%}
               {%- set battery_capacity = 0.0167 -%}
-              {%- set charging_efficiency = 1.1 -%}
+              {%- set charging_efficiency = 1.2 -%}
               {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
             {%- elif current_battery_level in (80, 100) and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") -%}
               {%- set now_timestamp = as_timestamp(now()) -%}
-              {%- set time_since_last_update = now_timestamp - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}  
-              {%- set trickle_charge_power = 0.0005 -%}
-              {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
+              {%- set time_since_last_update = now_timestamp - state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}
+              {%- if time_since_last_update > 60 -%}
+                {%- set trickle_charge_power = 0.001 -%}
+                {%- set energy = energy + trickle_charge_power * time_since_last_update / 3600 -%}
+              {%- endif -%}
             {%- endif -%}
           {%- endif -%}
           {{- energy -}}
@@ -119,7 +121,16 @@ template:
         icon: mdi:lightning-bolt
         attributes:
           last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
-          last_update_time: "{{ as_timestamp(now()) }}"
+          last_update_time: >
+            {%- set timestamp = as_timestamp(now()) -%}
+            {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float(0) -%}
+            {%- if current_battery_level in (80, 100) and states('sensor.dan_s_phone_battery_state') in ("Charging", "Full") and current_battery_level == last_battery_level -%}
+              {%- set last_update_time = state_attr('sensor.dan_s_phone_charger_energy', 'last_update_time')|float(now_timestamp) -%}
+              {%- if now_timestamp - last_update_time > 60 -%}
+                {%- set timestamp = last_update_time -%}
+              {%- endif -%}
+            {%- endif -%}
+            {{ timestamp }}
 
       - name: Washer energy
         unique_id: washer_energy
