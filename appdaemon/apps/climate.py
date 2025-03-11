@@ -14,7 +14,7 @@ User defined variables are configued in climate.yaml
 from __future__ import annotations
 
 import logging
-from math import ceil
+from math import floor
 from typing import TYPE_CHECKING
 
 from app import App, Device
@@ -61,7 +61,7 @@ class Climate(App):
                 controller=self,
                 room="dining_room",
                 linked_rooms=["living_room", "kitchen"],
-                doors=["kitchen", "dining_room_balcony", "bedroom_balcony"],
+                doors=["dining_room_balcony", "kitchen", "bedroom_balcony"],
             ),
         }
         self.heaters = {
@@ -127,7 +127,7 @@ class Climate(App):
             return
         self.log(f"'{'En' if enable else 'Dis'}abling' all climate control")
         if enable:
-            self.adjust_for_conditions()
+            self.suggest_for_conditions()
         else:
             self.allow_suggestion()
 
@@ -200,16 +200,14 @@ class Climate(App):
             humidifier.already_notified_of_empty_water_tank = False
         if self.any_climate_control_enabled:
             self.adjust_for_conditions()
+            self.suggest_for_conditions()
         if scene in ("Day", "Sleep") or self.presence.pets_home_alone:
             self.suggest_if_extreme_forecast_and_control_disabled()
         self.allow_suggestion()
 
-    def adjust_for_conditions(self):
+    def suggest_for_conditions(self):
         """Control aircon or suggest based on changes in inside temperature."""
         """Handle each case (house open, outside nicer, climate control status)?"""
-        for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
-            for device in device_group.values():
-                device.adjust_for_conditions()
         if (
             self.presence.pets_home_alone
             and not self.any_aircon_on
@@ -238,6 +236,14 @@ class Climate(App):
                 f"for the pets because {reason} turning aircon on manually",
             )
             # TODO: above doesn't account for the situation where the bedroom door is closed
+
+    def adjust_for_conditions(
+        self,
+    ):
+        """Control aircon or suggest based on changes in inside temperature."""
+        for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
+            for device in device_group.values():
+                device.adjust_for_conditions()
 
     def pre_condition_nursery(self):
         """Pre-heat/humidify the nursery for nice sleeping conditions."""
@@ -340,6 +346,7 @@ class Climate(App):
             )
         self.allow_suggestion()
         self.adjust_for_conditions()
+        self.suggest_for_conditions()
 
     def terminate(self):
         """Cancel presence callbacks before termination????
@@ -377,7 +384,7 @@ class Climate(App):
         if new not in (None, "unavailable", "unknown"):
             # TODO: https://app.asana.com/0/1207020279479204/1207217352886591/f
             # be more resilient towards unavailable/unknown temperatures
-            self.adjust_for_conditions()
+            self.suggest_for_conditions()
 
     @property
     def within_target_temperatures(self) -> bool:
@@ -483,16 +490,17 @@ class ClimateDevice(Device):
                 self.controller.listen_state(
                     self.handle_sensor_change,
                     temperature_sensor_id,
+                    duration=0.5,
                     constrain_input_boolean=self.control_input_boolean,
                 )
             if monitor_humidity:
                 self.controller.listen_state(
                     self.handle_sensor_change,
                     humidity_sensor_id,
+                    duration=0.5,
                     constrain_input_boolean=self.control_input_boolean,
                 )
-        self.adjustment_delay = 0
-        self.last_adjustment_time = self.controller.get_now_ts()
+        self.adjustment_delay = self.constants["adjustment_delay"]
         self.adjustment_timer = None
 
     @property
@@ -604,27 +612,46 @@ class ClimateDevice(Device):
     ):
         """Adjust for new conditions with delay if appropriate."""
         del entity, attribute, old, new, kwargs
-        if (
-            self.adjustment_delay > 0
-            and self.adjustment_timer is None
-            and (
-                self.controller.get_now_ts() - self.last_adjustment_time
-                < self.adjustment_delay
+        if self.device.state in (None, "unavailable", "unknown"):
+            self.controller.log(
+                f"The '{self.device_id}' is unavailable - ignoring sensor change",
+                level="DEBUG",
             )
-        ):
-            self.adjustment_timer = self.controller.run_in(
-                self.adjust_for_conditions_after_delay,
+            return
+        if self.adjustment_delay == 0:
+            self.adjust_for_conditions()
+            return
+        was_recent_adjustment = (
+            self.controller.get_now_ts() - self.last_adjustment_time
+            < self.adjustment_delay
+        )
+        if self.adjustment_timer is None and was_recent_adjustment:
+            run_in = (
                 self.last_adjustment_time
                 + self.adjustment_delay
-                - self.controller.get_now_ts(),
+                - self.controller.get_now_ts()
             )
-        else:
-            if (
-                self.adjustment_timer
-            ):  # TODO: this should be moved inside super adjust_for_conditions
+            self.adjustment_timer = self.controller.run_in(
+                self.adjust_for_conditions_after_delay,
+                run_in,
+            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"The '{self.device_id}' is set to adjust for conditions "
+                    f"in {run_in:.1f} seconds as it was already adjusted recently",
+                    level="DEBUG",
+                )
+        elif self.adjustment_timer is None or not was_recent_adjustment:
+            if self.adjustment_timer:
                 self.controller.cancel_timer(self.adjustment_timer)
                 self.adjustment_timer = None
             self.adjust_for_conditions()
+        elif self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"The '{self.device_id}' is already set to adjust for conditions "
+                "shortly - ignoring latest sensor change",
+                level="DEBUG",
+            )
 
     def adjust_for_conditions_after_delay(self, **kwargs: dict):
         """Delayed adjustment from timers initiated when handling presence change."""
@@ -655,7 +682,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         self.preferred_swing_mode = (
             "both" if "both" in self.get_attribute("swing_modes") else "rangefull"
         )
-        # TODO: set adjustment_delay?
         self.turn_off_timer_handle = None
         self.vacating_delay = 60 * float(
             controller.entities.input_number.aircon_vacating_delay.state,
@@ -733,7 +759,6 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.fan_mode = self.preferred_fan_mode
         if self.swing_mode != self.preferred_swing_mode:
             self.call_service("set_swing_mode", swing_mode=self.preferred_swing_mode)
-        self.controller.allow_suggestion()
         # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
         # What about cooling? Fans? Take into account pet presence in each room?
         # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
@@ -789,9 +814,8 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.turn_off()
         else:
             if check_if_would_adjust_only:
-                return self.on and self.would_turn_on_adjust_for_conditions
-            if self.on:
-                self.turn_on_for_conditions()
+                return self.would_turn_on_adjust_for_conditions
+            self.turn_on_for_conditions()  # already on, this will ensure best settings
             self.suggest_if_temperature_outside_nicer()
         return False
 
@@ -852,10 +876,6 @@ class Aircon(ClimateDevice, PresenceDevice):
             else:
                 self.adjust_for_conditions()
 
-    def call_service(self, service: str, **parameters: dict):
-        """Call one of the device's services in Home Assistant and wait for response."""
-        super().call_service(service, **parameters, return_result=True)
-
     def handle_user_adjustment(self, user: str):
         """"""
         if (
@@ -865,6 +885,7 @@ class Aircon(ClimateDevice, PresenceDevice):
         ):
             self.turn_on_for_conditions()
         super().handle_user_adjustment(user)
+        self.controller.allow_suggestion()
 
     def notify_if_turning_on_for_pets(self):
         """Notify if aircon is turning on for the pets."""
@@ -887,6 +908,10 @@ class Aircon(ClimateDevice, PresenceDevice):
                 f"is a more pleasant temperature than the {self.room} "
                 f"({self.room_temperature:.1f}º), consider opening up the house",
             )
+
+    def call_service(self, service: str, **parameters: dict):
+        """Call one of the aircon's services in Home Assistant and wait for response."""
+        super().call_service(service, **parameters, return_result=True)
 
 
 class Fan(ClimateDevice, PresenceDevice):
@@ -912,90 +937,44 @@ class Fan(ClimateDevice, PresenceDevice):
         self.speed_levels = round(100 / self.speed_per_level)
         self.minimum_speed = self.speed_per_level * 1
         self.reverse_desired = self.reverse
+        self.reversing_timer = None
+        self.reversing_steps_remaining = []
         self.companion_device = companion_device
         self.vacating_delay = 60 * float(
             controller.entities.input_number.fan_vacating_delay.state,
         )
-        self.adjustment_delay = self.constants["fan_adjustment_delay"]
 
     @property
     def speed(self) -> float:
         """Get the fan's speed (0 is off, 100 is full speed)."""
         return self.get_attribute("percentage") if self.on else 0
 
-    @speed.setter
-    def speed(self, new_speed: float):
-        """Set the fan's speed (0 is off, 100 is full speed)."""
-        if new_speed <= 0:
-            self.turn_off()
-            return
-        new_speed = self.validate_speed(new_speed)
-        if self.speed == new_speed:
-            return
-        if self.reverse_desired != self.reverse:
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"Changing '{self.room}' fan's spin direction to "
-                    f"'{self.get_attribute('direction')}'",
-                    level="DEBUG",
-                )
-            self.turn_on(percentage=self.minimum_speed, return_result=True)
-            self.reverse = self.reverse_desired
-            # TODO: try the above, if it doesn't work then try wait between each command
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Changing '{self.room}' fan speed from {self.speed}% to {new_speed}%",
-                level="DEBUG",
-            )
-        if self.on:
-            self.call_service("set_percentage", percentage=new_speed)
-        else:
-            self.turn_on(percentage=new_speed)
-
     def validate_speed(self, speed: float) -> float:
-        """Round speed up to nearest level and ensure it's between min/max values."""
-        return max(
-            self.minimum_speed,
+        """Round speed down to nearest level and ensure it's between 0% and 100%."""
+        # This matches the speed values that HA rounds to.
+        # While step is reported as 11.111...% HA uses 11% - except at 99% it uses 100%.
+        valid_speed = max(
+            0,
             min(
                 100,
-                ceil(speed / self.speed_per_level) * self.speed_per_level,
+                floor(speed / self.speed_per_level) * self.speed_per_level,
             ),
         )
+        return valid_speed if valid_speed != 99 else 100  # noqa: PLR2004
 
     @property
     def desired_cooling_speed(self) -> float:
-        """Calculate best fan speed for the current room temperature.
-
-        Formula derived from simultaneously solving the following:
-        apparent_temp = temp_without_fan - fan_cooling_per_speed * fan_speed
-        fan_speed = fan_speed_per_degree_off_target * (apparent_temp - target_temp)
-        """
+        """Calculate fan speed to lower apparent room temperature to the target."""
         speed = (
-            self.constants["fan_speed_per_degree_off_target"]
-            * (self.room_temperature_without_fan - self.target_temperature)
-            / (
-                1
-                + self.constants["fan_speed_per_degree_off_target"]
-                + self.constants["fan_cooling_per_speed"]
-            )
-        )
+            self.room_temperature_without_fan - self.target_temperature
+        ) / self.constants["fan_cooling_per_speed"]
         if self.controller.logger.isEnabledFor(
             logging.DEBUG,
         ):
-            validated_speed = self.validate_speed(speed)
-            temperature_change = self.cooling_effect_for_speed(
-                self.speed,
-                self.reverse,
-            ) - self.cooling_effect_for_speed(
-                validated_speed,
-                reverse=False,
-            )
             self.controller.log(
-                f"Desired cooling speed in the '{self.room}' is {speed:.1f}% ("
-                f"actual will be {validated_speed:.0f}%, current is {self.speed:.0f}%) "
-                f"which will change the apparent temperature by "
-                f"{temperature_change:.1f}C to "
-                f"{self.room_temperature + temperature_change:.1f}C",
+                f"Fan speed required to reduce '{self.room}' temperature to the target "
+                f"{self.target_temperature:.1f}C is {speed:.1f}% (currently "
+                f"{self.room_temperature:.1f}C and {self.speed:.0f}%) ",
                 level="DEBUG",
             )
         return speed
@@ -1005,23 +984,13 @@ class Fan(ClimateDevice, PresenceDevice):
         """True if the fan's spin direction is set to reverse."""
         return self.get_attribute("direction") == "reverse"
 
-    @reverse.setter
-    def reverse(self, new_reverse: bool):
-        """Set the fan's spin direction (forward or reverse)."""
-        self.reverse_desired = new_reverse
-        if self.on and self.reverse != new_reverse:
-            # TODO: because reversing takes time, we may need to pause all logic while this happens
-            self.call_service(
-                "set_direction",
-                direction="reverse" if new_reverse else "forward",
-                return_result=True,
-            )
-            # TODO: double check if return_result helps at all here
-
     @property
     def target_temperature(self) -> float:
-        """Get the fan's target temperature."""
-        return self.controller.get_setting("cooling_target_temperature")
+        """Get the fan's target temperature (including buffer to prevent toggling)."""
+        return (
+            self.controller.get_setting("cooling_target_temperature")
+            + self.constants["temperature_target_buffer"]
+        )
 
     @property
     def cooling_effect(self) -> float:
@@ -1035,7 +1004,7 @@ class Fan(ClimateDevice, PresenceDevice):
     ) -> float:
         """Calculate the reduction in apparent temperature caused by a given speed."""
         if reverse is None:
-            reverse = self.reverse
+            reverse = self.reverse_desired
         return (
             self.constants["fan_cooling_per_speed"]
             * speed
@@ -1051,11 +1020,41 @@ class Fan(ClimateDevice, PresenceDevice):
         """Calculate what the apparent room temperature would be if the fan was off."""
         return self.room_temperature + self.cooling_effect
 
+    @property
+    def reverse_to_match_companion_device(self) -> bool:
+        """True if the fan should be in reverse to match the companion device."""
+        return isinstance(self.companion_device, Heater) or (
+            isinstance(self.companion_device, Aircon)
+            and (
+                self.companion_device.device.state == "heat"
+                or (
+                    self.companion_device.device.state == "heat_cool"
+                    and not self.closer_to_hot_than_cold
+                )
+            )
+        )
+
+    def could_disturb_sleep_if_adjusted_to(self, reverse: bool, speed: float) -> bool:
+        """Check if the fan could disturb sleep if adjusted."""
+        return (
+            self.room in ("bedroom", "nursery")
+            and self.controller.control.scene in ("Sleep", "Morning")
+            and (
+                reverse != self.reverse or (not self.on and speed >= self.minimum_speed)
+            )
+        )
+
     def turn_on_for_conditions(self):
         """Turn the fan on with appropriate speed and direction for the environment."""
-        hot = self.closer_to_hot_than_cold
-        self.reverse = not hot
-        self.speed = self.desired_cooling_speed if hot else self.minimum_speed
+        reverse = (
+            self.reverse_to_match_companion_device
+            if (self.companion_device and self.companion_device.on)
+            else not self.closer_to_hot_than_cold
+        )
+        self.adjust(
+            reverse=reverse,
+            speed=max(self.minimum_speed, self.desired_cooling_speed),
+        )
 
     def adjust_for_conditions(
         self,
@@ -1065,65 +1064,135 @@ class Fan(ClimateDevice, PresenceDevice):
         """Calculate best fan speed for the current conditions and set accordingly."""
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
+        reverse = self.reverse_desired
         speed = 0
-        reverse = self.reverse
-        # TODO: if Sleep or Morning and hot, don't turn fan on, only off - is this required, might happen naturally?
         # TODO: handle if heating target is higher than cooling target
-        if (
-            "Away" not in self.controller.control.scene
-            or self.controller.presence.pets_home_alone
-        ) and (self.ignoring_vacancy or not self.vacant):
-            if not self.within_target_temperatures:
-                if self.closer_to_hot_than_cold:
-                    speed = self.desired_cooling_speed
-                    reverse = False
-                elif (
-                    self.companion_device
-                    and self.companion_device.on
-                    and self.controller.control.scene
-                    not in (
-                        "Sleep",
-                        "Morning",
-                    )
-                ):
-                    speed = self.minimum_speed
-                    reverse = True
-                    if self.controller.logger.isEnabledFor(logging.DEBUG):
-                        self.controller.log(
-                            f"The '{self.room}' fan will stay on with its companion "
-                            f"device ({self.companion_device.device.friendly_name})",
-                            level="DEBUG",
-                        )
-                elif self.controller.logger.isEnabledFor(logging.DEBUG) and self.on:
-                    self.controller.log(
-                        f"The '{self.room}' fan will turn off as the room is cold and "
-                        "won't help with heating or may disturb sleep",
-                        level="DEBUG",
-                    )
-            elif (
-                self.on
-                and not self.reverse_desired
-                and (
-                    self.room_temperature_without_fan
-                    >= self.controller.get_setting("cooling_target_temperature")
-                    - self.constants["temperature_target_buffer"]
-                )
+        if self.companion_device and self.companion_device.on:
+            reverse = self.reverse_to_match_companion_device
+            speed = max(self.minimum_speed, self.desired_cooling_speed)
+        elif (
+            (
+                "Away" not in self.controller.control.scene
+                or self.controller.presence.pets_home_alone
+            )
+            and (self.ignoring_vacancy or not self.vacant)
+            and not self.within_target_temperatures
+        ):
+            if (
+                self.closer_to_hot_than_cold
+                or self.room_temperature_without_fan >= self.target_temperature
             ):
-                speed = self.minimum_speed
                 reverse = False
-                if self.controller.logger.isEnabledFor(logging.DEBUG):
-                    self.controller.log(
-                        f"'{self.room}' fan will maintain minimum speed as turning it "
-                        f"off will raise the apparent temperature by "
-                        f"{self.cooling_effect:.1f}C to "
-                        f"{self.room_temperature_without_fan:.1f}C",
-                        level="DEBUG",
-                    )
+                speed = self.desired_cooling_speed
+        if self.could_disturb_sleep_if_adjusted_to(reverse, speed):
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"The desired '{self.room}' fan settings ({speed:.0f}% "
+                    f"{'reverse' if reverse else 'forward'}) could disturb sleep - "
+                    "turning off instead",
+                    level="DEBUG",
+                )
+            reverse = self.reverse_desired
+            speed = 0
         if check_if_would_adjust_only:
-            return self.reverse != reverse or self.speed != speed
-        self.reverse = reverse
-        self.speed = speed
+            return self.reverse_desired != reverse or self.speed != speed
+        self.adjust(reverse, speed)
         return None
+
+    def adjust(self, reverse: bool, speed: float) -> float:
+        """Adjust the fan direction and speed in the correct order."""
+        if self.reversing_timer:
+            self.controller.cancel_timer(self.reversing_timer)
+            self.reversing_timer = None
+        speed = self.validate_speed(speed)
+        if speed == 0:
+            self.turn_off()
+            return
+        self.reverse_desired = reverse
+        if reverse != self.reverse:
+            temperature_change = self.cooling_effect - self.cooling_effect_for_speed(
+                speed,
+                reverse,
+            )
+            self.controller.log(
+                f"Changing '{self.room}' fan's spin direction to "
+                f"'{'reverse' if self.reverse_desired else 'forward'}' and speed from "
+                f"{self.speed:.0f}% to {speed}%, which will change the apparent "
+                f"temperature by {temperature_change:.1f}C to "
+                f"{self.room_temperature + temperature_change:.1f}C",
+            )
+            if not self.on:
+                self.turn_on(percentage=self.minimum_speed)
+                self.reversing_steps_remaining = ["reverse"]
+            elif self.speed != self.minimum_speed:
+                self.call_service("set_percentage", percentage=self.minimum_speed)
+                self.reversing_steps_remaining = ["reverse"]
+            else:
+                self.call_service(
+                    "set_direction",
+                    direction="reverse" if reverse else "forward",
+                )
+                self.reversing_steps_remaining = []
+            if speed != self.minimum_speed:
+                self.reversing_steps_remaining += [speed]
+            self.reversing_timer = self.controller.run_in(
+                self.continue_reverse,
+                self.constants["fan_reversing_delay"],
+            )
+            return
+        if speed == self.speed:
+            return
+        temperature_change = self.cooling_effect - self.cooling_effect_for_speed(
+            speed,
+        )
+        self.controller.log(
+            f"Changing '{self.room}' fan speed from {self.speed:.0f}% to "
+            f"{speed}%, which will change the apparent temperature by "
+            f"{temperature_change:.1f}C to "
+            f"{self.room_temperature + temperature_change:.1f}C",
+        )
+        if self.on:
+            self.call_service("set_percentage", percentage=speed)
+        else:
+            self.turn_on(percentage=speed)
+
+    def continue_reverse(self, **kwargs: dict):
+        """Continue the remaining fan reversal steps (reverse or change speed)."""
+        del kwargs
+        if not self.reversing_steps_remaining:
+            return
+        if self.reversing_steps_remaining[0] == "reverse":
+            if self.reverse != self.reverse_desired:
+                self.call_service(
+                    "set_direction",
+                    direction="reverse" if self.reverse_desired else "forward",
+                )
+            else:
+                del self.reversing_steps_remaining[0]
+        elif self.speed != self.reversing_steps_remaining[0]:
+            self.call_service(
+                "set_percentage",
+                percentage=self.reversing_steps_remaining[0],
+            )
+        else:
+            del self.reversing_steps_remaining[0]
+        self.reversing_timer = (
+            self.controller.run_in(
+                self.continue_reverse,
+                self.constants["fan_reversing_delay"],
+            )
+            if self.reversing_steps_remaining
+            else None
+        )
+
+    # TODO: double check if return_result helps at all here
+    def turn_on(self, **parameters: dict):
+        """Call the fan's turn on service in Home Assistant and wait for response."""
+        super().turn_on(**parameters, return_result=True)
+
+    def call_service(self, service: str, **parameters: dict):
+        """Call one of the fan's services in Home Assistant and wait for response."""
+        super().call_service(service, **parameters, return_result=True)
 
 
 class Heater(ClimateDevice, PresenceDevice):
@@ -1212,10 +1281,9 @@ class Heater(ClimateDevice, PresenceDevice):
         """"""
         return (
             self.room_temperature
-            > 2 * self.desired_target_temperature
+            > self.desired_target_temperature
             + self.constants["temperature_target_buffer"]
         )
-        # TODO: figure out a better way to manage apparent temperature triggering nursery heater off than 2 *
 
     def adjust_for_conditions(
         self,
@@ -1297,6 +1365,11 @@ class Humidifier(ClimateDevice, PresenceDevice):
             self.sync_lighting,
             f"light.{room}",
             immediate=True,
+        )
+        self.controller.listen_state(
+            self.sync_lighting,
+            self.device_id,
+            new="on",
         )
         self.controller.listen_state(
             self.disable_beep,
@@ -1434,9 +1507,12 @@ class Humidifier(ClimateDevice, PresenceDevice):
     ):
         """Sync the humidifier's light with the room's light."""
         del entity, attribute, old, kwargs
+        if not self.on:
+            return
         self.controller.log(
             f"The {self.room} light is now {new}, syncing humidifier light "
             f"(currently {self.controller.get_state(f'light.{self.room}_humidifier')})",
+            level="DEBUG",
         )
         if new != "on":
             new = "off"

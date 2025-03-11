@@ -167,6 +167,7 @@ class Device:
         )
         self.room = room
         self.linked_rooms = linked_rooms
+        self.last_adjustment_time = self.controller.get_now_ts()
         devices = [self.device_id]
         if self.device_type == "group":
             devices += self.controller.get_state(self.device_id, "entity_id")
@@ -228,6 +229,7 @@ class Device:
                     entity_id=self.device_id,
                     **kwargs,
                 )
+            self.last_adjustment_time = self.controller.get_now_ts()
 
     def turn_off(self):
         """Turn the device off if it's on."""
@@ -239,10 +241,12 @@ class Device:
                     "homeassistant/turn_off",
                     entity_id=self.device_id,
                 )
+            self.last_adjustment_time = self.controller.get_now_ts()
 
     def call_service(self, service: str, **kwargs: dict):
         """Call one of the device's services in Home Assistant."""
         self.device.call_service(service, **kwargs)
+        self.last_adjustment_time = self.controller.get_now_ts()
 
     def get_attribute(
         self,

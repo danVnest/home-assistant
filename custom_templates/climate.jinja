@@ -1,5 +1,6 @@
 {%- macro fan_airspeed(room) -%}
     {%- set entity_id = 'fan.' + room -%}
+    {%- set max_airspeed = 7 if state_attr(entity_id, 'direction') == "forward" else 2 -%}
     {%- if states(entity_id) == "on" -%}
         {{- max_airspeed * state_attr(entity_id, 'percentage') / 100 -}}
     {%- else -%}
@@ -11,6 +12,8 @@
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
     {%- set mode = states(entity_id) -%}
     {%- if mode != "off" -%}
+        {%- set max_airspeed = 3 -%}
+        {%- set max_fan_temp_diff = 5 -%}
         {%- set fan_strength = state_attr(entity_id, 'fan_mode') -%}
         {%- if fan_strength == 'quiet' -%}
             {%- set fan_strength = 0.1 -%}
@@ -41,6 +44,8 @@
 
 {%- macro aircon_power(room) -%}
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
+    {%- set max_power_temp_diff = 5 -%}
+    {%- set max_airspeed = 3 -%}
     {%- set mode = states(entity_id) -%}
     {%- set temperature_difference = state_attr(entity_id, 'current_temperature')|float(0) - state_attr(entity_id, 'temperature')|float(0) -%}
     {%- if mode == "heat" -%}
