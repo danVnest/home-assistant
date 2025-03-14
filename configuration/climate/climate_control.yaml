@@ -133,13 +133,13 @@ template:
           {% set bedroom = state_attr('humidifier.bedroom', 'humidifier.fault') != 0 %}
           {% set nursery = state_attr('humidifier.nursery', 'humidifier.fault') != 0 %}
           {% if bedroom and nursery %}
-          Both humidifiers are empty
+          Both empty
           {% elif bedroom %}
-          Bedroom humidifier is empty
+          Bedroom empty
           {% elif nursery %}
-          Nursery humidifier is empty
+          Nursery empty
           {% else %}
-          Humidifiers are functional
+          Functional
           {% endif %}
         icon: mdi:air-humidifier-off
 
