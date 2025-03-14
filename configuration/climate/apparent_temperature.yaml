@@ -97,3 +97,67 @@ sensor:
       - sensor.office_sensor_temperature
       - sensor.office_sensor_humidity
       - sensor.office_airspeed
+
+  - platform: apparent_temperature
+    name: Bathroom apparent temperature ignoring wind
+    unique_id: bathroom_apparent_temperature_ignoring_wind
+    source:
+      - sensor.bathroom_multisensor_temperature
+      - sensor.bathroom_multisensor_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Bedroom apparent temperature ignoring wind
+    unique_id: bedroom_apparent_temperature_ignoring_wind
+    source:
+      - sensor.bedroom_temperature
+      - sensor.bedroom_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Dining room apparent temperature ignoring wind
+    unique_id: dining_room_apparent_temperature_ignoring_wind
+    source:
+      - sensor.dining_room_temperature
+      - sensor.dining_room_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Dog bed area apparent temperature ignoring wind
+    unique_id: dog_bed_area_apparent_temperature_ignoring_wind
+    source:
+      - sensor.dog_bed_area_sensor_temperature
+      - sensor.dog_bed_area_sensor_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Entryway apparent temperature ignoring wind
+    unique_id: entryway_apparent_temperature_ignoring_wind
+    source:
+      - sensor.entryway_multisensor_temperature
+      - sensor.entryway_multisensor_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Kitchen apparent temperature ignoring wind
+    unique_id: kitchen_apparent_temperature_ignoring_wind
+    source:
+      - sensor.kitchen_temperature
+      - sensor.kitchen_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Living room apparent temperature ignoring wind
+    unique_id: living_room_apparent_temperature_ignoring_wind
+    source:
+      - sensor.living_room_temperature
+      - sensor.living_room_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Nursery apparent temperature ignoring wind
+    unique_id: nursery_apparent_temperature_ignoring_wind
+    source:
+      - sensor.nursery_temperature
+      - sensor.nursery_humidity
+      - sensor.zero_airspeed
+  - platform: apparent_temperature
+    name: Office apparent temperature ignoring wind
+    unique_id: office_apparent_temperature_ignoring_wind
+    source:
+      - sensor.office_sensor_temperature
+      - sensor.office_sensor_humidity
+      - sensor.zero_airspeed

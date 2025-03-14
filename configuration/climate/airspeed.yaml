@@ -146,3 +146,10 @@ template:
             state_attr('fan.office', 'direction') is not none and
             state_attr('fan.office', 'percentage') is not none
           }}
+      - name: Zero airspeed
+        unique_id: zero_airspeed
+        state: "{{ 0 }}"
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy

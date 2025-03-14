@@ -467,8 +467,7 @@ class ClimateDevice(Device):
 
     def __init__(
         self,
-        monitor_temperature: bool = True,
-        monitor_humidity: bool = False,
+        monitor_humidity_only: bool = False,
         **kwargs: dict,
     ):
         """Initialise with device parameters and prepare for presence adjustments?"""
@@ -478,22 +477,24 @@ class ClimateDevice(Device):
         self.temperature_sensors = []
         self.humidity_sensors = []
         for room in (self.room, *self.linked_rooms):
-            temperature_sensor_id = f"sensor.{room}_apparent_temperature"
-            humidity_sensor_id = f"sensor.{room}_humidity"
-            self.temperature_sensors.append(
-                self.controller.get_entity(temperature_sensor_id),
-            )
-            self.humidity_sensors.append(
-                self.controller.get_entity(humidity_sensor_id),
-            )
-            if monitor_temperature:
+            if not monitor_humidity_only:
+                temperature_sensor_id = (
+                    f"sensor.{room}_apparent_temperature_ignoring_wind"
+                )
+                self.temperature_sensors.append(
+                    self.controller.get_entity(temperature_sensor_id),
+                )
                 self.controller.listen_state(
                     self.handle_sensor_change,
                     temperature_sensor_id,
                     duration=0.5,
                     constrain_input_boolean=self.control_input_boolean,
                 )
-            if monitor_humidity:
+            else:
+                humidity_sensor_id = f"sensor.{room}_humidity"
+                self.humidity_sensors.append(
+                    self.controller.get_entity(humidity_sensor_id),
+                )
                 self.controller.listen_state(
                     self.handle_sensor_change,
                     humidity_sensor_id,
@@ -965,16 +966,16 @@ class Fan(ClimateDevice, PresenceDevice):
     @property
     def desired_cooling_speed(self) -> float:
         """Calculate fan speed to lower apparent room temperature to the target."""
-        speed = (
-            self.room_temperature_without_fan - self.target_temperature
-        ) / self.constants["fan_cooling_per_speed"]
+        speed = (self.room_temperature - self.target_temperature) / self.constants[
+            "fan_cooling_per_speed"
+        ]
         if self.controller.logger.isEnabledFor(
             logging.DEBUG,
         ):
             self.controller.log(
                 f"Fan speed required to reduce '{self.room}' temperature to the target "
                 f"{self.target_temperature:.1f}C is {speed:.1f}% (currently "
-                f"{self.room_temperature:.1f}C and {self.speed:.0f}%) ",
+                f"{self.room_temperature_with_wind_chill:.1f}C and {self.speed:.0f}%) ",
                 level="DEBUG",
             )
         return speed
@@ -1016,9 +1017,9 @@ class Fan(ClimateDevice, PresenceDevice):
         )
 
     @property
-    def room_temperature_without_fan(self) -> float:
+    def room_temperature_with_wind_chill(self) -> float:
         """Calculate what the apparent room temperature would be if the fan was off."""
-        return self.room_temperature + self.cooling_effect
+        return self.room_temperature - self.cooling_effect
 
     @property
     def reverse_to_match_companion_device(self) -> bool:
@@ -1078,10 +1079,7 @@ class Fan(ClimateDevice, PresenceDevice):
             and (self.ignoring_vacancy or not self.vacant)
             and not self.within_target_temperatures
         ):
-            if (
-                self.closer_to_hot_than_cold
-                or self.room_temperature_without_fan >= self.target_temperature
-            ):
+            if self.closer_to_hot_than_cold:
                 reverse = False
                 speed = self.desired_cooling_speed
         if self.could_disturb_sleep_if_adjusted_to(reverse, speed):
@@ -1340,8 +1338,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
             device_id=device_id,
             controller=controller,
             control_input_boolean_suffix="_humidifier",
-            monitor_humidity=True,
-            monitor_temperature=False,
+            monitor_humidity_only=True,
             room=room,
             linked_rooms=linked_rooms,
         )
