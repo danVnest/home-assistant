@@ -56,6 +56,33 @@
                 },
                 {
                   "type": "tile",
+                  "name": "WARNING: Dog water bowl is empty",
+                  "state_content": "last_changed",
+                  "icon": "mdi:cup-water",
+                  "color": "red",
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 1
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.dog_water_bowl",
+                      "state_not": "on"
+                    }
+                  ],
+                  "entity": "binary_sensor.dog_water_bowl",
+                  "features_position": "bottom",
+                  "vertical": false,
+                  "card_mod": {
+                    "style": {
+                      "ha-tile-info$": "state-display:before {\n  content: 'Empty since';\n}\n",
+                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--state-icon-color), red) !important;\n}\n"
+                    }
+                  }
+                },
+                {
+                  "type": "tile",
                   "entity": "binary_sensor.internet",
                   "name": "WARNING: Internet is disconnected",
                   "state_content": "last_changed",
