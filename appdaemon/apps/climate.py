@@ -1347,16 +1347,9 @@ class Humidifier(ClimateDevice, PresenceDevice):
         )
         self.controller.listen_state(
             self.handle_empty_water_tank,
-            device_id,
-            attribute="humidifier.fault",
-            new=lambda x: x is not None and x > 0,
-            old=0,
-        )
-        self.controller.listen_state(
-            self.handle_empty_water_tank,
-            device_id,
-            new=lambda x: x != "off",
-            old="off",
+            f"sensor.{room}_humidifier_faults",
+            new=lambda x: x != "no faults",
+            old="no faults",
         )
         self.controller.listen_state(
             self.sync_lighting,
@@ -1411,7 +1404,10 @@ class Humidifier(ClimateDevice, PresenceDevice):
     @property
     def empty_water_tank(self) -> bool:
         """Check if the humidifier's water tank is empty."""
-        return self.get_attribute("humidifier.fault") > 0
+        return (
+            self.controller.get_state(f"sensor.{self.room}_humidifier_faults")
+            != "no faults"
+        )
 
     def handle_empty_water_tank(
         self,

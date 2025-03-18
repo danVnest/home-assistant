@@ -130,8 +130,8 @@ template:
       - name: Humidifiers status text
         unique_id: humidifiers_status_text
         state: >
-          {% set bedroom = state_attr('humidifier.bedroom', 'humidifier.fault') != 0 %}
-          {% set nursery = state_attr('humidifier.nursery', 'humidifier.fault') != 0 %}
+          {% set bedroom = states('sensor.bedroom_humidifier_faults') != 'no faults' %}
+          {% set nursery = states('sensor.nursery_humidifier_faults') != 'no faults' %}
           {% if bedroom and nursery %}
           Both empty
           {% elif bedroom %}
