@@ -96,3 +96,27 @@ automation:
   # TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
   # Maybe set up homekit here on zwave setup completion? Or maybe do this here:
   # https://app.asana.com/0/1207020279479204/1207033183175579/f
+
+script:
+  toggle_group:
+    alias: Toggle group
+    description: If group is on (for both 'any' and 'all' group types), turn all off else turn all on.
+    mode: queued
+    fields:
+      group:
+        name: Group
+        description: The group to toggle.
+        example: group.example
+        required: true
+    sequence:
+      - if:
+          - condition: template
+            value_template: "{{ states(group) == 'on' }}"
+        then:
+          - action: homeassistant.turn_off
+            target:
+              entity_id: "{{ expand(group) | map(attribute='entity_id') | list }}"
+        else:
+          - action: homeassistant.turn_on
+            target:
+              entity_id: "{{ expand(group) | map(attribute='entity_id') | list }}"

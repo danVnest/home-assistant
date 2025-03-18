@@ -71,6 +71,13 @@ group:
       - input_boolean.control_office_light
     icon: mdi:home-lightbulb
     all: true
+  all_kitchen_light_control:
+    name: Kitchen light control
+    entities:
+      - input_boolean.control_kitchen_light
+      - input_boolean.control_kitchen_strip_light
+    icon: mdi:home-lightbulb
+    all: true
 
 template:
   - sensor:

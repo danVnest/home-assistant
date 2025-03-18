@@ -651,9 +651,9 @@
                       },
                       "hold_action": {
                         "action": "call-service",
-                        "service": "homeassistant.toggle",
-                        "target": {
-                          "entity_id": "group.all_climate_control"
+                        "service": "script.toggle_group",
+                        "data": {
+                          "group": "group.all_light_control"
                         }
                       }
                     },
@@ -711,8 +711,10 @@
                       },
                       "hold_action": {
                         "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {}
+                        "service": "script.toggle_group",
+                        "data": {
+                          "group": "group.all_kitchen_light_control"
+                        }
                       }
                     },
                     {
@@ -791,7 +793,7 @@
                       }
                     }
                   ],
-                  "styles": ".bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_hall_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${hass.states['input_boolean.control_bedroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${hass.states['input_boolean.control_nursery_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-9 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;  \n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
+                  "styles": ".bubble-name-container {\n  max-width: 0px !important;\n} .large .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_hall_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? '1.5px solid green' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? '1.5px solid grey' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${hass.states['input_boolean.control_bedroom_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${hass.states['input_boolean.control_nursery_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n} .bubble-sub-button-9 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? '1.5px solid green' : 'none'} !important;  \n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? '1.5px solid green' : 'none'} !important;\n}\n"
                 }
               ]
             },
@@ -881,9 +883,9 @@
                   "card_layout": "large-2-rows",
                   "hold_action": {
                     "action": "call-service",
-                    "service": "homeassistant.toggle",
-                    "target": {
-                      "entity_id": "group.all_aircon_control"
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_aircon_control"
                     }
                   },
                   "button_action": {
@@ -892,9 +894,9 @@
                     },
                     "hold_action": {
                       "action": "call-service",
-                      "service": "homeassistant.toggle",
-                      "target": {
-                        "entity_id": "group.all_aircon_control"
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_aircon_control"
                       }
                     }
                   },
@@ -958,9 +960,9 @@
                   "card_layout": "large-2-rows",
                   "hold_action": {
                     "action": "call-service",
-                    "service": "homeassistant.toggle",
-                    "target": {
-                      "entity_id": "group.all_fan_control"
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_fan_control"
                     }
                   },
                   "button_action": {
@@ -969,9 +971,9 @@
                     },
                     "hold_action": {
                       "action": "call-service",
-                      "service": "homeassistant.toggle",
-                      "target": {
-                        "entity_id": "group.all_fan_control"
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_fan_control"
                       }
                     }
                   },
@@ -1035,9 +1037,9 @@
                   "card_layout": "large-2-rows",
                   "hold_action": {
                     "action": "call-service",
-                    "service": "homeassistant.toggle",
-                    "target": {
-                      "entity_id": "group.all_heater_control"
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_heater_control"
                     }
                   },
                   "button_action": {
@@ -1046,9 +1048,9 @@
                     },
                     "hold_action": {
                       "action": "call-service",
-                      "service": "homeassistant.toggle",
-                      "target": {
-                        "entity_id": "group.all_heater_control"
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_heater_control"
                       }
                     }
                   },
@@ -1098,9 +1100,9 @@
                   "card_layout": "large-2-rows",
                   "hold_action": {
                     "action": "call-service",
-                    "service": "homeassistant.toggle",
-                    "target": {
-                      "entity_id": "group.all_humidifier_control"
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_humidifier_control"
                     }
                   },
                   "button_action": {
@@ -1109,9 +1111,9 @@
                     },
                     "hold_action": {
                       "action": "call-service",
-                      "service": "homeassistant.toggle",
-                      "target": {
-                        "entity_id": "group.all_humidifier_control"
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_humidifier_control"
                       }
                     }
                   },
