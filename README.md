@@ -6,24 +6,21 @@ The goal of this setup is to require as little input from users as possible - in
 
 ## Usage Instructions & User Interface
 
-The user interface primarily features configuration parameters, but does also provide manual controls and some status indicators. Usage instructions are embedded, as shown below:
+Usage instructions are provided in a dedicated dashboard, as shown below:
 
-TODO: <https://app.asana.com/0/1207020279479204/1203851145721580/f>
-TODO: update screenshots once floor plan is added and layout is finalised
+![Guide](ui-screenshots/guide.png "Guide")
 
-![Control & Status](ui-screenshots/control-status.png "Control & Status")
+The main dashboard shows an overview of the entire system with integrated controls and conditional warnings (e.g. dog water bowl empty or plants need watering). This is done succinctly so as to fit on a single phone screen view without scrolling.
 
-![Instructions](ui-screenshots/instructions.png "Instructions")
+![Overview](ui-screenshots/overview.png "Overview")
 
-![Settings](ui-screenshots/settings.png "Settings")
-
-![System](ui-screenshots/system.png "System")
+The remaining dashboards include detailed settings, controls, and sensors for lighting, climate control, presence monitoring, electicity usage, and plant watering.
 
 ## Devices
 
 This home automation system is comprised of the following devices:
 
-- [Raspberry Pi 4 Model B](https://www.raspberrypi.org/products/raspberry-pi-4-model-b) running Home Assistant
+- [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5/) with NVME running Home Assistant
 - [Orbi AC3000 Mesh WiFi System](https://www.netgear.com/home/wifi/mesh/rbk50)
 - [Zooz USB Z-Wave controller](https://www.getzooz.com/zooz-zst10-s2-stick)
 - [ZigBee hub](https://www.aliexpress.com/item/1005006592375647.html)
