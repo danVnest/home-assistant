@@ -285,16 +285,27 @@ powercalc:
               daily_fixed_energy:
                 value: 0.048 # estimate
             - power_sensor_id: sensor.dishwasher_switch_device_power
+              energy_sensor_id: sensor.dishwasher_switch_device_energy
             - power_sensor_id: sensor.freezer_mini_fridge_routers_switch_device_power
+              energy_sensor_id: sensor.freezer_mini_fridge_routers_switch_device_energy
             - power_sensor_id: sensor.fridge_switch_device_power
+              energy_sensor_id: sensor.fridge_switch_device_energy
             - power_sensor_id: sensor.kettle_milk_frother_switch_device_power
+              energy_sensor_id: sensor.kettle_milk_frother_switch_device_energy
             - power_sensor_id: sensor.kitchen_switch_device_power
+              energy_sensor_id: sensor.kitchen_switch_device_energy
             - power_sensor_id: sensor.microwave_switch_device_power
+              energy_sensor_id: sensor.microwave_switch_device_energy
             - power_sensor_id: sensor.office_desk_switch_device_power
+              energy_sensor_id: sensor.office_desk_switch_device_energy
             - power_sensor_id: sensor.office_heater_switch_device_power
+              energy_sensor_id: sensor.office_heater_switch_device_energy
             - power_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_power
+              energy_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_energy
             - power_sensor_id: sensor.toaster_blender_switch_device_power
+              energy_sensor_id: sensor.toaster_blender_switch_device_energy
             - power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_power
+              energy_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_energy
         - entity_id: switch.paludarium_picture_frame_camera
           name: Paludarium, picture frame, camera
           power_sensor_id: sensor.paludarium_picture_frame_camera_power
