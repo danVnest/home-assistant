@@ -33,81 +33,22 @@ template:
         icon: mdi:home-alert
       - name: Device issues
         unique_id: device_issues
-        state: "{{ states('sensor.unavailable_entities')|int(1) + states('sensor.frozen_devices')|int(1) }}"
+        state: "{{ states('sensor.unavailable_entities')|int(1) + states('sensor.frozen_entities')|int(1) }}"
         state_class: total
         icon: mdi:alert-circle
       - name: Unavailable entities
         unique_id: unavailable_entities
         state: >
-          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {% set entities = state_attr('group.unavailable_entities', 'entity_id') %}
           {{ entities|count if entities != none else none }}
-        attributes:
-          entity_id: >
-            {% set allowed_entities = [this.entity_id] + integration_entities('iBeacon Tracker') %}
-            {% set unknown_allowed_entities =
-                [
-                    states.sensor.extreme_forecast,
-                ]
-                |selectattr('state', 'eq', 'unknown')
-                |map(attribute='entity_id')|list
-            %}
-            {% set long_delay_hours = 3 %}
-            {% set long_unknown_allowed_entities =
-                [
-                  states.sensor.rachel_s_phone_detected_activity,
-                  states.binary_sensor.rachel_s_phone_still,
-                ]
-                |selectattr('state', 'eq', 'unknown')
-                |selectattr('last_changed', 'ge', (now().timestamp() - long_delay_hours*60*60)|as_datetime)
-                |map(attribute='entity_id')|list
-            %}
-            {% set delay_seconds = 60 %}
-            {{ states
-                |rejectattr('entity_id', 'in', allowed_entities + unknown_allowed_entities + long_unknown_allowed_entities)
-                |rejectattr('entity_id', 'has_value')
-                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image'])
-                |rejectattr('last_changed', 'ge', (now().timestamp() - delay_seconds)|as_datetime)
-                |map(attribute='entity_id')|list
-            }}
         state_class: measurement
         unit_of_measurement: entities
         icon: mdi:alert-circle
-      - name: Frozen devices
-        unique_id: frozen_devices
+      - name: Frozen entities
+        unique_id: frozen_entities
         state: >
-          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {% set entities = state_attr('group.frozen_entities', 'entity_id') %}
           {{ entities|count if entities != none else none }}
-        attributes:
-          entity_id: >
-            {% set frozen_device_10_minute_check_entities =
-                [
-                  states.sensor.outside_apparent_temperature,
-                  states.sensor.bedroom_presence_sensor_esp_temperature,
-                  states.sensor.kitchen_presence_sensor_esp_temperature,
-                  states.sensor.nursery_presence_sensor_esp_temperature,
-                  states.sensor.office_presence_sensor_esp_temperature,
-                  states.sensor.smart_meter_real_power,
-                  states.sensor.power_meter_power_grid,
-                ]
-                |rejectattr('entity_id', 'has_value')
-                |selectattr('last_updated', 'le', (now().timestamp() - 10 * 60)|as_datetime)
-                |map(attribute='entity_id')|list
-            %}
-            {% set frozen_device_12_hour_check_entities =
-                [
-                  states.sensor.entryway_multisensor_temperature,
-                  states.sensor.hall_multisensor_temperature,
-                  states.sensor.dining_room_multisensor_temperature,
-                  states.sensor.bathroom_multisensor_temperature,
-                  states.sensor.office_sensor_temperature,
-                  states.sensor.dog_bed_area_sensor_temperature,
-                  states.sensor.nursery_sensor_temperature,
-                ]
-                |rejectattr('entity_id', 'has_value')
-                |selectattr('last_updated', 'le', (now().timestamp() - 12 * 60 * 60)|as_datetime)
-                |map(attribute='entity_id')|list
-            %}
-            {{ frozen_device_10_minute_check_entities + frozen_device_12_hour_check_entities }}
         state_class: measurement
         unit_of_measurement: entities
         icon: mdi:help-circle
@@ -223,53 +164,97 @@ template:
         availability: "{{ has_value('sensor.soil_battery_voltage_office') }}"
 
 automation:
-  # from https://github.com/jazzyisj/unavailable-entities-sensor
-  # TODO: update the following to include frozen?
-  - alias: Unavailable entities system notification
-    id: unavailable_entities_system_notification
-    description: Show unavailable entities in a persistent system notification
-    mode: restart
+  - alias: Update unavailable entities group
+    id: update_unavailable_entities_group
+    description: Update unavailable entities group
+    mode: single
+    max_exceeded: silent
     triggers:
-      - trigger: state
-        entity_id: sensor.unavailable_entities
-        attribute: entity_id
-        to: ~
-    condition:
-      - condition: template
-        alias: Sensor state is and was a valid numerical value
-        value_template: "{{ is_number(trigger.from_state.state) and is_number(trigger.to_state.state) }}"
+      - trigger: event
+        event_type: call_service
+        event_data:
+          domain: group
+          service: reload
+      - trigger: time_pattern
+        minutes: "/5"
     actions:
-      - action: persistent_notification.create
+      - action: group.set
         data:
-          notification_id: unavailable_entities
-          title: Unavailable Entities
-          message: >
-            {% set ns = namespace(result=[]) %}
-            {% for s in expand(state_attr('sensor.unavailable_entities', 'entity_id')) %}
-              {% set ns.result = ns.result + [
-                  device_attr(s.entity_id, "name") ~ "|" ~ device_id(s.entity_id) ~ "|- **" ~ s.name ~ "**\n"
-                  ~ "  - *entity_id*: " ~ s.entity_id ~ "\n"
-                  ~ "  - *state*: " ~ s.state ~ "\n"
+          object_id: unavailable_entities
+          entities: >
+            {% set allowed_entities = [
+              this.entity_id,
+              'sensor.power_meter_relative_self_consumption',
+            ] + integration_entities('iBeacon Tracker') %}
+            {% set unknown_allowed_entities =
+                [
+                    states.sensor.extreme_forecast,
                 ]
-              %}
-            {% endfor %}
-            {% set ns.result = ns.result | sort %}
-            {% set lastdev = namespace( id="" ) %}
-            {% set tarr = ns.result %}
-            {% set ns.result = [] %}
-            {% for item in tarr %}
-              {% set dev = namespace( id="" ) %}
-              {% set entity = namespace( data="" ) %}
-              {% set dev.id = item.split("|")[1] %}
-              {% set entity.data = item.split("|")[2] %}
-              {% if lastdev.id != dev.id %}
-                {% if dev.id != 'None' %}
-                  {% set ns.result = ns.result + [ "**<a href=\"/config/devices/device/" ~ dev.id ~ "\">" ~ device_attr(dev.id, "name") ~ "</a>**" ] %}
-                {% else %}
-                  {% set ns.result = ns.result + [ "**Non-Device Entities**" ] %}
-                {% endif %}
-                {% set lastdev.id = dev.id %}
-              {% endif %}
-              {% set ns.result = ns.result + [ entity.data ] %}
-            {% endfor %}
-            {{ ns.result | join('\n') }}
+                |selectattr('state', 'eq', 'unknown')
+                |map(attribute='entity_id')|list
+            %}
+            {% set long_delay_hours = 3 %}
+            {% set long_unknown_allowed_entities =
+                [
+                  states.sensor.rachel_s_phone_detected_activity,
+                  states.binary_sensor.rachel_s_phone_still,
+                ]
+                |selectattr('state', 'eq', 'unknown')
+                |selectattr('last_changed', 'ge', (now().timestamp() - long_delay_hours*60*60)|as_datetime)
+                |map(attribute='entity_id')|list
+            %}
+            {% set delay_minutes = 5 %}
+            {{ states
+                |rejectattr('entity_id', 'in', allowed_entities + unknown_allowed_entities + long_unknown_allowed_entities)
+                |rejectattr('entity_id', 'has_value')
+                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image'])
+                |rejectattr('last_changed', 'ge', (now().timestamp() - delay_minutes * 60)|as_datetime)
+                |map(attribute='entity_id')|list
+            }}
+  - alias: Update frozen entities group
+    id: update_frozen_entities_group
+    description: Update frozen entities group
+    mode: single
+    max_exceeded: silent
+    triggers:
+      - trigger: event
+        event_type: call_service
+        event_data:
+          domain: group
+          service: reload
+      - trigger: time_pattern
+        minutes: "/5"
+    actions:
+      - action: group.set
+        data:
+          object_id: frozen_entities
+          entities: >
+            {% set frozen_entities_10_minute_check_entities =
+                [
+                  states.sensor.outside_apparent_temperature,
+                  states.sensor.bedroom_presence_sensor_esp_temperature,
+                  states.sensor.kitchen_presence_sensor_esp_temperature,
+                  states.sensor.nursery_presence_sensor_esp_temperature,
+                  states.sensor.office_presence_sensor_esp_temperature,
+                  states.sensor.smart_meter_real_power,
+                  states.sensor.power_meter_power_grid,
+                ]
+                |rejectattr('entity_id', 'has_value')
+                |selectattr('last_updated', 'le', (now().timestamp() - 10 * 60)|as_datetime)
+                |map(attribute='entity_id')|list
+            %}
+            {% set frozen_entities_12_hour_check_entities =
+                [
+                  states.sensor.entryway_multisensor_temperature,
+                  states.sensor.hall_multisensor_temperature,
+                  states.sensor.dining_room_multisensor_temperature,
+                  states.sensor.bathroom_multisensor_temperature,
+                  states.sensor.office_sensor_temperature,
+                  states.sensor.dog_bed_area_sensor_temperature,
+                  states.sensor.nursery_sensor_temperature,
+                ]
+                |rejectattr('entity_id', 'has_value')
+                |selectattr('last_updated', 'le', (now().timestamp() - 12 * 60 * 60)|as_datetime)
+                |map(attribute='entity_id')|list
+            %}
+            {{ frozen_entities_10_minute_check_entities + frozen_entities_12_hour_check_entities }}

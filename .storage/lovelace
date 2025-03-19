@@ -137,7 +137,7 @@
                       "show_background": false
                     },
                     {
-                      "entity": "sensor.frozen_devices",
+                      "entity": "sensor.frozen_entities",
                       "show_state": true,
                       "show_background": false
                     }
@@ -149,7 +149,7 @@
                       "above": 0
                     }
                   ],
-                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_devices'].state + ' frozen' }\n"
+                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1369,7 +1369,7 @@
                         "type": "entities"
                       },
                       "filter": {
-                        "template": "{% set unavailable_entities = state_attr('sensor.unavailable_entities', 'entity_id') %}\n{% set frozen_devices = state_attr('sensor.frozen_devices', 'entity_id') %}\n{{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_devices if frozen_devices is not none else [])\n  )[:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_entities if frozen_entities is not none else [])\n  )[:15]\n}}\n"
                       }
                     },
                     {
@@ -1381,7 +1381,7 @@
                         "refresh_interval": 0
                       },
                       "filter": {
-                        "template": "{% set unavailable_entities = state_attr('sensor.unavailable_entities', 'entity_id') %}\n{% set frozen_devices = state_attr('sensor.frozen_devices', 'entity_id') %}\n{{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_devices if frozen_devices is not none else [])\n  )[:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_entities if frozen_entities is not none else [])\n  )[:15]\n}}\n"
                       }
                     },
                     {
