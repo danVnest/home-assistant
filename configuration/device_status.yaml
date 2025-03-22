@@ -55,32 +55,22 @@ template:
       - name: Low batteries
         unique_id: low_batteries
         state: >
-          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {% set entities = state_attr('group.low_batteries', 'entity_id') %}
           {% set unavailable = state_attr(this.entity_id, 'unavailable')|int(0) %}
           {{ (entities|count - unavailable) if entities != none else none }}
         attributes:
-          entity_id: >
-            {% set low_battery_threshold = 25 %}
-            {% set entities = states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list|sort %}
-            {% set battery_levels = entities|map('states')|map('float', 0)|list %}
-            {{ zip(entities, battery_levels)|selectattr(1, '<=', low_battery_threshold)|map(attribute=0)|list }}
-          unavailable: "{{ state_attr(this.entity_id, 'entity_id')|reject('has_value')|list|count }}"
+          unavailable: "{{ state_attr('group.low_batteries', 'entity_id')|reject('has_value')|list|count }}"
         state_class: measurement
         unit_of_measurement: devices
         icon: mdi:battery-low
       - name: Charging batteries
         unique_id: charging_batteries
         state: >
-          {% set entities = state_attr(this.entity_id, 'entity_id') %}
+          {% set entities = state_attr('group.charging_batteries', 'entity_id') %}
           {{ entities|count if entities != none else none }}
         attributes:
-          entity_id: >
-            {% set entities = states.sensor|selectattr('entity_id', 'search', 'charging_status$|battery_state$')|map(attribute='entity_id')|list|sort %}
-            {% set status = entities|map('states')|list %}
-            {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'full', 'Full'])|map(attribute=0)|list %}
-            {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}
-          above_90: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('ge', 90)|list|count }}"
-          above_50: "{{ state_attr(this.entity_id, 'entity_id')|map('states')|map('float', 0)|select('ge', 50)|select('lt', 90)|list|count }}"
+          above_90: "{{ state_attr('group.charging_batteries', 'entity_id')|map('states')|map('float', 0)|select('ge', 90)|list|count }}"
+          above_50: "{{ state_attr('group.charging_batteries', 'entity_id')|map('states')|map('float', 0)|select('ge', 50)|select('lt', 90)|list|count }}"
         state_class: measurement
         unit_of_measurement: devices
         icon: mdi:battery-charging
@@ -164,12 +154,14 @@ template:
         availability: "{{ has_value('sensor.soil_battery_voltage_office') }}"
 
 automation:
-  - alias: Update unavailable entities group
-    id: update_unavailable_entities_group
-    description: Update unavailable entities group
+  - alias: Update device issue and battery groups
+    id: update_device_issue_and_battery_groups
+    description: Update device issue and battery groups
     mode: single
     max_exceeded: silent
     triggers:
+      - trigger: homeassistant
+        event: start
       - trigger: event
         event_type: call_service
         event_data:
@@ -183,7 +175,6 @@ automation:
           object_id: unavailable_entities
           entities: >
             {% set allowed_entities = [
-              this.entity_id,
               'sensor.power_meter_relative_self_consumption',
             ] + integration_entities('iBeacon Tracker') %}
             {% set unknown_allowed_entities =
@@ -211,20 +202,6 @@ automation:
                 |rejectattr('last_changed', 'ge', (now().timestamp() - delay_minutes * 60)|as_datetime)
                 |map(attribute='entity_id')|list
             }}
-  - alias: Update frozen entities group
-    id: update_frozen_entities_group
-    description: Update frozen entities group
-    mode: single
-    max_exceeded: silent
-    triggers:
-      - trigger: event
-        event_type: call_service
-        event_data:
-          domain: group
-          service: reload
-      - trigger: time_pattern
-        minutes: "/5"
-    actions:
       - action: group.set
         data:
           object_id: frozen_entities
@@ -237,24 +214,37 @@ automation:
                   states.sensor.nursery_presence_sensor_esp_temperature,
                   states.sensor.office_presence_sensor_esp_temperature,
                   states.sensor.smart_meter_real_power,
-                  states.sensor.power_meter_power_grid,
+                  states.sensor.power_meter_power_load_consumed,
                 ]
-                |rejectattr('entity_id', 'has_value')
+                |selectattr('entity_id', 'has_value')
                 |selectattr('last_updated', 'le', (now().timestamp() - 10 * 60)|as_datetime)
                 |map(attribute='entity_id')|list
             %}
             {% set frozen_entities_12_hour_check_entities =
-                [
-                  states.sensor.entryway_multisensor_temperature,
-                  states.sensor.hall_multisensor_temperature,
-                  states.sensor.dining_room_multisensor_temperature,
-                  states.sensor.bathroom_multisensor_temperature,
-                  states.sensor.office_sensor_temperature,
-                  states.sensor.dog_bed_area_sensor_temperature,
-                  states.sensor.nursery_sensor_temperature,
-                ]
-                |rejectattr('entity_id', 'has_value')
+                (
+                  states.sensor|selectattr('entity_id', 'search', 'r_temperature$|feels_like|voltage$|last_seen')|list +
+                  [
+                    states.sensor.nursery_heater_uncalibrated_temperature,
+                  ]
+                )
+                |selectattr('entity_id', 'has_value')
                 |selectattr('last_updated', 'le', (now().timestamp() - 12 * 60 * 60)|as_datetime)
                 |map(attribute='entity_id')|list
             %}
             {{ frozen_entities_10_minute_check_entities + frozen_entities_12_hour_check_entities }}
+      - action: group.set
+        data:
+          object_id: low_batteries
+          entities: >
+            {% set low_battery_threshold = 25 %}
+            {% set entities = states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list|sort %}
+            {% set battery_levels = entities|map('states')|map('float', 0)|list %}
+            {{ zip(entities, battery_levels)|selectattr(1, '<=', low_battery_threshold)|map(attribute=0)|list }}
+      - action: group.set
+        data:
+          object_id: charging_batteries
+          entities: >
+            {% set entities = states.sensor|selectattr('entity_id', 'search', 'charging_status$|battery_state$')|map(attribute='entity_id')|list|sort %}
+            {% set status = entities|map('states')|list %}
+            {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'full', 'Full'])|map(attribute=0)|list %}
+            {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}

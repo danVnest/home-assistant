@@ -1327,12 +1327,25 @@
                       "type": "custom:bubble-card",
                       "card_type": "pop-up",
                       "hash": "#device-issues",
-                      "button_type": "name",
+                      "button_type": "state",
                       "name": "Device issues",
+                      "entity": "automation.update_device_issue_and_battery_groups",
+                      "attribute": "last_triggered",
+                      "show_state": false,
                       "icon": "mdi:alert-circle",
-                      "show_name": true,
                       "card_layout": "large",
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n",
+                      "sub_button": [
+                        {
+                          "icon": "mdi:refresh",
+                          "show_background": false,
+                          "tap_action": {
+                            "action": "call-service",
+                            "service": "group.reload"
+                          }
+                        }
+                      ],
+                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} ${card.querySelector('.bubble-state').innerText = 'Checked ' + Math.floor((new Date() - new Date(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60) + ' minute(s) ago'}\n",
+                      "bg_opacity": "10"
                     },
                     {
                       "type": "tile",
@@ -1404,12 +1417,24 @@
                       "type": "custom:bubble-card",
                       "card_type": "pop-up",
                       "hash": "#low-batteries",
-                      "button_type": "name",
+                      "button_type": "state",
                       "name": "Low batteries",
+                      "entity": "automation.update_device_issue_and_battery_groups",
+                      "attribute": "last_triggered",
+                      "show_state": false,
                       "icon": "mdi:battery-low",
-                      "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n"
+                      "sub_button": [
+                        {
+                          "icon": "mdi:refresh",
+                          "show_background": false,
+                          "tap_action": {
+                            "action": "call-service",
+                            "service": "group.reload"
+                          }
+                        }
+                      ],
+                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n${card.querySelector('.bubble-state').innerText = 'Checked ' +\nMath.floor((new Date() - new\nDate(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60)\n+ ' minute(s) ago'}\n"
                     },
                     {
                       "type": "tile",
@@ -1441,7 +1466,7 @@
                         "type": "entities"
                       },
                       "filter": {
-                        "template": "{{ state_attr('sensor.low_batteries', 'entity_id') }}"
+                        "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
                       },
                       "sort": {
                         "method": "state"
@@ -1456,7 +1481,7 @@
                         "refresh_interval": 0
                       },
                       "filter": {
-                        "template": "{{ state_attr('sensor.low_batteries', 'entity_id') }}"
+                        "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
                       }
                     },
                     {
@@ -1497,7 +1522,7 @@
                           "above": 0
                         }
                       ],
-                      "styles": ".bubble-button-card-container {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_devices'].state + ' frozen' }\n"
+                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n"
                     }
                   ]
                 },
@@ -1508,12 +1533,25 @@
                       "type": "custom:bubble-card",
                       "card_type": "pop-up",
                       "hash": "#charging-batteries",
-                      "button_type": "name",
+                      "button_type": "state",
                       "name": "Charging batteries",
+                      "entity": "automation.update_device_issue_and_battery_groups",
+                      "attribute": "last_triggered",
+                      "show_state": false,
                       "icon": "mdi:battery-charging",
                       "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n}\n"
+                      "sub_button": [
+                        {
+                          "icon": "mdi:refresh",
+                          "show_background": false,
+                          "tap_action": {
+                            "action": "call-service",
+                            "service": "group.reload"
+                          }
+                        }
+                      ],
+                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n}\n${card.querySelector('.bubble-state').innerText = 'Checked ' +\nMath.floor((new Date() - new\nDate(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60)\n+ ' minute(s) ago'}\n"
                     },
                     {
                       "type": "markdown",
@@ -1525,7 +1563,7 @@
                         "type": "entities"
                       },
                       "filter": {
-                        "template": "{{ state_attr('sensor.charging_batteries', 'entity_id') }}"
+                        "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
                       },
                       "sort": {
                         "method": "state"
@@ -1540,7 +1578,7 @@
                         "refresh_interval": 0
                       },
                       "filter": {
-                        "template": "{{ state_attr('sensor.charging_batteries', 'entity_id') }}"
+                        "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
                       }
                     }
                   ]
@@ -1557,7 +1595,7 @@
                       "icon": "mdi:text-box",
                       "show_name": true,
                       "card_layout": "large",
-                      "styles": ".bubble-pop-up, .bubble-pop-up-container,\n.bubble-button-card-container, .bubble-close-button {\n  background: var(--ha-card-background) !important;\n  border-radius: var(--ha-card-border-radius) !important;\n} .large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  background: var(--ha-card-background) !important;\n}\n"
+                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n}\n"
                     },
                     {
                       "type": "weather-forecast",
