@@ -57,6 +57,7 @@ class FireSensor:
         del attribute, kwargs
         if new == "on":
             self.controller.control.scene = "Bright"
+            self.presence.unlock_door()
             self.controller.media.pause()
             alert_type = (
                 entity.removeprefix(f"{self.sensor_prefix}{self.sensor_id}_")
@@ -69,5 +70,5 @@ class FireSensor:
                 title="Fire Alarm",
                 critical=True,
             )
-        elif new == "off" and old != "unavailable":
+        elif new == "off" and old == "on":
             self.controller.control.reset_scene()
