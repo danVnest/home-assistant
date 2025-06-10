@@ -108,10 +108,7 @@ class Lights(App):
             )
 
     def terminate(self):
-        """Cancel presence callbacks before termination.
-
-        Appdaemon defined function called before termination.
-        """
+        """Cancel presence callbacks before termination (auto run by Appdaemon)."""
         for light in self.lights.values():
             light.ignore_vacancy()
 

@@ -116,32 +116,32 @@ class App(hass.Hass):
 
     @property
     def climate(self) -> Climate:
-        """"""
+        """Get the Climate app instance."""
         return self.get_app("Climate")
 
     @property
     def control(self) -> Control:
-        """"""
+        """Get the Control app instance."""
         return self.get_app("Control")
 
     @property
     def lights(self) -> Lights:
-        """"""
+        """Get the Lights app instance."""
         return self.get_app("Lights")
 
     @property
     def media(self) -> Media:
-        """"""
+        """Get the Media app instance."""
         return self.get_app("Media")
 
     @property
     def presence(self) -> Presence:
-        """"""
+        """Get the Presence app instance."""
         return self.get_app("Presence")
 
     @property
     def safety(self) -> Safety:
-        """"""
+        """Get the Safety app instance."""
         return self.get_app("Safety")
 
 
@@ -191,12 +191,12 @@ class Device:
 
     @property
     def control_enabled(self) -> bool:
-        """"""
+        """Check if device automatic control is enabled (via Home Assistant)."""
         return self.controller.get_state(self.control_input_boolean) == "on"
 
     @control_enabled.setter
     def control_enabled(self, enabled: bool):
-        """"""
+        """Enable/disable automatic control of device."""
         if self.control_enabled != enabled:
             self.controller.call_service(
                 f"input_boolean/turn_{'on' if enabled else 'off'}",
@@ -275,12 +275,12 @@ class Device:
         new: str,
         **kwargs: dict,
     ):
-        """"""
+        """Handle manual adjustment of the device via the UI."""
         del attribute, old, kwargs
         user = IDs.get_name(new["user_id"])
         self.controller.log(
             f"'{user}' changed {entity} from UI: "
-            f"{self.controller.get_state(entity,'all')}",
+            f"{self.controller.get_state(entity, 'all')}",
         )
         self.handle_user_adjustment(user)
 
@@ -306,7 +306,7 @@ class Device:
         new: str,
         **kwargs: dict,
     ):
-        """"""
+        """Adjust device appropriately when automatic control is enabled."""
         del entity, attribute, old, new, kwargs
         self.adjust_for_conditions()
         if self.on:

@@ -1,7 +1,7 @@
-"""Automates airconditioning, fan, and heater control.
+"""Automates airconditioning, fan, heater, and humidifier control.
 
-Monitors climate inside and out, controlling airconditioning units, fans, and
-heaters in the house according to user defined temperature thresholds.
+Monitors climate inside and out, controlling airconditioning units, fans, heaters,
+and humidifiers in the house according to user defined temperature thresholds.
 The system can be disabled by its users, in which case suggestions are made
 (via notifications) instead based on the same thresholds using forecasted and
 current temperatures.
@@ -9,7 +9,6 @@ current temperatures.
 User defined variables are configued in climate.yaml
 """
 
-# TODO: adjust ALL documentation text for all apps
 # TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
@@ -330,10 +329,7 @@ class Climate(App):
         self.suggest_for_conditions()
 
     def terminate(self):
-        """Cancel presence callbacks before termination????
-
-        Appdaemon defined function called before termination.
-        """
+        """Cancel presence callbacks before termination (auto run by Appdaemon)."""
         for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
             for device in device_group.values():
                 device.ignore_vacancy()
@@ -444,14 +440,15 @@ class Climate(App):
 
 
 class ClimateDevice(Device):
-    """Climate device that can be configured to respond to environmental changes?"""
+    """Climate device configured to respond to environmental changes."""
 
     def __init__(
         self,
+        *,
         monitor_humidity_only: bool = False,
         **kwargs: dict,
     ):
-        """Initialise with device parameters and prepare for presence adjustments?"""
+        """Initialise with device parameters and prepare for environment changes."""
         super().__init__(
             **kwargs,
         )
@@ -487,7 +484,7 @@ class ClimateDevice(Device):
 
     @property
     def room_temperature(self) -> float:
-        """"""
+        """Get average temperature from all sensors in the room."""
         return sum(
             float(temperature_sensor.state)
             for temperature_sensor in self.temperature_sensors
@@ -495,7 +492,7 @@ class ClimateDevice(Device):
 
     @property
     def room_humidity(self) -> float:
-        """"""
+        """Get average humidity from all sensors in the room."""
         return sum(
             float(humidity_sensor.state) for humidity_sensor in self.humidity_sensors
         ) / len(self.humidity_sensors)
@@ -691,7 +688,7 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     @property
     def best_mode_for_conditions(self) -> str:
-        """?"""
+        """Determine best climate mode (cool/heat) for the current room temperature."""
         return (
             "cool"
             if self.above_target_temperature or self.closer_to_hot_than_cold
@@ -700,12 +697,12 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     @property
     def target_temperature(self) -> float:
-        """"""
+        """Get the aircon's current target temperature, or room temperature if off."""
         return self.get_attribute("temperature") if self.on else self.room_temperature
 
     @property
     def desired_target_temperature(self) -> float:
-        """"""
+        """Get the desired room target temperature based on settings and conditions."""
         mode = self.best_mode_for_conditions
         return self.controller.get_setting(
             mode + "ing_target_temperature",
@@ -760,7 +757,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             or self.swing_mode != self.preferred_swing_mode
         )
 
-    def adjust_for_conditions(
+    def adjust_for_conditions(  # noqa: PLR0911
         self,
         *,
         check_if_would_adjust_only: bool = False,
@@ -859,7 +856,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.adjust_for_conditions()
 
     def handle_user_adjustment(self, user: str):
-        """"""
+        """Handle manual aircon adjustment appropriately."""
         if (
             self.control_enabled
             and self.on
@@ -1223,7 +1220,7 @@ class Heater(ClimateDevice, PresenceDevice):
 
     @property
     def should_update_target_temperature(self):
-        """"""
+        """Check if device target temperature is as desired (if device type can)."""
         return (
             self.device_type == "climate"
             and self.target_temperature != self.desired_target_temperature
@@ -1248,7 +1245,7 @@ class Heater(ClimateDevice, PresenceDevice):
 
     @property
     def room_too_cold(self) -> bool:
-        """"""
+        """Check if room is too cold based on desired target temperature settings."""
         return (
             self.room_temperature
             < self.desired_target_temperature
@@ -1257,7 +1254,7 @@ class Heater(ClimateDevice, PresenceDevice):
 
     @property
     def room_warm_enough(self) -> bool:
-        """"""
+        """Check if room is warm enough based on desired target temperature settings."""
         return (
             self.room_temperature
             > self.desired_target_temperature
@@ -1415,7 +1412,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
 
     @property
     def room_too_dry(self) -> bool:
-        """"""
+        """Check if room is too dry based on desired target humidity settings."""
         return (
             self.room_humidity
             < self.desired_target_humidity - self.constants["humidity_target_buffer"]
@@ -1423,7 +1420,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
 
     @property
     def room_too_humid(self) -> bool:
-        """"""
+        """Check if room is too humid based on desired target humidity settings."""
         return (
             self.room_humidity
             > self.desired_target_humidity + self.constants["humidity_target_buffer"]
