@@ -8,7 +8,6 @@ Control:
   heartbeat_timeout: 10
   heartbeat_max_fail_count: 10
   heartbeat_period: 60
-  bedroom_button_node_id: 4
   notify_battery_level: 25
   mobiles:
     dan:
@@ -17,5 +16,9 @@ Control:
     rachel:
       name: mobile_app_rachel_s_phone
       type: Android
+  button_ids:
+    dan: bf9428682b24aed4a9paaa
+    rachel: bf3a40d46b789ec295bdtp
+  button_max_double_press_delay: 2
   priority: 1
   # log_level: DEBUG

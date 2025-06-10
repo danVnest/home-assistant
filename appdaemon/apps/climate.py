@@ -185,14 +185,6 @@ class Climate(App):
             for device_group in device_groups_to_turn_off:
                 for device in device_group.values():
                     device.turn_off()
-        if scene == "Sleep":
-            self.end_pre_condition_for_sleep()
-        elif scene == "Morning":
-            self.heaters["nursery"].monitor_presence()
-            self.humidifiers["nursery"].monitor_presence()
-            # TODO: remove when nursery presence is reliable
-            self.aircons["dining_room"].monitor_presence()
-            # TODO: remove dining room once presence detects dogs properly?
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if scene in ("Sleep", "Morning") else "auto"
         )
@@ -245,33 +237,22 @@ class Climate(App):
             for device in device_group.values():
                 device.adjust_for_conditions()
 
-    def pre_condition_nursery(self):
-        """Pre-heat/humidify the nursery for nice sleeping conditions."""
+    def condition_room_for_sleep(self, room: str):
+        """Cool/heat/humidify the given room for nice sleeping conditions."""
+        device_groups = (self.aircons, self.heaters, self.fans, self.humidifiers)
         for device in (
-            self.heaters["nursery"],
-            self.humidifiers["nursery"],
+            device_group[room] for device_group in device_groups if room in device_group
         ):
             device.ignore_vacancy()
             device.adjust_for_conditions()
 
-    def pre_condition_for_sleep(self):
-        """Pre-cool/heat/humidify bedroom/dog bed area for nice sleeping conditions."""
+    def condition_room_normally(self, room: str):
+        """Restore normal presence-based device functionality in the given room."""
+        device_groups = (self.aircons, self.heaters, self.fans, self.humidifiers)
         for device in (
-            self.aircons["bedroom"],
-            self.humidifiers["bedroom"],
-            self.aircons["dining_room"],
+            device_group[room] for device_group in device_groups if room in device_group
         ):
-            # TODO: remove dining room once presence detects dogs properly?
-            device.ignore_vacancy()
-            device.adjust_for_conditions()
-
-    def end_pre_condition_for_sleep(self):
-        """Return bedroom and nursery climate control to normal."""
-        self.aircons["bedroom"].monitor_presence()
-        self.humidifiers["bedroom"].monitor_presence()
-        # self.aircons["dining_room"].monitor_presence() # TODO: ?
-        # self.heaters["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
-        # self.humidifiers["nursery"].monitor_presence() # TODO: uncomment when nursery presence is reliable
+            device.monitor_presence()
 
     def suggest_if_extreme_forecast_and_control_disabled(self):
         """Suggest user enables more control if extreme temperatures are forecast."""
@@ -1039,7 +1020,7 @@ class Fan(ClimateDevice, PresenceDevice):
         """Check if the fan could disturb sleep if adjusted."""
         return (
             self.room in ("bedroom", "nursery")
-            and self.controller.control.scene in ("Sleep", "Morning")
+            and self.controller.control.napping_in(self.room)
             and (
                 reverse != self.reverse or (not self.on and speed >= self.minimum_speed)
             )

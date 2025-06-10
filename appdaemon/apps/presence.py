@@ -151,7 +151,7 @@ class Presence(App):
             self.unlock_door()
             if "Away" in self.control.scene:
                 self.pets_home_alone = False
-                self.control.reset_scene()
+                self.control.reset_scene(keep_bright=True)
         else:
             if old == "home":
                 self.lock_door()

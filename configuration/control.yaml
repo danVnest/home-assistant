@@ -13,6 +13,12 @@ input_select:
     icon: mdi:home-lightning-bolt
 
 input_boolean:
+  napping_in_bedroom:
+    name: Napping in bedroom
+    icon: mdi:bed
+  napping_in_nursery:
+    name: Napping in nursery
+    icon: mdi:cradle
   pets_home_alone:
     name: Pets home alone
     icon: mdi:dog-side

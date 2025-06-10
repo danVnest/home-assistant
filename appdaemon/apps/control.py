@@ -26,9 +26,12 @@ class Control(App):
             "heartbeat": None,
             "heartbeat_fail_count": 0,
             "init_delay": None,
+            "living_room_button": None,
+            "living_room_button_last_press": 0,
+            "nursery_button": None,
+            "nursery_button_last_press": 0,
         }
         self.is_all_initialised = False
-        self.pre_sleep_scene = False
 
     def initialize(self):
         """Monitor logs, listen for user input, monitor batteries and set timers.
@@ -44,6 +47,8 @@ class Control(App):
         for setting in [
             "input_boolean.development_mode",
             "input_boolean.pets_home_alone",
+            "input_boolean.napping_in_bedroom",
+            "input_boolean.napping_in_nursery",
             "input_datetime",
             "input_number",
             "input_select",
@@ -53,7 +58,17 @@ class Control(App):
                 setting,
                 duration=self.constants["settings_change_delay"],
             )
-        self.listen_event(self.handle_button, "zwave_js_value_notification")
+        for name in ("rachel", "dan"):
+            self.listen_event(
+                self.handle_bedroom_tuya_button,
+                "localtuya_device_dp_triggered",
+                device_id=self.constants["button_ids"][name],
+            )
+        for room in ("nursery", "living_room"):
+            self.listen_state(
+                self.handle_z_wave_button,
+                f"event.{room}_button",
+            )
         self.listen_event(self.handle_ifttt, "ifttt_webhook_received")
         for battery in (
             "front_door_camera",
@@ -113,7 +128,7 @@ class Control(App):
         del event_name, data, kwargs
         self.log("All apps ready, resetting scene")
         self.is_all_initialised = True
-        self.reset_scene()
+        self.reset_scene(keep_bright=True)
         self.listen_event(
             self.handle_app_reloaded,
             "app_initialized",
@@ -134,7 +149,7 @@ class Control(App):
         """Re-link the app and set a timer to initialise it?"""
         del event_name, kwargs
         self.log(f"App added: '{data['app']}'")
-        self.reset_scene()
+        self.reset_scene(keep_bright=True)
 
     @property
     def scene(self) -> str:
@@ -151,11 +166,15 @@ class Control(App):
             self.presence.lock_door()
             self.turn_on("switch.entryway_camera_enabled")
             self.turn_on("switch.back_door_camera_enabled")
-            if "Away" in new_scene:
+            if new_scene == "Sleep":
+                self.napping_in_bedroom = True
+            else:
                 self.notify(
                     f"Home set to {new_scene} mode",
                     title="Door Locked",
                 )
+                self.napping_in_bedroom = False
+                self.napping_in_nursery = False
                 # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
                 # clear above notification when not Away?
                 self.media.turn_off()
@@ -172,10 +191,10 @@ class Control(App):
             option=new_scene,
         )
 
-    def reset_scene(self):
+    def reset_scene(self, *, keep_bright: bool = False):
         """Set scene based on who's home, time, stored scene, etc."""
         self.log("Detecting current appropriate scene")
-        if self.scene == "Bright":
+        if keep_bright and self.scene == "Bright":
             self.scene = "Bright"
         elif not self.presence.anyone_home:
             self.scene = (
@@ -198,6 +217,50 @@ class Control(App):
             )
         else:
             self.scene = "Night"
+
+    @property
+    def napping_in_bedroom(self) -> bool:
+        """Get bedroom napping state from Home Assistant."""
+        return self.get_state("input_boolean.napping_in_bedroom") == "on"
+
+    @napping_in_bedroom.setter
+    def napping_in_bedroom(self, napping: bool):
+        """Set bedroom napping state, adjusting lights and climate devices."""
+        self.__change_napping_state("bedroom", napping)
+
+    @property
+    def napping_in_nursery(self) -> bool:
+        """Get nursery napping state from Home Assistant."""
+        return self.get_state("input_boolean.napping_in_nursery") == "on"
+
+    @napping_in_nursery.setter
+    def napping_in_nursery(self, napping: bool):
+        """Set nursery napping state, adjusting lights and climate devices."""
+        self.__change_napping_state("nursery", napping)
+
+    def napping_in(self, room: str) -> bool:
+        """Get napping state for the given room from Home Assistant."""
+        return self.get_state(f"input_boolean.napping_in_{room}") == "on"
+
+    def __change_napping_state(self, room: str, napping: bool):
+        """Change device behaviour based on napping state in the specified room."""
+        self.log(
+            f"Configuring the '{room}' with "
+            f"'{'nap' if napping else 'normal'}' settings",
+        )
+        self.call_service(
+            f"input_boolean/turn_{'on' if napping else 'off'}",
+            entity_id=f"input_boolean.napping_in_{room}",
+        )
+        if napping:
+            for light in (room, "hall"):
+                self.lights.lights[light].ignore_vacancy()
+                self.turn_off(f"light.{light}")  # turns off even if control disabled
+            self.climate.condition_room_for_sleep(room)
+        else:
+            self.lights.lights[room].control_enabled = True
+            self.lights.transition_to_scene(self.scene)
+            self.climate.condition_room_normally(room)
 
     def set_timer(self, name: str):
         """Set morning or bed timers as specified by the corresponding settings."""
@@ -233,17 +296,20 @@ class Control(App):
         del kwargs
         self.log("Day timer triggered")
         if self.scene == "Morning":
+            self.napping_in_bedroom = False
             self.scene = "Day"
         else:
             self.log(f"Ignoring day timer (scene is '{self.scene}', not 'Morning')")
 
     def handle_bed_times(self, **kwargs: dict):
         """Adjust climate control when nearing bed times (callback for daily timer)."""
+        if "Away" in self.scene:
+            self.log(f"Ignoring '{kwargs['timer_name']}' timer ('{self.scene}' scene)")
+            return
         self.log(f"{kwargs['timer_name']} triggered")
-        if kwargs["timer_name"] == "bed_time":
-            self.climate.pre_condition_for_sleep()
-        else:
-            self.climate.pre_condition_nursery()
+        self.climate.condition_room_for_sleep(
+            "bedroom" if kwargs["timer_name"] == "bed_time" else "nursery",
+        )
         self.presence.lock_door()
 
     @property
@@ -251,62 +317,188 @@ class Control(App):
         """Return if the time is after bed time (and before midnight)."""
         return self.time() > self.parse_time(self.get_setting("bed_time"))
 
-    def handle_button(self, event_name: str, data: dict, **kwargs: dict):
-        """Detect and handle when a button is clicked or held."""
-        # TODO: add new buttons and rework the following
-        del event_name, kwargs
-        room = (
-            "bedroom"
-            if data["node_id"] == self.constants["bedroom_button_node_id"]
-            else "living_room"
-        )
-        if data["value"] == "KeyPressed":
-            self.handle_button_click(room)
-        elif data["value"] == "KeyHeldDown":
-            self.log(f"Button in '{room}' held")
-            # TODO: for bedroom, if aircon and/or fan is on, turn them off
-            # else turn on aircon and/or fan based on conditions
-            # TODO: for living room, if either aircon on, turn them off
-            # else turn both on based on conditions
-            # (disabling climate control for each option above where required)
-            # self.climate.toggle_climate_control_in_room(room)
-            self.climate.toggle_airconditioning(
-                user=f"the {room} button",
-            )  # TODO: remove once above implemented
-
-    def handle_button_click(self, room: str):
-        """Handle a button click."""
-        self.log(f"Button in '{room}' clicked")
-        if room == "living_room":
-            if self.scene == "Night":
-                if self.entities.binary_sensor.dark_outside.state == "off":
-                    self.scene = "Day"
-                elif self.media.playing:
-                    self.scene = "TV"
-                else:
-                    self.scene = "Bright"
-            else:
-                self.scene = "Night"
-        elif room == "bedroom":
-            if self.scene == "Morning":
-                self.scene = "Day"
-                self.lights.lights["bedroom"].adjust_to_max()
-                self.log("Bedroom light turned on")
-            elif self.scene == "Night":
-                self.pre_sleep_scene = True
-                self.scene = "Sleep"
-                self.log("Bedroom light kept on (pre-sleep)")
-            elif (
-                self.scene == "Sleep" and self.lights.lights["bedroom"].brightness != 0
+    def handle_z_wave_button(
+        self,
+        entity: str,
+        attribute: str,
+        old,
+        new,
+        **kwargs: dict,
+    ):
+        """Handle a Z-Wave button event."""
+        del attribute, old, new, kwargs
+        button = entity.removeprefix("event.")
+        self.cancel_timer(self.timers[button])
+        event = self.get_state(entity, attribute="event_type")
+        now = self.get_now_ts()
+        if event == "KeyPressed":
+            if (
+                now - self.timers[f"{button}_last_press"]
+                < self.constants["button_max_double_press_delay"]
             ):
-                self.lights.lights["bedroom"].turn_off()
-                self.log("Pre-sleep transitioned to Sleep - bedroom light turned off")
-            elif self.scene == "TV":
-                self.lights.lights["bedroom"].ignore_presence()
-                self.lights.lights["bedroom"].turn_off()
-                self.log("TV is on - bedroom light turned off but scene remains 'TV'")
+                getattr(self, f"handle_{button}_double_press")()
             else:
+                self.log(
+                    f"The '{button}' was pressed once: "
+                    "delaying action to detect double press",
+                    level="DEBUG",
+                )
+                self.timers[button] = self.run_in(
+                    getattr(self, f"handle_{button}_single_press"),
+                    self.constants["button_max_double_press_delay"],
+                )
+            self.timers[f"{button}_last_press"] = now
+        elif event == "KeyHeldDown":
+            getattr(self, f"handle_{button}_long_press")()
+
+    def handle_living_room_button_single_press(self, **kwargs: dict):
+        """Handle a single press of the living room button."""
+        del kwargs
+        self.timers["living_room_button"] = None
+        self.log("Living room button pressed")
+        self.log("Enabling automatic control for all lights and climate devices")
+        for device_group in (
+            self.lights.lights,
+            self.climate.aircons,
+            self.climate.fans,
+            self.climate.heaters,
+            self.climate.humidifiers,
+        ):
+            for device in device_group.values():
+                device.control_enabled = True
+        self.reset_scene()
+        # TODO: enable guest mode
+        # TODO: toggle TV if can't get it working automatically?
+
+    def handle_living_room_button_double_press(self):
+        """Handle a double press of the living room button."""
+        self.log("Living room button double pressed")
+        if self.scene != "Bright":
+            self.scene = "Bright"
+        else:
+            self.reset_scene()
+
+    def handle_living_room_button_long_press(self):
+        """Handle a long press of the living room button."""
+        self.log("Living room button held down")
+        aircons = (
+            self.climate.aircons["living_room"],
+            self.climate.aircons["dining_room"],
+        )
+        should_turn_off = any(aircon.on for aircon in aircons)
+        self.log(f"Aircon turning {'off' if should_turn_off else 'on'}")
+        for aircon in aircons:
+            if should_turn_off:
+                aircon.turn_off()
+            else:
+                aircon.turn_on_for_conditions()
+            aircon.handle_user_adjustment("the living room button")
+
+    def handle_nursery_button_single_press(self, **kwargs: dict):
+        """Handle a single press of the nursery button."""
+        del kwargs
+        self.timers["nursery_button"] = None
+        self.log("Nursery button pressed")
+        if self.napping_in_nursery:
+            self.log("Nursery already configured for napping - setting again anyway")
+        self.napping_in_nursery = True
+
+    def handle_nursery_button_double_press(self):
+        """Handle a double press of the nursery button."""
+        self.log("Nursery button double pressed: turning light on")
+        self.napping_in_nursery = False
+        self.lights.lights["nursery"].turn_on_for_conditions()
+        self.lights.lights["nursery"].control_enabled = True
+
+    def handle_nursery_button_long_press(self):
+        """Handle a long press of the nursery button."""
+        self.log("Nursery button held down")
+        devices = (
+            self.climate.heaters["nursery"],
+            self.climate.fans["nursery"],
+            self.climate.humidifiers["nursery"],
+        )
+        if any(device.on for device in devices):
+            self.log("Turning climate devices off")
+            for device in devices:
+                device.turn_off()
+                device.handle_user_adjustment("the nursery button")
+        else:
+            self.climate.humidifiers["nursery"].control_enabled = True
+            if devices[0].closer_to_hot_than_cold:
+                device = self.climate.fans["nursery"]
+                self.log("Turning fan on because it's hot")
+            else:
+                device = self.climate.heaters["nursery"]
+                self.log("Turning heater on because it's cold")
+            device.turn_on_for_conditions()
+            device.handle_user_adjustment("the nursery button")
+
+    def handle_bedroom_tuya_button(
+        self,
+        event_type: str,
+        data: dict[str],
+        **kwargs: dict,
+    ):
+        """Handle a bedroom Tuya button event."""
+        del event_type, kwargs
+        button = (
+            "Dan's bedroom button"
+            if data["device_id"] == self.constants["button_ids"]["dan"]
+            else "Rachel's bedroom button"
+        )
+        if data["value"] == "single_click":
+            self.handle_bedroom_button_single_press(button)
+        elif data["value"] == "double_click":
+            self.handle_bedroom_button_double_press(button)
+        elif data["value"] == "long_press":
+            self.handle_bedroom_button_long_press(button)
+
+    def handle_bedroom_button_single_press(self, button: str):
+        """Handle a single press of a bedroom button."""
+        self.log(f"{button} pressed")
+        if self.napping_in_bedroom and self.scene == "Night":
+            self.scene = "Sleep"
+        else:
+            self.napping_in_bedroom = True
+
+    def handle_bedroom_button_double_press(self, button: str):
+        """Handle a double press of bedroom button."""
+        self.log(f"{button} double pressed: turning light on")
+        self.lights.lights["bedroom"].control_enabled = True
+        self.napping_in_bedroom = False
+        if self.scene == "Sleep":
+            self.reset_scene()
+            if self.scene == "Sleep":
+                self.log("Reset still chose 'Sleep' scene - overriding to 'Night'")
                 self.scene = "Night"
+
+    def handle_bedroom_button_long_press(self, button: str):
+        """Handle a long press of a bedroom button."""
+        self.log(f"{button} held down: adjusting aircon/fan")
+        self.climate.humidifiers["bedroom"].control_enabled = True
+        aircon = self.climate.aircons["bedroom"]
+        fan = self.climate.fans["bedroom"]
+        if aircon.on:
+            aircon.turn_off()
+            aircon.handle_user_adjustment(button)
+            if fan.on and not fan.closer_to_hot_than_cold:
+                fan.turn_off()
+                fan.handle_user_adjustment(button)
+        elif fan.on:
+            if fan.closer_to_hot_than_cold:
+                aircon.turn_on_for_conditions()
+                aircon.handle_user_adjustment(button)
+            else:
+                fan.turn_off()
+                fan.handle_user_adjustment(button)
+        elif fan.closer_to_hot_than_cold:
+            fan.turn_on_for_conditions()
+            fan.handle_user_adjustment(button)
+            aircon.control_enabled = True
+        else:
+            aircon.turn_on_for_conditions()
+            aircon.handle_user_adjustment(button)
 
     def handle_ifttt(self, event_name: str, data: dict, **kwargs: dict):
         """Handle commands coming in via IFTTT."""
@@ -353,6 +545,8 @@ class Control(App):
         elif setting == "pets_home_alone":
             if (new == "on") != self.presence.pets_home_alone:
                 self.presence.pets_home_alone = new == "on"
+        elif "napping_in" in setting:
+            self.__change_napping_state(setting.split("_")[-1], new == "on")
         else:
             self.handle_simple_settings_change(setting, new, old)
 

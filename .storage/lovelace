@@ -198,13 +198,49 @@
                       "condition": "state",
                       "entity": "input_select.scene",
                       "state": [
-                        "Sleep",
                         "Away (Day)",
                         "Away (Night)"
                       ]
                     }
                   ],
-                  "styles": ".large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n.bubble-sub-button-1 {\n  display: ${hass.states['input_boolean.pets_home_alone'].state === 'on' ? '' : 'none'} !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
+                  "styles": ".large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-sub-button-name-container').innerText = (hass.states['input_boolean.pets_home_alone'].state === 'on' ? 'Pets home alone' : 'Pets not detected')}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n",
+                  "modules": [
+                    "default"
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "select",
+                  "entity": "input_select.scene",
+                  "show_last_changed": true,
+                  "sub_button": [
+                    {
+                      "entity": "input_boolean.napping_in_bedroom",
+                      "name": "apping",
+                      "show_name": true
+                    },
+                    {
+                      "entity": "input_boolean.napping_in_nursery",
+                      "name": "apping",
+                      "show_name": true
+                    }
+                  ],
+                  "card_layout": "large-2-rows",
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "input_select.scene",
+                      "state_not": [
+                        "Away (Day)",
+                        "Away (Night)"
+                      ]
+                    }
+                  ],
+                  "styles": ".large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-name-container {\n  text-transform: lowercase;\n}.bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: \"${hass.states['input_boolean.napping_in_bedroom'].state === 'on' ? 'N' : 'Not n'}\";\n  white-space: pre;\n  text-transform: none;\n} .bubble-sub-button-2 .bubble-sub-button-name-container:before {\n  content: \"${hass.states['input_boolean.napping_in_nursery'].state === 'on' ? 'N' : 'Not n'}\";\n  white-space: pre;\n  text-transform: none;\n} ${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n",
+                  "modules": [
+                    "default"
+                  ],
+                  "rows": ""
                 },
                 {
                   "type": "custom:bubble-card",
@@ -259,75 +295,10 @@
                       }
                     }
                   ],
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "input_select.scene",
-                      "state": [
-                        "Sleep",
-                        "Away (Day)",
-                        "Away (Night)"
-                      ]
-                    }
-                  ],
-                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .rows-2 .bubble-sub-button-container {\n  border-radius: var(--ha-card-border-radius) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  padding-left: 5px !important;\n  padding-right: 0px !important;\n  margin-right: -3px !important;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "select",
-                  "entity": "input_select.scene",
-                  "show_last_changed": true,
-                  "card_layout": "large",
-                  "grid_options": {
-                    "columns": 6,
-                    "rows": 1
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "input_select.scene",
-                      "state_not": [
-                        "Sleep",
-                        "Away (Day)",
-                        "Away (Night)"
-                      ]
-                    }
-                  ],
-                  "styles": ".large .bubble-icon-container, .bubble-dropdown-arrow {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n}\n${card.querySelector('.bubble-name').innerText = state + \" scene\"}\n${icon.setAttribute(\"icon\", (() => {\n  switch (state) {\n    case 'Day':\n      return 'mdi:weather-sunny';\n    case 'Night':\n      return 'mdi:weather-night';\n    case 'Bright':\n      return 'mdi:white-balance-sunny';\n    case 'Sleep':\n      return 'mdi:sleep';\n    case 'Morning':\n      return 'mdi:weather-sunset';\n    case 'TV':\n      return 'mdi:television';\n    case 'Away (Night)':\n      return 'mdi:home-off';\n    case 'Away (Day)':\n      return 'mdi:home-off';\n  }\n})())}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "lock.door_lock",
-                  "show_state": false,
-                  "show_last_changed": true,
-                  "name": "Front door",
-                  "card_layout": "large-2-rows",
-                  "button_action": {
-                    "double_tap_action": {
-                      "action": "toggle"
-                    },
-                    "hold_action": {
-                      "action": "toggle"
-                    }
-                  },
-                  "grid_options": {
-                    "columns": 6,
-                    "rows": 1
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "input_select.scene",
-                      "state_not": [
-                        "Sleep",
-                        "Away (Day)",
-                        "Away (Night)"
-                      ]
-                    }
-                  ],
-                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n}\n"
+                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n} .rows-2 .bubble-sub-button-container {\n  border-radius: var(--ha-card-border-radius) !important;\n  border: 1.5px solid var(--accent-color) !important;\n  padding-left: 5px !important;\n  padding-right: 0px !important;\n  margin-right: -3px !important;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
+                  "modules": [
+                    "default"
+                  ]
                 },
                 {
                   "type": "map",
@@ -2177,10 +2148,13 @@
                   "entity": "input_number.office_vacating_delay"
                 },
                 {
+                  "entity": "input_number.bathroom_vacating_delay"
+                },
+                {
                   "entity": "input_number.bedroom_vacating_delay"
                 },
                 {
-                  "entity": "input_number.bathroom_vacating_delay"
+                  "entity": "input_number.nursery_vacating_delay"
                 }
               ],
               "title": "Room Vacating Delays",
