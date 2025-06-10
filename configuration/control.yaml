@@ -60,10 +60,6 @@ template:
         icon: mdi:play-pause
         device_class: running
         availability: "{{ has_value('sensor.webostvservice_play_state') }}"
-      - name: Owlet attached # TODO: update
-        unique_id: owlet_attached
-        state: "{{ states('binary_sensor.owlet_awake') != 'unknown' }}"
-        icon: mdi:foot-print
       - name: Dark outside
         unique_id: dark_outside
         state: >

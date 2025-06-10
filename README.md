@@ -43,7 +43,6 @@ This home automation system is comprised of the following devices:
 - [Eufy security cameras](https://myeufy.com.au/eufy-cam-2c-pro-2k-2-camera-set.html)
 - [Eufy indoor cameras](https://myeufy.com.au/indoor-cam-2k.html)
 - [Nest Protect fire alarms](https://store.google.com/au/product/nest_protect_2nd_gen)
-- [Owlet Smart Sock](https://owletcare.com.au/products/owlet-smart-sock)
 - [Samsung Smart Washer](https://www.samsung.com/au/washers-and-dryers/washing-machines/8kg-smart-ai-front-load-washer-ww85t554daw-ww85t554daw-sa)
 - [Samsung Smart Dryer](https://www.samsung.com/au/washers-and-dryers/dryers/8kg-smart-ai-heat-pump-dryer-dv80t5420aw-dv80t5420aw-sa)
 - [Fronius solar system](https://www.fronius.com/en-au/australia/solar-energy/installers-partners/technical-data/all-products/inverters/fronius-primo-gen24/fronius-primo-gen24-6-0)

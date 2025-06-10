@@ -77,7 +77,6 @@ class Presence(App):
         self.rooms["dining_room"].add_sensor("dining_room_balcony_door_motion")
         self.rooms["bedroom"].add_sensor("bedroom_balcony_door_motion")
         self.rooms["office"].add_sensor("dan_s_computer_active_at_home")
-        self.rooms["nursery"].add_sensor("owlet_attached")
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175551/f
         # create floorplan for UI, show lighting and presence (combine person and pet?) - create template sensors for room presence or change UI from here
         # TODO: https://app.asana.com/0/1207020279479204/1165239627642113/f

@@ -16,16 +16,8 @@ class Safety(App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.fire_sensors = {"entryway": None, "living_room": None, "garage": None}
-        self.owlet_sensors = (
-            "low_heart_rate",
-            "high_heart_rate",
-            "low_oxygen",
-            "high_oxygen",
-        )
         # TODO: https://app.asana.com/0/1207020279479204/1205753645479427/f
         # add , "low_battery", "lost_power", "sock_disconnected", "sock_off") ?
-        self.owlet_sensor_prefix = "binary_sensor.owlet_"
-        self.owlet_sensor_suffix = "_alert"
 
     def initialize(self):
         """Initialise listeners for fire and baby sensors.
@@ -35,39 +27,6 @@ class Safety(App):
         super().initialize()
         for sensor_id in self.fire_sensors:
             self.fire_sensors[sensor_id] = FireSensor(sensor_id, self)
-        for owlet_sensor in self.owlet_sensors:
-            self.listen_state(
-                self.handle_owlet_alert,
-                f"{self.owlet_sensor_prefix}{owlet_sensor}{self.owlet_sensor_suffix}",
-            )
-
-    def handle_owlet_alert(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        **kwargs: dict,
-    ):
-        """React when an Owlet alert is triggered or ends."""
-        del attribute, kwargs
-        if new == "on":
-            self.control.scene = "Bright"
-            self.media.pause()
-            alert_type = (
-                entity.removeprefix(self.owlet_sensor_prefix)
-                .removesuffix(self.owlet_sensor_suffix)
-                .replace("_", " ")
-            )
-            self.notify(
-                f"Check Wren - {alert_type} detected",
-                title="Owlet Alarm",
-                critical=True,
-            )
-            # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
-            # do we want to notify? Maybe not since the app already does. Or is a critical notification here better?
-        elif new == "off" and old != "unavailable":
-            self.control.reset_scene()
 
 
 class FireSensor:
