@@ -803,7 +803,7 @@ class Light(PresenceDevice):
                 f"Setting {self.device_id}'s kelvin to {value} (from {self.kelvin})",
                 level="DEBUG",
             )
-        self.turn_on(kelvin=value)
+        self.turn_on(color_temp_kelvin=value)
 
     def validate_kelvin(self, value: int) -> int | None:
         """Return closest valid value for kelvin."""
@@ -842,7 +842,7 @@ class Light(PresenceDevice):
             elif brightness == self.brightness:
                 self.kelvin = kelvin
             else:
-                self.turn_on(brightness=brightness, kelvin=kelvin)
+                self.turn_on(brightness=brightness, color_temp_kelvin=kelvin)
 
     def adjust_to_max(self):
         """Adjust light brightness and kelvin at the same time to maximum values."""
