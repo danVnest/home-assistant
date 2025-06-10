@@ -888,10 +888,6 @@ class Aircon(ClimateDevice, PresenceDevice):
                 f"({self.room_temperature:.1f}º), consider opening up the house",
             )
 
-    def call_service(self, service: str, **parameters: dict):
-        """Call one of the aircon's services in Home Assistant and wait for response."""
-        super().call_service(service, **parameters, return_result=True)
-
 
 class Fan(ClimateDevice, PresenceDevice):
     """Control a fan and configure responses to environmental changes."""
@@ -1160,15 +1156,6 @@ class Fan(ClimateDevice, PresenceDevice):
             if self.reversing_steps_remaining
             else None
         )
-
-    # TODO: double check if return_result helps at all here
-    def turn_on(self, **parameters: dict):
-        """Call the fan's turn on service in Home Assistant and wait for response."""
-        super().turn_on(**parameters, return_result=True)
-
-    def call_service(self, service: str, **parameters: dict):
-        """Call one of the fan's services in Home Assistant and wait for response."""
-        super().call_service(service, **parameters, return_result=True)
 
 
 class Heater(ClimateDevice, PresenceDevice):
