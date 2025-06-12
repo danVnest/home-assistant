@@ -821,8 +821,9 @@
                   "card_type": "button",
                   "name": "WARNING: Aircon filters need cleaning",
                   "button_type": "state",
-                  "entity": "group.any_climate_control",
+                  "entity": "group.all_aircon",
                   "show_state": false,
+                  "icon": "mdi:air-filter",
                   "card_layout": "large",
                   "sub_button": [
                     {
