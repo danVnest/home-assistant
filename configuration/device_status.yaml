@@ -153,6 +153,16 @@ template:
         state_class: measurement
         availability: "{{ has_value('sensor.soil_battery_voltage_office') }}"
 
+command_line:
+  sensor:
+    name: Disabled entities
+    unique_id: disabled_entities
+    json_attributes:
+      - entities
+    value_template: "{{ value_json.entities | length }}"
+    command: "jq '.data.entities |= map(select(.disabled_by? != null) | {entity_id: .entity_id}) | del(.data.deleted_entities) | flatten | .[3]' < .storage/core.entity_registry"
+    scan_interval: 300
+
 automation:
   - alias: Update device issue and battery groups
     id: update_device_issue_and_battery_groups
@@ -160,8 +170,6 @@ automation:
     mode: single
     max_exceeded: silent
     triggers:
-      - trigger: homeassistant
-        event: start
       - trigger: event
         event_type: call_service
         event_data:
@@ -176,7 +184,9 @@ automation:
           entities: >
             {% set allowed_entities = [
               'sensor.power_meter_relative_self_consumption',
-            ] + integration_entities('iBeacon Tracker') %}
+            ] + integration_entities('iBeacon Tracker') +
+            integration_entities('netgear')|select('search', '_ssid$')|list
+            %}
             {% set unknown_allowed_entities =
                 [
                     states.sensor.extreme_forecast,
@@ -194,11 +204,15 @@ automation:
                 |selectattr('last_changed', 'ge', (now().timestamp() - long_delay_hours*60*60)|as_datetime)
                 |map(attribute='entity_id')|list
             %}
+            {% set disabled_entities = state_attr('sensor.disabled_device_entities', 'entities')
+                |regex_replace(find='\[|\]|\{|\}|\'entity_id\':', replace='')
+                |map(attribute='entity_id')|list
+            %}
             {% set delay_minutes = 5 %}
             {{ states
-                |rejectattr('entity_id', 'in', allowed_entities + unknown_allowed_entities + long_unknown_allowed_entities)
+                |rejectattr('entity_id', 'in', allowed_entities + unknown_allowed_entities + long_unknown_allowed_entities + disabled_entities)
                 |rejectattr('entity_id', 'has_value')
-                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image'])
+                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image', 'select'])
                 |rejectattr('last_changed', 'ge', (now().timestamp() - delay_minutes * 60)|as_datetime)
                 |map(attribute='entity_id')|list
             }}
