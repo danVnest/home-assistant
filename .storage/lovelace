@@ -217,12 +217,24 @@
                     {
                       "entity": "input_boolean.napping_in_bedroom",
                       "name": "apping",
-                      "show_name": true
+                      "show_name": true,
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "toggle"
+                      }
                     },
                     {
                       "entity": "input_boolean.napping_in_nursery",
                       "name": "apping",
-                      "show_name": true
+                      "show_name": true,
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "toggle"
+                      }
                     }
                   ],
                   "card_layout": "large-2-rows",
