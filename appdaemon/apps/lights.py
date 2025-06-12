@@ -652,7 +652,10 @@ class Lights(App):
                         f"Bedroom light levels are high ({new}lx), "
                         "automatic lighting disabled",
                     )
-            elif self.lights["bedroom"].ignoring_vacancy:
+            elif (
+                self.lights["bedroom"].ignoring_vacancy
+                and not self.control.napping_in_bedroom
+            ):
                 self.lights["bedroom"].set_presence_adjustments(
                     occupied=(
                         self.constants["max_brightness"],
@@ -705,7 +708,7 @@ class Lights(App):
                         self.lights["nursery"].kelvin_limits["max"],
                     ),
                     vacating_delay=self.get_setting(
-                        "bedroom_vacating_delay",
+                        "nursery_vacating_delay",
                     ),
                 )
                 self.log(
