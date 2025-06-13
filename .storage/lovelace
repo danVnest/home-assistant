@@ -882,7 +882,7 @@
                       ]
                     }
                   ],
-                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  border: 1.5px solid green !important;\n  box-sizing: border-box !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button-1 {\n${card.querySelector('.bubble-state').innerText = 'Press button after cleaning ➔' }\n"
+                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} ${card.querySelector('.bubble-state').innerText = 'Press button after cleaning ➔' }\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1259,47 +1259,6 @@
                 }
               ],
               "column_span": 1
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Settings"
-                },
-                {
-                  "cards": [
-                    {
-                      "entities": [
-                        {
-                          "entity": "input_datetime.morning_time"
-                        },
-                        {
-                          "entity": "input_datetime.nursery_time"
-                        },
-                        {
-                          "entity": "input_datetime.bed_time"
-                        }
-                      ],
-                      "show_header_toggle": false,
-                      "type": "entities",
-                      "state_color": true
-                    },
-                    {
-                      "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
-                      "type": "markdown"
-                    }
-                  ],
-                  "type": "vertical-stack"
-                }
-              ],
-              "column_span": 1,
-              "visibility": [
-                {
-                  "condition": "user",
-                  "users": []
-                }
-              ]
             },
             {
               "type": "grid",
@@ -1952,6 +1911,32 @@
                 }
               ],
               "type": "vertical-stack"
+            },
+            {
+              "type": "vertical-stack",
+              "cards": [
+                {
+                  "entities": [
+                    {
+                      "entity": "input_datetime.morning_time"
+                    },
+                    {
+                      "entity": "input_datetime.nursery_time"
+                    },
+                    {
+                      "entity": "input_datetime.bed_time"
+                    }
+                  ],
+                  "show_header_toggle": false,
+                  "type": "entities",
+                  "state_color": true
+                },
+                {
+                  "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
+                  "type": "markdown"
+                }
+              ],
+              "title": "Timing"
             }
           ]
         },
@@ -2172,6 +2157,32 @@
               ],
               "title": "Room Vacating Delays",
               "type": "entities"
+            },
+            {
+              "type": "vertical-stack",
+              "cards": [
+                {
+                  "entities": [
+                    {
+                      "entity": "input_datetime.morning_time"
+                    },
+                    {
+                      "entity": "input_datetime.nursery_time"
+                    },
+                    {
+                      "entity": "input_datetime.bed_time"
+                    }
+                  ],
+                  "show_header_toggle": false,
+                  "type": "entities",
+                  "state_color": true
+                },
+                {
+                  "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
+                  "type": "markdown"
+                }
+              ],
+              "title": "Timing"
             }
           ]
         },
@@ -3208,7 +3219,7 @@
                 },
                 {
                   "type": "markdown",
-                  "content": "This Home Assistant system is designed to operate as autonomously as possible, so you hopefully don't need to use manual controls very often.\n\nCurrently, the main tasks/devices that require manual control are:\n- setting the sleep scene when everyone is in bed\n- nursery light & fan\n- back deck light\n- bathroom vent fan\n- toilet light/vent fan\n- downstairs lights & aircon (except the entryway lights)\n\n\nFor everything else, this dashboard provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the [<ha-icon icon=\"mdi:thermometer\"></ha-icon>**Climate**](/lovelace/climate), [<ha-icon icon=\"mdi:lightbulb-variant\"></ha-icon>**Lights**](/lovelace/lights), [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence), [<ha-icon icon=\"mdi:lightning-bolt\"></ha-icon>**Electricity**](/lovelace/electricity), and [<ha-icon icon=\"mdi:grass\"></ha-icon>**Plants**](/lovelace/plants) dashboards (navigate to these with the icons at the top of the screen).\n\nSingle pressing on icons or text will show relevant history graphs and/or controls. Anything with an <span>orange border</span> will show something different when pressed - usually a collection of other relevant information.\n\nDouble pressing on icons or text will toggle the entity if applicable. For example, you can toggle the door lock, lights, and climate devices such as aircon, fans, heaters, and humidifiers.\n\nPress and hold on icons or text to toggle automatic control for lights and climate devices. A device that is currently being controlled automatically will have a <span>green border</span>.\n\n<center><h3>For more information, select a topic:</h3></center>\n<details><summary><i>Automatic control</i></summary>\n\n**Climate** and **lighting** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in the other dashboards. The system will automatically switch between different scenes. You can also manually select a preferred scene.\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger before anyone wakes up (at the time specified in the settings here), providing dim kitchen lighting plus climate control to the whole house (rather than just the bedroom). Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient lighting in the house is sufficient, and thus turns off all lighting.\n- ***Night*** is triggered when there is insufficient lighting, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm.\n- ***Sleep*** turns off all lighting in the house. If climate control is enabled, only the bedroom is monitored and controlled. This scene has to be manually triggered.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness and has to be manually triggered.\n- ***Away (Night/Day)*** turns off all lights (except one obvious one at night for security purposes) and disables climate control. Automatically triggered when both of us have left the house.\n</details>\n<details><summary><i>Manual control</i></summary>\n\nYou can manually control devices with their physical remotes/switches/buttons, or through this app.\nControls are provided for **lights**, **aircon**, **fans**, **heaters**, **humidifiers**, **door locks**, and the **garden watering system**. \n\nAutomatic controls should provide almost all the functionality you need, but manual control is of course useful when required.\n\nAutomatic control may be disabled when you manually adjust a device if there is a logic conflict. You can manually re-enable automatic control in this app, or disable control if you want to ensure the current device state is maintained.\n \n</details>\n<details><summary><i>Smart buttons</i></summary>\n\nThe **buttons** in the kitchen and bedroom will essentially toggle lighting when clicked, intelligently changing the scene based on the current conditions. The bedroom button also allows you to first switch from ***Night*** to ***Sleep*** while keeping the bedroom light on, then when clicked again it will turn the bedroom light off (properly entering ***Sleep***). Holding either button for a few seconds will toggle the aircon.\n</details>\n<details><summary><i>Voice control</i></summary>\n\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\n\n, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nIn order to use Google, you will need to connect your Google Assistant to IFTTT and add applets with webhooks to Home Assistant corresponding to each command.\n\nTODO: CHANGE ABOVE TO LIST OF QUOTES\nTODO: consider inbuilt LLM voice control?\n\n</details>",
+                  "content": "This Home Assistant system is designed to operate as autonomously as possible, so you hopefully don't need to use manual controls very often.\n\nCurrently, the main functionality/devices that require manual control are:\n- nap mode (for day naps in the bedroom or nursery)*\n- Sleep scene (for when everyone is in bed)*\n- back deck light\n- bathroom vent fan\n- toilet light/vent fan\n- downstairs lights & aircon (except the entryway lights)\n\n\\* Use the **smart buttons**, **app**, or **voice control** to change the scene and set napping state when required.\n\nFor everything else, the [<ha-icon icon=\"mdi:home-assistant\"></ha-icon>**Main Dashboard**](/lovelace/climate) provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the [<ha-icon icon=\"mdi:thermometer\"></ha-icon>**Climate**](/lovelace/climate), [<ha-icon icon=\"mdi:lightbulb-variant\"></ha-icon>**Lights**](/lovelace/lights), [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence), [<ha-icon icon=\"mdi:lightning-bolt\"></ha-icon>**Electricity**](/lovelace/electricity), and [<ha-icon icon=\"mdi:grass\"></ha-icon>**Plants**](/lovelace/plants) dashboards (navigate to these with the icons at the top of the screen).\n\n<center><h3>For more information, select a topic:</h3></center>\n<details><summary><i>Automatic control</i></summary>\n\n**Climate** and **lighting** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in the other dashboards. The system will automatically switch between different scenes. You can also manually select a preferred scene.\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger just before anyone wakes up (at the time specified in the Climate and Lights dashboards), providing dim kitchen lighting plus turning on the living room aircon if appropriate. Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient bedroom light is sufficient (usually when the blinds are opened). House lighting is minimised in this scene, but the kitchen, office, bedroom, and nursery will still automatically turn on the lights if there is not enough ambient light in that particular room (and its nap mode is off).\n- ***Night*** is triggered when outdoor light levels are low, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm. This scene is usually triggered as the sun sets, but dark clouds, total solar eclipses, or large birds sitting on the weather station can also trigger it.\n- ***Sleep*** turns off all lighting in the house - except for some non-sleeping areas which are still lit only when there is motion. This scene has to be manually triggered with the bedroom button, this app, or voice control.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness - triggered when there is a fire, otherwise has to be manually triggered with the app or living room button.\n- ***Away (Night/Day)*** turns off all lights (except dining room lights at night for security purposes) and disables climate control unless the pets are detected alone at home. Also ensures the house is locked and security cameras are all monitoring. This scene is automatically triggered when both of us have left the house.\n\nDuring **nap mode** the light will not turn on automatically, and climate devices are enabled even when motion isn't detected.\n\n</details>\n<details><summary><i>Manual control</i></summary>\n\nYou can manually control devices with their physical remotes/switches/buttons, or through this app.\nControls are provided for **lights**, **aircon**, **fans**, **heaters**, **humidifiers**, **door locks**, and the **garden watering system**. \n\nAutomatic controls should provide almost all the functionality you need, but manual control is of course useful when required.\n\nIf you manually adjust a device the system may disable subsequent automatic control if there is a logic conflict. If this happens you will get a notification. You can manually re-enable automatic control in this app, or disable control if you want to ensure the current device state is maintained.\n \n</details>\n<details><summary><i>Smart buttons</i></summary>\n\nThe **buttons** in the nursery and bedroom do the following:\n- *single press*: turn **nap mode on** for the room\n  - for the bedroom button, if nap mode already on and it is the Night scene, single press transitions to **Sleep** scene\n- *double press*: turn **nap mode off**, and the light on\n- *long press*: if no climate device (**aircon**, **heater**, **fan**, or **humidifier**) is on in the room, they will turn on with appropriate settings for current conditions; otherwise all will turn off\n\nThe living room **button** does the following:\n- *single press*: sets all devices to automatic control and resets the scene appropriately\n- *double press*: toggles the ***Bright*** scene\n- *long press*: if the dining and living room **aircon** are both off, they will turn on with appropriate settings for current conditions; otherwise both will turn off\n</details>\n\n<details><summary><i>App usage</i></summary>\nSingle pressing on icons or text will show relevant history graphs and/or controls. Anything with an <span>orange border</span> will show something different when pressed - usually a collection of other relevant information.\n\nDouble pressing on icons or text will toggle the entity if applicable. For example, you can toggle the door lock, lights, and climate devices such as aircon, fans, heaters, and humidifiers.\n\nPress and hold on icons or text to toggle automatic control for lights and climate devices. A device that is currently being controlled automatically will have a <span>green border</span>.\n</details>\n\n<details><summary><i>Voice control</i></summary>\n\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\n\n, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nIn order to use Google, you will need to connect your Google Assistant to IFTTT and add applets with webhooks to Home Assistant corresponding to each command.\n\nTODO: CHANGE ABOVE TO LIST OF QUOTES\nTODO: consider inbuilt LLM voice control?\n\n</details>",
                   "layout_options": {
                     "grid_columns": "full"
                   },
