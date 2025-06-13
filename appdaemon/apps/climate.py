@@ -187,6 +187,10 @@ class Climate(App):
         self.aircons["bedroom"].preferred_fan_mode = (
             "low" if scene in ("Sleep", "Morning") else "auto"
         )
+        if scene == "Morning":
+            self.aircons["living_room"].ignore_vacancy()
+        else:
+            self.aircons["living_room"].monitor_presence()
         for humidifier in self.humidifiers.values():
             humidifier.already_notified_of_empty_water_tank = False
         if self.any_climate_control_enabled:
