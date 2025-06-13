@@ -333,10 +333,16 @@ class Control(App):
         **kwargs: dict,
     ):
         """Handle a Z-Wave button event."""
-        del attribute, old, new, kwargs
+        del attribute, new, kwargs
         button = entity.removeprefix("event.")
-        self.cancel_timer(self.timers[button])
         event = self.get_state(entity, attribute="event_type")
+        if old == "unavailable":
+            self.log(
+                f"Button '{button}' was previously 'unavailable', ignoring '{{event}}'",
+                log_level="DEBUG",
+            )
+            return
+        self.cancel_timer(self.timers[button])
         now = self.get_now_ts()
         if event == "KeyPressed":
             if (
@@ -361,7 +367,6 @@ class Control(App):
     def handle_living_room_button_single_press(self, **kwargs: dict):
         """Handle a single press of the living room button."""
         del kwargs
-        self.timers["living_room_button"] = None
         self.log("Living room button pressed")
         self.log("Enabling automatic control for all lights and climate devices")
         for device_group in (
