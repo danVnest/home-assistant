@@ -38,7 +38,7 @@ This home automation system is comprised of the following devices:
 - [Mill smart panel heater](https://millnorway.com/product/mill-invisible-panel-heater-600-watt)
 - [Xiaomi humidifiers](https://www.mi.com/global/product/xiaomi-smart-humidifier-2)
 - [Arlec smart plugs](https://www.bunnings.com.au/arlec-grid-connect-smart-plug-in-socket-with-energy-meter-4-pack_p0273368)
-- [LG C1 TV](https://www.lg.com/au/tvs/lg-oled65c1ptb)
+- [LG C1 TV](https://www.lg.com/au/tvs/lg-oled65c1ptb) with a custom [app launcher and media state reporter](https://github.com/danVnest/LGTV-app-launcher-and-state-reporter)
 - [Eufy doorbell](https://myeufy.com.au/eufy-video-doorbell-battery-powered.html)
 - [Eufy security cameras](https://myeufy.com.au/eufy-cam-2c-pro-2k-2-camera-set.html)
 - [Eufy indoor cameras](https://myeufy.com.au/indoor-cam-2k.html)

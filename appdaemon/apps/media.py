@@ -1,24 +1,29 @@
-"""Monitors media devices.
+"""Controls & monitors media devices.
 
-Monitors the TV to change the scene appropriately.
+Loads the TV app launcher on startup, and monitors to change the scene appropriately.
 
 User defined variables are configued in media.yaml
 """
 
+import logging
 import subprocess
+from typing import TYPE_CHECKING
 
 from app import App
 
+if TYPE_CHECKING:
+    from appdaemon.entity import Entity
+
 
 class Media(App):
-    """Listen for TV state changes to set the scene appropriately."""
+    """Listen for TV state changes to load the app launcher & set the scene."""
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.entity_id = "media_player.tv"
-        self.play_state_sensor = "sensor.webostvservice_play_state"
-        self.last_play_state = None
+        self.device: Entity = self.get_entity("media_player.tv")
+        self.play_state: Entity = self.get_entity("sensor.tv_state")
+        self.last_valid_play_state = None
 
     def initialize(self):
         """Start listening to TV states.
@@ -26,18 +31,18 @@ class Media(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.listen_state(self.state_change, self.entity_id)
+        self.listen_state(self.handle_state_change, self.device.entity_id)
         self.listen_state(
-            self.state_change,
-            self.play_state_sensor,
+            self.handle_state_change,
+            self.play_state.entity_id,
             duration=self.constants["state_change_delay"],
         )
         # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
         # try without state_change_delay, I'd previously removed it!
         for muted in [True, False]:
             self.listen_state(
-                self.state_change,
-                self.entity_id,
+                self.handle_state_change,
+                self.device.entity_id,
                 attribute="is_volume_muted",
                 old=not muted,
                 new=muted,
@@ -47,22 +52,25 @@ class Media(App):
     @property
     def on(self) -> bool:
         """Check if the TV is currently on or not."""
-        return self.get_state(self.entity_id) == "on"
+        return self.device.state == "on"
 
     @property
     def playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        play_state = self.get_state(self.play_state_sensor)
-        if self.get_state(self.entity_id, attribute="source") == "PC" and self.pc_on:
+        if not self.on:
+            return False
+        if self.device.attribute.source == "PC" and self.pc_on:
             return True
-        if play_state == "unavailable":
-            return self.last_play_state == "playing"
-        return play_state == "playing"
+        return (
+            self.play_state.state == "playing"
+            if self.play_state.state != "unavailable"
+            else self.last_valid_play_state == "playing"
+        )
 
     @property
     def muted(self) -> bool:
         """Check if the TV is currently muted or not."""
-        return self.get_state(self.entity_id, attribute="is_volume_muted") is True
+        return self.device.attribute.is_volume_muted is True
 
     @property
     def pc_on(self) -> bool:
@@ -71,21 +79,21 @@ class Media(App):
 
     def turn_off(self):
         """Turn the TV off."""
-        self.call_service("media_player/turn_off", entity_id=self.entity_id)
+        self.device.turn_off()
         self.log("TV is now off", level="DEBUG")
 
     def turn_on(self):
         """Turn the TV on."""
-        self.call_service("media_player/turn_on", entity_id=self.entity_id)
+        self.device.turn_on()
         self.log("TV is now on", level="DEBUG")
 
     def pause(self):
         """Pause media being played on the TV."""
-        self.call_service("media_player/media_pause", entity_id=self.entity_id)
+        self.device.call_service("media_player/media_pause")
         self.log("TV media is now paused", level="DEBUG")
 
-    def setup_play_state_sensor(self, **kwargs: dict):
-        """Start the MQTT app on the TV, enabling play/pause state detection."""
+    def load_app_launcher_and_state_reporter(self, **kwargs: dict):
+        """Start the LG TV app launcher app & media state reporting service."""
         del kwargs
         if not self.on:
             self.log(
@@ -93,21 +101,16 @@ class Media(App):
                 level="DEBUG",
             )
             return
-        if self.get_state(self.play_state_sensor) in ("unavailable", "unknown"):
-            if self.get_state(self.entity_id, attribute="source") != "LG 2 MQTT":
-                self.call_service(
-                    "media_player/select_source",
-                    source="LG 2 MQTT",
-                    entity_id=self.entity_id,
-                )
-            self.run_in(
-                self.setup_play_state_sensor, self.constants["setup_check_delay"]
-            )
-            self.log("Loading app on TV to setup state sensor", level="DEBUG")
-        else:
-            self.log("Play state sensor setup complete", level="DEBUG")
+        self.log(
+            "Loading app launcher & media state reporting service on TV",
+            level="DEBUG",
+        )
+        self.device.call_service(
+            "media_player/select_source",
+            source="App Launcher & Media State Reporter",
+        )
 
-    def state_change(
+    def handle_state_change(
         self,
         entity: str,
         attribute: str,
@@ -115,32 +118,29 @@ class Media(App):
         new: str,
         **kwargs: dict,
     ):
-        """Handle TV events at night and change the scene."""
+        """Handle TV events to adjust the scene and load appropriately on startup."""
         del kwargs
-        if entity == self.entity_id and attribute == "state" and new == "on":
-            self.setup_play_state_sensor()
-        elif entity == self.play_state_sensor:
-            if new != "unavailable":
-                self.last_play_state = new
-                if old == "unavailable":
-                    old = self.last_play_state
-                    # self.call_service("media_player/select_source", source="Home Dashboard", entity_id=self.entity_id)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.log(
+                f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')",
+                level="DEBUG",
+            )
+        if entity == self.play_state.entity_id:
+            if new not in ("unavailable", "unknown"):
+                self.last_valid_play_state = new
             else:
-                # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
-                # Firstly, does this matter? Try ignoring as per current setup
-                # if it does matter, mark as setup required and trigger __setup_state_change_sensor when not playing
-                # BETTER IDEA: recreate LG TV dashboard, no logs, have all streaming app icons (wait for sensor before leaving dashboard)
-                # HALT ALL DEVELOPMENT HERE, looks like play state is being released as default functionality
-                return
-        self.log(f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')")
+                self.log(
+                    "TV state sensor unavailable, using last valid state",
+                    level="DEBUG",
+                )
+        elif attribute == "state" and new == "on":
+            self.load_app_launcher_and_state_reporter()
         if self.on and self.playing and not self.muted:
             if self.control.scene == "Night":
                 self.control.scene = "TV"
         elif self.control.scene == "TV":
-            if (
-                self.lights.lights["bedroom"].brightness == 0
-                and self.lights.lights["bedroom"].ignoring_vacancy
-            ):
-                self.control.scene = "Sleep"
-            else:
-                self.control.scene = "Night"
+            self.control.scene = (
+                "Night"
+                if self.entities.binary_sensor.dark_outside.state == "on"
+                else "Day"
+            )

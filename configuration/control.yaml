@@ -98,6 +98,22 @@ automation:
   # TODO: https://app.asana.com/0/1207020279479204/1207033183175582/f
   # Maybe set up homekit here on zwave setup completion? Or maybe do this here:
   # https://app.asana.com/0/1207020279479204/1207033183175579/f
+  - alias: Renew LG TV developer mode session weekly
+    description: "Required to use TV app launcher and media state reporter"
+    actions:
+      - action: rest_command.renew_lgtv_developer_mode_session
+    triggers:
+      - trigger: time
+        at: "01:01:01"
+    conditions:
+      - condition: time
+        weekday:
+          - sun
+    mode: single
+
+rest_command:
+  renew_lgtv_developer_mode_session:
+    url: !secret lgtv_developer_mode_session_renewing_url
 
 script:
   toggle_group:
