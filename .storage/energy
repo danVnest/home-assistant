@@ -17,7 +17,7 @@
           {
             "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
             "stat_cost": null,
-            "entity_energy_price": "sensor.grid_energy_cost_per_kwh",
+            "entity_energy_price": "sensor.electricity_general_price",
             "number_energy_price": null
           }
         ],
@@ -25,7 +25,7 @@
           {
             "stat_energy_to": "sensor.smart_meter_real_energy_produced",
             "stat_compensation": null,
-            "entity_energy_price": "input_number.energy_export_price",
+            "entity_energy_price": "sensor.electricity_feed_in_price",
             "number_energy_price": null
           }
         ],

@@ -1,15 +1,3 @@
-utility_meter:
-  monthly_energy_consumed:
-    name: Monthly energy consumed
-    unique_id: monthly_energy_consumed
-    source: sensor.total_energy_consumed
-    cycle: monthly
-  monthly_energy_from_grid:
-    name: Monthly energy from grid
-    unique_id: monthly_energy_from_grid
-    source: sensor.smart_meter_real_energy_consumed
-    cycle: monthly
-
 template:
   - sensor:
       - name: Total energy consumed
@@ -30,6 +18,7 @@ template:
             has_value('sensor.smart_meter_real_energy_produced') and
             has_value('sensor.smart_meter_real_energy_consumed')
           }}
+
       - name: Average daily solar production
         unique_id: average_daily_solar_production
         state: "{{ (states('sensor.inverter_total_energy')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
@@ -37,22 +26,23 @@ template:
         state_class: total
         icon: mdi:solar-power-variant
         availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Average daily solar export
-        unique_id: average_daily_solar_export
+      - name: Average daily energy export
+        unique_id: average_daily_energy_export
         state: "{{ (states('sensor.smart_meter_real_energy_produced')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:transmission-tower-import
         availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Average daily battery export
-        unique_id: average_daily_battery_export
+        # TODO: add to daily export once battery is installed with VPP
+      - name: Average daily solar storage
+        unique_id: average_daily_solar_storage
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
-        icon: mdi:transmission-tower-import
-        # TODO: add daily battery export once battery is installed with VPP
-      - name: Average daily solar storage
-        unique_id: average_daily_solar_storage
+        icon: mdi:battery-heart-variant
+        # TODO: update once battery is installed
+      - name: Average daily grid storage
+        unique_id: average_daily_grid_storage
         state: "{{ 0 }}"
         unit_of_measurement: kWh/day
         state_class: total
@@ -65,14 +55,20 @@ template:
         state_class: total
         icon: mdi:home-lightning-bolt
         availability: "{{ has_value('sensor.total_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Solar consumption
+        unique_id: solar_consumption
+        state: "{{ ((states('sensor.inverter_total_energy')|float - states('sensor.smart_meter_real_energy_produced')|float) / 1000)|round(1) }}"
+        unit_of_measurement: kWh
+        state_class: total
+        icon: mdi:home-sound-in
+        availability: "{{ has_value('sensor.inverter_total_energy') and has_value('sensor.smart_meter_real_energy_produced') }}"
       - name: Average daily solar consumption
         unique_id: average_daily_solar_consumption
-        state: "{{ states('sensor.average_daily_solar_production')|float - states('sensor.average_daily_solar_export')|float  }}"
+        state: "{{ (states('sensor.solar_consumption')|float / states('sensor.days_since_solar_installation')|float)|round(1) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-sound-in
-        availability: "{{ has_value('sensor.average_daily_solar_production') and has_value('sensor.average_daily_solar_export') }}"
-        # TODO: update once battery is installed
+        availability: "{{ has_value('sensor.solar_consumption') and has_value('sensor.days_since_solar_installation') }}"
       - name: Average daily battery consumption
         unique_id: average_daily_battery_consumption
         state: "{{ 0 }}"
@@ -87,12 +83,28 @@ template:
         state_class: total
         icon: mdi:home-import-outline
         availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
+
       - name: Days since solar installation
         unique_id: days_since_solar_installation
         state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(5) }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:calendar-start
+      # TODO: update once battery is installed
+      # - name: Days since battery installation
+      #   unique_id: days_since_battery_installation
+      #   state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(5) }}"
+      #   unit_of_measurement: days
+      #   state_class: total_increasing
+      #   icon: mdi:calendar-start
+
+      - name: Electricity non-renewable percentage
+        unique_id: electricity_non_renewable_percentage
+        state: "{{ 100 - states('sensor.electricity_renewable_percentage')|float }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:leaf-off
+        availability: "{{ has_value('sensor.electricity_renewable_percentage') }}"
 
       - name: Dan's phone charger energy
         unique_id: dan_s_phone_charger_energy
@@ -152,3 +164,134 @@ template:
         attributes:
           refreshed: "{{ now() }}"
         availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"
+
+  - trigger:
+      - platform: state
+        entity_id: sensor.solar_production_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily solar production
+        unique_id: maximum_daily_solar_production
+        state: "{{ [trigger.to_state.attributes.last_period|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:solar-power-variant
+  - trigger:
+      - platform: state
+        entity_id: sensor.energy_export_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily energy export
+        unique_id: maximum_daily_energy_export
+        state: "{{ [trigger.to_state.attributes.last_period|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:transmission-tower-import
+  - trigger:
+      - platform: state
+        entity_id: sensor.solar_storage_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily solar storage
+        unique_id: maximum_daily_solar_storage
+        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:battery-heart-variant
+  - trigger:
+      - platform: state
+        entity_id: sensor.grid_storage_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily grid storage
+        unique_id: maximum_daily_grid_storage
+        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:battery-charging
+  - trigger:
+      - platform: state
+        entity_id: sensor.energy_consumption_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily energy consumption
+        unique_id: maximum_daily_energy_consumption
+        state: "{{ [trigger.to_state.attributes.last_period|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-lightning-bolt
+  - trigger:
+      - platform: state
+        entity_id: sensor.solar_consumption_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily solar consumption
+        unique_id: maximum_daily_solar_consumption
+        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-sound-in
+  - trigger:
+      - platform: state
+        entity_id: sensor.battery_consumption_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily battery consumption
+        unique_id: maximum_daily_battery_consumption
+        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-battery
+  - trigger:
+      - platform: state
+        entity_id: sensor.grid_consumption_today
+        attribute: last_period
+    sensor:
+      - name: Maximum daily grid consumption
+        unique_id: maximum_daily_grid_consumption
+        state: "{{ [trigger.to_state.attributes.last_period|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        unit_of_measurement: kWh/day
+        state_class: total
+        icon: mdi:home-import-outline
+
+utility_meter:
+  solar_production_today:
+    name: Solar production today
+    unique_id: solar_production_today
+    source: sensor.inverter_total_energy
+    cycle: daily
+  energy_export_today:
+    name: Energy export today
+    unique_id: energy_export_today
+    source: sensor.smart_meter_real_energy_produced
+    cycle: daily
+  solar_storage_today:
+    name: Solar storage today
+    unique_id: solar_storage_today
+    source: sensor.average_daily_solar_storage # TODO: update with actual when battery installed
+    cycle: daily
+  grid_storage_today:
+    name: Grid storage today
+    unique_id: grid_storage_today
+    source: sensor.average_daily_grid_storage # TODO: update with actual when battery installed
+    cycle: daily
+  energy_consumption_today:
+    name: Energy consumption today
+    unique_id: energy_consumption_today
+    source: sensor.total_energy_consumed
+    cycle: daily
+  solar_consumption_today:
+    name: Solar consumption today
+    unique_id: solar_consumption_today
+    source: sensor.solar_consumption
+    cycle: daily
+  battery_consumption_today:
+    name: Battery consumption today
+    unique_id: battery_consumption_today
+    source: sensor.average_daily_battery_consumption # TODO: update with actual when battery installed
+    cycle: daily
+  grid_consumption_today:
+    name: Grid consumption today
+    unique_id: grid_consumption_today
+    source: sensor.smart_meter_real_energy_consumed
+    cycle: daily
