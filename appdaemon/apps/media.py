@@ -59,7 +59,7 @@ class Media(App):
         """Check if the TV is currently playing or not."""
         if not self.on:
             return False
-        if self.device.attribute.source == "PC" and self.pc_on:
+        if self.device.attributes.source == "PC" and self.pc_on:
             return True
         return (
             self.play_state.state == "playing"
@@ -70,7 +70,7 @@ class Media(App):
     @property
     def muted(self) -> bool:
         """Check if the TV is currently muted or not."""
-        return self.device.attribute.is_volume_muted is True
+        return self.device.attributes.is_volume_muted is True
 
     @property
     def pc_on(self) -> bool:
@@ -89,10 +89,10 @@ class Media(App):
 
     def pause(self):
         """Pause media being played on the TV."""
-        self.device.call_service("media_player/media_pause")
+        self.device.call_service("media_pause")
         self.log("TV media is now paused", level="DEBUG")
 
-    def load_app_launcher_and_state_reporter(self, **kwargs: dict):
+    def load_app_launcher_and_state_reporter(self):
         """Start the LG TV app launcher app & media state reporting service."""
         del kwargs
         if not self.on:
@@ -106,7 +106,7 @@ class Media(App):
             level="DEBUG",
         )
         self.device.call_service(
-            "media_player/select_source",
+            "select_source",
             source="App Launcher & Media State Reporter",
         )
 

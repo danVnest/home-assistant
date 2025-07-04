@@ -180,7 +180,7 @@ powercalc:
                     if not state_attr('media_player.tv_speakers', 'is_volume_muted')|default(False) else 0
                   -%}
                   {%- if state_attr('media_player.tv', 'sound_output')|default == "external_arc" -%}
-                    {{- 12 + 4 * volume * (1 + 6 * volume) if states('sensor.webostvservice_play_state') == "on" else 12 -}}
+                    {{- 12 + 4 * volume * (1 + 6 * volume) if states('binary_sensor.tv_playing') == "on" else 12 -}}
                   {%-
                     elif state_attr('media_player.tv_speakers', 'source')|default == "Bluetooth" and
                     '24:E8:53:AB:AC:DF (LG_Speaker_SP11RA_2463)' in

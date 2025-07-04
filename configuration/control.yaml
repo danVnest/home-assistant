@@ -54,12 +54,11 @@ template:
             today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')|float(0)) > now()
           }}
         icon: mdi:sun-clock
-      - name: TV playing # TODO: update
+      - name: TV playing
         unique_id: tv_playing
-        state: "{{ states('sensor.webostvservice_play_state') == 'playing' }}"
+        state: "{{ states('sensor.tv_state') == 'playing' and states('media_player.tv') == 'on' }}"
         icon: mdi:play-pause
-        device_class: running
-        availability: "{{ has_value('sensor.webostvservice_play_state') }}"
+        availability: "{{ has_value('sensor.tv_state') or states('media_player.tv') == 'off' }}"
       - name: Dark outside
         unique_id: dark_outside
         state: >
@@ -69,7 +68,6 @@ template:
           }}
         delay_off: 0:05
         icon: mdi:theme-light-dark
-        device_class: running
         availability: "{{ has_value('sensor.weather_station_illuminance') and has_value('sun.sun') }}"
       - name: Washer running
         unique_id: washer_running
@@ -99,6 +97,7 @@ automation:
   # Maybe set up homekit here on zwave setup completion? Or maybe do this here:
   # https://app.asana.com/0/1207020279479204/1207033183175579/f
   - alias: Renew LG TV developer mode session weekly
+    id: renew_lgtv_developer_mode_session_weekly
     description: "Required to use TV app launcher and media state reporter"
     actions:
       - action: rest_command.renew_lgtv_developer_mode_session
