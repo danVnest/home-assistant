@@ -2,11 +2,11 @@ template:
   - sensor:
       - name: Effective energy cost per kWh
         unique_id: effective_energy_cost_per_kwh
-        state: "{{ states('sensor.electricity_general_price')|float - states('sensor.savings_from_solar_and_battery_per_kwh')|float }}"
+        state: "{{ states('sensor.electricity_general_price')|float * (1 - states('sensor.power_meter_relative_autonomy')|float / 100) }}"
         unit_of_measurement: $/kWh
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.electricity_general_price') and has_value('sensor.savings_from_solar_and_battery_per_kwh') }}"
+        availability: "{{ has_value('sensor.electricity_general_price') and has_value('sensor.power_meter_relative_autonomy') }}"
       - name: Effective energy cost per Wh
         unique_id: effective_energy_cost_per_wh
         state: "{{ states('sensor.effective_energy_cost_per_kwh')|float / 1000 }}"
