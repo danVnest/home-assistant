@@ -4,7 +4,7 @@ template:
       - name: Solar and battery return on investment
         unique_id: solar_and_battery_return_on_investment
         state: >
-          {% set install_costs = 8889.98 %}
+          {% set install_costs = 20189.98 %}
           {% set cost_savings_incorrect_start_offset = 506.89 %}
           {{ (states('sensor.total_energy_cost_savings')|float - install_costs - cost_savings_incorrect_start_offset)|round(2) }}
         unit_of_measurement: $
@@ -12,6 +12,14 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') }}"
+  - triggers:
+      - trigger: time
+        at: "00:00:00"
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+    sensor:
       - name: Solar and battery years to break even
         unique_id: solar_and_battery_years_to_break_even
         state: "{{ (states('sensor.solar_and_battery_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) }}"
@@ -22,25 +30,25 @@ template:
       - name: Solar and battery years to beat investment
         unique_id: solar_and_battery_years_to_beat_investment
         state: >
-          {% set install_costs = 8889.98 %}
+          {% set install_costs = 20189.98 %}
           {% set annual_return_rate = 0.06 %}
           {% set monthly_return_rate = (1 + annual_return_rate) ** (1/12) - 1 %}
           {% set monthly_savings = states('sensor.total_energy_cost_savings_monthly')|float %}
           {% set break_even_month = (states('sensor.solar_and_battery_years_to_break_even')|float * 12)|int %}
           {% set investment = install_costs * (1 + monthly_return_rate) ** break_even_month %}
-          {% set var = namespace(savings = 0, investment = investment, diff = investment) %}
+          {% set var = namespace(savings = 0, investment = investment, diff = investment, beat_investment_year = -100) %}
           {%- for month in range(break_even_month, 600) -%}
             {%- set var.savings = var.savings + monthly_savings -%}
             {%- set var.investment = var.investment * (1 + monthly_return_rate) -%}
             {%- if var.savings >= var.investment -%}
-              {{- (month / 12)|round(1) -}}
+              {%- set var.beat_investment_year = (month / 12)|round(1) -%}
               {%- break -%}
             {%- elif var.investment - var.savings > var.diff -%}
-              -100
               {%- break -%}
             {%- endif -%}
             {%- set var.diff = var.investment - var.savings -%}
           {%- endfor -%}
+          {{- var.beat_investment_year -}}
         unit_of_measurement: years
         state_class: measurement
         icon: mdi:calendar

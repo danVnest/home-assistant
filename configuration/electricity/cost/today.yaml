@@ -258,6 +258,14 @@ template:
         state_class: total
         icon: mdi:currency-usd
 
+  - triggers:
+      - trigger: time
+        at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+    sensor:
       - name: Average daily total energy cost
         unique_id: average_daily_total_energy_cost
         state: >
@@ -332,47 +340,27 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.energy_export_earnings_minus_battery_charging_cost') and has_value('sensor.days_since_solar_installation') }}"
 
-  - trigger:
-      - platform: state
-        entity_id: sensor.total_energy_cost_today
-        attribute: last_period
-    sensor:
       - name: Maximum daily total energy cost
         unique_id: maximum_daily_total_energy_cost
-        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(2) }}"
+        state: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-  - trigger:
-      - platform: state
-        entity_id: sensor.total_energy_cost_savings_today
-        attribute: last_period
-    sensor:
       - name: Maximum daily total energy cost savings
         unique_id: maximum_daily_total_energy_cost_savings
-        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(2) }}"
+        state: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-  - trigger:
-      - platform: state
-        entity_id: sensor.grid_cost_today
-        attribute: last_period
-    sensor:
       - name: Maximum daily grid cost
         unique_id: maximum_daily_grid_cost
-        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(2) }}"
+        state: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-  - trigger:
-      - platform: state
-        entity_id: sensor.energy_export_earnings_minus_battery_charging_cost_today
-        attribute: last_period
-    sensor:
       - name: Maximum daily energy export earnings minus battery charging cost
         unique_id: maximum_daily_energy_export_earnings_minus_battery_charging_cost
-        state: "{{ [trigger.to_state.attributes.last_period|float(0), this.state|float(0)]|max|round(2) }}"
+        state: "{{ [state_attr('sensor.energy_export_earnings_minus_battery_charging_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd

@@ -317,6 +317,67 @@ powercalc:
       fixed:
         power: "{{ max(0, states('sensor.power_meter_power_load_consumed')|float(0) - states('sensor.tracked_power')|float(0)) }}"
 
+template:
+  - sensor:
+      - name: Battery solar charge power
+        unique_id: battery_solar_charge_power
+        state: "{{ states('sensor.power_meter_power_battery_charge')|float * states('sensor.power_meter_relative_autonomy')|float / 100 }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-heart-variant
+        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.power_meter_relative_autonomy') }}"
+      - name: Battery grid charge power
+        unique_id: battery_grid_charge_power
+        state: "{{ states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_solar_charge_power')|float }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-charging
+        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.battery_solar_charge_power') }}"
+      - name: Battery consumption power
+        unique_id: battery_consumption_power
+        state: "{{ [states('sensor.power_meter_power_battery_discharge')|float - states('sensor.power_meter_power_grid_export')|float, 0]|max }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:home-battery
+        availability: "{{ has_value('sensor.power_meter_power_battery_discharge') and has_value('sensor.power_meter_power_grid_export') }}"
+      - name: Battery export power
+        unique_id: battery_export_power
+        state: "{{ states('sensor.power_meter_power_battery_discharge')|float - states('sensor.battery_consumption_power')|float }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-charging-wireless
+        availability: "{{ has_value('sensor.power_meter_power_battery_discharge') and has_value('sensor.battery_consumption_power') }}"
+      - name: Solar export power
+        unique_id: solar_export_power
+        state: "{{ states('sensor.power_meter_power_grid_export')|float - states('sensor.battery_export_power')|float }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:transmission-tower-import
+        availability: "{{ has_value('sensor.power_meter_power_grid_export') and has_value('sensor.battery_export_power') }}"
+      - name: Solar consumption power
+        unique_id: solar_consumption_power
+        state: >
+          {{
+            states('sensor.power_meter_power_photovoltaics')|float - 
+            states('sensor.battery_solar_charge_power')|float -
+            states('sensor.solar_export_power')|float
+          }}
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:home-sound-in
+        availability: >
+          {{
+            has_value('sensor.power_meter_power_photovoltaics') and
+            has_value('sensor.battery_solar_charge_power') and
+            has_value('sensor.solar_export_power')
+          }}
+
 sensor:
   - platform: derivative
     name: Washer power

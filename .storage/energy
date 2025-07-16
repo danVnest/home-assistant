@@ -6,7 +6,7 @@
     "energy_sources": [
       {
         "type": "solar",
-        "stat_energy_from": "sensor.inverter_total_energy",
+        "stat_energy_from": "sensor.solar_energy_produced",
         "config_entry_solar_forecast": [
           "01J70GAMKRWSDDJSQ0PANJBDP6"
         ]
@@ -30,6 +30,11 @@
           }
         ],
         "cost_adjustment_day": 0.0
+      },
+      {
+        "type": "battery",
+        "stat_energy_from": "sensor.battery_energy_discharged",
+        "stat_energy_to": "sensor.battery_energy_charged"
       }
     ],
     "device_consumption": [
