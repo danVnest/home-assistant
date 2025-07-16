@@ -304,14 +304,14 @@ template:
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.washer_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
+        availability: "{{ has_value('sensor.washer_power') and has_value('sensor.effective_energy_cost_per_kwh') }}"
       - name: Washer power cost savings
         unique_id: washer_power_cost_savings
         state: "{{ (states('sensor.washer_power')|float * states('sensor.savings_from_solar_and_battery_per_kwh')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.washer_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
+        availability: "{{ has_value('sensor.washer_power') and has_value('sensor.savings_from_solar_and_battery_per_kwh') }}"
 
       - name: Dryer power cost
         unique_id: dryer_power_cost
@@ -319,14 +319,14 @@ template:
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
+        availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.effective_energy_cost_per_kwh') }}"
       - name: Dryer power cost savings
         unique_id: dryer_power_cost_savings
         state: "{{ (states('sensor.dryer_power')|float * states('sensor.savings_from_solar_and_battery_per_kwh')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
+        availability: "{{ has_value('sensor.dryer_power') and has_value('sensor.savings_from_solar_and_battery_per_kwh') }}"
 
       - name: TV, speakers, PC, Home Assistant, router relay, security hub power cost
         unique_id: tv_speakers_pc_home_assistant_router_relay_security_hub_power_cost
