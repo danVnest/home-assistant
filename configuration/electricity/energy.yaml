@@ -66,6 +66,77 @@ template:
             has_value('sensor.smart_meter_real_energy_consumed')
           }}
 
+      - name: Electricity non-renewable percentage
+        unique_id: electricity_non_renewable_percentage
+        state: "{{ 100 - states('sensor.electricity_renewable_percentage')|float }}"
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:leaf-off
+        availability: "{{ has_value('sensor.electricity_renewable_percentage') }}"
+
+      - name: Dan's phone charger energy
+        unique_id: dan_s_phone_charger_energy
+        state: >
+          {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
+          {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
+            {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
+            {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
+            {%- if current_battery_level > last_battery_level -%}
+              {%- set battery_capacity = 0.0167 -%}
+              {%- set charging_efficiency = 1.3 -%}
+              {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
+            {%- endif -%}
+          {%- endif -%}
+          {{- energy -}}
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
+
+      - name: Washer energy
+        unique_id: washer_energy
+        state: "{{ states('sensor.washer_energy_without_refresh') }}"
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          refreshed: "{{ now() }}"
+        availability: "{{ has_value('sensor.washer_energy_without_refresh') }}"
+      - name: Dryer energy
+        unique_id: dryer_energy
+        state: "{{ states('sensor.dryer_energy_without_refresh') }}"
+        unit_of_measurement: kWh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:lightning-bolt
+        attributes:
+          refreshed: "{{ now() }}"
+        availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"
+
+  - triggers:
+      - trigger: time
+        at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
+      - trigger: homeassistant
+        event: start
+      - trigger: event
+        event_type: event_template_reloaded
+    sensor:
+      - name: Days since solar installation
+        unique_id: days_since_solar_installation
+        state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
+        unit_of_measurement: days
+        state_class: total_increasing
+        icon: mdi:calendar-start
+      - name: Days since battery installation
+        unique_id: days_since_battery_installation
+        state: "{{ ((today_at() - as_datetime('2025-07-15T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
+        unit_of_measurement: days
+        state_class: total_increasing
+        icon: mdi:calendar-start
+
       - name: Average daily solar production
         unique_id: average_daily_solar_production
         state: >
@@ -138,77 +209,6 @@ template:
         icon: mdi:home-import-outline
         availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_battery_installation') }}"
 
-      - name: Days since solar installation
-        unique_id: days_since_solar_installation
-        state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
-        unit_of_measurement: days
-        state_class: total_increasing
-        icon: mdi:calendar-start
-      - name: Days since battery installation
-        unique_id: days_since_battery_installation
-        state: "{{ ((today_at() - as_datetime('2025-07-15T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
-        unit_of_measurement: days
-        state_class: total_increasing
-        icon: mdi:calendar-start
-
-      - name: Electricity non-renewable percentage
-        unique_id: electricity_non_renewable_percentage
-        state: "{{ 100 - states('sensor.electricity_renewable_percentage')|float }}"
-        unit_of_measurement: "%"
-        state_class: measurement
-        icon: mdi:leaf-off
-        availability: "{{ has_value('sensor.electricity_renewable_percentage') }}"
-
-      - name: Dan's phone charger energy
-        unique_id: dan_s_phone_charger_energy
-        state: >
-          {%- set energy = states('sensor.dan_s_phone_charger_energy')|float(0) -%}
-          {%- if states('device_tracker.dan_s_phone') == "home" and has_value('sensor.dan_s_phone_battery_level') -%}
-            {%- set current_battery_level = states('sensor.dan_s_phone_battery_level')|float -%}
-            {%- set last_battery_level = state_attr('sensor.dan_s_phone_charger_energy', 'last_battery_level')|float(100) -%}
-            {%- if current_battery_level > last_battery_level -%}
-              {%- set battery_capacity = 0.0167 -%}
-              {%- set charging_efficiency = 1.3 -%}
-              {%- set energy = energy + charging_efficiency * (current_battery_level - last_battery_level) / 100 * battery_capacity -%}
-            {%- endif -%}
-          {%- endif -%}
-          {{- energy -}}
-        unit_of_measurement: kWh
-        device_class: energy
-        state_class: total_increasing
-        icon: mdi:lightning-bolt
-        attributes:
-          last_battery_level: "{{ states('sensor.dan_s_phone_battery_level')|float(100) }}"
-
-      - name: Washer energy
-        unique_id: washer_energy
-        state: "{{ states('sensor.washer_energy_without_refresh') }}"
-        unit_of_measurement: kWh
-        device_class: energy
-        state_class: total_increasing
-        icon: mdi:lightning-bolt
-        attributes:
-          refreshed: "{{ now() }}"
-        availability: "{{ has_value('sensor.washer_energy_without_refresh') }}"
-      - name: Dryer energy
-        unique_id: dryer_energy
-        state: "{{ states('sensor.dryer_energy_without_refresh') }}"
-        unit_of_measurement: kWh
-        device_class: energy
-        state_class: total_increasing
-        icon: mdi:lightning-bolt
-        attributes:
-          refreshed: "{{ now() }}"
-        availability: "{{ has_value('sensor.dryer_energy_without_refresh') }}"
-
-  - triggers:
-      - trigger: time
-        at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
-      - trigger: homeassistant
-        event: start
-      - trigger: event
-        event_type: event_template_reloaded
-    sensor:
       - name: Maximum daily solar production
         unique_id: maximum_daily_solar_production
         state: "{{ [state_attr('sensor.solar_production_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
