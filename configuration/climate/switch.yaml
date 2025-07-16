@@ -26,7 +26,7 @@ switch:
           target:
             entity_id: switch.office_heater_dumb
         turn_off:
-          action: climate.turn_off
+          action: switch.turn_off
           target:
             entity_id: switch.office_heater_dumb
 
