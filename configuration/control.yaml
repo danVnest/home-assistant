@@ -2,12 +2,12 @@ input_select:
   scene:
     name: Scene
     options:
-      - Day
-      - Night
-      - Bright
       - Sleep
       - Morning
+      - Day
+      - Night
       - TV
+      - Bright
       - Away (Day)
       - Away (Night)
     icon: mdi:home-lightning-bolt
