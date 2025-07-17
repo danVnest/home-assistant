@@ -73,14 +73,80 @@ template:
         unique_id: washer_running
         state: "{{ as_datetime(states('sensor.washer_completion_time')) >= now() }}"
         device_class: running
-        availability: "{{ has_value('sensor.washer_completion_time') }}"
         icon: mdi:washing-machine
+        availability: "{{ has_value('sensor.washer_completion_time') }}"
       - name: Dryer running
         unique_id: dryer_running
         state: "{{ as_datetime(states('sensor.dryer_completion_time')) >= now() }}"
         device_class: running
-        availability: "{{ has_value('sensor.dryer_completion_time') }}"
         icon: mdi:tumble-dryer
+        availability: "{{ has_value('sensor.dryer_completion_time') }}"
+  - sensor:
+      - name: Washer completion percentage
+        unique_id: washer_completion_percentage
+        state: >
+          {% set start = as_datetime(states('sensor.washer_start_time')) %}
+          {% set end = as_datetime(states('sensor.washer_completion_time')) %}
+          {%- if end > now() > start -%}
+            {{- (100 * (now() - start) / (end - start))|round(0)|max(1) -}}
+          {%- elif now() < end + timedelta(hours = 6) -%}
+            100
+          {%- else -%}
+            0
+          {%- endif -%}
+        icon: mdi:percent
+        availability: "{{ has_value('sensor.washer_start_time') and has_value('sensor.washer_completion_time')}}"
+      - name: Dryer completion percentage
+        unique_id: dryer_completion_percentage
+        state: >
+          {% set start = as_datetime(states('sensor.dryer_start_time')) %}
+          {% set end = as_datetime(states('sensor.dryer_completion_time')) %}
+          {%- if end > now() > start -%}
+            {{- (100 * (now() - start) / (end - start))|round(0)|max(1) -}}
+          {%- elif now() < end + timedelta(hours = 6) -%}
+            100
+          {%- else -%}
+            0
+          {%- endif -%}
+        icon: mdi:percent
+        availability: "{{ has_value('sensor.dryer_start_time') and has_value('sensor.dryer_completion_time')}}"
+  - triggers:
+      - trigger: state
+        entity_id: select.washer
+        from: stop
+        to: run
+    sensor:
+      - name: Washer start time
+        unique_id: washer_start_time
+        device_class: timestamp
+        state: "{{ now() }}"
+  - triggers:
+      - trigger: state
+        entity_id: select.dryer
+        from: stop
+        to: run
+    sensor:
+      - name: Dryer start time
+        unique_id: dryer_start_time
+        device_class: timestamp
+        state: "{{ now() }}"
+  - triggers:
+      - trigger: state
+        entity_id:
+          - sensor.washer_completion_time
+          - sensor.dryer_completion_time
+      - trigger: time
+        at: "00:00:00"
+    binary_sensor:
+      - name: Washer or dryer run today
+        unique_id: washer_or_dryer_run_today
+        state: >
+          {{
+            as_datetime(states('sensor.washer_completion_time')).date() == now().date() or
+            as_datetime(states('sensor.dryer_completion_time')).date() == now().date()
+          }}
+        icon: mdi:washing-machine
+        availability: "{{ has_value('sensor.washer_completion_time') and has_value('sensor.dryer_completion_time') }}"
 
 automation:
   - alias: Turn TV on if not already on

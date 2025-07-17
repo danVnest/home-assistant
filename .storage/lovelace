@@ -435,56 +435,96 @@
                   ]
                 },
                 {
-                  "type": "tile",
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
                   "entity": "sensor.washer_completion_time",
-                  "name": "Washing done",
                   "icon": "mdi:washing-machine",
-                  "color": "accent",
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.washer_running",
-                      "state": "on"
-                    }
-                  ]
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.washer_completion_time",
                   "name": "Washing done",
-                  "icon": "mdi:washing-machine",
+                  "styles": ".bubble-icon {\n  color: ${hass.states[\"select.washer\"].state === \"run\" ? \"color-mix(in srgb, var(--bubble-color-mix-in-base), blue)\" : \"var(--bubble-inactive-color)\"} !important;\n}\n\n${card.querySelector('.bubble-state').innerText = (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const now = new Date();\n  const then = new Date(state);\n  const diff = now - then;\n  const seconds = Math.round(diff / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  return rtf.format(-Math.round(minutes / 60), 'hour');\n})()}\n",
+                  "icon_border_progress": [
+                    {
+                      "button": "main",
+                      "source": "sensor.washer_completion_percentage",
+                      "condition": [
+                        {
+                          "condition": "numeric_state",
+                          "entity_id": "sensor.washer_completion_percentage",
+                          "above": 0
+                        }
+                      ],
+                      "color_stops": {
+                        "0": {
+                          "color": "brown",
+                          "percent": 50
+                        },
+                        "1": {
+                          "color": "light-blue",
+                          "percent": 50
+                        }
+                      },
+                      "interpolate_colors": true
+                    }
+                  ],
+                  "modules": [
+                    "icon_border_progress"
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": "auto"
+                  },
                   "visibility": [
                     {
                       "condition": "state",
-                      "entity": "binary_sensor.washer_running",
-                      "state": "off"
+                      "entity": "binary_sensor.washer_or_dryer_run_today",
+                      "state_not": "off"
                     }
                   ]
                 },
                 {
-                  "type": "tile",
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
                   "entity": "sensor.dryer_completion_time",
-                  "name": "Drying done",
                   "icon": "mdi:tumble-dryer",
-                  "color": "accent",
-                  "visibility": [
+                  "name": "Drying done",
+                  "styles": ".bubble-icon {\n  color: ${hass.states[\"select.dryer\"].state === \"run\" ? \"color-mix(in srgb, var(--bubble-color-mix-in-base), orange)\" : \"var(--bubble-inactive-color)\"} !important;\n}\n\n${card.querySelector('.bubble-state').innerText = (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const now = new Date();\n  const then = new Date(state);\n  const diff = now - then;\n  const seconds = Math.round(diff / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  return rtf.format(-Math.round(minutes / 60), 'hour');\n})()}\n",
+                  "icon_border_progress": [
                     {
-                      "condition": "state",
-                      "entity": "binary_sensor.dryer_running",
-                      "state": "on"
+                      "button": "main",
+                      "source": "sensor.dryer_completion_percentage",
+                      "condition": [
+                        {
+                          "condition": "numeric_state",
+                          "entity_id": "sensor.dryer_completion_percentage",
+                          "above": 0
+                        }
+                      ],
+                      "color_stops": {
+                        "0": {
+                          "color": "blue",
+                          "percent": 50
+                        },
+                        "1": {
+                          "color": "orange",
+                          "percent": 50
+                        }
+                      },
+                      "interpolate_colors": true
                     }
-                  ]
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.dryer_completion_time",
-                  "name": "Drying done",
-                  "icon": "mdi:tumble-dryer",
+                  ],
+                  "modules": [
+                    "icon_border_progress"
+                  ],
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": "auto"
+                  },
                   "visibility": [
                     {
                       "condition": "state",
-                      "entity": "binary_sensor.dryer_running",
-                      "state": "off"
+                      "entity": "binary_sensor.washer_or_dryer_run_today",
+                      "state_not": "off"
                     }
                   ]
                 },
