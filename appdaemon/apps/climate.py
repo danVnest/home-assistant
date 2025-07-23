@@ -682,7 +682,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.handle_door_change,
                 door_id,
                 new="on",
-                duration=self.constants["aircon_reduce_fan_delay"],
+                duration=self.constants["aircon_reduce_fan"]["delay"],
             )
         self.__door_open_delay = None
         self.door_open_delay = 60 * float(
@@ -710,9 +710,9 @@ class Aircon(ClimateDevice, PresenceDevice):
         mode = self.best_mode_for_conditions
         return self.controller.get_setting(
             mode + "ing_target_temperature",
-        ) + self.constants["temperature_target_buffer"] * (
+        ) + self.constants["target_buffer"]["temperature"] * (
             1 if mode == "heat" else -1
-        )  # TODO: potentially remove temperature_target_buffer?
+        )  # TODO: potentially remove target_buffer"]["temperature?
 
     @property
     def fan_mode(self) -> str:
@@ -810,7 +810,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             for door in self.doors
         )
         # TODO: maybe change all repeated get_state usages to storing the actual entitiy as a variable and getting state from that
-        # useful attributes: friendly_name, last_changed/_seconds, entity_name, domain, entity_id
+        # useful device variables: friendly_name, last_changed/_seconds, entity_name, domain, entity_id, attributes (dict)
 
     @property
     def door_open_delay(self) -> float:
@@ -832,25 +832,25 @@ class Aircon(ClimateDevice, PresenceDevice):
         new: str,
         **kwargs: dict,
     ) -> None:
-        """If the kitchen door status changes, check if aircon needs to change."""
+        """If the door status changes, check if aircon needs to change."""
         del attribute, old, kwargs
         self.controller.cancel_timer(self.turn_off_timer_handle)
         if not self.control_enabled:
             return
         if new == "on" and self.on:
-            if self.vacating_delay - self.constants["aircon_reduce_fan_delay"] <= 0:
+            if self.vacating_delay - self.constants["aircon_reduce_fan"]["delay"] <= 0:
                 self.turn_off()
             else:
                 self.turn_off_timer_handle = self.controller.run_in(
                     self.turn_off_after_delay,
-                    self.vacating_delay - self.constants["aircon_reduce_fan_delay"],
+                    self.vacating_delay - self.constants["aircon_reduce_fan"]["delay"],
                     constrain_input_boolean=self.control_input_boolean,
                 )
                 if (
                     entity == self.doors[0].entity_id
                     and self.fan_mode == "auto"
                     and abs(self.room_temperature - self.target_temperature)
-                    > self.constants["aircon_reduce_fan_temperature_threshold"]
+                    > self.constants["aircon_reduce_fan"]["temperature_threshold"]
                 ):
                     self.fan_mode = "low"
         elif not self.door_open:
@@ -945,8 +945,8 @@ class Fan(ClimateDevice, PresenceDevice):
     def desired_cooling_speed(self) -> float:
         """Calculate fan speed to lower apparent room temperature to the target."""
         speed = (self.room_temperature - self.target_temperature) / self.constants[
-            "fan_cooling_per_speed"
-        ]
+            "fan"
+        ]["cooling_per_speed"]
         if self.controller.logger.isEnabledFor(
             logging.DEBUG,
         ):
@@ -968,7 +968,7 @@ class Fan(ClimateDevice, PresenceDevice):
         """Get the fan's target temperature (including buffer to prevent toggling)."""
         return (
             self.controller.get_setting("cooling_target_temperature")
-            + self.constants["temperature_target_buffer"]
+            + self.constants["target_buffer"]["temperature"]
         )
 
     @property
@@ -985,10 +985,10 @@ class Fan(ClimateDevice, PresenceDevice):
         if reverse is None:
             reverse = self.reverse_desired
         return (
-            self.constants["fan_cooling_per_speed"]
+            self.constants["fan"]["cooling_per_speed"]
             * speed
             / (
-                self.constants["fan_cooling_reduction_factor_when_reverse"]
+                self.constants["fan"]["cooling_reduction_factor_when_reverse"]
                 if reverse
                 else 1
             )
@@ -1113,7 +1113,7 @@ class Fan(ClimateDevice, PresenceDevice):
                 self.reversing_steps_remaining += [speed]
             self.reversing_timer = self.controller.run_in(
                 self.continue_reverse,
-                self.constants["fan_reversing_delay"],
+                self.constants["fan"]["reversing_delay"],
             )
             return
         if speed == self.speed:
@@ -1155,7 +1155,7 @@ class Fan(ClimateDevice, PresenceDevice):
         self.reversing_timer = (
             self.controller.run_in(
                 self.continue_reverse,
-                self.constants["fan_reversing_delay"],
+                self.constants["fan"]["reversing_delay"],
             )
             if self.reversing_steps_remaining
             else None
@@ -1240,7 +1240,7 @@ class Heater(ClimateDevice, PresenceDevice):
         return (
             self.room_temperature
             < self.desired_target_temperature
-            - self.constants["temperature_target_buffer"]
+            - self.constants["target_buffer"]["temperature"]
         )
 
     @property
@@ -1249,7 +1249,7 @@ class Heater(ClimateDevice, PresenceDevice):
         return (
             self.room_temperature
             > self.desired_target_temperature
-            + self.constants["temperature_target_buffer"]
+            + self.constants["target_buffer"]["temperature"]
         )
 
     def adjust_for_conditions(
@@ -1406,7 +1406,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
         """Check if room is too dry based on desired target humidity settings."""
         return (
             self.room_humidity
-            < self.desired_target_humidity - self.constants["humidity_target_buffer"]
+            < self.desired_target_humidity - self.constants["target_buffer"]["humidity"]
         )
 
     @property
@@ -1414,7 +1414,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
         """Check if room is too humid based on desired target humidity settings."""
         return (
             self.room_humidity
-            > self.desired_target_humidity + self.constants["humidity_target_buffer"]
+            > self.desired_target_humidity + self.constants["target_buffer"]["humidity"]
         )
 
     def adjust_for_conditions(

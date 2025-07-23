@@ -115,7 +115,7 @@ class Control(App):
         self.timers["heartbeat"] = self.run_every(
             self.heartbeat,
             "now",
-            self.constants["heartbeat_period"],
+            self.constants["heartbeat"]["period"],
         )
         self.listen_state(
             self.handle_update_available,
@@ -640,15 +640,15 @@ class Control(App):
         del kwargs
         try:
             urllib.request.urlopen(  # noqa: S310
-                self.constants["heartbeat_url"],
-                timeout=self.constants["heartbeat_timeout"],
+                self.constants["heartbeat"]["url"],
+                timeout=self.constants["heartbeat"]["timeout"],
             )
         except OSError:
             self.timers["heartbeat_fail_count"] += 1
             if (
                 self.online
                 and self.timers["heartbeat_fail_count"]
-                >= self.constants["heartbeat_max_fail_count"]
+                >= self.constants["heartbeat"]["max_fail_count"]
             ):
                 self.online = False
                 self.log("Heartbeat timed out", level="WARNING")
@@ -662,7 +662,7 @@ class Control(App):
                 self.online = True
                 if (
                     self.timers["heartbeat_fail_count"]
-                    >= self.constants["heartbeat_max_fail_count"]
+                    >= self.constants["heartbeat"]["max_fail_count"]
                 ):
                     self.log("Restarting Home Assistant to fix any broken entities")
                     self.cancel_listen_log(self.handle_log)
