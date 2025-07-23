@@ -2415,38 +2415,153 @@
               "type": "history-graph",
               "entities": [
                 {
-                  "entity": "binary_sensor.entryway_multisensor_motion"
+                  "entity": "binary_sensor.front_door_motion",
+                  "name": "Front door"
                 },
                 {
-                  "entity": "binary_sensor.bathroom_multisensor_motion"
+                  "entity": "lock.door_lock",
+                  "name": "Front door lock"
                 },
                 {
-                  "entity": "binary_sensor.hall_multisensor_motion"
+                  "entity": "binary_sensor.entryway_multisensor_motion",
+                  "name": "Entryway"
                 },
                 {
-                  "entity": "binary_sensor.dining_room_multisensor_motion"
+                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
+                  "name": "Kitchen"
                 },
                 {
-                  "entity": "binary_sensor.kitchen_door_motion"
+                  "entity": "binary_sensor.kitchen_door_motion",
+                  "name": "Kitchen door"
                 },
                 {
-                  "entity": "lock.door_lock"
+                  "entity": "binary_sensor.back_deck_motion_detected",
+                  "name": "Back deck"
                 },
                 {
-                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy"
+                  "entity": "binary_sensor.living_room_motion_detected",
+                  "name": "Living room"
                 },
                 {
-                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy"
+                  "entity": "binary_sensor.dining_room_multisensor_motion",
+                  "name": "Dining room"
                 },
                 {
-                  "entity": "binary_sensor.nursery_presence_sensor_occupancy"
+                  "entity": "binary_sensor.dining_room_balcony_door_motion",
+                  "name": "Dining room balcony door"
                 },
                 {
-                  "entity": "binary_sensor.office_presence_sensor_occupancy"
+                  "entity": "binary_sensor.hall_multisensor_motion",
+                  "name": "Hall"
+                },
+                {
+                  "entity": "binary_sensor.bathroom_multisensor_motion",
+                  "name": "Bathroom"
+                },
+                {
+                  "entity": "binary_sensor.office_presence_sensor_occupancy",
+                  "name": "Office"
+                },
+                {
+                  "entity": "binary_sensor.nursery_presence_sensor_occupancy",
+                  "name": "Nursery"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
+                  "name": "Bedroom"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_balcony_door_motion",
+                  "name": "Bedroom balcony door"
+                },
+                {
+                  "entity": "binary_sensor.back_door_motion_detected",
+                  "name": "Back door"
+                },
+                {
+                  "entity": "binary_sensor.garage_motion_detected",
+                  "name": "Garage"
                 }
               ],
-              "title": "Motion",
-              "hours_to_show": 24
+              "title": "Motion in last hour",
+              "logarithmic_scale": false,
+              "hours_to_show": 1
+            },
+            {
+              "type": "history-graph",
+              "entities": [
+                {
+                  "entity": "binary_sensor.front_door_motion",
+                  "name": "Front door"
+                },
+                {
+                  "entity": "lock.door_lock",
+                  "name": "Front door lock"
+                },
+                {
+                  "entity": "binary_sensor.entryway_multisensor_motion",
+                  "name": "Entryway"
+                },
+                {
+                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
+                  "name": "Kitchen"
+                },
+                {
+                  "entity": "binary_sensor.kitchen_door_motion",
+                  "name": "Kitchen door"
+                },
+                {
+                  "entity": "binary_sensor.back_deck_motion_detected",
+                  "name": "Back deck"
+                },
+                {
+                  "entity": "binary_sensor.living_room_motion_detected",
+                  "name": "Living room"
+                },
+                {
+                  "entity": "binary_sensor.dining_room_multisensor_motion",
+                  "name": "Dining room"
+                },
+                {
+                  "entity": "binary_sensor.dining_room_balcony_door_motion",
+                  "name": "Dining room balcony door"
+                },
+                {
+                  "entity": "binary_sensor.hall_multisensor_motion",
+                  "name": "Hall"
+                },
+                {
+                  "entity": "binary_sensor.bathroom_multisensor_motion",
+                  "name": "Bathroom"
+                },
+                {
+                  "entity": "binary_sensor.office_presence_sensor_occupancy",
+                  "name": "Office"
+                },
+                {
+                  "entity": "binary_sensor.nursery_presence_sensor_occupancy",
+                  "name": "Nursery"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
+                  "name": "Bedroom"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_balcony_door_motion",
+                  "name": "Bedroom balcony door"
+                },
+                {
+                  "entity": "binary_sensor.back_door_motion_detected",
+                  "name": "Back door"
+                },
+                {
+                  "entity": "binary_sensor.garage_motion_detected",
+                  "name": "Garage"
+                }
+              ],
+              "logarithmic_scale": false,
+              "hours_to_show": 24,
+              "title": "Motion over 24 hours"
             }
           ],
           "visible": [
