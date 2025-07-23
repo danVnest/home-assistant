@@ -4,10 +4,20 @@ Lights:
   max_brightness: 255 # maximum brightness value that lighting can reach
   min_brightness: 3 # minimum brightness possible for normal lights
   restricted_min_brightness: 26 # minimum brightness possible for other lights (0 turns off the light, anything higher defaults to minimum)
-  night_to_day_delay: 600 # maximum ambient illuminance to trigger transition to day scene
-  morning_max_illuminance: 60 # maximum ambient illuminance to trigger transition to day scene
-  day_min_illuminance: 40 # minimum ambient illuminance to trigger transition to night scenes
-  night_max_illuminance: 70 # maximum ambient illuminance to trigger transition to day scenes
-  lighting_illuminance_factor: 30 # reduction to account for powered lighting (e.g. will reduce by 15 at 50% brightness)
+  night_to_day_delay: 600 # seconds it has to be light outside before transitioning to day scene
+  illuminance:
+    bedroom_morning_max_illuminance: 10 # bedroom illuminance above this triggers transition to day scene
+    auto_on: # illuminance below this enables automatic lighting
+      bedroom: 30
+      nursery: 15
+      kitchen: 25
+    auto_off: # illuminance above this disables automatic lighting
+      bedroom: 40
+      nursery: 20
+      kitchen: 75
+    lighting_factor: # multiplied by light brightness to estimate powered illuminance
+      bedroom: 5
+      nursery: 15
+      kitchen: 10
   dependencies: Presence
   # log_level: DEBUG

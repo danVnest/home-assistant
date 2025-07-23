@@ -511,20 +511,20 @@ class Lights(App):
             self.lights["dining_room"].ignore_vacancy()
             self.lights["dining_room"].turn_off()
 
-    def is_lighting_sufficient(self, room: str = "kitchen") -> bool:
+    def is_lighting_sufficient(self, room: str) -> bool:
         """Return if there is enough light to not require further lighting."""
         return (
             float(self.get_state(f"sensor.{room}_presence_sensor_illuminance"))
-            - self.lighting_illuminance()
-            >= self.constants["day_min_illuminance"]
+            - self.lighting_illuminance(room)
+            >= self.constants["illuminance"]["auto_off"][room]
         )
 
-    def lighting_illuminance(self, room: str = "kitchen") -> float:
+    def lighting_illuminance(self, room: str) -> float:
         """Return approximate illuminance of powered lights affecting light sensors."""
         return (
             self.lights[room].brightness
             / self.constants["max_brightness"]
-            * self.constants["lighting_illuminance_factor"]
+            * self.constants["illuminance"]["lighting_factor"][room]
         )
 
     def handle_dark_outside(
@@ -580,40 +580,37 @@ class Lights(App):
             self.log("'Kitchen' illuminance is 'unavailable'", level="WARNING")
             return
         if (
-            self.control.scene != "Morning"
+            self.control.scene not in ("Morning", "Day")
             or not self.lights["kitchen"].control_enabled
         ):
             return
         if (
-            float(new) - self.lighting_illuminance()
-            >= self.constants["night_max_illuminance"]
+            float(new) - self.lighting_illuminance("kitchen")
+            >= self.constants["illuminance"]["auto_off"]["kitchen"]
         ):
-            if self.lights["kitchen"].on_when_vacant:
-                self.log(
-                    f"Kitchen light levels are high ({new}lx) "
-                    "during morning scene, disabling kitchen vacancy light",
-                )
-                self.lights["kitchen"].set_presence_adjustments(
+            for light_name in ("kitchen", "kitchen_strip"):
+                self.lights[light_name].ignore_vacancy()
+                self.lights[light_name].turn_off()
+            self.log(
+                f"Kitchen light levels are high ({new}lx), automatic lighting disabled",
+            )
+        elif (
+            not self.lights["kitchen"].ignoring_vacancy
+            and float(new) - self.lighting_illuminance("kitchen")
+            <= self.constants["illuminance"]["auto_on"]["kitchen"]
+        ):
+            for light_name in ("kitchen", "kitchen_strip"):
+                self.lights[light_name].set_presence_adjustments(
                     occupied=(
                         self.constants["max_brightness"],
-                        self.get_setting("morning_kelvin"),
+                        self.lights[light_name].kelvin_limits["max"],
                     ),
-                    vacating_delay=self.get_setting("morning_vacating_delay"),
+                    vacating_delay=self.get_setting(
+                        "morning_vacating_delay",
+                    ),
                 )
-        elif (
-            float(new) - self.lighting_illuminance()
-            <= self.constants["day_min_illuminance"]
-            and not self.lights["kitchen"].on_when_vacant
-        ):
             self.log(
-                f"Kitchen light levels are low ({new}lx) during morning scene, "
-                "enabling kitchen vacancy light",
-            )
-            kelvin = self.get_setting("morning_kelvin")
-            self.lights["kitchen"].set_presence_adjustments(
-                vacant=(self.get_setting("morning_brightness"), kelvin),
-                occupied=(self.constants["max_brightness"], kelvin),
-                vacating_delay=self.get_setting("morning_vacating_delay"),
+                f"Kitchen light levels are low ({new}lx), automatic lighting enabled",
             )
 
     def handle_bedroom_illuminance_change(
@@ -629,46 +626,18 @@ class Lights(App):
         if new == "unavailable":
             self.log("'Bedroom' illuminance is 'unavailable'", level="WARNING")
             return
-        if self.control.scene == "Morning":
-            if (
-                float(new) - self.lighting_illuminance("bedroom")
-                >= self.constants["morning_max_illuminance"]
-            ):
-                self.log(
-                    f"Bedroom light levels are high ({new}lx), "
-                    "transitioning to day scene",
-                )
-                self.napping_in_bedroom = False
-                self.control.scene = "Day"
-        elif self.control.scene == "Day" and self.lights["bedroom"].control_enabled:
-            if (
-                float(new) - self.lighting_illuminance("bedroom")
-                >= self.constants["morning_max_illuminance"]
-            ):
-                if not self.lights["bedroom"].ignoring_vacancy:
-                    self.lights["bedroom"].ignore_vacancy()
-                    self.lights["bedroom"].turn_off()
-                    self.log(
-                        f"Bedroom light levels are high ({new}lx), "
-                        "automatic lighting disabled",
-                    )
-            elif (
-                self.lights["bedroom"].ignoring_vacancy
-                and not self.control.napping_in_bedroom
-            ):
-                self.lights["bedroom"].set_presence_adjustments(
-                    occupied=(
-                        self.constants["max_brightness"],
-                        self.lights["bedroom"].kelvin_limits["max"],
-                    ),
-                    vacating_delay=self.get_setting(
-                        "bedroom_vacating_delay",
-                    ),
-                )
-                self.log(
-                    f"Bedroom light levels are low ({new}lx), "
-                    "automatic lighting enabled",
-                )
+        if (
+            self.control.scene == "Morning"
+            and float(new) >= self.constants["bedroom_morning_max_illuminance"]
+        ):
+            self.log(
+                f"Bedroom light levels are high ({new}lx), transitioning to day scene",
+            )
+            self.napping_in_bedroom = False
+            self.control.scene = "Day"
+        if self.control.scene != "Day" or not self.lights["bedroom"].control_enabled:
+            return
+        self.handle_room_illuminance_change(float(new), "bedroom")
 
     def handle_nursery_illuminance_change(
         self,
@@ -678,43 +647,50 @@ class Lights(App):
         new: str,
         **kwargs: dict,
     ):
-        """Change kitchen vacancy lighting based on illuminance levels (and napping)."""
+        """Change nursery vacancy lighting based on illuminance levels."""
         del entity, attribute, old, kwargs
         if new == "unavailable":
             self.log("'Nursery' illuminance is 'unavailable'", level="WARNING")
             return
         if (
-            self.control.scene in ("Morning", "Day")
-            and self.lights["nursery"].control_enabled
+            self.control.scene not in ("Morning", "Day")
+            or not self.lights["nursery"].control_enabled
         ):
-            if (
-                float(new) - self.lighting_illuminance("nursery")
-                >= self.constants["morning_max_illuminance"]
-            ):
-                if not self.lights["nursery"].ignoring_vacancy:
-                    self.lights["nursery"].ignore_vacancy()
-                    self.lights["nursery"].turn_off()
-                    self.log(
-                        f"Nursery light levels are high ({new}lx), "
-                        "automatic lighting disabled",
-                    )
-            elif (
-                self.lights["nursery"].ignoring_vacancy
-                and not self.control.napping_in_nursery
-            ):
-                self.lights["nursery"].set_presence_adjustments(
-                    occupied=(
-                        self.constants["max_brightness"],
-                        self.lights["nursery"].kelvin_limits["max"],
-                    ),
-                    vacating_delay=self.get_setting(
-                        "nursery_vacating_delay",
-                    ),
-                )
+            return
+        self.handle_room_illuminance_change(float(new), "nursery")
+
+    def handle_room_illuminance_change(self, illuminance: float, room: str):
+        """Change room vacancy lighting based on illuminance levels (and napping)."""
+        if (
+            illuminance - self.lighting_illuminance(room)
+            >= self.constants["illuminance"]["auto_off"][room]
+        ):
+            if not self.lights[room].ignoring_vacancy:
+                self.lights[room].ignore_vacancy()
+                self.lights[room].turn_off()
                 self.log(
-                    f"Nursery light levels are low ({new}lx), "
-                    "automatic lighting enabled",
+                    f"The '{room}'s' light levels are high ({illuminance}lx), "
+                    "automatic lighting disabled",
                 )
+        elif (
+            self.lights[room].ignoring_vacancy
+            and not self.control.napping_in(room)
+            and illuminance - self.lighting_illuminance(room)
+            <= self.constants["illuminance"]["auto_on"][room]
+        ):
+            self.lights[room].set_presence_adjustments(
+                occupied=(
+                    self.constants["max_brightness"],
+                    self.lights[room].kelvin_limits["max"],
+                ),
+                vacating_delay=self.get_setting(
+                    f"{room}_vacating_delay",
+                ),
+            )
+            self.log(
+                f"The '{room}'s' light levels are low ({illuminance}lx), "
+                "automatic lighting enabled",
+            )
 
     @property
     def lights(self) -> Lights:
