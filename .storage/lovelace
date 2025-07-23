@@ -634,7 +634,7 @@
                   "visibility": [
                     {
                       "condition": "numeric_state",
-                      "entity": "sensor.charging_batteries",
+                      "entity": "sensor.charged_batteries",
                       "above": 0
                     }
                   ],

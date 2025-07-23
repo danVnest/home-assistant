@@ -74,6 +74,12 @@ template:
         state_class: measurement
         unit_of_measurement: devices
         icon: mdi:battery-charging
+      - name: Charged batteries
+        unique_id: charged_batteries
+        state: "{{ state_attr('sensor.charging_batteries', 'above_90') }}"
+        state_class: measurement
+        unit_of_measurement: devices
+        icon: mdi:battery-charging
 
       - name: Nursery temperature sensor battery level
         unique_id: nursery_temperature_sensor_battery_level
