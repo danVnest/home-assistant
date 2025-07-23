@@ -185,6 +185,34 @@ modules:
         width: 100%;
         justify-content: left !important;
       }
+  icon_color_mix_in:
+    id: icon_color_mix_in
+    name: Set icon color (mixed-in with theme color)
+    version: v1.0
+    creator: danVnest
+    description: >
+      Set the icon's color from a predefined list of colors.
+
+      This color is then mixed-in with the default theme's color so it looks
+      good in both light and dark theme variants.
+    code: |
+      .bubble-icon {
+        color: color-mix(in srgb, var(--color-mix-in-base), ${this.config.icon_color_mix_in?.color}) !important;
+      }
+    editor:
+      - name: color
+        label: Color
+        selector:
+          ui_color:
+            include_none: true
+    supported:
+      - calendar
+      - pop-up
+      - cover
+      - button
+      - media-player
+      - climate
+      - select
   icon_border_progress:
     id: icon_border_progress
     name: Icon Border Progress

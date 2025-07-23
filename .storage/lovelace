@@ -155,8 +155,7 @@
                   "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
                   "modules": [
                     "normalised_sub_button_size",
-                    "icon_color_mix_in",
-                    "default"
+                    "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
                     "color": "red"
@@ -593,8 +592,12 @@
                   ],
                   "styles": "${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n",
                   "modules": [
-                    "normalised_sub_button_size"
-                  ]
+                    "normalised_sub_button_size",
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "blue"
+                  }
                 },
                 {
                   "type": "custom:bubble-card",
@@ -708,7 +711,7 @@
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
-                    "color": "green"
+                    "color": "yellow"
                   }
                 }
               ]
@@ -1369,8 +1372,14 @@
                           }
                         }
                       ],
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} ${card.querySelector('.bubble-state').innerText = 'Checked ' + Math.floor((new Date() - new Date(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60) + ' minute(s) ago'}\n",
-                      "bg_opacity": "10"
+                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                      "modules": [
+                        "icon_color_mix_in",
+                        "datetime_to_relative_time"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
                     },
                     {
                       "type": "tile",
@@ -1378,7 +1387,7 @@
                       "name": "Internet is disconnected - reconnect to fix issues",
                       "state_content": "last_changed",
                       "icon": "mdi:close-network",
-                      "color": "red",
+                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
                       "visibility": [
                         {
                           "condition": "state",
@@ -1459,7 +1468,14 @@
                           }
                         }
                       ],
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n}\n${card.querySelector('.bubble-state').innerText = 'Checked ' +\nMath.floor((new Date() - new\nDate(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60)\n+ ' minute(s) ago'}\n"
+                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                      "modules": [
+                        "icon_color_mix_in",
+                        "datetime_to_relative_time"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
                     },
                     {
                       "type": "tile",
@@ -1467,7 +1483,7 @@
                       "name": "Internet is disconnected - batteries may be unavailable",
                       "state_content": "last_changed",
                       "icon": "mdi:close-network",
-                      "color": "red",
+                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
                       "visibility": [
                         {
                           "condition": "state",
@@ -1547,7 +1563,14 @@
                           "above": 0
                         }
                       ],
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n  border: 1.5px solid var(--accent-color) !important;\n  box-sizing: border-box !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important; !important;\n} .bubble-name {\n  font-weight: 500 !important;\n} .bubble-sub-button {\n  width: 100%;\n  justify-content: left !important;\n}\n${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n"
+                      "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
+                      "modules": [
+                        "normalised_sub_button_size",
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      }
                     }
                   ]
                 },
@@ -1576,7 +1599,13 @@
                           }
                         }
                       ],
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n} .bubble-icon {\n  color: color-mix(in srgb, var(--state-icon-color), green) !important; !important;\n}\n${card.querySelector('.bubble-state').innerText = 'Checked ' +\nMath.floor((new Date() - new\nDate(hass.states['automation.update_device_issue_and_battery_groups'].attributes.last_triggered))/1000/60)\n+ ' minute(s) ago'}\n"
+                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "yellow"
+                      }
                     },
                     {
                       "type": "markdown",
