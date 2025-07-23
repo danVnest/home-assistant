@@ -1181,6 +1181,12 @@ class Heater(ClimateDevice, PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
+        door_id = f"binary_sensor.{room}_door"
+        if self.controller.entity_exists(door_id):
+            self.door = self.controller.get_entity(door_id)
+            self.controller.listen_state(self.handle_door_change, door_id)
+        else:
+            self.door = None
         self.safe_when_vacant = safe_when_vacant
         self.vacating_delay = (
             60
@@ -1264,11 +1270,19 @@ class Heater(ClimateDevice, PresenceDevice):
             self.turn_off()
         elif self.control_enabled or check_if_would_adjust_only:
             if not self.on:
-                if self.room_too_cold and (self.ignoring_vacancy or not self.vacant):
+                if (
+                    self.room_too_cold
+                    and (self.ignoring_vacancy or not self.vacant)
+                    and (self.door and self.door.state == "off")
+                ):
                     if check_if_would_adjust_only:
                         return True
                     self.turn_on_for_conditions()
-            elif self.room_warm_enough or (not self.ignoring_vacancy and self.vacant):
+            elif (
+                self.room_warm_enough
+                or (not self.ignoring_vacancy and self.vacant)
+                or (self.door and self.door.state != "off")
+            ):
                 if check_if_would_adjust_only:
                     return True
                 self.turn_off()
@@ -1277,6 +1291,18 @@ class Heater(ClimateDevice, PresenceDevice):
             else:
                 self.target_temperature = self.desired_target_temperature
         return False
+
+    def handle_door_change(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: dict,
+    ) -> None:
+        """If the room's door status changes, check if heater needs to change."""
+        del entity, attribute, old, new, kwargs
+        self.adjust_for_conditions()
 
     def handle_user_adjustment(self, user: str):
         """Handle manual heater adjustment appropriately."""
