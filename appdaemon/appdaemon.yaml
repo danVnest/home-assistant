@@ -2,16 +2,11 @@ secrets: /homeassistant/secrets.yaml
 logs:
   main_log:
     filename: /config/logs/main.log
-    log_generations: 0
-    log_size: 10000000
     filter_threshold: 5
   error_log:
     filename: /config/logs/errors.log
-    log_generations: 0
-    log_size: 10000000
   diag_log:
     filename: /config/logs/diag.log
-    log_generations: 0
   access_log:
     filename: /config/logs/access.log
 appdaemon:
