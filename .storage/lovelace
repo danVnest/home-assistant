@@ -23,8 +23,6 @@
                   "badges": [
                     {
                       "type": "entity",
-                      "show_state": true,
-                      "show_icon": true,
                       "entity": "sensor.texts",
                       "name": "Guide",
                       "state_content": "name",
@@ -59,10 +57,9 @@
                   "name": "WARNING: Dog water bowl is empty",
                   "state_content": "last_changed",
                   "icon": "mdi:cup-water",
-                  "color": "red",
+                  "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
                   "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 1
+                    "grid_columns": 4
                   },
                   "visibility": [
                     {
@@ -76,8 +73,8 @@
                   "vertical": false,
                   "card_mod": {
                     "style": {
-                      "ha-tile-info$": "state-display:before {\n  content: 'Empty since';\n}\n",
-                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--state-icon-color), red) !important;\n}\n"
+                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
+                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Empty since';\n}\n"
                     }
                   }
                 },
@@ -87,10 +84,9 @@
                   "name": "WARNING: Internet is disconnected",
                   "state_content": "last_changed",
                   "icon": "mdi:close-network",
-                  "color": "red",
+                  "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
                   "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 1
+                    "grid_columns": 4
                   },
                   "visibility": [
                     {
@@ -103,8 +99,8 @@
                   "vertical": false,
                   "card_mod": {
                     "style": {
-                      "ha-tile-info$": "state-display:before {\n  content: 'System functionality limited since';\n}\n",
-                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--bubble-color-mix-in-base), red) !important;\n}\n"
+                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
+                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'System functionality limited since';\n}\n"
                     }
                   }
                 },
@@ -113,7 +109,6 @@
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "sensor.device_issues",
-                  "show_state": false,
                   "card_layout": "large-2-rows",
                   "tap_action": {
                     "action": "navigate",
@@ -166,7 +161,6 @@
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "sensor.system_issues_in_the_last_hour",
-                  "show_state": false,
                   "card_layout": "large-2-rows",
                   "sub_button": [
                     {
@@ -209,7 +203,6 @@
                       "show_name": true
                     }
                   ],
-                  "card_layout": "large",
                   "visibility": [
                     {
                       "condition": "state",
@@ -233,8 +226,6 @@
                   "sub_button": [
                     {
                       "entity": "input_boolean.napping_in_bedroom",
-                      "name": "apping",
-                      "show_name": true,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -244,8 +235,6 @@
                     },
                     {
                       "entity": "input_boolean.napping_in_nursery",
-                      "name": "apping",
-                      "show_name": true,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -324,9 +313,8 @@
                       }
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'color-mix(in srgb, var(--state-icon-color) 66%, orange)' : 'var(--bubble-icon-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: ${hass.states['lock.door_lock'].state == 'locked' ? 'black' : 'white' } !important;\n} .bubble-name:after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container:before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
                   "modules": [
-                    "default",
                     "normalised_sub_button_size"
                   ]
                 },
@@ -340,18 +328,12 @@
                       "entity": "person.rachel"
                     }
                   ],
-                  "theme_mode": "light",
                   "hours_to_show": 1,
                   "layout_options": {
                     "grid_columns": 4,
                     "grid_rows": 2
                   },
                   "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "sun.sun",
-                      "state": "above_horizon"
-                    },
                     {
                       "condition": "or",
                       "conditions": [
@@ -610,7 +592,6 @@
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "sensor.low_batteries",
-                  "show_state": false,
                   "card_layout": "large-2-rows",
                   "tap_action": {
                     "action": "navigate",
@@ -756,6 +737,7 @@
                       "entity": "light.hall",
                       "name": "Hall",
                       "show_name": true,
+                      "light_background": false,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -786,6 +768,7 @@
                       "entity": "light.bathroom",
                       "name": "Bathroom",
                       "show_name": true,
+                      "light_background": false,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -816,6 +799,7 @@
                       "entity": "light.bedroom",
                       "name": "Bedroom",
                       "show_name": true,
+                      "light_background": false,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -846,6 +830,7 @@
                       "entity": "light.nursery",
                       "name": "Nursery",
                       "show_name": true,
+                      "light_background": false,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -876,6 +861,7 @@
                       "entity": "light.office",
                       "name": "Office",
                       "show_name": true,
+                      "light_background": false,
                       "double_tap_action": {
                         "action": "toggle"
                       },
@@ -911,9 +897,7 @@
                   "name": "WARNING: Aircon filters need cleaning",
                   "button_type": "state",
                   "entity": "group.all_aircon",
-                  "show_state": false,
                   "icon": "mdi:air-filter",
-                  "card_layout": "large",
                   "sub_button": [
                     {
                       "entity": "binary_sensor.living_room_aircon_filter_clean_required",
@@ -1382,11 +1366,8 @@
                       "hash": "#device-issues",
                       "button_type": "state",
                       "name": "Device issues",
-                      "entity": "automation.update_device_issue_and_battery_groups",
-                      "attribute": "last_triggered",
-                      "show_state": false,
+                      "entity": "group.unavailable_entities",
                       "icon": "mdi:alert-circle",
-                      "card_layout": "large",
                       "sub_button": [
                         {
                           "icon": "mdi:refresh",
@@ -1426,16 +1407,17 @@
                       ],
                       "card_mod": {
                         "style": {
-                          "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
+                          "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
+                          "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Disconnected';\n}\n"
                         }
                       }
                     },
                     {
                       "type": "markdown",
-                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n1. If the system was recently restarted or reconnected, wait up to 10 minutes or so for configuration to complete\n\n1. Check the device is plugged in or has sufficient battery charge\n\n1. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n1. Try reloading home assistant [ADD BUTTON]\n\n1. Try restarting home assistant [ADD BUTTON]\n\n1. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details>",
+                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n1. If the system was recently restarted or reconnected, wait up to 10 minutes or so for configuration to complete\n\n1. Check the device is plugged in or has sufficient battery charge\n\n1. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n1. Try reloading home assistant\n\n1. Try restarting home assistant\n\n1. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details> {%- if states('sensor.device_issues')|int(1) > 15 -%}\n  15 of {{ states('sensor.device_issues')|int }} device issues are shown below. Resolve these to see the remaining issues.\n{%- endif -%}",
                       "card_mod": {
                         "style": {
-                          "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"
+                          "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"
                         }
                       }
                     },
@@ -1459,17 +1441,6 @@
                       "filter": {
                         "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_entities if frozen_entities is not none else [])\n  )[:15]\n}}\n"
                       }
-                    },
-                    {
-                      "type": "markdown",
-                      "content": "There are {{ states('sensor.device_issues')|int(1) - 15 }} additional device issues.\nResolve the above first to see more.",
-                      "visibility": [
-                        {
-                          "condition": "numeric_state",
-                          "entity": "sensor.device_issues",
-                          "above": 15
-                        }
-                      ]
                     }
                   ]
                 },
@@ -1482,9 +1453,7 @@
                       "hash": "#low-batteries",
                       "button_type": "state",
                       "name": "Low batteries",
-                      "entity": "automation.update_device_issue_and_battery_groups",
-                      "attribute": "last_triggered",
-                      "show_state": false,
+                      "entity": "group.low_batteries",
                       "icon": "mdi:battery-low",
                       "card_layout": "large",
                       "sub_button": [
@@ -1526,7 +1495,8 @@
                       ],
                       "card_mod": {
                         "style": {
-                          "ha-tile-info$": "state-display {\n  text-transform: lowercase !important;\n}\nstate-display:before {\n  content: 'since';\n}\n"
+                          "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
+                          "ha-tile-info$": "state-display {\n  opacity: 0.7;\n}\nstate-display::before {\n  content: 'Disconnected';\n}\n"
                         }
                       }
                     },
@@ -1616,12 +1586,8 @@
                       "hash": "#charging-batteries",
                       "button_type": "state",
                       "name": "Charging batteries",
-                      "entity": "automation.update_device_issue_and_battery_groups",
-                      "attribute": "last_triggered",
-                      "show_state": false,
+                      "entity": "group.charging_batteries",
                       "icon": "mdi:battery-charging",
-                      "show_name": true,
-                      "card_layout": "large",
                       "sub_button": [
                         {
                           "icon": "mdi:refresh",
@@ -2084,8 +2050,7 @@
                   "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
                   "type": "markdown"
                 }
-              ],
-              "title": "Timing"
+              ]
             }
           ]
         },
@@ -2330,8 +2295,7 @@
                   "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
                   "type": "markdown"
                 }
-              ],
-              "title": "Timing"
+              ]
             }
           ]
         },
@@ -2839,7 +2803,7 @@
                   "content": "**Power** shows the current electricity usage across the home, while **energy** shows electricity usage over time.\nEnergy shows today’s usage by default, but you can change the day or time period using the controls shown.\n\nPower and energy is tracked in the groups shown based on sensors and logic.\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n\n- *Standby*\nThe total estimated power usage of all devices in standby. This total is only shown for reference as each component’s power is already included in other groups. When the standby power drops it is because a component is no longer in standby mode.\n</details>",
                   "card_mod": {
                     "style": {
-                      "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
+                      "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
                     }
                   }
                 }
@@ -2891,7 +2855,7 @@
                     },
                     "card_param": "cards",
                     "filter": {
-                      "template": "{% set total_cost_modifier = 10 %} [{% set items = [\n  {'entity': 'total', 'name': 'Total (including export earnings)', 'icon': 'home-lightning-bolt', 'state': states(\"sensor.total_energy_cost_weekly\") | float(0)},\n  {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states(\"sensor.electricity_provider_service_energy_cost_weekly\") | float(0)},\n  {'entity': 'battery', 'name': 'Battery', 'icon': 'fuel-cell', 'state': states(\"sensor.battery_energy_cost_weekly\") | float(0)},\n  {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states(\"sensor.lights_energy_cost_weekly\") | float(0)},\n  {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.living_room_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.dining_room_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.bedroom_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'radiator', 'state': states(\"sensor.office_heater_energy_cost_weekly\") | float(0)},\n  {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'radiator', 'state': states(\"sensor.nursery_heater_energy_cost_weekly\") | float(0)},\n  {'entity': 'fans', 'name': 'Fans', 'icon': 'fan', 'state': states(\"sensor.fans_energy_cost_weekly\") | float(0)},\n  {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'air-humidifier', 'state': states(\"sensor.humidifiers_energy_cost_weekly\") | float(0)},\n  {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'kettle-pour-over', 'state': states(\"sensor.kitchen_appliances_energy_cost_weekly\") | float(0)},\n  {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'dishwasher', 'state': states(\"sensor.dishwasher_energy_cost_weekly\") | float(0)},\n  {'entity': 'fridge', 'name': 'Fridge', 'icon': 'fridge', 'state': states(\"sensor.fridge_energy_cost_weekly\") | float(0)},\n  {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'fridge-industrial', 'state': states(\"sensor.freezer_mini_fridge_routers_energy_cost_weekly\") | float(0)},\n  {'entity': 'washer', 'name': 'Washer', 'icon': 'washing-machine', 'state': states(\"sensor.washer_energy_cost_weekly\") | float(0)},\n  {'entity': 'dryer', 'name': 'Dryer', 'icon': 'tumble-dryer', 'state': states(\"sensor.dryer_energy_cost_weekly\") | float(0)},\n  {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, Home Assistant, router relay, security hub', 'icon': 'television', 'state': states(\"sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_weekly\") | float(0)},\n  {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven & stove, guest suite, garage, all other', 'icon': 'water-boiler', 'state': states(\"sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_weekly\") | float(0)},\n  {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor, cooler, fish tank', 'icon': 'desktop-tower-monitor', 'state': states(\"sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_weekly\") | float(0)},\n  {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'cellphone-charging', 'state': states(\"sensor.phone_chargers_energy_cost_weekly\") | float(0)},\n  {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states(\"sensor.sensors_energy_cost_weekly\") | float(0)},\n  {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states(\"sensor.paludarium_picture_frame_camera_energy_cost_weekly\") | float(0)},\n  {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states(\"sensor.standby_energy_cost_weekly\") | float(0)},\n] | sort(attribute='state', reverse=true) %} {% for item in items %} {% set good_cost_per_hour = 0.01 * (total_cost_modifier if item.entity == \"total\" else 1) %} {% set ok_cost_per_hour = 0.05 * (total_cost_modifier if item.entity == \"total\" else 1) %} {% set bad_cost_per_hour = 0.5 * (total_cost_modifier if item.entity == \"total\" else 1) %} {{{\n  'type': 'markdown',\n  'content': '<ha-icon icon=\"mdi:' + item.icon + '\"></ha-icon>&emsp;' + item.name,\n  'card_mod': {\n    'style': {\n      '.': \"ha-card {\"\n        \"background: none;\"\n        \"border: none;\"\n        \"margin-top: -10px;\"\n        \"margin-bottom: -20px;\"\n        \"margin-left: -10px;\"\n      \"}\"\n      ,\n      'ha-markdown$': \"ha-markdown-element p {\"\n        \"white-space: nowrap;\"\n        \"overflow: hidden;\"\n        \"text-overflow: ellipsis;\"\n      \"}\"\n    }\n  }\n}}},\n{{{\n  'type': 'horizontal-stack',\n  'cards': [\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_yearly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 240,\n      'points_per_hour': 0.05,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_yearly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 8760, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 8760, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 8760, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: var(--rgb-card-background-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state:before {\"\n            \"content: '$';\"\n          \"} .state:after {\"\n            \"content: '/year';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_monthly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 240,\n      'points_per_hour': 0.05,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_monthly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 720, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 720, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 720, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: var(--rgb-card-background-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state:before {\"\n            \"content: '$';\"\n          \"} .state:after {\"\n            \"content: '/month';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_weekly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 168,\n      'points_per_hour': 0.1,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_weekly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 168, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 168, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 168, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: var(--rgb-card-background-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state:before {\"\n            \"content: '$';\"\n          \"} .state:after {\"\n            \"content: '/week';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_today',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': max(now().hour, 1),\n      'points_per_hour': 20 / max(now().hour, 1),\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 60,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_today')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 24, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 24, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 24, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: var(--rgb-card-background-color);\"\n            \"border: 1px solid var(--light-primary-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state:before {\"\n            \"content: '$';\"\n          \"} .state:after {\"\n            \"content: 'today';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_power_cost',\n        {\n          'entity': 'sensor.' + item.entity + '_power_cost_savings',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 1,\n      'points_per_hour': 20,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 10,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_power_cost')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: var(--rgb-card-background-color);\"\n            \"border: 1px solid var(--light-primary-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state:before {\"\n            \"content: '$';\"\n          \"} .states > .state:after {\"\n            \"content: '/h now';\"\n      }\n    }\n  ]\n}}},\n{{{\n  'type': 'horizontal-stack',\n  'cards': [\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_power_cost_savings',\n      'state_display': \"[[[ return 'saving $<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b>/h' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n  ]\n}}}, {% if not loop.last %} {{{\n  'type' : 'entities',\n  'entities': [{\n    'type': 'divider',\n    'style': {\n      'margin': '-15px -26px 0 -26px',\n      'height': ('5' if loop.first else '1') + 'px !important',\n    } \n  }],\n  'card_mod': {\n    'style':\n      \"ha-card {\"\n        \"background: none;\"\n        \"margin-bottom: -40px;\"\n      \"}\"\n  }\n}}}, {% endif %} {% endfor %}]"
+                      "template": "{% set total_cost_modifier = 10 %} [{% set items = [\n  {'entity': 'total', 'name': 'Total (including export earnings)', 'icon': 'home-lightning-bolt', 'state': states(\"sensor.total_energy_cost_weekly\") | float(0)},\n  {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states(\"sensor.electricity_provider_service_energy_cost_weekly\") | float(0)},\n  {'entity': 'battery', 'name': 'Battery', 'icon': 'fuel-cell', 'state': states(\"sensor.battery_energy_cost_weekly\") | float(0)},\n  {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states(\"sensor.lights_energy_cost_weekly\") | float(0)},\n  {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.living_room_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.dining_room_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'air-conditioner', 'state': states(\"sensor.bedroom_aircon_energy_cost_weekly\") | float(0)},\n  {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'radiator', 'state': states(\"sensor.office_heater_energy_cost_weekly\") | float(0)},\n  {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'radiator', 'state': states(\"sensor.nursery_heater_energy_cost_weekly\") | float(0)},\n  {'entity': 'fans', 'name': 'Fans', 'icon': 'fan', 'state': states(\"sensor.fans_energy_cost_weekly\") | float(0)},\n  {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'air-humidifier', 'state': states(\"sensor.humidifiers_energy_cost_weekly\") | float(0)},\n  {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'kettle-pour-over', 'state': states(\"sensor.kitchen_appliances_energy_cost_weekly\") | float(0)},\n  {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'dishwasher', 'state': states(\"sensor.dishwasher_energy_cost_weekly\") | float(0)},\n  {'entity': 'fridge', 'name': 'Fridge', 'icon': 'fridge', 'state': states(\"sensor.fridge_energy_cost_weekly\") | float(0)},\n  {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'fridge-industrial', 'state': states(\"sensor.freezer_mini_fridge_routers_energy_cost_weekly\") | float(0)},\n  {'entity': 'washer', 'name': 'Washer', 'icon': 'washing-machine', 'state': states(\"sensor.washer_energy_cost_weekly\") | float(0)},\n  {'entity': 'dryer', 'name': 'Dryer', 'icon': 'tumble-dryer', 'state': states(\"sensor.dryer_energy_cost_weekly\") | float(0)},\n  {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, Home Assistant, router relay, security hub', 'icon': 'television', 'state': states(\"sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_weekly\") | float(0)},\n  {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven & stove, guest suite, garage, all other', 'icon': 'water-boiler', 'state': states(\"sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_weekly\") | float(0)},\n  {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor, cooler, fish tank', 'icon': 'desktop-tower-monitor', 'state': states(\"sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_weekly\") | float(0)},\n  {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'cellphone-charging', 'state': states(\"sensor.phone_chargers_energy_cost_weekly\") | float(0)},\n  {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states(\"sensor.sensors_energy_cost_weekly\") | float(0)},\n  {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states(\"sensor.paludarium_picture_frame_camera_energy_cost_weekly\") | float(0)},\n  {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states(\"sensor.standby_energy_cost_weekly\") | float(0)},\n] | sort(attribute='state', reverse=true) %} {% for item in items %} {% set good_cost_per_hour = 0.01 * (total_cost_modifier if item.entity == \"total\" else 1) %} {% set ok_cost_per_hour = 0.05 * (total_cost_modifier if item.entity == \"total\" else 1) %} {% set bad_cost_per_hour = 0.5 * (total_cost_modifier if item.entity == \"total\" else 1) %} {{{\n  'type': 'markdown',\n  'content': '<ha-icon icon=\"mdi:' + item.icon + '\"></ha-icon>&emsp;' + item.name,\n  'card_mod': {\n    'style': {\n      '.': \"ha-card {\"\n        \"background: none;\"\n        \"border: none;\"\n        \"margin-top: -10px;\"\n        \"margin-bottom: -20px;\"\n        \"margin-left: -10px;\"\n      \"}\"\n      ,\n      'ha-markdown$': \"ha-markdown-element p {\"\n        \"white-space: nowrap;\"\n        \"overflow: hidden;\"\n        \"text-overflow: ellipsis;\"\n      \"}\"\n    }\n  }\n}}},\n{{{\n  'type': 'horizontal-stack',\n  'cards': [\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_yearly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 240,\n      'points_per_hour': 0.05,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_yearly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 8760, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 8760, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 8760, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: rgb(var(--rgb-card-background-color));\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state::before {\"\n            \"content: '$';\"\n          \"} .state::after {\"\n            \"content: '/year';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_monthly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 240,\n      'points_per_hour': 0.05,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_monthly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 720, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 720, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 720, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: rgb(var(--rgb-card-background-color));\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state::before {\"\n            \"content: '$';\"\n          \"} .state::after {\"\n            \"content: '/month';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_weekly',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 168,\n      'points_per_hour': 0.1,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 3600,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_weekly')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 168, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 168, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 168, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: rgb(var(--rgb-card-background-color));\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state::before {\"\n            \"content: '$';\"\n          \"} .state::after {\"\n            \"content: '/week';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_energy_cost_today',\n        {\n          'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': max(now().hour, 1),\n      'points_per_hour': 20 / max(now().hour, 1),\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 60,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_today')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour * 24, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour * 24, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour * 24, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: rgb(var(--rgb-card-background-color));\"\n            \"border: 1px solid var(--light-primary-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state::before {\"\n            \"content: '$';\"\n          \"} .state::after {\"\n            \"content: 'today';\"\n          \"}\"\n      }\n    },\n    {\n      'type': 'custom:mini-graph-card',\n      'entities': [\n        'sensor.' + item.entity + '_power_cost',\n        {\n          'entity': 'sensor.' + item.entity + '_power_cost_savings',\n          'color': 'darkgreen',\n        },\n      ],\n      'hours_to_show': 1,\n      'points_per_hour': 20,\n      'min_bound_range': 0.5,\n      'lower_bound': -0.1,\n      'update_interval': 10,\n      'animate': true,\n      'font_size': 50,\n      'decimals': 1 if states('sensor.' + item.entity + '_power_cost')|float(0) < 10 else 0,\n      'unit': ' ',\n      'group': true,\n      'align_state': 'center',\n      'color_thresholds': [\n        { 'value': 0, 'color': '#0066cc' },\n        { 'value': good_cost_per_hour, 'color': '#c1bb3c' },\n        { 'value': ok_cost_per_hour, 'color': '#ff8100' },\n        { 'value': bad_cost_per_hour, 'color': '#ff4d00' },\n      ],\n      'show': {\n        'icon': false,\n        'name': false,\n        'points': false,\n        'legend': false,\n        'labels': false,\n        'loading_indicator': false,\n      },\n      'card_mod': {\n        'style':\n          \"ha-card {\"\n            \"background: rgb(var(--rgb-card-background-color));\"\n            \"border: 1px solid var(--light-primary-color);\"\n            \"max-height: 40px;\"\n            \"z-index: 1;\"\n          \"} .states {\"\n            \"padding: 3px 0 0 0;\"\n          \"} .state::before {\"\n            \"content: '$';\"\n          \"} .states > .state::after {\"\n            \"content: '/h now';\"\n      }\n    }\n  ]\n}}},\n{{{\n  'type': 'horizontal-stack',\n  'cards': [\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',\n      'state_display': \"[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n    {\n      'type': 'custom:button-card',\n      'entity': 'sensor.' + item.entity + '_power_cost_savings',\n      'state_display': \"[[[ return 'saving $<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b>/h' ]]]\",\n      'show_state': true,\n      'show_name': false,\n      'show_icon': false,\n      'show_units': true,\n      'styles': {\n        'card': [{\n          'font-size': '7px',\n          'color': 'white',\n          'background': 'darkgreen',\n          'margin-top': '-30px',\n          'padding-top': '25px',\n          'padding-bottom': '4px',\n          'height': '32px',\n        }]\n      }\n    },\n  ]\n}}}, {% if not loop.last %} {{{\n  'type' : 'entities',\n  'entities': [{\n    'type': 'divider',\n    'style': {\n      'margin': '-15px -26px 0 -26px',\n      'height': ('5' if loop.first else '1') + 'px !important',\n    } \n  }],\n  'card_mod': {\n    'style':\n      \"ha-card {\"\n        \"background: none;\"\n        \"margin-bottom: -40px;\"\n      \"}\"\n  }\n}}}, {% endif %} {% endfor %}]"
                     }
                   }
                 },
@@ -3074,7 +3038,7 @@
                       "content": "**Energy costs** are determined by the energy's source (grid, solar and/or battery). The energy used is multiplied by the **grid pricing** shown below, where the proportion of imported (grid) and produced (solar/battery) energy contributes to costs and savings respectively. **Savings** represent how much extra would have needed to be spent if the solar system had never been installed.\n\n- *Yearly, monthly, and weekly* costs/savings are rolling totals, so a change indicates more/less usage than the previous period. As solar was only recently installed, the yearly value will increase until a year has past.\n- *Today’s* costs/savings reset to $0 at midnight.\n- *Real-time* costs/savings are based on current power usage if it would be maintained for an hour.\n\nThe graphs show how costs change over their respective time periods, and are colour coded by <font color=#0066cc>low</font>, <font color=#c1bb3c>moderate</font>, and <font color=#ff4d00>high</font> costs. Likewise, the savings for that time period are also plotted in <font color=darkgreen>green</font>.\n\nGroups are shown in order of highest to lowest weekly cost.\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Total*\nCosts for all devices, reduced by export earnings, but also including fixed daily & monthly electricity provider costs. Savings are from using solar/battery instead of the grid, for all devices - with export earnings added and battery charging costs subtracted. Both total costs and savings can be negative (e.g. negative costs when export earnings are high, negative savings when battery charging costs exceed solar savings).\n\n- *Electricity provider service*\nThe fixed daily service and monthly subscription costs charged by the provider, totalled per timeframe.\n\n- *Battery*\nBattery costs are calculated when charging from the grid, while savings show how much more the charging would have cost if solar charging had instead come from the grid. These values do not consider export earnings.\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage. The water heater can use the controlled load power supply, but is not accurately reflected here or in total costs.\n\n- *Standby*\nTotal estimated costs and savings of all devices in standby. This total is only shown for reference as each component is already included in other groups.\n</details>\n\n**Daily averages** for energy produced, exported, and stored, as well as each variety of consumption are calculated since installation of the relevant component(s). Over time this will account for seasonal  variation. Export earnings have battery charging costs subtracted to give a more realistic value. Similarly, **daily maximums** are the highest ever recorded values across a single day. Some of these values are also used to calculate the **return on investment** (details below).\n\n<details><summary><i>Return on investment</i></summary>\n\nThe **return on investment** section below shows a calculation for the current total amount saved through the use of the solar and battery system, minus install costs. This value will improve over time, and based on these projected savings the time taken to break even is estimated.\n\nIt is also useful to compare projected savings (minus install costs) with likely returns if the funds spent on installing the solar system had instead been invested at 6% per annum.\nIf savings are sufficiently high then eventually they will outweight the likely returns from standard investments (shown in years required to **beat investment in**). If -100 years is shown this indicates that investment always outperforms as compounding accelerates.\n\nNote that these **return on investment** figures ignore the increase in house value the solar and battery system provides, which would likely cover a reasonable proportion of the install costs and justify the installation much earlier.\n</details>\n\nThe **electricity pricing now** section shows the real-time cost per kWh if energy is consumed from the grid (general or controlled load), as well the current price paid for any energy you export. The electricity provider's daily property service and monthly subscription fees should be adjusted manually to reflect actual values.",
                       "card_mod": {
                         "style": {
-                          "ha-markdown$": "font {\n  text-shadow: 0.5px 0.5px 0.5px var(--primary-text-color), 0 0 2px var(--rgb-card-background-color), 0 0 5px var(--rgb-card-background-color);\n}\nsummary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
+                          "ha-markdown$": "font {\n  text-shadow: 0.5px 0.5px 0.5px var(--primary-text-color), 0 0 2px var(--rgb-card-background-color), 0 0 5px var(--rgb-card-background-color);\n}\nsummary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
                         }
                       }
                     }

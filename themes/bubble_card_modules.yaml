@@ -154,6 +154,8 @@ modules:
         background: transparent !important;
       } .bubble-state {
         opacity: 0.7 !important;
+      } .bubble-sub-button.background-off, .bubble-sub-button.background-on {
+        color: var(--button-color);
       }
     supported:
       - button
