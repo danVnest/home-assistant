@@ -2631,7 +2631,11 @@
                       "color_circle": true,
                       "display_state": "one_way",
                       "use_metadata": false,
-                      "color_value": true
+                      "color_value": true,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "display_zero_tolerance": 50
                     },
                     "solar": {
                       "entity": "sensor.power_meter_power_photovoltaics",
@@ -2639,7 +2643,11 @@
                       "secondary_info": {},
                       "color_value": false,
                       "color_icon": false,
-                      "invert_state": false
+                      "invert_state": false,
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "display_zero_tolerance": 50
                     },
                     "fossil_fuel_percentage": {
                       "state_type": "percentage",
@@ -2649,14 +2657,20 @@
                       "display_zero": false,
                       "color_icon": true,
                       "display_zero_state": false,
-                      "name": "Renewable"
+                      "name": "Renewable",
+                      "tap_action": {
+                        "action": "more-info"
+                      }
                     },
                     "home": {
                       "secondary_info": {},
                       "subtract_individual": false,
                       "circle_animation": true,
                       "override_state": false,
-                      "entity": "sensor.power_meter_power_load_consumed"
+                      "entity": "sensor.power_meter_power_load_consumed",
+                      "tap_action": {
+                        "action": "more-info"
+                      }
                     },
                     "individual": [],
                     "battery": {
@@ -2669,7 +2683,11 @@
                       "invert_state": false,
                       "color_value": true,
                       "use_metadata": false,
-                      "entity": "sensor.power_meter_power_battery"
+                      "entity": "sensor.power_meter_power_battery",
+                      "tap_action": {
+                        "action": "more-info"
+                      },
+                      "display_zero_tolerance": 50
                     }
                   },
                   "clickable_entities": false,
