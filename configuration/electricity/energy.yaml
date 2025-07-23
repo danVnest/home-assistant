@@ -119,20 +119,20 @@ template:
   - triggers:
       - trigger: time
         at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
-      - trigger: homeassistant
-        event: start
       - trigger: event
-        event_type: event_template_reloaded
+        event_type:
+          - homeassistant_started
+          - event_template_reloaded
     sensor:
       - name: Days since solar installation
         unique_id: days_since_solar_installation
-        state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
+        state: "{{ ((today_at() - as_datetime('2024-09-05T00+10:00')).total_seconds() / 60 / 60 / 24)|round }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:calendar-start
       - name: Days since battery installation
         unique_id: days_since_battery_installation
-        state: "{{ ((today_at() - as_datetime('2025-07-15T00+10:00')).total_seconds() / 60 / 60 / 24)|round(0) }}"
+        state: "{{ ((today_at() - as_datetime('2025-07-15T00+10:00')).total_seconds() / 60 / 60 / 24)|round }}"
         unit_of_measurement: days
         state_class: total_increasing
         icon: mdi:calendar-start

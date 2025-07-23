@@ -2,7 +2,7 @@ utility_meter:
   energy_export_earnings_minus_battery_charging_cost_today:
     name: Energy export earnings minus battery charging cost today
     unique_id: energy_export_earnings_minus_battery_charging_cost_today
-    source: sensor.power_export_earnings
+    source: sensor.energy_export_earnings_minus_battery_charging_cost
     cycle: daily
   total_energy_cost_today:
     name: Total energy cost today
@@ -257,14 +257,43 @@ template:
         device_class: monetary
         state_class: total
         icon: mdi:currency-usd
+      - name: Grid cost
+        unique_id: grid_cost
+        state: >
+          {% set cost_incorrect_start_offset = -478.89 %}
+          {% set initial_earnings = 231.51 %}
+          {{
+            ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) -
+            states('sensor.battery_energy_cost')|float +
+            (states('sensor.energy_export_earnings')|float + initial_earnings))
+            |round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.battery_energy_cost') and has_value('sensor.energy_export_earnings') }}"
+      - name: Energy export earnings minus battery charging cost
+        unique_id: energy_export_earnings_minus_battery_charging_cost
+        state: >
+          {% set initial_earnings = 231.51 %}
+          {{
+            (states('sensor.energy_export_earnings')|float +
+            initial_earnings -
+            states('sensor.battery_energy_cost')|float)
+            |round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.energy_export_earnings') and has_value('sensor.battery_energy_cost') }}"
 
   - triggers:
       - trigger: time
         at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
-      - trigger: homeassistant
-        event: start
       - trigger: event
-        event_type: event_template_reloaded
+        event_type:
+          - homeassistant_started
+          - event_template_reloaded
     sensor:
       - name: Average daily total energy cost
         unique_id: average_daily_total_energy_cost
@@ -292,21 +321,6 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Grid cost
-        unique_id: grid_cost
-        state: >
-          {% set cost_incorrect_start_offset = -478.89 %}
-          {% set initial_earnings = 231.51 %}
-          {{
-            ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) -
-            states('sensor.battery_energy_cost')|float +
-            (states('sensor.energy_export_earnings')|float + initial_earnings))
-            |round(2)
-          }}
-        unit_of_measurement: $
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.battery_energy_cost') and has_value('sensor.energy_export_earnings') }}"
       - name: Average daily grid cost
         unique_id: average_daily_grid_cost
         state: "{{ ((states('sensor.grid_cost')|float) / states('sensor.days_since_solar_installation')|float)|round(2) }}"
@@ -314,20 +328,6 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.grid_cost') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Energy export earnings minus battery charging cost
-        unique_id: energy_export_earnings_minus_battery_charging_cost
-        state: >
-          {% set initial_earnings = 231.51 %}
-          {{
-            (states('sensor.energy_export_earnings')|float +
-            initial_earnings -
-            states('sensor.battery_energy_cost')|float)
-            |round(2)
-          }}
-        unit_of_measurement: $
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.energy_export_earnings') and has_value('sensor.battery_energy_cost') }}"
       - name: Average daily energy export earnings minus battery charging cost
         unique_id: average_daily_energy_export_earnings_minus_battery_charging_cost
         state: >
@@ -342,25 +342,25 @@ template:
 
       - name: Maximum daily total energy cost
         unique_id: maximum_daily_total_energy_cost
-        state: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        state: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float(0), this.state|float(0)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
       - name: Maximum daily total energy cost savings
         unique_id: maximum_daily_total_energy_cost_savings
-        state: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        state: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(0), this.state|float(0)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
       - name: Maximum daily grid cost
         unique_id: maximum_daily_grid_cost
-        state: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        state: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float(0), this.state|float(0)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
       - name: Maximum daily energy export earnings minus battery charging cost
         unique_id: maximum_daily_energy_export_earnings_minus_battery_charging_cost
-        state: "{{ [state_attr('sensor.energy_export_earnings_minus_battery_charging_cost_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
+        state: "{{ [state_attr('sensor.energy_export_earnings_minus_battery_charging_cost_today', 'last_period')|float(0), this.state|float(0)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd

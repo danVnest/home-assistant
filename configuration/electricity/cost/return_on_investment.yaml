@@ -15,10 +15,10 @@ template:
   - triggers:
       - trigger: time
         at: "00:00:00"
-      - trigger: homeassistant
-        event: start
       - trigger: event
-        event_type: event_template_reloaded
+        event_type:
+          - homeassistant_started
+          - event_template_reloaded
     sensor:
       - name: Solar and battery years to break even
         unique_id: solar_and_battery_years_to_break_even
