@@ -456,10 +456,14 @@
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "sensor.washer_completion_time",
+                  "entity": "select.washer",
                   "icon": "mdi:washing-machine",
-                  "name": "Washing done",
-                  "styles": ".bubble-icon {\n  color: ${hass.states[\"select.washer\"].state === \"run\" ? \"color-mix(in srgb, var(--bubble-color-mix-in-base), blue)\" : \"var(--bubble-inactive-color)\"} !important;\n}\n\n${card.querySelector('.bubble-state').innerText = (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const now = new Date();\n  const then = new Date(state);\n  const diff = now - then;\n  const seconds = Math.round(diff / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  return rtf.format(-Math.round(minutes / 60), 'hour');\n})()}\n",
+                  "name": "Washing",
+                  "styles": ".bubble-icon {\n  color: ${state === \"run\" ? \"color-mix(in srgb, var(--color-mix-in-base), blue)\" : \"var(--light-primary-color)\"} !important;\n} .bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "icon_border_progress",
+                    "datetime_to_relative_time"
+                  ],
                   "icon_border_progress": [
                     {
                       "button": "main",
@@ -473,23 +477,22 @@
                       ],
                       "color_stops": {
                         "0": {
-                          "color": "brown",
-                          "percent": 50
+                          "color": "rgb(234, 174, 101)",
+                          "percent": 25
                         },
                         "1": {
-                          "color": "light-blue",
-                          "percent": 50
+                          "color": "rgb(101, 157, 234)",
+                          "percent": 75
                         }
                       },
                       "interpolate_colors": true
                     }
                   ],
-                  "modules": [
-                    "icon_border_progress"
-                  ],
+                  "datetime_to_relative_time": {
+                    "entity": "sensor.washer_completion_time"
+                  },
                   "grid_options": {
-                    "columns": 6,
-                    "rows": "auto"
+                    "columns": 6
                   },
                   "visibility": [
                     {
@@ -503,10 +506,10 @@
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "sensor.dryer_completion_time",
+                  "entity": "select.dryer",
                   "icon": "mdi:tumble-dryer",
-                  "name": "Drying done",
-                  "styles": ".bubble-icon {\n  color: ${hass.states[\"select.dryer\"].state === \"run\" ? \"color-mix(in srgb, var(--bubble-color-mix-in-base), orange)\" : \"var(--bubble-inactive-color)\"} !important;\n}\n\n${card.querySelector('.bubble-state').innerText = (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const now = new Date();\n  const then = new Date(state);\n  const diff = now - then;\n  const seconds = Math.round(diff / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  return rtf.format(-Math.round(minutes / 60), 'hour');\n})()}\n",
+                  "name": "Drying",
+                  "styles": ".bubble-icon {\n  color: ${state === \"run\" ? \"color-mix(in srgb, var(--color-mix-in-base), var(--orange-color))\" : \"var(--light-primary-color)\"} !important;\n} .bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n",
                   "icon_border_progress": [
                     {
                       "button": "main",
@@ -520,23 +523,26 @@
                       ],
                       "color_stops": {
                         "0": {
-                          "color": "blue",
-                          "percent": 50
+                          "color": "rgb(101, 157, 234)",
+                          "percent": 25
                         },
                         "1": {
-                          "color": "orange",
-                          "percent": 50
+                          "color": "rgb(234, 207, 101)",
+                          "percent": 75
                         }
                       },
                       "interpolate_colors": true
                     }
                   ],
+                  "datetime_to_relative_time": {
+                    "entity": "sensor.dryer_completion_time"
+                  },
                   "modules": [
-                    "icon_border_progress"
+                    "icon_border_progress",
+                    "datetime_to_relative_time"
                   ],
                   "grid_options": {
-                    "columns": 6,
-                    "rows": "auto"
+                    "columns": 6
                   },
                   "visibility": [
                     {
@@ -1399,6 +1405,10 @@
                       "icon_color_mix_in": {
                         "color": "red"
                       },
+                      "datetime_to_relative_time": {
+                        "entity": "automation.update_device_issue_and_battery_groups",
+                        "attribute": "last_triggered"
+                      }
                     },
                     {
                       "type": "tile",
@@ -1495,6 +1505,10 @@
                       "icon_color_mix_in": {
                         "color": "red"
                       },
+                      "datetime_to_relative_time": {
+                        "entity": "automation.update_device_issue_and_battery_groups",
+                        "attribute": "last_triggered"
+                      }
                     },
                     {
                       "type": "tile",
@@ -1620,8 +1634,13 @@
                       ],
                       "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
                       "modules": [
+                        "datetime_to_relative_time",
                         "icon_color_mix_in"
                       ],
+                      "datetime_to_relative_time": {
+                        "entity": "automation.update_device_issue_and_battery_groups",
+                        "attribute": "last_triggered"
+                      },
                       "icon_color_mix_in": {
                         "color": "yellow"
                       }
