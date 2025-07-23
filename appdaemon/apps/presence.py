@@ -220,10 +220,8 @@ class Room:
             vacant = self.controller.get_state(sensor_id) == "off"
             last_changed = self.controller.convert_utc(
                 self.controller.get_state(sensor_id, attribute="last_changed"),
-            ).replace(tzinfo=None) + timedelta(
-                minutes=self.controller.get_tz_offset(),
-            )
-        except ValueError:
+            ).replace(tzinfo=None)
+        except (ValueError, TypeError):
             self.controller.notify(
                 f"Sensor in {room_id} is {self.controller.get_state(sensor_id)}",
                 title="Sensor Error",
