@@ -371,68 +371,14 @@
                         }
                       ]
                     }
-                  ]
-                },
-                {
-                  "type": "map",
-                  "entities": [
-                    {
-                      "entity": "person.dan"
-                    },
-                    {
-                      "entity": "person.rachel"
-                    }
                   ],
-                  "theme_mode": "dark",
-                  "hours_to_show": 1,
-                  "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 2
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "sun.sun",
-                      "state_not": "above_horizon"
-                    },
-                    {
-                      "condition": "or",
-                      "conditions": [
-                        {
-                          "condition": "and",
-                          "conditions": [
-                            {
-                              "condition": "user",
-                              "users": [
-                                "15ff7a86d4ae4d38a60003ad4064ff78"
-                              ]
-                            },
-                            {
-                              "condition": "state",
-                              "entity": "person.rachel",
-                              "state_not": "home"
-                            }
-                          ]
-                        },
-                        {
-                          "condition": "and",
-                          "conditions": [
-                            {
-                              "condition": "user",
-                              "users": [
-                                "9a175674be354863afb9634adc4b8980"
-                              ]
-                            },
-                            {
-                              "condition": "state",
-                              "entity": "person.dan",
-                              "state_not": "home"
-                            }
-                          ]
-                        }
-                      ]
+                  "theme_mode": "auto",
+                  "card_mod": {
+                    "style": {
+                      ".": "ha-card {\n  background: transparent;\n}\n",
+                      "ha-map$": "#map {\n  background: transparent;\n} .leaflet-tile-pane {\n  opacity: 0.5;\n} .leaflet-control-container {\n  opacity: 0.75;\n} .leaflet-control-attribution {\n  opacity: 0.1;\n}\n"
                     }
-                  ]
+                  }
                 },
                 {
                   "type": "custom:bubble-card",
