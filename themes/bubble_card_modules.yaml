@@ -277,6 +277,155 @@ modules:
       - pop-up
       - select
       - separator
+  colorise_entities:
+    id: colorise_entities
+    name: Colorise entities
+    version: "1.0"
+    creator: danVnest
+    description: ""
+    code: |-
+      ${(() => {
+        const formulateAndSetButtonColor = (entity, button) => {
+          const entityType = entity.entity_id.split(".")[0];
+          let color = "";
+          if (entity.state !== "off") {
+            const getColor = colorFunctions[entityType];
+            color = typeof getColor === "function" ? getColor(entity) : defaultColor(entity);
+          }
+          if (entityType === "sensor") {
+            button.querySelector('.bubble-sub-button-icon').style.color = color; // + ' !important';
+          } else {
+            button.style.backgroundColor = color; // TODO:  + ' !important'?
+            if (color.startsWith("hsl")) {
+              if (parseInt(color.split(',').pop().slice(1, -2)) > 65) {
+                button.style.color = "var(--button-color-active)";
+              } else button.style.color = "var(--button-color)";
+            } else if (color !== "" && ((color.match(/inactive/g) || []).length / (color.match(/color-mix\(/g) || []).length > 0.5)) {
+              button.style.color = "var(--button-color-active)";
+            } else button.style.color = "var(--button-color)";
+          }
+          return color;
+        };
+        
+        const defaultColor = (entity) => {
+          if (entity.entity_id.includes("heat"))
+            return "color-mix(in srgb, var(--color-mix-in-base), var(--state-climate-heat-color)";
+          return "var(--light-primary-color)";
+        };
+        
+        const averageColor = (colors) => {
+          if (colors.every((color) => color.startsWith("hsl") || color === "")) {
+            const hslValues = colors.map((c) => {
+              const match = c.match(/hsl\((\d+),\s*(\d+)%?,\s*(\d+)%?\)/);
+              return match ? [parseInt(match[1]), parseInt(match[2]), parseInt(match[3])] : [0, 0, 50]; // 50 keeps minimum button lightness readable
+            });
+            const sum = hslValues.reduce((acc, val) => acc.map((c, i) => c + val[i]));
+            const average = sum.map((c) => c / hslValues.length);
+            return `hsl(${Math.round(average[0])}, ${Math.round(average[1])}%, ${Math.round(average[2])}%)`;
+          } else {
+            let mixedColor = colors[0] !== "" ? colors[0] : "var(--inactive-color)";
+            colors.forEach((color, index) => {
+              if (index === 0) return;
+              if (color === "") color = "var(--inactive-color)";
+              mixedColor = `color-mix(in srgb, ${mixedColor}, ${color} ${Math.round(100 / (index + 1))}%)`;
+            });
+            return mixedColor;
+          }
+        };
+        
+        const sensorColor = (sensor) => {
+          let baseColor = "var(--light-primary-color)";
+          let color = "var(--warm-color)";
+          let percentage = ((parseFloat(sensor.state) - 21) / 5) * 100;
+          if (percentage < 0) {
+            color = "var(--cold-color)";
+            percentage *= -1;
+          } else if (percentage > 100) {
+            percentage -= 100;
+            baseColor = "var(--warm-color)";
+            color = "var(--hot-color)";
+          }
+          percentage = Math.min(100, Math.round(percentage));
+          return `color-mix(in srgb, var(--light-primary-color), color-mix(in srgb, ${baseColor}, ${color} ${percentage}%))`;
+          // get unit?
+          // unit_of_measurement or device_class can be used to determine the sensor's type and select an appropriate color.
+          // For example, temperature sensors might use a gradient from blue to red, humidity sensors could use blue shades, etc.
+          // Future implementation could check sensor.device_class or sensor.unit_of_measurement to assign colors accordingly.
+        };
+        
+        const groupColor = (group) => {
+          if (!Array.isArray(group.attributes.entity_id)) return "";
+          const colors = [];
+          for (const entityID of group.attributes.entity_id) {
+            const entity = hass.states[entityID];
+            if (entity.state === "off") colors.push("");
+            else {
+              const getColor = colorFunctions[entityID.split(".")[0]];
+              colors.push(typeof getColor === "function" ? getColor(entity) : defaultColor(entity));
+            }
+          }
+          return averageColor(colors);
+        };
+        
+        const lightColor = (light) => {
+          const [hue, saturation] = light.attributes.hs_color ?? [30, 40]; // use warm white for lights that can't change color temperature
+          const warmth = (saturation - 25) / (90 - 25) - 0.2; // magic numbers to achieve desired button color lightness at different warmths
+          let lightness = (light.attributes.brightness ?? 0) / 255 - warmth; // reduce warm light lightness, increase white light lightness
+          lightness = 30 + 70 * Math.max(Math.min(lightness, 1), 0); // scale to within 30-100% so dim lights don't look black
+          return `hsl(${Math.round(hue)}, ${Math.round(saturation)}%, ${Math.round(lightness)}%)`;
+        };
+        
+        const climateColor = (climate) => {
+          return `color-mix(in srgb, var(--color-mix-in-base), var(--state-climate-${climate.state}-color)`;
+        };
+        
+        const fanColor = (fan) => {
+          if (fan.attributes.direction === "reverse")
+            return "color-mix(in srgb, var(--color-mix-in-base), var(--state-climate-heat-cool-color))";
+          return `color-mix(in srgb, var(--light-primary-color), color-mix(in srgb, var(--cold-color) ${fan.attributes.percentage}%, var(--cool-color)))`;
+        };
+        
+        const humidifierColor = (humidifier) => {
+          return "color-mix(in srgb, var(--color-mix-in-base), var(--state-humidifier-on-color))";
+        };
+        
+        const colorFunctions = {
+          sensor: sensorColor,
+          group: groupColor,
+          light: lightColor,
+          climate: climateColor,
+          fan: fanColor,
+          humidifier: humidifierColor,
+        };
+        
+        let colors = [];
+        for (let i = 1; i <= 99; i++) {
+          const button = card.querySelector(`.bubble-sub-button-${i}`);
+          if (!button) break;
+          const entityID = button.dataset?.entity;
+          if (!entityID || !hass.states[entityID]) colors.push("");
+          else colors.push(formulateAndSetButtonColor(hass.states[entityID], button));
+        }
+        
+        if (!entity) return;
+        if (entity.includes("group")) {
+          card.querySelector(".bubble-icon-container").style.setProperty("background", (colors.every((color) => color === "") ? "var(--bubble-sub-button-background-color)" : averageColor(colors)), "important");
+          card.querySelector(".bubble-main-icon").style.color = "var(--button-color)";
+        } else if (entity.includes("temperature")) {
+          card.querySelector(".bubble-main-icon").style.color = sensorColor(hass.states[entity]); // TODO:  + ' !important'?
+        }
+      })()}
+    editor: ""
+    supported:
+      - button
+      - calendar
+      - climate
+      - cover
+      - horizontal-buttons-stack
+      - media-player
+      - pop-up
+      - select
+      - separator
   icon_border_progress:
     id: icon_border_progress
     name: Icon Border Progress
