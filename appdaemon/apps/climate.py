@@ -185,7 +185,7 @@ class Climate(App):
                 for device in device_group.values():
                     device.turn_off()
         self.aircons["bedroom"].preferred_fan_mode = (
-            "low" if scene in ("Sleep", "Morning") else "auto"
+            "low" if self.control.napping_in_bedroom else "auto"
         )
         if scene == "Morning":
             self.aircons["living_room"].ignore_vacancy()
