@@ -228,7 +228,7 @@ class Lights(App):
         for light_name in ("entryway", "kitchen"):
             self.lights[light_name].set_presence_adjustments(
                 entered=(
-                    self.constants["min_brightness"],
+                    self.lights[light_name].minimum_brightness,
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 occupied=(
@@ -243,7 +243,7 @@ class Lights(App):
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
-                    self.constants["min_brightness"],
+                    self.lights[light_name].minimum_brightness,
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 vacating_delay=self.get_setting(
@@ -742,6 +742,12 @@ class Light(PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
+        self.minimum_brightness = self.controller.constants[
+            "min_brightness"
+            if device_id.endswith("strip")
+            or self.get_attribute("supported_color_modes")[0] == "brightness"
+            else "restricted_min_brightness"
+        ]
         self.kelvin_limits = {
             "max": self.get_attribute("max_color_temp_kelvin"),
             "min": self.get_attribute("min_color_temp_kelvin"),
@@ -775,17 +781,11 @@ class Light(PresenceDevice):
 
     def validate_brightness(self, value: int) -> int:
         """Return closest valid value for brightness."""
-        validated_value = value
-        if value < self.controller.args["min_brightness"]:
-            validated_value = self.controller.args["min_brightness"] if value > 0 else 0
-        elif value > self.controller.args["max_brightness"]:
-            validated_value = self.controller.args["max_brightness"]
-        if validated_value != value:
-            self.controller.log(
-                f"Brightness ({value}) out of bounds for '{self.device_id}'",
-                level="WARNING",
-            )
-        return validated_value
+        if value < self.minimum_brightness:
+            return self.minimum_brightness if value > 0 else 0
+        if value > self.controller.args["max_brightness"]:
+            return self.controller.args["max_brightness"]
+        return value
 
     @property
     def kelvin(self) -> int:
@@ -812,16 +812,9 @@ class Light(PresenceDevice):
         """Return closest valid value for kelvin."""
         if self.kelvin_limits["min"] is None:
             return None
-        validated_value = value
-        validated_value = max(validated_value, self.kelvin_limits["min"])
-        validated_value = min(validated_value, self.kelvin_limits["max"])
-        if validated_value != value:
-            self.controller.log(
-                f"Kelvin ({value}) out of bounds for '{self.device_id}'",
-                level="DEBUG",
-            )
         return self.constants["kelvin_per_step"] * int(
-            value / self.constants["kelvin_per_step"],
+            min(max(value, self.kelvin_limits["min"]), self.kelvin_limits["max"])
+            / self.constants["kelvin_per_step"],
         )
 
     def adjust(self, brightness: int, kelvin: int):
@@ -915,13 +908,6 @@ class Light(PresenceDevice):
                 f"presence adjustments: {self.presence_adjustments}",
                 level="DEBUG",
             )
-
-    @property
-    def on_when_vacant(self) -> bool:
-        """Check if the device is or will be on when vacant."""
-        if self.ignoring_vacancy:
-            return self.brightness > 0
-        return self.presence_adjustments["vacant"]["brightness"] > 0
 
     def adjust_for_conditions(
         self,

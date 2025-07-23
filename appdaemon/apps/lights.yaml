@@ -2,7 +2,8 @@ Lights:
   module: lights
   class: Lights
   max_brightness: 255 # maximum brightness value that lighting can reach
-  min_brightness: 25 # minimum brightness possible (0 turns off the light, anything higher defaults to minimum)
+  min_brightness: 3 # minimum brightness possible for normal lights
+  restricted_min_brightness: 26 # minimum brightness possible for other lights (0 turns off the light, anything higher defaults to minimum)
   night_to_day_delay: 600 # maximum ambient illuminance to trigger transition to day scene
   morning_max_illuminance: 60 # maximum ambient illuminance to trigger transition to day scene
   day_min_illuminance: 40 # minimum ambient illuminance to trigger transition to night scenes
