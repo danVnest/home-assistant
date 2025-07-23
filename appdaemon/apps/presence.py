@@ -22,7 +22,7 @@ class Presence(App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.rooms = {}
-        self.__pets_home_alone = False
+        self.__pets_home_alone = None
         self.last_device_date = None
 
     def initialize(self):
@@ -31,7 +31,9 @@ class Presence(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.pets_home_alone = self.entities.input_boolean.pets_home_alone.state == "on"
+        self.__pets_home_alone = (
+            self.entities.input_boolean.pets_home_alone.state == "on"
+        )
         # TODO: https://app.asana.com/0/1207020279479204/1207033183175547/f
         # add overide functionality so that if pets home alone mode is manually turned off it doesn't turn on again until after someone comes home and leaves again
         for multisensor_room in ["entryway", "dining_room", "bathroom"]:
