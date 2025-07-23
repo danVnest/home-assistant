@@ -213,6 +213,70 @@ modules:
       - media-player
       - climate
       - select
+  scene_state_text_and_icon:
+    id: scene_state_text_and_icon
+    name: Adjust text and icon based on scene state
+    version: "1.0"
+    creator: danVnest
+    description: Adjust text and icon based on scene state.
+    code: >-
+      ${card.querySelector('.bubble-name').innerText = state + " scene"}
+
+
+      ${icon.setAttribute("icon", "mdi:" + (() => {
+        switch (state) {
+          case 'Sleep':
+            return 'sleep';
+          case 'Morning':
+            return 'weather-sunset';
+          case 'Day':
+            return 'weather-sunny';
+          case 'Night':
+            return 'weather-night';
+          case 'TV':
+            return 'television';
+          case 'Bright':
+            return 'white-balance-sunny';
+          case 'Away (Day)':
+            return 'home-off';
+          case 'Away (Night)':
+            return 'home-off';
+        }
+      })())}
+
+
+      ${icon.style.color = 'color-mix(in srgb, var(--state-icon-color) 66%, ' +
+      (() => {
+        switch (state) {
+          case 'Sleep':
+            return 'purple';
+          case 'Morning':
+            return 'organge';
+          case 'Day':
+            return 'yellow';
+          case 'Night':
+            return 'blue';
+          case 'TV':
+            return 'green';
+          case 'Bright':
+            return 'white';
+          case 'Away (Day)':
+            return 'yellow';
+          case 'Away (Night)':
+            return 'blue';
+        }
+      })() + ')'}
+    editor: ""
+    supported:
+      - button
+      - calendar
+      - climate
+      - cover
+      - horizontal-buttons-stack
+      - media-player
+      - pop-up
+      - select
+      - separator
   icon_border_progress:
     id: icon_border_progress
     name: Icon Border Progress
