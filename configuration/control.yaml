@@ -46,14 +46,6 @@ input_datetime:
 
 template:
   - binary_sensor:
-      - name: Display day card # TODO: maybe not required anymore
-        unique_id: display_day_card
-        state: >
-          {{
-            states('input_select.scene') != 'Sleep' and
-            today_at('00:00') + timedelta(seconds=state_attr('input_datetime.bed_time', 'timestamp')|float(0)) > now()
-          }}
-        icon: mdi:sun-clock
       - name: TV playing
         unique_id: tv_playing
         state: "{{ states('sensor.tv_state') == 'playing' and states('media_player.tv') == 'on' }}"
@@ -63,12 +55,12 @@ template:
         unique_id: dark_outside
         state: >
           {{
-            states('sensor.weather_station_illuminance')|float < 5000 or 
+            states('sensor.weather_station_illuminance')|float(9999) < 2000 or 
             states('sun.sun') == 'below_horizon'
           }}
         delay_off: 0:05
         icon: mdi:theme-light-dark
-        
+        availability: "{{ has_value('sun.sun') }}"
   - sensor:
       - name: Washer completion percentage
         unique_id: washer_completion_percentage
