@@ -584,19 +584,20 @@ class Lights(App):
             or not self.lights["kitchen"].control_enabled
         ):
             return
-        if (
-            float(new) - self.lighting_illuminance("kitchen")
-            >= self.constants["illuminance"]["auto_off"]["kitchen"]
-        ):
-            for light_name in ("kitchen", "kitchen_strip"):
-                self.lights[light_name].ignore_vacancy()
-                self.lights[light_name].turn_off()
-            self.log(
-                f"Kitchen light levels are high ({new}lx), automatic lighting disabled",
-            )
+        if not self.lights["kitchen"].ignoring_vacancy:
+            if (
+                float(new) - self.lighting_illuminance("kitchen")
+                >= self.constants["illuminance"]["auto_off"]["kitchen"]
+            ):
+                for light_name in ("kitchen", "kitchen_strip"):
+                    self.lights[light_name].ignore_vacancy()
+                    self.lights[light_name].turn_off()
+                self.log(
+                    f"Kitchen light levels are high ({new}lx), "
+                    "automatic lighting disabled",
+                )
         elif (
-            not self.lights["kitchen"].ignoring_vacancy
-            and float(new) - self.lighting_illuminance("kitchen")
+            float(new) - self.lighting_illuminance("kitchen")
             <= self.constants["illuminance"]["auto_on"]["kitchen"]
         ):
             for light_name in ("kitchen", "kitchen_strip"):
@@ -661,11 +662,11 @@ class Lights(App):
 
     def handle_room_illuminance_change(self, illuminance: float, room: str):
         """Change room vacancy lighting based on illuminance levels (and napping)."""
-        if (
-            illuminance - self.lighting_illuminance(room)
-            >= self.constants["illuminance"]["auto_off"][room]
-        ):
-            if not self.lights[room].ignoring_vacancy:
+        if not self.lights[room].ignoring_vacancy:
+            if (
+                illuminance - self.lighting_illuminance(room)
+                >= self.constants["illuminance"]["auto_off"][room]
+            ):
                 self.lights[room].ignore_vacancy()
                 self.lights[room].turn_off()
                 self.log(
@@ -673,8 +674,7 @@ class Lights(App):
                     "automatic lighting disabled",
                 )
         elif (
-            self.lights[room].ignoring_vacancy
-            and not self.control.napping_in(room)
+            not self.control.napping_in(room)
             and illuminance - self.lighting_illuminance(room)
             <= self.constants["illuminance"]["auto_on"][room]
         ):
