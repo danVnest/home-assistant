@@ -629,7 +629,7 @@ class Lights(App):
             return
         if (
             self.control.scene == "Morning"
-            and float(new) >= self.constants["bedroom_morning_max_illuminance"]
+            and float(new) >= self.constants["illuminance"]["bedroom_morning_max"]
         ):
             self.log(
                 f"Bedroom light levels are high ({new}lx), transitioning to day scene",
@@ -670,7 +670,7 @@ class Lights(App):
                 self.lights[room].ignore_vacancy()
                 self.lights[room].turn_off()
                 self.log(
-                    f"The '{room}'s' light levels are high ({illuminance}lx), "
+                    f"The {room}'s light levels are high ({illuminance}lx), "
                     "automatic lighting disabled",
                 )
         elif (

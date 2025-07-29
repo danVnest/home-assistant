@@ -6,7 +6,7 @@ Lights:
   restricted_min_brightness: 26 # minimum brightness possible for other lights (0 turns off the light, anything higher defaults to minimum)
   night_to_day_delay: 600 # seconds it has to be light outside before transitioning to day scene
   illuminance:
-    bedroom_morning_max_illuminance: 10 # bedroom illuminance above this triggers transition to day scene
+    bedroom_morning_max: 10 # bedroom illuminance above this triggers transition to day scene
     auto_on: # illuminance below this enables automatic lighting
       bedroom: 30
       nursery: 15
