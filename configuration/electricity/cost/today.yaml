@@ -3,11 +3,13 @@ utility_meter:
     name: Energy export earnings minus battery charging cost today
     unique_id: energy_export_earnings_minus_battery_charging_cost_today
     source: sensor.energy_export_earnings_minus_battery_charging_cost
+    net_consumption: true
     cycle: daily
   total_energy_cost_today:
     name: Total energy cost today
     unique_id: total_energy_cost_today
     source: sensor.total_energy_cost
+    net_consumption: true
     cycle: daily
   grid_cost_today:
     name: Grid cost today
@@ -134,6 +136,7 @@ utility_meter:
     name: Total energy cost savings today
     unique_id: total_energy_cost_savings_today
     source: sensor.total_energy_cost_savings
+    net_consumption: true
     cycle: daily
   battery_energy_cost_savings_today:
     name: Battery energy cost savings today
@@ -210,13 +213,11 @@ utility_meter:
     unique_id: dryer_energy_cost_savings_today
     source: sensor.dryer_energy_cost_savings
     cycle: daily
-
   tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_today:
     name: TV, speakers, PC, Home Assistant, router relay, security hub energy cost savings today
     unique_id: tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_today
     source: sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings
     cycle: daily
-
   water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_today:
     name: Water heater, oven & stove, guest suite, garage, all other energy cost savings today
     unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_today

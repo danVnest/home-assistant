@@ -194,6 +194,89 @@
                 },
                 {
                   "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "High power cost",
+                  "entity": "sensor.electricity_general_price",
+                  "icon": "mdi:lightning-bolt",
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/electricity"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/lovelace/electricity"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.total_energy_cost_monthly",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/electricity"
+                      }
+                    },
+                    {
+                      "entity": "sensor.total_energy_cost_savings_monthly",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/electricity"
+                      }
+                    },
+                    {
+                      "entity": "sensor.total_power_cost",
+                      "show_state": true,
+                      "show_background": false,
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.total_power_cost",
+                          "above": 0.3
+                        }
+                      ]
+                    },
+                    {
+                      "entity": "sensor.total_power_cost_savings",
+                      "show_state": true,
+                      "show_background": false,
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.total_power_cost",
+                          "below": 0.3
+                        }
+                      ]
+                    },
+                    {
+                      "entity": "sensor.battery_time_remaining",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.electricity_general_price",
+                      "above": 0.4
+                    }
+                  ],
+                  "styles": ".bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), red)\n} .bubble-sub-button-4 {\n  color: color-mix(in srgb, var(--color-mix-in-base), green)\n}\n${card.querySelector('.bubble-state').innerText = 'Minimise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.total_energy_cost_yearly'].state) + '/y spent'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.total_energy_cost_savings_yearly'].state) + '/y saved'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n${card.querySelector('.bubble-sub-button-4 .bubble-sub-button-name-container').innerText =  parseFloat(hass.states['sensor.total_power_cost_savings'].state).toFixed(2) + '/h saving'}\n${card.querySelector('.bubble-sub-button-5 .bubble-sub-button-name-container').innerText = (parseFloat(hass.states['sensor.battery_time_remaining'].state) >= 1 ? parseFloat(hass.states['sensor.battery_time_remaining'].state).toFixed(0) + 'h' : Math.round(parseFloat(hass.states['sensor.battery_time_remaining'].state) * 60) + 'm')\n + ' battery left'}\n",
+                  "modules": [
+                    "normalised_sub_button_size",
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "var(--amber-color)"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
                   "card_type": "select",
                   "entity": "input_select.scene",
                   "show_last_changed": true,
@@ -2674,7 +2757,7 @@
                     },
                     "individual": [],
                     "battery": {
-                      "state_of_charge": "sensor.byd_battery_box_premium_hv_state_of_charge",
+                      "state_of_charge": "sensor.battery_state_of_charge",
                       "state_of_charge_unit_white_space": false,
                       "show_state_of_charge": true,
                       "color_state_of_charge_value": true,
@@ -3192,7 +3275,7 @@
                       "style": {
                         ".entity$": {
                           ".": "div:not(.name) {\n  font-size: 12px !important;\n}\nstate-badge {\n  margin: -3px !important;\n  --mdc-icon-size: 30px !important;\n}\n",
-                          "state-badge$": "ha-state-icon[data-state=off] {\n  color: color-mix(in srgb, var(--state-icon-color), red) !important;\n} ha-state-icon[data-state=on] {\n  color: color-mix(in srgb, var(--state-icon-color), blue) !important;\n}\n"
+                          "state-badge$": "ha-state-icon[data-state=off] {\n  color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n} ha-state-icon[data-state=on] {\n  color: color-mix(in srgb, var(--color-mix-in-base), blue) !important;\n}\n"
                         }
                       }
                     }
@@ -3450,7 +3533,7 @@
                   },
                   "card_mod": {
                     "style": {
-                      "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}\np:nth-of-type(6) span {\n  text-shadow: 0px 0px 2px green;\n}"
+                      "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}\np:nth-of-type(6) span {\n  text-shadow: 0px 0px 2px green;\n}"
                     }
                   }
                 }

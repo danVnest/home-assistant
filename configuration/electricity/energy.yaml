@@ -65,6 +65,30 @@ template:
             has_value('sensor.smart_meter_real_energy_produced') and
             has_value('sensor.smart_meter_real_energy_consumed')
           }}
+      - name: Battery time remaining
+        unique_id: battery_time_remaining
+        state: >
+          {%- set battery_reserve = 0.07 -%}
+          {%- if states('sensor.battery_state_of_charge')|float == battery_reserve -%}
+            0
+          {%- else -%}
+            {{-
+              [(states('sensor.battery_maximum_capacity')|float *
+              (1 - battery_reserve) /
+              (states('sensor.power_meter_power_battery_discharge')|float + 1))|round(2),
+              24]|min
+            -}}
+          {%- endif -%}
+        unit_of_measurement: h
+        device_class: duration
+        state_class: measurement
+        icon: mdi:battery-clock
+        availability: >
+          {{
+            has_value('sensor.battery_state_of_charge') and
+            has_value('sensor.battery_maximum_capacity') and
+            has_value('sensor.power_meter_power_battery_discharge')
+          }}
 
       - name: Electricity non-renewable percentage
         unique_id: electricity_non_renewable_percentage
