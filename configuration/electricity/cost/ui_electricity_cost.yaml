@@ -1,0 +1,448 @@
+template:
+  - triggers:
+      - trigger: time_pattern
+        hours: "/1"
+      - trigger: event
+        event_type:
+          - event_template_reloaded
+    sensor:
+      - name: Electricity cost breakdown dashboard card
+        unique_id: electricity_cost_breakdown_dashboard_card
+        state: "{{ now() }}"
+        attributes:
+          template: >
+            {% set total_cost_modifier = 10 %}
+            {% set max_ratio = 3 %}
+            [{% set items = [
+              {'entity': 'total', 'name': 'Total (including export earnings)', 'icon': 'home-lightning-bolt', 'state': states("sensor.total_energy_cost_weekly")|float(0)},
+              {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states("sensor.electricity_provider_service_energy_cost_weekly")|float(0)},
+              {'entity': 'battery', 'name': 'Battery', 'icon': 'fuel-cell', 'state': states("sensor.battery_energy_cost_weekly")|float(0)},
+              {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states("sensor.lights_energy_cost_weekly")|float(0)},
+              {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states("sensor.living_room_aircon_energy_cost_weekly")|float(0)},
+              {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'air-conditioner', 'state': states("sensor.dining_room_aircon_energy_cost_weekly")|float(0)},
+              {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'air-conditioner', 'state': states("sensor.bedroom_aircon_energy_cost_weekly")|float(0)},
+              {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'radiator', 'state': states("sensor.office_heater_energy_cost_weekly")|float(0)},
+              {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'radiator', 'state': states("sensor.nursery_heater_energy_cost_weekly")|float(0)},
+              {'entity': 'fans', 'name': 'Fans', 'icon': 'fan', 'state': states("sensor.fans_energy_cost_weekly")|float(0)},
+              {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'air-humidifier', 'state': states("sensor.humidifiers_energy_cost_weekly")|float(0)},
+              {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'kettle-pour-over', 'state': states("sensor.kitchen_appliances_energy_cost_weekly")|float(0)},
+              {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'dishwasher', 'state': states("sensor.dishwasher_energy_cost_weekly")|float(0)},
+              {'entity': 'fridge', 'name': 'Fridge', 'icon': 'fridge', 'state': states("sensor.fridge_energy_cost_weekly")|float(0)},
+              {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'fridge-industrial', 'state': states("sensor.freezer_mini_fridge_routers_energy_cost_weekly")|float(0)},
+              {'entity': 'washer', 'name': 'Washer', 'icon': 'washing-machine', 'state': states("sensor.washer_energy_cost_weekly")|float(0)},
+              {'entity': 'dryer', 'name': 'Dryer', 'icon': 'tumble-dryer', 'state': states("sensor.dryer_energy_cost_weekly")|float(0)},
+              {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, Home Assistant, router relay, security hub', 'icon': 'television', 'state': states("sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_weekly")|float(0)},
+              {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven & stove, guest suite, garage, all other', 'icon': 'water-boiler', 'state': states("sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_weekly")|float(0)},
+              {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor, cooler, fish tank', 'icon': 'desktop-tower-monitor', 'state': states("sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_weekly")|float(0)},
+              {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'cellphone-charging', 'state': states("sensor.phone_chargers_energy_cost_weekly")|float(0)},
+              {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states("sensor.sensors_energy_cost_weekly")|float(0)},
+              {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states("sensor.paludarium_picture_frame_camera_energy_cost_weekly")|float(0)},
+              {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states("sensor.standby_energy_cost_weekly")|float(0)},
+            ]|sort(attribute='state', reverse=true) %}
+            {% for item in items %}
+            {% set good_cost_per_hour = 0.01 * (total_cost_modifier if item.entity == "total" else 1) %}
+            {% set ok_cost_per_hour = 0.05 * (total_cost_modifier if item.entity == "total" else 1) %}
+            {% set bad_cost_per_hour = 0.5 * (total_cost_modifier if item.entity == "total" else 1) %}
+            {% set yearly_ratio = [states('sensor.' + item.entity + '_energy_cost_yearly')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_yearly')|float(0),0]|max+0.0001)+0.0001 %}
+            {% set monthly_ratio = [states('sensor.' + item.entity + '_energy_cost_monthly')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_monthly')|float(0),0]|max+0.0001)+0.0001 %}
+            {% set weekly_ratio = [item.state,0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_weekly')|float(0),0]|max+0.0001)+0.0001 %}
+            {% set today_ratio = [states('sensor.' + item.entity + '_energy_cost_today')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_today')|float(0),0]|max+0.0001)+0.0001 %}
+            {{{
+              'type': 'markdown',
+              'content': '<ha-icon icon="mdi:' + item.icon + '"></ha-icon>&emsp;' + item.name,
+              'card_mod': {
+                'style': {
+                  '.': "ha-card {"
+                    "background: none;"
+                    "border: none;"
+                    "margin-top: -10px;"
+                    "margin-bottom: -20px;"
+                    "margin-left: -10px;"
+                  "}"
+                  ,
+                  'ha-markdown$': "ha-markdown-element p {"
+                    "white-space: nowrap;"
+                    "overflow: hidden;"
+                    "text-overflow: ellipsis;"
+                  "}"
+                }
+              }
+            }}},
+            {{{
+              'type': 'horizontal-stack',
+              'cards': [
+                {
+                  'type': 'custom:mini-graph-card',
+                  'entities': [
+                    'sensor.' + item.entity + '_energy_cost_yearly',
+                    {
+                      'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',
+                      'color': 'darkgreen',
+                    },
+                  ],
+                  'hours_to_show': 240,
+                  'points_per_hour': 0.05,
+                  'min_bound_range': 0.5,
+                  'lower_bound': -0.1,
+                  'update_interval': 3600,
+                  'animate': true,
+                  'font_size': 50,
+                  'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_yearly')|float(0) < 10 else 0,
+                  'unit': ' ',
+                  'group': true,
+                  'align_state': 'center',
+                  'color_thresholds': [
+                    { 'value': 0, 'color': '#0066cc' },
+                    { 'value': good_cost_per_hour * 8760, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * 8760, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * 8760, 'color': '#ff4d00' },
+                  ],
+                  'show': {
+                    'icon': false,
+                    'name': false,
+                    'points': false,
+                    'legend': false,
+                    'labels': false,
+                    'loading_indicator': false,
+                  },
+                  'card_mod': {
+                    'style':
+                      "ha-card {"
+                        "background: rgb(var(--rgb-card-background-color));"
+                        "max-height: 40px;"
+                        "z-index: 1;"
+                      "} .states {"
+                        "padding: 3px 0 0 0;"
+                      "} .state::before {"
+                        "content: '$';"
+                      "} .state::after {"
+                        "content: '/year';"
+                      "}"
+                  }
+                },
+                {
+                  'type': 'custom:mini-graph-card',
+                  'entities': [
+                    'sensor.' + item.entity + '_energy_cost_monthly',
+                    {
+                      'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',
+                      'color': 'darkgreen',
+                    },
+                  ],
+                  'hours_to_show': 240,
+                  'points_per_hour': 0.05,
+                  'min_bound_range': 0.5,
+                  'lower_bound': -0.1,
+                  'update_interval': 3600,
+                  'animate': true,
+                  'font_size': 50,
+                  'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_monthly')|float(0) < 10 else 0,
+                  'unit': ' ',
+                  'group': true,
+                  'align_state': 'center',
+                  'color_thresholds': [
+                    { 'value': 0, 'color': '#0066cc' },
+                    { 'value': good_cost_per_hour * 720, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * 720, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * 720, 'color': '#ff4d00' },
+                  ],
+                  'show': {
+                    'icon': false,
+                    'name': false,
+                    'points': false,
+                    'legend': false,
+                    'labels': false,
+                    'loading_indicator': false,
+                  },
+                  'card_mod': {
+                    'style':
+                      "ha-card {"
+                        "background: rgb(var(--rgb-card-background-color));"
+                        "max-height: 40px;"
+                        "z-index: 1;"
+                      "} .states {"
+                        "padding: 3px 0 0 0;"
+                      "} .state::before {"
+                        "content: '$';"
+                      "} .state::after {"
+                        "content: '/month';"
+                      "}"
+                  }
+                },
+                {
+                  'type': 'custom:mini-graph-card',
+                  'entities': [
+                    'sensor.' + item.entity + '_energy_cost_weekly',
+                    {
+                      'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',
+                      'color': 'darkgreen',
+                    },
+                  ],
+                  'hours_to_show': 168,
+                  'points_per_hour': 0.1,
+                  'min_bound_range': 0.5,
+                  'lower_bound': -0.1,
+                  'update_interval': 3600,
+                  'animate': true,
+                  'font_size': 50,
+                  'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_weekly')|float(0) < 10 else 0,
+                  'unit': ' ',
+                  'group': true,
+                  'align_state': 'center',
+                  'color_thresholds': [
+                    { 'value': 0, 'color': '#0066cc' },
+                    { 'value': good_cost_per_hour * 168, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * 168, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * 168, 'color': '#ff4d00' },
+                  ],
+                  'show': {
+                    'icon': false,
+                    'name': false,
+                    'points': false,
+                    'legend': false,
+                    'labels': false,
+                    'loading_indicator': false,
+                  },
+                  'card_mod': {
+                    'style':
+                      "ha-card {"
+                        "background: rgb(var(--rgb-card-background-color));"
+                        "max-height: 40px;"
+                        "z-index: 1;"
+                      "} .states {"
+                        "padding: 3px 0 0 0;"
+                      "} .state::before {"
+                        "content: '$';"
+                      "} .state::after {"
+                        "content: '/week';"
+                      "}"
+                  }
+                },
+                {
+                  'type': 'custom:mini-graph-card',
+                  'entities': [
+                    'sensor.' + item.entity + '_energy_cost_today',
+                    {
+                      'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',
+                      'color': 'darkgreen',
+                    },
+                  ],
+                  'hours_to_show': max(now().hour, 1),
+                  'points_per_hour': 20 / max(now().hour, 1),
+                  'min_bound_range': 0.5,
+                  'lower_bound': -0.1,
+                  'update_interval': 60,
+                  'animate': true,
+                  'font_size': 50,
+                  'decimals': 1 if states('sensor.' + item.entity + '_energy_cost_today')|float(0) < 10 else 0,
+                  'unit': ' ',
+                  'group': true,
+                  'align_state': 'center',
+                  'color_thresholds': [
+                    { 'value': 0, 'color': '#0066cc' },
+                    { 'value': good_cost_per_hour * 24, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * 24, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * 24, 'color': '#ff4d00' },
+                  ],
+                  'show': {
+                    'icon': false,
+                    'name': false,
+                    'points': false,
+                    'legend': false,
+                    'labels': false,
+                    'loading_indicator': false,
+                  },
+                  'card_mod': {
+                    'style':
+                      "ha-card {"
+                        "background: rgb(var(--rgb-card-background-color));"
+                        "border: 1px solid var(--light-primary-color);"
+                        "max-height: 40px;"
+                        "z-index: 1;"
+                      "} .states {"
+                        "padding: 3px 0 0 0;"
+                      "} .state::before {"
+                        "content: '$';"
+                      "} .state::after {"
+                        "content: 'today';"
+                      "}"
+                  }
+                },
+                {
+                  'type': 'custom:mini-graph-card',
+                  'entities': [
+                    'sensor.' + item.entity + '_power_cost',
+                    {
+                      'entity': 'sensor.' + item.entity + '_power_cost_savings',
+                      'color': 'darkgreen',
+                    },
+                  ],
+                  'hours_to_show': 1,
+                  'points_per_hour': 20,
+                  'min_bound_range': 0.5,
+                  'lower_bound': -0.1,
+                  'update_interval': 10,
+                  'animate': true,
+                  'font_size': 50,
+                  'decimals': 1 if states('sensor.' + item.entity + '_power_cost')|float(0) < 10 else 0,
+                  'unit': ' ',
+                  'group': true,
+                  'align_state': 'center',
+                  'color_thresholds': [
+                    { 'value': 0, 'color': '#0066cc' },
+                    { 'value': good_cost_per_hour, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour, 'color': '#ff4d00' },
+                  ],
+                  'show': {
+                    'icon': false,
+                    'name': false,
+                    'points': false,
+                    'legend': false,
+                    'labels': false,
+                    'loading_indicator': false,
+                  },
+                  'card_mod': {
+                    'style':
+                      "ha-card {"
+                        "background: rgb(var(--rgb-card-background-color));"
+                        "border: 1px solid var(--light-primary-color);"
+                        "max-height: 40px;"
+                        "z-index: 1;"
+                      "} .states {"
+                        "padding: 3px 0 0 0;"
+                      "} .state::before {"
+                        "content: '$';"
+                      "} .states > .state::after {"
+                        "content: '/h now';"
+                  }
+                }
+              ]
+            }}},
+            {{{
+              'type': 'horizontal-stack',
+              'cards': [
+                {
+                  'type': 'custom:button-card',
+                  'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',
+                  'state_display': "[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]",
+                  'show_state': true,
+                  'show_name': false,
+                  'show_icon': false,
+                  'show_units': true,
+                  'styles': {
+                    'card': [
+                      {'font-size': '7px'},
+                      {'color': 'white'},
+                      {'background': 'color-mix(in srgb, ' + (('darkred ' + [100, 100*(yearly_ratio-1)/(max_ratio-1)]|min|round(0)|string) if yearly_ratio >= 1 else ('darkgreen ' + [100, 100*((1/yearly_ratio)-1)/(max_ratio-1)]|min|round(0)|string)) + '%, black)'},
+                      {'margin-top': '-30px'},
+                      {'padding-top': '25px'},
+                      {'padding-bottom': '4px'},
+                      {'height': '32px'},
+                    ]
+                  }
+                },
+                {
+                  'type': 'custom:button-card',
+                  'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',
+                  'state_display': "[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]",
+                  'show_state': true,
+                  'show_name': false,
+                  'show_icon': false,
+                  'show_units': true,
+                  'styles': {
+                    'card': [
+                      {'font-size': '7px'},
+                      {'color': 'white'},
+                      {'background': 'color-mix(in srgb, ' + (('darkred ' + [100, 100*(monthly_ratio-1)/(max_ratio-1)]|min|round(0)|string) if monthly_ratio >= 1 else ('darkgreen ' + [100, 100*((1/monthly_ratio)-1)/(max_ratio-1)]|min|round(0)|string)) + '%, black)'},
+                      {'margin-top': '-30px'},
+                      {'padding-top': '25px'},
+                      {'padding-bottom': '4px'},
+                      {'height': '32px'},
+                    ]
+                  }
+                },
+                {
+                  'type': 'custom:button-card',
+                  'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',
+                  'state_display': "[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]",
+                  'show_state': true,
+                  'show_name': false,
+                  'show_icon': false,
+                  'show_units': true,
+                  'styles': {
+                    'card': [
+                      {'font-size': '7px'},
+                      {'color': 'white'},
+                      {'background': 'color-mix(in srgb, ' + (('darkred ' + [100, 100*(weekly_ratio-1)/(max_ratio-1)]|min|round(0)|string) if weekly_ratio >= 1 else ('darkgreen ' + [100, 100*((1/weekly_ratio)-1)/(max_ratio-1)]|min|round(0)|string)) + '%, black)'},
+                      {'margin-top': '-30px'},
+                      {'padding-top': '25px'},
+                      {'padding-bottom': '4px'},
+                      {'height': '32px'},
+                    ]
+                  }
+                },
+                {
+                  'type': 'custom:button-card',
+                  'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',
+                  'state_display': "[[[ return '$<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b> saved' ]]]",
+                  'show_state': true,
+                  'show_name': false,
+                  'show_icon': false,
+                  'show_units': true,
+                  'styles': {
+                    'card': [
+                      {'font-size': '7px'},
+                      {'color': 'white'},
+                      {'background': 'color-mix(in srgb, ' + (('darkred ' + [100, 100*(today_ratio-1)/(max_ratio-1)]|min|round(0)|string) if today_ratio >= 1 else ('darkgreen ' + [100, 100*((1/today_ratio)-1)/(max_ratio-1)]|min|round(0)|string)) + '%, black)'},
+                      {'margin-top': '-30px'},
+                      {'padding-top': '25px'},
+                      {'padding-bottom': '4px'},
+                      {'height': '32px'},
+                    ]
+                  }
+                },
+                {
+                  'type': 'custom:button-card',
+                  'entity': 'sensor.' + item.entity + '_power_cost_savings',
+                  'state_display': "[[[ return 'saving $<b>' + parseFloat(entity.state).toFixed(parseFloat(entity.state) < 10 ? 1 : 0) + '</b>/h' ]]]",
+                  'show_state': true,
+                  'show_name': false,
+                  'show_icon': false,
+                  'show_units': true,
+                  'variables': { 'ratio': "[[[ return Math.max(0,parseFloat(states['sensor." + item.entity + "_power_cost'].state)) / (Math.max(0,parseFloat(entity.state)) + 0.0001) + 0.0001 ]]]" },
+                  'triggers_update': [ 'sensor.' + item.entity + '_power_cost' ],
+                  'styles': {
+                    'card': [
+                      {'font-size': '7px'},
+                      {'color': 'white'},
+                      {'background': "[[[ return 'color-mix(in srgb, ' + (parseFloat(variables.ratio) >= 1 ? ('darkred ' + Math.round(100 * Math.min(1, (variables.ratio - 1) / " + (max_ratio - 1)|string + "))) : ('darkgreen ' + Math.round(100 * Math.min(1, (1/parseFloat(variables.ratio) - 1) / " + (max_ratio - 1)|string + ")))) + '%, black)' ]]]"},
+                      {'margin-top': '-30px'},
+                      {'padding-top': '25px'},
+                      {'padding-bottom': '4px'},
+                      {'height': '32px'},
+                    ]
+                  }
+                },
+              ]
+            }}},
+            {% if not loop.last %}
+            {{{
+              'type' : 'entities',
+              'entities': [{
+                'type': 'divider',
+                'style': {
+                  'margin': '-15px -26px 0 -26px',
+                  'height': ('5' if loop.first else '1') + 'px !important',
+                } 
+              }],
+              'card_mod': {
+                'style':
+                  "ha-card {"
+                    "background: none;"
+                    "margin-bottom: -40px;"
+                  "}"
+              }
+            }}},
+            {% endif %}
+            {% endfor %}]
