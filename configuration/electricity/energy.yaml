@@ -68,17 +68,17 @@ template:
       - name: Battery time remaining
         unique_id: battery_time_remaining
         state: >
-          {%- set battery_reserve = 0.07 -%}
-          {%- if states('sensor.battery_state_of_charge')|float == battery_reserve -%}
+          {%- set level = states('sensor.battery_state_of_charge')|float -%}
+          {%- set reserve = 7.1 -%}
+          {%- if level <= reserve -%}
             0
           {%- else -%}
+            {%- set discharge = states('sensor.power_meter_power_battery_discharge')|float -%}
             {{-
-              [(states('sensor.battery_maximum_capacity')|float *
-              (1 - battery_reserve) /
-              (states('sensor.power_meter_power_battery_discharge')|float + 1))|round(2),
-              24]|min
+              ((level - reserve) / 100 * states('sensor.battery_maximum_capacity')|float / 
+              [discharge if discharge > 200 else states('sensor.power_meter_power_load_consumed')|float, 1]|max)|round(2)
             -}}
-          {%- endif -%}
+          {% endif %}
         unit_of_measurement: h
         device_class: duration
         state_class: measurement
@@ -87,7 +87,8 @@ template:
           {{
             has_value('sensor.battery_state_of_charge') and
             has_value('sensor.battery_maximum_capacity') and
-            has_value('sensor.power_meter_power_battery_discharge')
+            has_value('sensor.power_meter_power_battery_discharge') and
+            has_value('sensor.power_meter_power_load_consumed')
           }}
 
       - name: Electricity non-renewable percentage
