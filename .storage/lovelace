@@ -2495,6 +2495,11 @@
               ]
             },
             {
+              "type": "markdown",
+              "title": "Nursery camera alerts",
+              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% if alerts %}\n{% for alert in alerts %}\n| **{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}** | \n  {{ as_timestamp(alert['created']) | timestamp_custom('%Y-%m-%d %H:%M', true) }} | \n  {% if alert['image'] %}![img]({{ alert['image'] }}){% else %}-{% endif %} |\n{% endfor %}\n{% else %}\n_No recent alerts_\n{% endif %}\n"
+            },
+            {
               "type": "history-graph",
               "entities": [
                 {

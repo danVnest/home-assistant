@@ -15,6 +15,7 @@ secrets.yaml
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/apparent_temperature/sensor.py
+cuboai_*
 themes/*/*.jpg
 
 # Logs
