@@ -268,3 +268,71 @@ automation:
             {% set status = entities|map('states')|list %}
             {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'full', 'Full'])|map(attribute=0)|list %}
             {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}
+
+rest:
+  - verify_ssl: false
+    scan_interval: 900
+    resource: http://db21ed7f-scrutiny-fa:8080/api/device/aa20250603250g910987/details
+    binary_sensor:
+      - name: SSD SMART status
+        value_template: "{{ 1 if value_json.data.smart_results[0].Status in [1, 2] else 0 }}"
+        device_class: problem
+    sensor:
+      - name: SSD temperature
+        unique_id: ssd_temperature
+        value_template: "{{ value_json.data.smart_results[0].temp }}"
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+      - name: SSD power on hours
+        unique_id: ssd_power_on_hours
+        value_template: "{{ value_json.data.smart_results[0].power_on_hours }}"
+        unit_of_measurement: h
+        device_class: duration
+        state_class: measurement
+      - name: SSD time at warning temperature
+        unique_id: ssd_time_at_warning_temperature
+        value_template: "{{ value_json.data.smart_results[0].attrs.warning_temp_time.value }}"
+        unit_of_measurement: min
+        device_class: duration
+        state_class: measurement
+      - name: SSD time at critical temperature
+        unique_id: ssd_time_at_critical_temperature
+        value_template: "{{ value_json.data.smart_results[0].attrs.critical_comp_time.value }}"
+        unit_of_measurement: min
+        device_class: duration
+        state_class: measurement
+      - name: SSD busy time
+        unique_id: ssd_busy_time
+        value_template: "{{ value_json.data.smart_results[0].attrs.controller_busy_time.value }}"
+        unit_of_measurement: min
+        device_class: duration
+        state_class: measurement
+      - name: SSD power cycles
+        unique_id: ssd_power_cycles
+        value_template: "{{ value_json.data.smart_results[0].power_cycle_count }}"
+        state_class: measurement
+      - name: SSD critical warning count
+        unique_id: ssd_critical_warning_count
+        value_template: "{{ value_json.data.smart_results[0].attrs.critical_warning.value }}"
+        state_class: measurement
+      - name: SSD reads
+        unique_id: ssd_reads
+        value_template: "{{ value_json.data.smart_results[0].attrs.host_reads.value }}"
+        state_class: measurement
+      - name: SSD writes
+        unique_id: ssd_writes
+        value_template: "{{ value_json.data.smart_results[0].attrs.host_writes.value }}"
+        state_class: measurement
+      - name: SSD media errors
+        unique_id: ssd_media_errors
+        value_template: "{{ value_json.data.smart_results[0].attrs.media_errors.value }}"
+        state_class: measurement
+      - name: SSD error log entries
+        unique_id: ssd_error_log_entries
+        value_template: "{{ value_json.data.smart_results[0].attrs.num_err_log_entries.value }}"
+        state_class: measurement
+      - name: SSD unsafe shutdowns
+        unique_id: ssd_unsafe_shutdowns
+        value_template: "{{ value_json.data.smart_results[0].attrs.unsafe_shutdowns.value }}"
+        state_class: measurement
