@@ -50,10 +50,11 @@ template:
         state: >
           {%- set total_produced_before_battery_install = 8851354 -%}
           {{
-            total_produced_before_battery_install +
+            [total_produced_before_battery_install +
             states('sensor.solar_energy_produced')|float +
             states('sensor.smart_meter_real_energy_consumed')|float -
-            states('sensor.smart_meter_real_energy_produced')|float 
+            states('sensor.smart_meter_real_energy_produced')|float,
+            this.state|float(0)]|max 
           }}
         unit_of_measurement: Wh
         device_class: energy
