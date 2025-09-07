@@ -21,11 +21,24 @@ influxdb:
   username: homeassistant
   password: !secret influx_password
   max_retries: 3
+  include:
+    entity_globs:
+      - sensor.*energy_cost_*last*
 logbook:
 mobile_app:
 my:
 network:
 person:
+recorder:
+  exclude:
+    entities:
+      - sensor.weather_station_wind_speed
+      - sensor.weather_station_wind_direction
+      - sensor.electricity_cost_breakdown_dashboard_card
+      - sensor.bubble_card_modules
+    entity_globs:
+      - sensor.*_presence_sensor_distance
+      - sensor.*_presence_sensor_illuminance
 sun:
 system_health:
 wake_on_lan:
