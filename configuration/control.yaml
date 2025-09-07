@@ -162,8 +162,8 @@ template:
         unique_id: washer_or_dryer_run_today
         state: >
           {{
-            as_datetime(states('sensor.washer_start_time')).date() == now().date() or
-            as_datetime(states('sensor.dryer_start_time')).date() == now().date()
+            (states('sensor.washer_start_time')|as_datetime|as_local).date() == now().date() or
+            (states('sensor.dryer_start_time')|as_datetime|as_local).date() == now().date()
           }}
         icon: mdi:washing-machine
         availability: "{{ has_value('sensor.washer_start_time') and has_value('sensor.dryer_start_time') }}"
