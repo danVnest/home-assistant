@@ -103,6 +103,7 @@ template:
             {{- states('sensor.washer_completion_time_buggy') -}}
           {%- endif -%}
         device_class: timestamp
+        availability: "{{ has_value('sensor.washer_last_completion_time') and has_value('sensor.washer_completion_time_buggy') }}"
       - name: Dryer completion time
         unique_id: dryer_completion_time
         state: >
@@ -112,6 +113,7 @@ template:
             {{- states('sensor.dryer_completion_time_buggy') -}}
           {%- endif -%}
         device_class: timestamp
+        availability: "{{ has_value('sensor.dryer_last_completion_time') and has_value('sensor.dryer_completion_time_buggy') }}"
   - triggers:
       - trigger: state
         entity_id: select.washer
