@@ -211,7 +211,7 @@ class Climate(App):
             if all(aircon.door_open for aircon in self.aircons.values()):
                 reason = "the door(s) are open"
                 if self.too_hot_or_cold_outside:
-                    reason += f" (but outside is {self.outside_temperature:.1f}º)"
+                    reason += f" (but outside is {self.outside_temperature:.1f}°)"
                 reason += ", consider"
             elif any(
                 not aircon.control_enabled and not aircon.door_open
@@ -227,7 +227,7 @@ class Climate(App):
                 )
                 return
             self.suggest(
-                f"It is {self.inside_temperature:.1f}º inside but aircon won't turn on "
+                f"It is {self.inside_temperature:.1f}° inside but aircon won't turn on "
                 f"for the pets because {reason} turning aircon on manually",
             )
             # TODO: above doesn't account for the situation where the bedroom door is closed
@@ -274,7 +274,7 @@ class Climate(App):
         ):
             self.allow_suggestion()
             self.suggest(
-                f"It's forecast to reach {float(extreme_forecast):.1f}º, "
+                f"It's forecast to reach {float(extreme_forecast):.1f}°, "
                 "consider enabling additional climate control",
             )
 
@@ -325,7 +325,7 @@ class Climate(App):
             )
             self.log(
                 f"The '{target_or_trigger}' value is not valid, adjusting "
-                f"the corresponding target/trigger to '{valid_other}º'",
+                f"the corresponding target/trigger to '{valid_other}°'",
                 level="WARNING",
             )
         self.allow_suggestion()
@@ -878,7 +878,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             and not self.controller.presence.anyone_home
         ):
             self.controller.notify(
-                f"It is {self.room_temperature}º in the {self.room}, "
+                f"It is {self.room_temperature}° in the {self.room}, "
                 "turning aircon on for the pets",
                 title="Climate Control",
             )
@@ -887,9 +887,9 @@ class Aircon(ClimateDevice, PresenceDevice):
         """Suggest opening up the house if outside is nicer."""
         if self.outside_temperature_nicer and self.controller.presence.anyone_home:
             self.controller.suggest(
-                f"Outside ({self.controller.outside_temperature:.1f}º) "
+                f"Outside ({self.controller.outside_temperature:.1f}°) "
                 f"is a more pleasant temperature than the {self.room} "
-                f"({self.room_temperature:.1f}º), consider opening up the house",
+                f"({self.room_temperature:.1f}°), consider opening up the house",
             )
 
 
