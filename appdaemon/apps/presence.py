@@ -42,7 +42,13 @@ class Presence(App):
                 f"{multisensor_room}_multisensor_motion",
                 self,
             )
-        for presence_sensor_room in ["kitchen", "bedroom", "nursery", "office"]:
+        for presence_sensor_room in [
+            "kitchen",
+            "living_room",
+            "bedroom",
+            "nursery",
+            "office",
+        ]:
             self.rooms[presence_sensor_room] = Room(
                 presence_sensor_room,
                 f"{presence_sensor_room}_presence_sensor_occupancy",
@@ -50,7 +56,6 @@ class Presence(App):
             )
         for camera_room in [
             "front_door",
-            "living_room",
             "back_deck",
             "back_door",
             "garage",
@@ -68,14 +73,18 @@ class Presence(App):
                     self.rooms[camera_room].add_sensor(
                         f"{camera_room}_{motion_type}",
                     )
-        self.rooms["front_door"].add_sensor(
-            "doorbell_ringing",
-        )
+        self.rooms["front_door"].add_sensor("doorbell_ringing")
         self.rooms["entryway"].add_sensor("entryway_person_detected")
         self.rooms["entryway"].add_sensor("entryway_motion_detected")
         self.rooms["kitchen"].add_sensor("kitchen_door_motion")
-        self.rooms["living_room"].add_sensor("tv_playing")
-        self.rooms["living_room"].add_sensor("hall_multisensor_motion")
+        for sensor in (
+            "tv_playing",
+            "living_room_person_detected",
+            "living_room_motion_detected",
+            "living_room_pet_detected",
+            "hall_multisensor_motion",
+        ):
+            self.rooms["living_room"].add_sensor(sensor)
         self.rooms["dining_room"].add_sensor("dining_room_balcony_door_motion")
         self.rooms["bedroom"].add_sensor("bedroom_balcony_door_motion")
         self.rooms["office"].add_sensor("dan_s_computer_active_at_home")

@@ -288,6 +288,15 @@ sensor:
       - filter: time_throttle
         window_size: "00:01"
   - platform: filter
+    name: living_room_presence_sensor_illuminance_filtered
+    unique_id: living_room_presence_sensor_illuminance_filtered
+    entity_id: sensor.living_room_presence_sensor_illuminance
+    filters:
+      - filter: time_simple_moving_average
+        window_size: "00:01"
+      - filter: time_throttle
+        window_size: "00:01"
+  - platform: filter
     name: office_presence_sensor_illuminance_filtered
     unique_id: office_presence_sensor_illuminance_filtered
     entity_id: sensor.office_presence_sensor_illuminance

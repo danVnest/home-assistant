@@ -229,8 +229,9 @@ automation:
             {% set frozen_entities_10_minute_check_entities =
                 [
                   states.sensor.outside_apparent_temperature,
-                  states.sensor.bedroom_presence_sensor_esp_temperature,
                   states.sensor.kitchen_presence_sensor_esp_temperature,
+                  states.sensor.living_room_presence_sensor_esp_temperature,
+                  states.sensor.bedroom_presence_sensor_esp_temperature,
                   states.sensor.nursery_presence_sensor_esp_temperature,
                   states.sensor.office_presence_sensor_esp_temperature,
                   states.sensor.smart_meter_real_power,
