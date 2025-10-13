@@ -27,6 +27,7 @@ appdaemon/logs
 *.db
 *.db-shm
 *.db-wal
+.ha_run.lock
 .ruff_cache
 __pycache__
 appdaemon/compiled
