@@ -167,7 +167,9 @@ command_line:
       - entities
     value_template: "{{ value_json.entities | length }}"
     command: "jq '.data.entities |= map(select(.disabled_by? != null) | {entity_id: .entity_id}) | del(.data.deleted_entities) | flatten | .[3]' < .storage/core.entity_registry"
-    scan_interval: 300
+    scan_interval: 999999999
+    unit_of_measurement: entities
+    state_class: measurement
 
 automation:
   - alias: Update device issue and battery groups
@@ -177,25 +179,30 @@ automation:
     max_exceeded: silent
     triggers:
       - trigger: event
-        event_type: call_service
-        event_data:
-          domain: group
-          service: reload
+        event_type:
+          - homeassistant_started
+          - event_group_reloaded
       - trigger: time_pattern
         minutes: "/5"
     actions:
+      - action: homeassistant.update_entity
+        target:
+          entity_id: sensor.disabled_entities
       - action: group.set
         data:
           object_id: unavailable_entities
           entities: >
             {% set allowed_entities = [
               'sensor.power_meter_relative_self_consumption',
+              'sensor.tv_state',
             ] + integration_entities('iBeacon Tracker') +
             integration_entities('netgear')|select('search', '_ssid$')|list
             %}
             {% set unknown_allowed_entities =
                 [
-                    states.sensor.extreme_forecast,
+                  states.sensor.power_meter_real_energy_produced_compensation,
+                  states.binary_sensor.electricity_demand_window,
+                  states.sensor.extreme_forecast,
                 ]
                 |selectattr('state', 'eq', 'unknown')
                 |map(attribute='entity_id')|list
@@ -210,7 +217,7 @@ automation:
                 |selectattr('last_changed', 'ge', (now().timestamp() - long_delay_hours*60*60)|as_datetime)
                 |map(attribute='entity_id')|list
             %}
-            {% set disabled_entities = state_attr('sensor.disabled_device_entities', 'entities')
+            {% set disabled_entities = state_attr('sensor.disabled_entities', 'entities')
                 |regex_replace(find='\[|\]|\{|\}|\'entity_id\':', replace='')
                 |map(attribute='entity_id')|list
             %}
