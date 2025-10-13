@@ -23,7 +23,8 @@ influxdb:
   max_retries: 3
   include:
     entity_globs:
-      - sensor.*energy_cost_*last*
+      - sensor.*energy_cost
+      - sensor.*energy_cost_savings
 logbook:
 mobile_app:
 my:
