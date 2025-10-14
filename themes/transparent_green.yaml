@@ -64,6 +64,8 @@ Transparent Green:
   button-border-manual: 1.5px solid grey #
   button-border-error: 1.5px solid red #
   button-border-info: 1.5px solid var(--accent-color)
+  wa-color-brand-fill-normal: var(--button-color)
+  wa-color-brand-on-normal: var(--primary-color)
   # Switches
   switch-checked-button-color: var(--primary-text-color)
   switch-unchecked-button-color: var(--primary-text-color)
