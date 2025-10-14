@@ -8,8 +8,8 @@
       "background": "var(--background-image)",
       "views": [
         {
-          "title": "Dashboards",
-          "path": "dashboards",
+          "title": "Overview",
+          "path": "overview",
           "icon": "mdi:home-assistant",
           "sections": [
             {
@@ -74,7 +74,7 @@
                   "card_mod": {
                     "style": {
                       "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
-                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Empty since';\n}\n"
+                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Since';\n}\n"
                     }
                   }
                 },
@@ -296,7 +296,7 @@
                       ]
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-sub-button-name-container').innerText = (hass.states['input_boolean.pets_home_alone'].state === 'on' ? 'Pets home alone' : 'Pets not detected')}",
+                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n}\n${card.querySelector('.bubble-sub-button-name-container').innerText = (hass.states['input_boolean.pets_home_alone'].state === 'on' ? 'Pets home alone' : 'Pets not detected')}",
                   "modules": [
                     "scene_state_text_and_icon"
                   ]
@@ -337,7 +337,7 @@
                       ]
                     }
                   ],
-                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button {\n  white-space: pre;\n  text-transform: none;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_bedroom'].state === 'on' ? 'Napping' : 'Not napping'}\";\n} .bubble-sub-button-2 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_nursery'].state === 'on' ? 'Napping' : 'Not napping'}\";\n}\n",
+                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button {\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_bedroom'].state === 'on' ? 'Napping' : 'Not napping'}\";\n} .bubble-sub-button-2 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_nursery'].state === 'on' ? 'Napping' : 'Not napping'}\";\n}\n",
                   "modules": [
                     "normalised_sub_button_size",
                     "scene_state_text_and_icon"
@@ -393,10 +393,17 @@
                       "hold_action": {
                         "action": "navigate",
                         "navigation_path": "/lovelace/presence"
-                      }
+                      },
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "sensor.security_monitoring",
+                          "state_not": "off"
+                        }
+                      ]
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
                   "modules": [
                     "normalised_sub_button_size"
                   ]
@@ -591,13 +598,14 @@
                   "sub_button": [
                     {
                       "entity": "sensor.dry_plants",
-                      "show_state": true,
-                      "show_background": false
+                      "show_background": false,
+                      "show_attribute": true,
+                      "attribute": "text"
                     },
                     {
                       "entity": "sensor.plants_last_watered",
-                      "show_state": true,
-                      "show_background": false
+                      "show_background": false,
+                      "show_state": true
                     }
                   ],
                   "visibility": [
@@ -607,14 +615,14 @@
                       "state": "on"
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.dry_plants'].state + '% are dry' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = 'Watered ' + hass.states['sensor.plants_last_watered'].state }\n",
                   "modules": [
                     "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
                     "color": "blue"
-                  }
+                  },
+                  "styles": "${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = \"watered \" + (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const seconds = Math.round((new Date() - new Date(hass.states['sensor.plants_last_watered'].state)) / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  const hours = Math.round(minutes / 60);\n  if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');\n  return rtf.format(-Math.round(hours / 24), 'day');\n})()}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1301,18 +1309,18 @@
                   "card_layout": "large-2-rows",
                   "sub_button": [
                     {
-                      "entity": "sensor.extreme_forecast_text",
+                      "entity": "sensor.extreme_forecast",
                       "icon": "mdi:thermometer",
                       "show_state": true,
                       "show_background": false
                     },
                     {
-                      "entity": "sensor.next_rain_forecast_text",
+                      "entity": "sensor.next_rain_forecast",
                       "show_state": true,
                       "show_background": false
                     }
                   ],
-                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n",
+                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.extreme_forecast'].attributes.text }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.next_rain_forecast'].attributes.text }\n",
                   "modules": [
                     "normalised_sub_button_size",
                     "colorise_entities"
@@ -1326,15 +1334,15 @@
                   "entity": "sensor.weighted_average_inside_apparent_temperature",
                   "tap_action": {
                     "action": "navigate",
-                    "navigation_path": "#weather"
+                    "navigation_path": "/lovelace/climate"
                   },
                   "double_tap_action": {
                     "action": "navigate",
-                    "navigation_path": "#weather"
+                    "navigation_path": "/lovelace/climate"
                   },
                   "hold_action": {
                     "action": "navigate",
-                    "navigation_path": "#weather"
+                    "navigation_path": "/lovelace/climate"
                   },
                   "card_layout": "large-2-rows",
                   "sub_button": [
@@ -1402,8 +1410,11 @@
                           "icon": "mdi:refresh",
                           "show_background": false,
                           "tap_action": {
-                            "action": "call-service",
-                            "service": "group.reload"
+                            "action": "perform-action",
+                            "perform_action": "automation.trigger",
+                            "target": {
+                              "entity_id": "automation.update_device_issue_and_battery_groups"
+                            }
                           }
                         }
                       ],
@@ -1422,11 +1433,6 @@
                     },
                     {
                       "type": "tile",
-                      "entity": "binary_sensor.internet",
-                      "name": "Internet is disconnected - reconnect to fix issues",
-                      "state_content": "last_changed",
-                      "icon": "mdi:close-network",
-                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
                       "visibility": [
                         {
                           "condition": "state",
@@ -1434,6 +1440,13 @@
                           "state_not": "on"
                         }
                       ],
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected - reconnect to fix issues",
+                      "icon": "mdi:close-network",
+                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
+                      "state_content": "last_changed",
+                      "vertical": false,
+                      "features_position": "bottom",
                       "card_mod": {
                         "style": {
                           "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
@@ -1456,7 +1469,7 @@
                         "type": "entities"
                       },
                       "filter": {
-                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_entities if frozen_entities is not none else [])\n  )[:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
                       }
                     },
                     {
@@ -1468,7 +1481,7 @@
                         "refresh_interval": 0
                       },
                       "filter": {
-                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else []) +\n    (frozen_entities if frozen_entities is not none else [])\n  )[:15]\n}}\n"
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
                       }
                     }
                   ]
@@ -1490,8 +1503,11 @@
                           "icon": "mdi:refresh",
                           "show_background": false,
                           "tap_action": {
-                            "action": "call-service",
-                            "service": "group.reload"
+                            "action": "perform-action",
+                            "perform_action": "automation.trigger",
+                            "target": {
+                              "entity_id": "automation.update_device_issue_and_battery_groups"
+                            }
                           }
                         }
                       ],
@@ -1622,8 +1638,11 @@
                           "icon": "mdi:refresh",
                           "show_background": false,
                           "tap_action": {
-                            "action": "call-service",
-                            "service": "group.reload"
+                            "action": "perform-action",
+                            "perform_action": "automation.trigger",
+                            "target": {
+                              "entity_id": "automation.update_device_issue_and_battery_groups"
+                            }
                           }
                         }
                       ],
@@ -2497,7 +2516,7 @@
             {
               "type": "markdown",
               "title": "Nursery camera alerts",
-              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% if alerts %}\n{% for alert in alerts %}\n| **{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}** | \n  {{ as_timestamp(alert['created']) | timestamp_custom('%Y-%m-%d %H:%M', true) }} | \n  {% if alert['image'] %}![img]({{ alert['image'] }}){% else %}-{% endif %} |\n{% endfor %}\n{% else %}\n_No recent alerts_\n{% endif %}\n"
+              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% if alerts %}\n{% for alert in alerts %}\n**{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}**\n  {{ as_timestamp(alert['created']) | timestamp_custom('%Y-%m-%d %H:%M', true) }}\n  {% if alert['image'] %}![img]({{ alert['image'] }}){% else %}-{% endif %}\n{% endfor %}\n{% else %}\n_No recent alerts_\n{% endif %}\n"
             },
             {
               "type": "history-graph",
@@ -2527,8 +2546,12 @@
                   "name": "Back deck"
                 },
                 {
-                  "entity": "binary_sensor.living_room_motion_detected",
+                  "entity": "binary_sensor.living_room_presence_sensor_occupancy",
                   "name": "Living room"
+                },
+                {
+                  "entity": "binary_sensor.living_room_motion_detected",
+                  "name": "Living room camera"
                 },
                 {
                   "entity": "binary_sensor.dining_room_multisensor_motion",
@@ -2603,8 +2626,12 @@
                   "name": "Back deck"
                 },
                 {
-                  "entity": "binary_sensor.living_room_motion_detected",
+                  "entity": "binary_sensor.living_room_presence_sensor_occupancy",
                   "name": "Living room"
+                },
+                {
+                  "entity": "binary_sensor.living_room_motion_detected",
+                  "name": "Living room camera"
                 },
                 {
                   "entity": "binary_sensor.dining_room_multisensor_motion",
@@ -2797,7 +2824,10 @@
                   "min_expected_power": 0.01,
                   "watt_threshold": 1000,
                   "transparency_zero_lines": 0,
-                  "disable_dots": false
+                  "disable_dots": false,
+                  "card_mod": {
+                    "style": "#battery-state-of-charge-text::after {\n  content: \" {{ (states['sensor.battery_time_remaining'].state|int(0)|string + 'h') if states['sensor.battery_time_remaining'].state|float(1) >= 1 else ((states['sensor.battery_time_remaining'].state|float * 60)|round|string + 'm') }}\";\n}\n"
+                  }
                 },
                 {
                   "type": "custom:auto-entities",
@@ -3270,6 +3300,17 @@
                   ]
                 },
                 {
+                  "type": "tile",
+                  "entity": "sensor.plants_last_watered",
+                  "features_position": "bottom",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  },
+                  "vertical": false,
+                  "icon": "mdi:watering-can"
+                },
+                {
                   "type": "custom:auto-entities",
                   "card": {
                     "type": "glance",
@@ -3388,6 +3429,14 @@
                   "icon": "mdi:sprout"
                 },
                 {
+                  "type": "tile",
+                  "entity": "sensor.last_rained",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": 1
+                  }
+                },
+                {
                   "type": "entities",
                   "title": "Watering",
                   "show_header_toggle": false,
@@ -3436,7 +3485,7 @@
                 },
                 {
                   "type": "markdown",
-                  "content": "These garden areas are watered automatically based on prior, current, and forecast weather conditions, as well as watering history, soil, and plant type.\n\nIn addition, you can manually water garden sections with the buttons above if you think it is necessary. Each manual watering session lasts for ≈10 minutes. It's best not to water more than one section at once as the water pressure is reduced (so not all plants will get enough water). You can also toggle automatic watering and rain delays below. A rain delay will delay automatic watering for 1 day.\n\nTo ensure adequate watering without wastage, it is recommended to periodically check the following:\n\n- move the lawn sprinkler to cover drier parts of the lawn\n- the plants look healthy and their soil feels sufficiently moist in each section\n- the taps to the automatic watering controllers are fully on\n- there are no leaks at the taps or connections to the watering controllers\n\nUnfortunately some of these controls can get stuck (e.g. watering buttons will stay on once they've finished, or pressed buttons will immediately revert and ignore the command). In these cases, you'll need to open the b-hyve app to make everything sync and work again."
+                  "content": "These garden areas are watered automatically based on prior, current, and forecast weather conditions, as well as watering history, soil, and plant type.\n\nIn addition, you can manually water garden sections with the switches above if you think it is necessary. Each manual watering session lasts for ≈10 minutes. It's best not to water more than one section at a time as this reduces the water pressure and not all plants will get watered properly. You can also toggle automatic watering and rain delays below. Rain delays will delay automatic watering for at least one day.\n\nTo ensure adequate watering without wastage, it is recommended to periodically check the following:\n\n- move the lawn sprinkler to cover drier parts of the lawn\n- the plants look healthy and their soil feels sufficiently moist in each section\n- the taps leading to the automatic watering controllers are fully on\n- there are no leaks at the taps or connections to the watering controllers"
                 },
                 {
                   "type": "entities",
@@ -3538,7 +3587,7 @@
                   },
                   "card_mod": {
                     "style": {
-                      "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}\np:nth-of-type(6) span {\n  text-shadow: 0px 0px 2px green;\n}"
+                      "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}\np:nth-of-type(2) span {\n  text-shadow: 0px 0px 2px green;\n}"
                     }
                   }
                 }

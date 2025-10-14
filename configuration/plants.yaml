@@ -4,11 +4,11 @@ template:
         unique_id: plants_need_watering
         state: >
           {{
-            states('input_datetime.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=10) or
+            states('sensor.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=10) or
             states('sensor.dry_plants')|int > 0
           }}
         icon: mdi:watering-can
-        availability: "{{ has_value('input_datetime.plants_last_watered') and has_value('sensor.dry_plants') }}"
+        availability: "{{ has_value('sensor.plants_last_watered') and has_value('sensor.dry_plants') }}"
   - sensor:
       - name: Dry plants
         unique_id: dry_plants
@@ -26,6 +26,8 @@ template:
            {{- (100 * sensors|select('is_state', 'off')|list|count / sensors|count)|round -}}
         unit_of_measurement: "%"
         icon: mdi:grass
+        attributes:
+          text: "{{ this.state|string + '% are dry'}}"
         availability: >
           {{
             has_value('binary_sensor.soil_moist_entryway') and
@@ -37,11 +39,6 @@ template:
             has_value('binary_sensor.soil_moist_bathroom') and
             has_value('binary_sensor.soil_moist_office')
           }}
-      - name: Plants last watered
-        unique_id: plants_last_watered
-        state: "{{ states('input_datetime.plants_last_watered')|as_datetime|time_since + ' ago'}}"
-        icon: mdi:clock
-        availability: "{{ has_value('input_datetime.plants_last_watered') }}"
 
       - name: Front and back side days since watered
         unique_id: front_and_back_side_days_since_watered
@@ -78,6 +75,22 @@ template:
         state_class: total_increasing
         icon: mdi:clock
         availability: "{{ has_value('sensor.lawn_last_watered') }}"
+
+  - triggers:
+      - trigger: state
+        entity_id: sensor.dry_plants
+        to: "0"
+        not_from:
+          - "0"
+          - "unknown"
+          - "unavaiable"
+          - none
+    sensor:
+      - name: Plants last watered
+        unique_id: plants_last_watered
+        state: "{{ now() }}"
+        device_class: timestamp
+        icon: mdi:clock
 
 binary_sensor:
   - platform: threshold
@@ -128,29 +141,3 @@ binary_sensor:
     upper: 30
     hysteresis: 5
     device_class: moisture
-
-input_datetime:
-  plants_last_watered:
-    name: Plants last watered
-    has_date: true
-    has_time: true
-    icon: mdi:clock
-
-automation:
-  - alias: Reset plants last watered
-    id: reset_plants_last_watered
-    triggers:
-      trigger: state
-      entity_id: sensor.dry_plants
-      to: "0"
-      not_from:
-        - "0"
-        - "unknown"
-        - "unavaiable"
-        - none
-    actions:
-      - action: input_datetime.set_datetime
-        target:
-          entity_id: input_datetime.plants_last_watered
-        data:
-          datetime: "{{ now() }}"

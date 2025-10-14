@@ -25,6 +25,26 @@ template:
         device_class: temperature
         state_class: measurement
         icon: mdi:sun-thermometer-outline
+        attributes:
+          hours_until: >
+            {%- if has_value('sensor.extreme_forecast') -%}
+              {%- for hour in ['2','4','6','8','10'] -%}
+                {%- if states('sensor.outside_apparent_temperature_' + hour + 'h_forecast') == this.state -%}
+                  {{- hour -}}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+            {%- else -%}
+              {{- this.state -}}
+            {%- endif -%}
+          text: >
+            {%- if has_value('sensor.extreme_forecast') -%}
+              {{- this.state|float|round(1)|string + '°C in ' + this.attributes.hours_until|string + ' hours' -}}
+            {%- elif this.state == 'unknown' -%}
+              Nice for 10 hours
+            {%- else -%}
+              Extreme forecast unavailable
+            {%- endif -%}
         availability: >
           {{ 
             has_value('sensor.outside_apparent_temperature_2h_forecast') and
@@ -35,43 +55,53 @@ template:
             has_value('input_number.high_temperature_aircon_trigger') and
             has_value('input_number.low_temperature_aircon_trigger')
           }}
-      - name: Extreme forecast text
-        unique_id: extreme_forecast_text
-        state: >
-          {%- set extreme = states('sensor.extreme_forecast') -%}
-          {%- if has_value('sensor.extreme_forecast') -%}
-            {%- for hour in ['2','4','6','8','10'] -%}
-              {%- if states('sensor.outside_apparent_temperature_' + hour + 'h_forecast') == extreme -%}
-                {{- extreme|round(1)|string + " °C in " + hour + " hours" -}}
-                {%- break -%}
-              {%- endif -%}
-            {%- endfor -%}
-          {%- elif extreme == "unknown" -%}
-            nice for 10 hours
-          {%- else -%}
-            extreme forecast unavailable
-          {%- endif -%}
-        icon: mdi:sun-thermometer-outline
-      - name: Next rain forecast text
-        unique_id: next_rain_forecast_text
+      - name: Next rain forecast
+        unique_id: next_rain_forecast
         state: >
           {%- if states('sensor.weather_station_precipitation_intensity')|float(0) > 0.1 -%}
-            raining now
+            0
           {%- else -%}
             {%- set hours = ['1h','2h','3h','4h','5h','6h','7h','8h','9h','10h','11h','12h','13h','14h','15h','16h','17h','18h','19h','20h','21h','22h', '23h'] -%}
             {%- set days = ['1d','2d','3d','4d','5d','6d','7d'] -%}
-            {%- set var = namespace(rain_in = 'no rain for 7 days') -%}
+            {%- set var = namespace(rain_in = 168) -%}
             {%- for time in hours + days -%}
               {%- set probability_sensor = 'sensor.pirateweather_precip_probability_' + time -%}
               {%- set intensity_sensor = 'sensor.pirateweather_precip_intensity_' + time -%}
               {%- if not (has_value(probability_sensor) and has_value(intensity_sensor)) -%}
-                {%- set var.rain_in = "rain forecast unavailable" -%}
+                {%- set var.rain_in = None -%}
                 {%- break -%}
               {%- elif states(probability_sensor)|float > 0 and states(intensity_sensor)|float > 0.1 -%}
-                {%- set var.rain_in = "rain in " + time[:-1] + (" hour" if time[-1] == 'h' else " day") + ("s" if time[:-1] != "1" else "") -%}
+                {%- set var.rain_in = time[:-1]|float * (24 if time[-1] == 'd' else 1) -%}
                 {%- break -%}
               {%- endif -%}
             {%- endfor -%}
             {{- var.rain_in -}}
           {%- endif -%}
+        unit_of_measurement: h
+        device_class: duration
+        state_class: measurement
         icon: "{{ 'mdi:weather-rainy' if states('sensor.next_rain_forecast_text') != 'no rain for 7 days' else 'mdi:weather-sunny' }}"
+        attributes:
+          text: >
+            {%- if not has_value('sensor.next_rain_forecast') -%}
+              Rain forecast unavailable
+            {%- elif this.state|int(1) == 0 -%}
+              Raining now
+            {%- elif this.state|int == 168 -%}
+              No rain for 7 days
+            {%- else -%}
+              {{- 'Rain in ' + ((this.state|int|string + ' hour') if this.state|float < 24 else (this.state|int|string + ' day')) + ('s' if this.state|int not in (1, 24) else '') -}}
+            {%- endif -%}
+  - triggers:
+      - trigger: state
+        entity_id: sensor.next_rain_forecast
+        to: "0"
+      - trigger: state
+        entity_id: sensor.next_rain_forecast
+        from: "0"
+    sensor:
+      - name: Last rained
+        unique_id: last_rained
+        state: "{{ now() }}"
+        device_class: timestamp
+        icon: mdi:weather-rainy
