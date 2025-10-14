@@ -3,7 +3,7 @@ modules:
   home-assistant-default:
     id: home-assistant-default
     name: Home Assistant default styling
-    version: v1.7
+    version: v1.8
     creator: Clooos
     supported:
       - button
@@ -79,10 +79,6 @@ modules:
 
       .bubble-sub-button {
           border: 0px solid transparent !important;
-      }
-
-      .bubble-select.bubble-wrapper {
-          margin: 0 -2px;
       }
 
       .large .bubble-icon-container {
@@ -295,9 +291,9 @@ modules:
             color = typeof getColor === "function" ? getColor(entity) : defaultColor(entity);
           }
           if (entityType === "sensor") {
-            button.querySelector('.bubble-sub-button-icon').style.color = color; // + ' !important';
+            button.querySelector('.bubble-sub-button-icon').style.color = color;
           } else {
-            button.style.backgroundColor = color; // TODO:  + ' !important'?
+            button.style.backgroundColor = color;
             if (color.startsWith("hsl")) {
               if (parseInt(color.split(',').pop().slice(1, -2)) > 65) {
                 button.style.color = "var(--button-color-active)";
@@ -337,22 +333,20 @@ modules:
         
         const sensorColor = (sensor) => {
           let baseColor = "var(--light-primary-color)";
-          let color = "var(--warm-color)";
-          let percentage = ((parseFloat(sensor.state) - 21) / 5) * 100;
-          if (percentage < 0) {
-            color = "var(--cold-color)";
-            percentage *= -1;
-          } else if (percentage > 100) {
-            percentage -= 100;
-            baseColor = "var(--warm-color)";
-            color = "var(--hot-color)";
+          if (sensor.attributes["device_class"] === "temperature") {
+            let color = "var(--warm-color)";
+            let percentage = ((parseFloat(sensor.state) - 21) / 5) * 100;
+            if (percentage < 0) {
+              color = "var(--cold-color)";
+              percentage *= -1;
+            } else if (percentage > 100) {
+              percentage -= 100;
+              baseColor = "var(--warm-color)";
+              color = "var(--hot-color)";
+            }
+            percentage = Math.min(100, Math.round(percentage));
+            return `color-mix(in srgb, var(--light-primary-color), color-mix(in srgb, ${baseColor}, ${color} ${percentage}%))`;
           }
-          percentage = Math.min(100, Math.round(percentage));
-          return `color-mix(in srgb, var(--light-primary-color), color-mix(in srgb, ${baseColor}, ${color} ${percentage}%))`;
-          // get unit?
-          // unit_of_measurement or device_class can be used to determine the sensor's type and select an appropriate color.
-          // For example, temperature sensors might use a gradient from blue to red, humidity sensors could use blue shades, etc.
-          // Future implementation could check sensor.device_class or sensor.unit_of_measurement to assign colors accordingly.
         };
         
         const groupColor = (group) => {
@@ -414,7 +408,7 @@ modules:
           card.querySelector(".bubble-icon-container").style.setProperty("background", (colors.every((color) => color === "") ? "var(--bubble-sub-button-background-color)" : averageColor(colors)), "important");
           card.querySelector(".bubble-main-icon").style.color = "var(--button-color)";
         } else if (entity.includes("temperature")) {
-          card.querySelector(".bubble-main-icon").style.color = sensorColor(hass.states[entity]); // TODO:  + ' !important'?
+          card.querySelector(".bubble-main-icon").style.color = sensorColor(hass.states[entity]);
         }
       })()}
     editor: ""
@@ -431,7 +425,7 @@ modules:
   icon_border_progress:
     id: icon_border_progress
     name: Icon Border Progress
-    version: v1.4.1
+    version: v1.7.0
     creator: lsmarsden
     link: https://github.com/Clooos/Bubble-Card/discussions/1525
     supported:
@@ -448,6 +442,8 @@ modules:
               Forked from <a href="https://github.com/Clooos/Bubble-Card/discussions/1296" target="_blank">Nick's module</a>.
 
               This module adds the ability to show progress of an entity via icon borders. If using a custom border-radius please make sure you define --bubble-icon-border-radius for this to work correctly.
+
+              Also supports timers!
           </p>
 
           <p>
@@ -465,29 +461,33 @@ modules:
 
       const getState = (input, fallbackToRaw = true) => {
         if (input == null) return undefined;
-        if (typeof input !== "string" && typeof input !== "object") return input;
+        if (typeof input !== "string" && typeof input !== "object") return fallbackToRaw ? input : undefined;
 
+        const entityDetails = parseEntity(input);
+        const stateObj = hass.states[entityDetails.entityId];
+
+        if (!stateObj) return fallbackToRaw ? input : undefined;
+
+        return entityDetails.attribute ? stateObj.attributes[entityDetails.attribute] : stateObj.state;
+      };
+
+
+      const parseEntity = (input) => {
         let entityId, attribute;
-
-        if (typeof input === "object") {
+        if (typeof input === "object" && input !== null) {
           entityId = input.entity_id || input.entity;
           attribute = input.attribute || input.att;
-        } else {
+        }
+        if (typeof input === "string") {
           // Pattern: entity_id[attribute]
           const match = input.match(/^([A-z0-9_.]+)\[([A-z0-9_]+)]$/);
           if (match) {
             [, entityId, attribute] = match;
-          } else if (hass.states[input]) {
-            entityId = input;
           } else {
-            return fallbackToRaw ? input : undefined;
+            entityId = input;
           }
         }
-
-        const stateObj = hass.states[entityId];
-        if (!stateObj) return fallbackToRaw ? input : undefined;
-
-        return attribute ? stateObj.attributes[attribute] : stateObj.state;
+        return { entityId, attribute };
       };
 
 
@@ -914,6 +914,140 @@ modules:
       }
 
 
+      const getAttributes = (input) => {
+        if (input == null) return undefined;
+        if (typeof input !== "string" && typeof input !== "object") return undefined;
+
+        const entityDetails = parseEntity(input);
+        const stateObj = hass.states[entityDetails.entityId];
+
+        if (!stateObj) return undefined;
+        return stateObj.attributes || {};
+      };
+
+
+      const getDomain = (input) => {
+        if (input == null) return undefined;
+        if (typeof input !== "string" && typeof input !== "object") return undefined;
+
+        const entityDetails = parseEntity(input);
+        return entityDetails.entityId ? entityDetails.entityId.split(".")[0] : undefined;
+      };
+
+
+      function parseHHMMSSToSeconds(timeString) {
+        if (!timeString || typeof timeString !== "string") return 0;
+
+        const parts = timeString.split(":");
+        if (parts.length !== 3) return 0;
+
+        const [hours, minutes, seconds] = parts.map(Number);
+        if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) return 0;
+
+        return hours * 3600 + minutes * 60 + seconds;
+      }
+
+
+      function calculateProgressValue(progressSource, progressOptions = { start:
+      0, end: 100 }) {
+        // Check if this is a timer entity
+        const domain = getDomain(progressSource);
+        if (domain === "timer") {
+          return calculateTimerProgress(progressSource);
+        }
+
+        // Existing numeric progress calculation
+        let progressValue = parseFloat(getState(progressSource));
+        let startValue = parseFloat(getState(progressOptions.start));
+        let endValue = parseFloat(getState(progressOptions.end));
+
+        startValue = isNaN(startValue) ? 0 : startValue;
+        endValue = isNaN(endValue) ? 100 : endValue;
+
+        if (isNaN(progressValue) || progressValue < startValue) {
+          progressValue = startValue;
+        }
+        if (progressValue > endValue) {
+          progressValue = endValue;
+        }
+
+        return ((progressValue - startValue) / (endValue - startValue)) * 100;
+      }
+
+
+      function calculateTimerProgress(timer) {
+        const timerState = getState(timer);
+        const attributes = getAttributes(timer);
+
+        if (!timerState || !attributes) {
+          return 0;
+        }
+
+        if (timerState === "active") {
+          // Calculate progress based on current time, duration, and finishes_at
+          const duration = attributes.duration;
+          const finishesAt = attributes.finishes_at;
+
+          if (!duration || !finishesAt) return 0;
+
+          const durationSeconds = parseHHMMSSToSeconds(duration);
+          const finishTime = new Date(finishesAt);
+          const currentTime = new Date();
+
+          if (durationSeconds === 0) return 0;
+
+          // Calculate remaining time and then elapsed time
+          const remainingSeconds = (finishTime.getTime() - currentTime.getTime()) / 1000;
+          const elapsedSeconds = durationSeconds - remainingSeconds;
+
+          // Clamp between 0 and 100%
+          return Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100));
+        } else if (timerState === "paused") {
+          // Calculate progress based on duration and remaining
+          const duration = attributes.duration;
+          const remaining = attributes.remaining;
+
+          if (!duration || !remaining) return 0;
+
+          const durationSeconds = parseHHMMSSToSeconds(duration);
+          const remainingSeconds = parseHHMMSSToSeconds(remaining);
+
+          if (durationSeconds === 0) return 0;
+
+          const elapsedSeconds = durationSeconds - remainingSeconds;
+          return Math.max(0, Math.min(100, (elapsedSeconds / durationSeconds) * 100));
+        }
+
+        // All other states (idle, finished, etc.) return 0
+        return 0;
+      }
+
+
+      function isActiveTimer(progressSource) {
+        return isTimerEntity(progressSource) && getState(progressSource) === "active";
+      }
+
+
+      function isTimerEntity(progressSource) {
+        return getDomain(progressSource) === "timer";
+      }
+
+
+      function manageTimerUpdater(element, progressSource, updateFn) {
+        const hasUpdater = !!element.dataset.progress_update_interval;
+        const shouldHaveUpdater = isActiveTimer(progressSource);
+
+        if (shouldHaveUpdater && !hasUpdater) {
+          element.dataset.progress_update_interval = setInterval(updateFn, 1000);
+        }
+
+        if (!shouldHaveUpdater && hasUpdater) {
+          clearInterval(Number(element.dataset.progress_update_interval));
+          element.removeAttribute("data-progress_update_interval");
+        }
+      }
+
+
       /**
        * ======== MAIN MODULE CODE =========
        */
@@ -940,24 +1074,6 @@ modules:
           element.style.background = element.dataset.originalBackground;
 
           removeProgressBorder(element);
-        }
-
-        function calculateProgressValue(progressSource, buttonConfig) {
-          let progressValue = parseFloat(getState(progressSource));
-          let startValue = parseFloat(getState(buttonConfig.start));
-          let endValue = parseFloat(getState(buttonConfig.end));
-
-          startValue = isNaN(startValue) ? 0 : startValue;
-          endValue = isNaN(endValue) ? 100 : endValue;
-
-          if (isNaN(progressValue) || progressValue < startValue) {
-            progressValue = startValue;
-          }
-          if (progressValue > endValue) {
-            progressValue = endValue;
-          }
-
-          return ((progressValue - startValue) / (endValue - startValue)) * 100;
         }
 
         function resolveColorConfigs(buttonConfig) {
@@ -1003,41 +1119,70 @@ modules:
           });
         }
 
+        function updateProgressDisplay(progressSource, buttonConfig, buttonElement) {
+          const progressValue = calculateProgressValue(progressSource, buttonConfig);
+          const inverted = buttonConfig?.invert || false;
+          const adjustedProgress = inverted ? 100 - progressValue : progressValue;
+          const colorStops = buttonConfig.color_stops || [];
+          const progressColor = resolveColorFromStops(adjustedProgress, colorStops, buttonConfig.interpolate_colors);
+          const colors = resolveColorConfigs(buttonConfig);
+
+          applyProgressStyling(buttonElement, adjustedProgress, progressColor, colors, buttonConfig);
+        }
+
+        // group button configs by button name
+        function groupByButton(configArray) {
+          return configArray.reduce((groups, buttonConfig) => {
+            const button = buttonConfig.button;
+            if (!button) return groups;
+
+            if (!groups.has(button)) {
+              groups.set(button, []);
+            }
+            groups.get(button).push(buttonConfig);
+            return groups;
+          }, new Map());
+        }
+
         // Main processing loop
-        toArray(config).forEach((buttonConfig) => {
-          const button = buttonConfig.button;
-          if (!button) return;
-
+        groupByButton(toArray(config)).forEach((buttonConfigs, button) => {
           const selector = getElementSelector(button);
-          const element = card.querySelector(selector);
-          if (!element) return;
+          const buttonElement = card.querySelector(selector);
+          if (!buttonElement) return;
 
-          storeOriginalBackground(element);
+          storeOriginalBackground(buttonElement);
 
-          if (!checkAllConditions(buttonConfig.condition)) {
-            cleanupProgressStyling(element);
+          // Find the first configuration with matching conditions
+          const matchingConfig = buttonConfigs.find((config) => checkAllConditions(config.condition));
+
+          if (!matchingConfig) {
+            // No matching conditions found, cleanup styling
+            cleanupProgressStyling(buttonElement);
+            const updateIntervalId = buttonElement.dataset.progress_update_interval;
+            if (updateIntervalId) {
+              buttonElement.removeAttribute("data-progress_update_interval");
+              clearInterval(Number(updateIntervalId));
+            }
             return;
           }
 
           const progressSource = resolveConfig([
             {
-              config: buttonConfig,
+              config: matchingConfig,
               path: "source",
             },
             {
-              config: buttonConfig,
+              config: matchingConfig,
               path: "entity",
               metadata: { deprecated: true, replacedWith: "source" },
             },
           ]);
 
-          const progressValue = calculateProgressValue(progressSource, buttonConfig);
-          const colorStops = buttonConfig.color_stops || [];
-          const progressColor = resolveColorFromStops(progressValue, colorStops, buttonConfig.interpolate_colors);
-          const colors = resolveColorConfigs(buttonConfig);
-
-          applyProgressStyling(element, progressValue, progressColor, colors, buttonConfig);
-          applyEffects(element, buttonConfig.effects || []);
+          manageTimerUpdater(buttonElement, progressSource, () => {
+            updateProgressDisplay(progressSource, matchingConfig, buttonElement);
+          });
+          updateProgressDisplay(progressSource, matchingConfig, buttonElement);
+          applyEffects(buttonElement, matchingConfig.effects || []);
         });
       })()}
 
@@ -1113,6 +1258,11 @@ modules:
             label: ✨Source entity
             selector:
               entity: {}
+          - name: invert
+            label: Invert the progress direction
+            selector:
+              boolean:
+                default: false
           - name: condition
             label: >-
               Condition to show progress (see docs for additional condition
@@ -1201,6 +1351,11 @@ modules:
             label: ✨Source entity
             selector:
               entity: {}
+          - name: invert
+            label: Invert the progress direction
+            selector:
+              boolean:
+                default: false
           - name: condition
             label: >-
               Condition to show progress (see docs for additional condition
@@ -1295,7 +1450,9 @@ modules:
         if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');
         const minutes = Math.round(seconds / 60);
         if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');
-        return rtf.format(-Math.round(minutes / 60), 'hour');
+        const hours = Math.round(minutes / 60);
+        if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');
+        return rtf.format(-Math.round(hours / 24), 'day');
       })()}
     editor:
       - name: entity
@@ -1314,6 +1471,32 @@ modules:
       - pop-up
       - select
       - separator
-last_updated: "2025-07-23T05:38:55.470Z"
+  indicate_unavailable_entities:
+    id: indicate_unavailable_entities
+    name: Indicate unavailable entities
+    version: "1.0"
+    creator: danVnest
+    description: ""
+    code: |-
+      ${(() => {
+        for (let i = 1; i <= 99; i++) {
+          const button = card.querySelector(`.bubble-sub-button-${i}`);
+          if (!button) break;
+          const entityID = button.dataset?.entity;
+          if (!entityID || !hass.states[entityID]) entity.style.setProperty("border", "var(--button-border-error)", "important");
+        }
+      })()}
+    editor: ""
+    supported:
+      - button
+      - calendar
+      - climate
+      - cover
+      - horizontal-buttons-stack
+      - media-player
+      - pop-up
+      - select
+      - separator
+last_updated: "2025-10-14T00:59:38.808Z"
 icon: mdi:puzzle
 friendly_name: Bubble Card Modules

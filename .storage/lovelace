@@ -914,7 +914,8 @@
                   "styles": ".bubble-name-container {\n  max-width: 0px !important;\n} .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
                   "modules": [
                     "normalised_sub_button_size",
-                    "colorise_entities"
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ]
                 }
               ]
@@ -1076,7 +1077,8 @@
                   },
                   "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_aircon_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_living_room_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_dining_room_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_bedroom_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
                   "modules": [
-                    "colorise_entities"
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ]
                 },
                 {
@@ -1155,7 +1157,8 @@
                   },
                   "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_fan_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_bedroom_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_nursery_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_office_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
                   "modules": [
-                    "colorise_entities"
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ]
                 },
                 {
@@ -1220,7 +1223,8 @@
                   },
                   "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_heater_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_nursery_heater'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_office_heater'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
                   "modules": [
-                    "colorise_entities"
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ]
                 },
                 {
@@ -1285,7 +1289,8 @@
                   },
                   "styles": ".bubble-icon-container {\n  border: ${hass.states['sensor.humidifiers_status_text'].state !== 'Functional' ? 'var(--button-border-error)' : (hass.states['group.all_humidifier_control'].state == 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['sensor.bedroom_humidifier_faults'].state !== 'no faults' ? 'var(--button-border-error)' : (hass.states['input_boolean.control_bedroom_humidifier'].state === 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['sensor.nursery_humidifier_faults'].state !== 'no faults' ? 'var(--button-border-error)' : (hass.states['input_boolean.control_nursery_humidifier'].state === 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.humidifiers_status_text'].state !== \"Functional\" ? hass.states['sensor.humidifiers_status_text'].state : \"\" }\n",
                   "modules": [
-                    "colorise_entities"
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ]
                 },
                 {
