@@ -200,3 +200,9 @@ template:
         device_class: motion
         icon: mdi:door
         availability: "{{ states.binary_sensor.bedroom_balcony_door.last_changed|default != '' }}"
+      - name: Nursery door motion
+        unique_id: nursery_door_motion
+        state: "{{ now() - states.binary_sensor.nursery_door.last_changed < timedelta(seconds=30) }}"
+        device_class: motion
+        icon: mdi:door
+        availability: "{{ states.binary_sensor.nursery_door.last_changed|default != '' }}"

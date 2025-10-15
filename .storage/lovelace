@@ -379,8 +379,9 @@
                       }
                     },
                     {
-                      "entity": "sensor.security_monitoring_count_text",
-                      "show_state": true,
+                      "entity": "sensor.security_monitoring",
+                      "show_attribute": true,
+                      "attribute": "count_text",
                       "show_background": false,
                       "tap_action": {
                         "action": "navigate",
