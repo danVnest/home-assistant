@@ -90,7 +90,7 @@ template:
             {%- elif this.state|int == 168 -%}
               No rain for 7 days
             {%- else -%}
-              {{- 'Rain in ' + ((this.state|int|string + ' hour') if this.state|float < 24 else (this.state|int|string + ' day')) + ('s' if this.state|int not in (1, 24) else '') -}}
+              {{- 'Rain in ' + ((this.state|int|string + ' hour') if this.state|float < 24 else ((this.state|float / 24)|int|string + ' day')) + ('s' if this.state|int not in (1, 24) else '') -}}
             {%- endif -%}
   - triggers:
       - trigger: state
