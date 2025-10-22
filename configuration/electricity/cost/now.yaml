@@ -30,9 +30,9 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.savings_from_solar_and_battery_per_kwh') }}"
 
-      - name: Power export earnings
-        unique_id: power_export_earnings
-        state: "{{ (states('sensor.power_meter_power_grid_export')|float * states('sensor.electricity_feed_in_price')|float / 1000)|round(9) }}"
+      - name: Export power cost
+        unique_id: export_power_cost
+        state: "{{ (states('sensor.power_meter_power_grid_export')|float * states('sensor.electricity_feed_in_price')|float / -1000)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
@@ -44,11 +44,10 @@ template:
           {{
             ((states('sensor.power_meter_power_grid_import')|float * 
             states('sensor.electricity_general_price')|float) / 1000 +
-            states('sensor.electricity_provider_service_power_cost')|float -
-            states('sensor.power_export_earnings')|float
+            states('sensor.electricity_provider_service_power_cost')|float +
+            states('sensor.export_power_cost')|float
             )|round(9)
           }}
-        # TODO: this doesn't take into account controlled load pricing, but we don't have an accurate way of determining
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
@@ -57,28 +56,30 @@ template:
             has_value('sensor.power_meter_power_grid_import') and
             has_value('sensor.electricity_general_price') and
             has_value('sensor.electricity_provider_service_power_cost') and
-            has_value('sensor.power_export_earnings')
+            has_value('sensor.export_power_cost')
           }}
       - name: Total power cost savings
         unique_id: total_power_cost_savings
-        state: >
-          {{
-            (states('sensor.power_meter_power_load_consumed')|float *
-            states('sensor.savings_from_solar_and_battery_per_wh')|float +
-            states('sensor.power_export_earnings')|float -
-            states('sensor.battery_power_cost')|float
-            )|round(9)
-          }}
+        state: "{{ (states('sensor.total_excluding_battery_and_export_power_cost_savings')|float - states('sensor.export_power_cost')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: >
-          {{
-            has_value('sensor.power_meter_power_load_consumed') and
-            has_value('sensor.savings_from_solar_and_battery_per_wh') and
-            has_value('sensor.power_export_earnings') and
-            has_value('sensor.battery_power_cost')
-          }}
+        availability: "{{ has_value('sensor.total_excluding_battery_and_export_power_cost_savings') and has_value('sensor.export_power_cost') }}"
+
+      - name: Total excluding battery and export power cost
+        unique_id: total_excluding_battery_and_export_power_cost
+        state: "{{ (states('sensor.total_power_cost')|float - states('sensor.battery_power_cost')|float - states('sensor.export_power_cost')|float)|round(9) }}"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_power_cost') and has_value('sensor.battery_power_cost') and has_value('sensor.export_power_cost') }}"
+      - name: Total excluding battery and export power cost savings
+        unique_id: total_excluding_battery_and_export_power_cost_savings
+        state: "{{ ((states('sensor.power_meter_power_load_consumed')|float * states('sensor.savings_from_solar_and_battery_per_wh')|float))|round(9) }}"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.power_meter_power_load_consumed') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
 
       - name: Electricity provider service power cost
         unique_id: electricity_provider_service_power_cost
@@ -96,12 +97,6 @@ template:
             has_value('input_number.energy_cost_service') and
             has_value('input_number.energy_cost_subscription')
           }}
-      - name: Electricity provider service power cost savings
-        unique_id: electricity_provider_service_power_cost_savings
-        state: "0"
-        unit_of_measurement: $/h
-        state_class: measurement
-        icon: mdi:currency-usd
 
       - name: Battery power cost
         unique_id: battery_power_cost
@@ -110,13 +105,6 @@ template:
         state_class: measurement
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.battery_grid_charge_power') and has_value('sensor.electricity_general_price') }}"
-      - name: Battery power cost savings
-        unique_id: battery_power_cost_savings
-        state: "{{ (states('sensor.battery_solar_charge_power')|float * states('sensor.electricity_general_price')|float / 1000)|round(9) }}"
-        unit_of_measurement: $/h
-        state_class: measurement
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.battery_solar_charge_power') and has_value('sensor.electricity_general_price') }}"
 
       - name: Lights power cost
         unique_id: lights_power_cost
@@ -352,22 +340,11 @@ template:
         availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
       - name: Water heater, oven & stove, guest suite, garage, all other power cost savings
         unique_id: water_heater_oven_stove_guest_suite_garage_all_other_power_cost_savings
-        # assume water heater usage when solar available, use controlled load costs
-        state: >
-          {{
-            states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power')|float *
-            (states('sensor.electricity_controlled_load_price')|float) *
-            states('sensor.power_meter_relative_autonomy')|float / 100 / 1000
-          }}
+        state: "{{ (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power')|float * states('sensor.savings_from_solar_and_battery_per_wh')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: >
-          {{
-            has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') and
-            has_value('sensor.electricity_controlled_load_price') and
-            has_value('sensor.power_meter_relative_autonomy')
-          }}
+        availability: "{{ has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
 
       - name: Office desk, computer & monitor, cooler, fish tank power cost
         unique_id: office_desk_computer_monitor_cooler_fish_tank_power_cost

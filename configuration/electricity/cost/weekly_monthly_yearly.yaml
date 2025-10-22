@@ -5,6 +5,25 @@ sensor:
     username: homeassistant
     password: !secret influx_password
     queries:
+      - name: Export energy cost last week
+        unique_id: export_energy_cost_last_week
+        where: '"entity_id" = ''export_energy_cost'' AND time >= now() - 7d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Export energy cost last month
+        unique_id: export_energy_cost_last_month
+        where: '"entity_id" = ''export_energy_cost'' AND time >= now() - 30d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Export energy cost last year
+        unique_id: export_energy_cost_last_year
+        where: '"entity_id" = ''export_energy_cost'' AND time >= now() - 365d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+
       - name: Total energy cost last week
         unique_id: total_energy_cost_last_week
         where: '"entity_id" = ''total_energy_cost'' AND time >= now() - 7d'
@@ -877,6 +896,28 @@ sensor:
 
 template:
   - sensor:
+      - name: Export energy cost weekly
+        unique_id: export_energy_cost_weekly
+        state: "{{ (states('sensor.export_energy_cost')|float - states('sensor.export_energy_cost_last_week')|float)|round(2) -}}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.export_energy_cost') and has_value('sensor.export_energy_cost_last_week') -}}"
+      - name: Export energy cost monthly
+        unique_id: export_energy_cost_monthly
+        state: "{{ (states('sensor.export_energy_cost')|float - states('sensor.export_energy_cost_last_month')|float)|round(2) -}}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.export_energy_cost') and has_value('sensor.export_energy_cost_last_month') -}}"
+      - name: Export energy cost yearly
+        unique_id: export_energy_cost_yearly
+        state: "{{ (states('sensor.export_energy_cost')|float - states('sensor.export_energy_cost_last_year')|float)|round(2) -}}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.export_energy_cost') and has_value('sensor.export_energy_cost_last_year') -}}"
+
       - name: Total energy cost weekly
         unique_id: total_energy_cost_weekly
         state: "{{ (states('sensor.total_energy_cost')|float - states('sensor.total_energy_cost_last_week')|float)|round(2) -}}"
@@ -920,6 +961,49 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') and has_value('sensor.total_energy_cost_savings_last_year') }}"
 
+      - name: Total excluding battery and export energy cost weekly
+        unique_id: total_excluding_battery_and_export_energy_cost_weekly
+        state: "{{ (states('sensor.total_energy_cost_weekly')|float - states('sensor.battery_energy_cost_weekly')|float - states('sensor.export_energy_cost_weekly')|float)|round(2) -}}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_weekly') and has_value('sensor.battery_energy_cost_weekly') and has_value('sensor.export_energy_cost_weekly') -}}"
+      - name: Total excluding battery and export energy cost monthly
+        unique_id: total_excluding_battery_and_export_energy_cost_monthly
+        state: "{{ (states('sensor.total_energy_cost_monthly')|float - states('sensor.battery_energy_cost_monthly')|float - states('sensor.export_energy_cost_monthly')|float)|round(2) -}}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_monthly') and has_value('sensor.battery_energy_cost_monthly') and has_value('sensor.export_energy_cost_monthly') -}}"
+      - name: Total excluding battery and export energy cost yearly
+        unique_id: total_excluding_battery_and_export_energy_cost_yearly
+        state: "{{ (states('sensor.total_energy_cost_yearly')|float - states('sensor.battery_energy_cost_yearly')|float - states('sensor.export_energy_cost_yearly')|float)|round(2) -}}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_yearly') and has_value('sensor.battery_energy_cost_yearly') and has_value('sensor.export_energy_cost_yearly') -}}"
+      - name: Total excluding battery and export energy cost savings weekly
+        unique_id: total_excluding_battery_and_export_energy_cost_savings_weekly
+        state: "{{ (states('sensor.total_energy_cost_savings_weekly')|float + states('sensor.export_energy_cost_weekly')|float)|round(2) }}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_savings_weekly') and has_value('sensor.export_energy_cost_weekly') }}"
+      - name: Total excluding battery and export energy cost savings monthly
+        unique_id: total_excluding_battery_and_export_energy_cost_savings_monthly
+        state: "{{ (states('sensor.total_energy_cost_savings_monthly')|float + states('sensor.export_energy_cost_monthly')|float)|round(2) }}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_savings_monthly') and has_value('sensor.export_energy_cost_monthly') }}"
+      - name: Total excluding battery and export energy cost savings yearly
+        unique_id: total_excluding_battery_and_export_energy_cost_savings_yearly
+        state: "{{ (states('sensor.total_energy_cost_savings_yearly')|float + states('sensor.export_energy_cost_yearly')|float)|round(2) }}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost_savings_yearly') and has_value('sensor.export_energy_cost_yearly') }}"
+
       - name: Electricity provider service energy cost weekly
         unique_id: electricity_provider_service_energy_cost_weekly
         state: "{{ (states('sensor.electricity_provider_service_energy_cost')|float - states('sensor.electricity_provider_service_energy_cost_last_week')|float)|round(2) }}"
@@ -941,24 +1025,6 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.electricity_provider_service_energy_cost') and has_value('sensor.electricity_provider_service_energy_cost_last_year') }}"
-      - name: Electricity provider service energy cost savings weekly
-        unique_id: electricity_provider_service_energy_cost_savings_weekly
-        state: "0"
-        unit_of_measurement: $/h
-        state_class: measurement
-        icon: mdi:currency-usd
-      - name: Electricity provider service energy cost savings monthly
-        unique_id: electricity_provider_service_energy_cost_savings_monthly
-        state: "0"
-        unit_of_measurement: $/h
-        state_class: measurement
-        icon: mdi:currency-usd
-      - name: Electricity provider service energy cost savings yearly
-        unique_id: electricity_provider_service_energy_cost_savings_yearly
-        state: "0"
-        unit_of_measurement: $/h
-        state_class: measurement
-        icon: mdi:currency-usd
 
       - name: Battery energy cost weekly
         unique_id: battery_energy_cost_weekly
@@ -981,27 +1047,6 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.battery_energy_cost') and has_value('sensor.battery_energy_cost_last_year') }}"
-      - name: Battery energy cost savings weekly
-        unique_id: battery_energy_cost_savings_weekly
-        state: "{{ (states('sensor.battery_energy_cost_savings')|float - states('sensor.battery_energy_cost_savings_last_week')|float)|round(2) }}"
-        unit_of_measurement: $/week
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.battery_energy_cost_savings') and has_value('sensor.battery_energy_cost_savings_last_week') }}"
-      - name: Battery energy cost savings monthly
-        unique_id: battery_energy_cost_savings_monthly
-        state: "{{ (states('sensor.battery_energy_cost_savings')|float - states('sensor.battery_energy_cost_savings_last_month')|float)|round(2) }}"
-        unit_of_measurement: $/month
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.battery_energy_cost_savings') and has_value('sensor.battery_energy_cost_savings_last_month') }}"
-      - name: Battery energy cost savings yearly
-        unique_id: battery_energy_cost_savings_yearly
-        state: "{{ (states('sensor.battery_energy_cost_savings')|float - states('sensor.battery_energy_cost_savings_last_year')|float)|round(2) }}"
-        unit_of_measurement: $/year
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.battery_energy_cost_savings') and has_value('sensor.battery_energy_cost_savings_last_year') }}"
 
       - name: Lights energy cost weekly
         unique_id: lights_energy_cost_weekly

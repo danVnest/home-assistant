@@ -1,8 +1,8 @@
 sensor:
   - platform: integration
-    name: Energy export earnings
-    unique_id: energy_export_earnings
-    source: sensor.power_export_earnings
+    name: Export energy cost
+    unique_id: export_energy_cost
+    source: sensor.export_power_cost
     method: left
     max_sub_interval:
       minutes: 1
@@ -23,6 +23,21 @@ sensor:
       minutes: 1
 
   - platform: integration
+    name: Total excluding battery and export energy cost
+    unique_id: total_excluding_battery_and_export_energy_cost
+    source: sensor.total_excluding_battery_and_export_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Total excluding battery and export energy cost savings
+    unique_id: total_excluding_battery_and_export_energy_cost_savings
+    source: sensor.total_excluding_battery_and_export_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
     name: Electricity provider service energy cost
     unique_id: electricity_provider_service_energy_cost
     source: sensor.electricity_provider_service_power_cost
@@ -34,13 +49,6 @@ sensor:
     name: Battery energy cost
     unique_id: battery_energy_cost
     source: sensor.battery_power_cost
-    method: left
-    max_sub_interval:
-      minutes: 1
-  - platform: integration
-    name: Battery energy cost savings
-    unique_id: battery_energy_cost_savings
-    source: sensor.battery_power_cost_savings
     method: left
     max_sub_interval:
       minutes: 1
