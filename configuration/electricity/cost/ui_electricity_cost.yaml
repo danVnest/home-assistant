@@ -11,42 +11,47 @@ template:
         state: "{{ now() }}"
         attributes:
           template: >
-            {% set total_cost_modifier = 10 %}
-            {% set max_ratio = 3 %}
+            {% set good_earnings_per_hour = -0.5 %}
+            {% set good_cost_per_hour = 0.1 %}
+            {% set ok_cost_per_hour = 0.5 %}
+            {% set sustained_cost_hours_per_day_modifier = 3 %}
             [{% set items = [
-              {'entity': 'total', 'name': 'Total (including export earnings)', 'icon': 'home-lightning-bolt', 'state': states("sensor.total_energy_cost_weekly")|float(0)},
-              {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states("sensor.electricity_provider_service_energy_cost_weekly")|float(0)},
+              {'entity': 'total', 'name': 'Total', 'icon': 'home-lightning-bolt'},
+              {'entity': 'total_excluding_battery_and_export', 'name': 'Total (excluding battery and export)', 'icon': 'home-lightbulb'},
+              {'entity': 'export', 'name': 'Export', 'icon': 'transmission-tower-import'}] + [
+              {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states("sensor.electricity_provider_service_energy_cost_weekly")|float(0) + states("sensor.electricity_provider_service_energy_cost_savings_weekly")|float(0)},
               {'entity': 'battery', 'name': 'Battery', 'icon': 'fuel-cell', 'state': states("sensor.battery_energy_cost_weekly")|float(0)},
-              {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states("sensor.lights_energy_cost_weekly")|float(0)},
-              {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states("sensor.living_room_aircon_energy_cost_weekly")|float(0)},
-              {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'air-conditioner', 'state': states("sensor.dining_room_aircon_energy_cost_weekly")|float(0)},
-              {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'air-conditioner', 'state': states("sensor.bedroom_aircon_energy_cost_weekly")|float(0)},
-              {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'radiator', 'state': states("sensor.office_heater_energy_cost_weekly")|float(0)},
-              {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'radiator', 'state': states("sensor.nursery_heater_energy_cost_weekly")|float(0)},
-              {'entity': 'fans', 'name': 'Fans', 'icon': 'fan', 'state': states("sensor.fans_energy_cost_weekly")|float(0)},
-              {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'air-humidifier', 'state': states("sensor.humidifiers_energy_cost_weekly")|float(0)},
-              {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'kettle-pour-over', 'state': states("sensor.kitchen_appliances_energy_cost_weekly")|float(0)},
-              {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'dishwasher', 'state': states("sensor.dishwasher_energy_cost_weekly")|float(0)},
-              {'entity': 'fridge', 'name': 'Fridge', 'icon': 'fridge', 'state': states("sensor.fridge_energy_cost_weekly")|float(0)},
-              {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'fridge-industrial', 'state': states("sensor.freezer_mini_fridge_routers_energy_cost_weekly")|float(0)},
-              {'entity': 'washer', 'name': 'Washer', 'icon': 'washing-machine', 'state': states("sensor.washer_energy_cost_weekly")|float(0)},
-              {'entity': 'dryer', 'name': 'Dryer', 'icon': 'tumble-dryer', 'state': states("sensor.dryer_energy_cost_weekly")|float(0)},
-              {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, Home Assistant, router relay, security hub', 'icon': 'television', 'state': states("sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_weekly")|float(0)},
-              {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven & stove, guest suite, garage, all other', 'icon': 'water-boiler', 'state': states("sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_weekly")|float(0)},
-              {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor, cooler, fish tank', 'icon': 'desktop-tower-monitor', 'state': states("sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_weekly")|float(0)},
-              {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'cellphone-charging', 'state': states("sensor.phone_chargers_energy_cost_weekly")|float(0)},
-              {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states("sensor.sensors_energy_cost_weekly")|float(0)},
-              {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states("sensor.paludarium_picture_frame_camera_energy_cost_weekly")|float(0)},
-              {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states("sensor.standby_energy_cost_weekly")|float(0)},
+              {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states("sensor.lights_energy_cost_weekly")|float(0) + states("sensor.lights_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states("sensor.living_room_aircon_energy_cost_weekly")|float(0) + states("sensor.living_room_aircon_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'dining_room_aircon', 'name': 'Dining room aircon', 'icon': 'air-conditioner', 'state': states("sensor.dining_room_aircon_energy_cost_weekly")|float(0) + states("sensor.dining_room_aircon_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'bedroom_aircon', 'name': 'Bedroom aircon', 'icon': 'air-conditioner', 'state': states("sensor.bedroom_aircon_energy_cost_weekly")|float(0) + states("sensor.bedroom_aircon_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'office_heater', 'name': 'Office heater', 'icon': 'radiator', 'state': states("sensor.office_heater_energy_cost_weekly")|float(0) + states("sensor.office_heater_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'nursery_heater', 'name': 'Nursery heater', 'icon': 'radiator', 'state': states("sensor.nursery_heater_energy_cost_weekly")|float(0) + states("sensor.nursery_heater_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'fans', 'name': 'Fans', 'icon': 'fan', 'state': states("sensor.fans_energy_cost_weekly")|float(0) + states("sensor.fans_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'humidifiers', 'name': 'Humidifiers', 'icon': 'air-humidifier', 'state': states("sensor.humidifiers_energy_cost_weekly")|float(0) + states("sensor.humidifiers_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'kitchen_appliances', 'name': 'Kitchen appliances', 'icon': 'kettle-pour-over', 'state': states("sensor.kitchen_appliances_energy_cost_weekly")|float(0) + states("sensor.kitchen_appliances_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'dishwasher', 'name': 'Dishwasher', 'icon': 'dishwasher', 'state': states("sensor.dishwasher_energy_cost_weekly")|float(0) + states("sensor.dishwasher_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'fridge', 'name': 'Fridge', 'icon': 'fridge', 'state': states("sensor.fridge_energy_cost_weekly")|float(0) + states("sensor.fridge_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'freezer_mini_fridge_routers', 'name': 'Freezer, mini fridge, routers', 'icon': 'fridge-industrial', 'state': states("sensor.freezer_mini_fridge_routers_energy_cost_weekly")|float(0) + states("sensor.freezer_mini_fridge_routers_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'washer', 'name': 'Washer', 'icon': 'washing-machine', 'state': states("sensor.washer_energy_cost_weekly")|float(0) + states("sensor.washer_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'dryer', 'name': 'Dryer', 'icon': 'tumble-dryer', 'state': states("sensor.dryer_energy_cost_weekly")|float(0) + states("sensor.dryer_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'tv_speakers_pc_home_assistant_router_relay_security_hub', 'name': 'TV, speakers, PC, Home Assistant, router relay, security hub', 'icon': 'television', 'state': states("sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_weekly")|float(0) + states("sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'water_heater_oven_stove_guest_suite_garage_all_other', 'name': 'Water heater, oven & stove, guest suite, garage, all other', 'icon': 'water-boiler', 'state': states("sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_weekly")|float(0) + states("sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'office_desk_computer_monitor_cooler_fish_tank', 'name': 'Office desk, computer & monitor, cooler, fish tank', 'icon': 'desktop-tower-monitor', 'state': states("sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_weekly")|float(0) + states("sensor.office_desk_computer_monitor_cooler_fish_tank_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'phone_chargers', 'name': 'Phone chargers', 'icon': 'cellphone-charging', 'state': states("sensor.phone_chargers_energy_cost_weekly")|float(0) + states("sensor.phone_chargers_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states("sensor._energy_cost_weekly")|float(0) + states("sensor._energy_cost_savings_weekly")|float(0)},
+              {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states("sensor.paludarium_picture_frame_camera_energy_cost_weekly")|float(0) + states("sensor.paludarium_picture_frame_camera_energy_cost_savings_weekly")|float(0)},
+              {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states("sensor.standby_energy_cost_weekly")|float(0) + states("sensor.standby_energy_cost_savings_weekly")|float(0)},
             ]|sort(attribute='state', reverse=true) %}
             {% for item in items %}
-            {% set good_cost_per_hour = 0.01 * (total_cost_modifier if item.entity == "total" else 1) %}
-            {% set ok_cost_per_hour = 0.05 * (total_cost_modifier if item.entity == "total" else 1) %}
-            {% set bad_cost_per_hour = 0.5 * (total_cost_modifier if item.entity == "total" else 1) %}
-            {% set yearly_ratio = [states('sensor.' + item.entity + '_energy_cost_yearly')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_yearly')|float(0),0]|max+0.0001)+0.0001 %}
-            {% set monthly_ratio = [states('sensor.' + item.entity + '_energy_cost_monthly')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_monthly')|float(0),0]|max+0.0001)+0.0001 %}
-            {% set weekly_ratio = [item.state,0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_weekly')|float(0),0]|max+0.0001)+0.0001 %}
-            {% set today_ratio = [states('sensor.' + item.entity + '_energy_cost_today')|float(0),0]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_today')|float(0),0]|max+0.0001)+0.0001 %}
+            {% set bad_cost_per_hour = 1 if not item.entity.startswith("total") else 3 %}
+            {% if item.entity not in ("export", "electricity_provider_service", "battery") %}
+            {% set max_ratio = 2 if item.entity.startswith("total") else 10 %}
+            {% set yearly_ratio = [states('sensor.' + item.entity + '_energy_cost_yearly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_yearly')|float(0),0.05]|max) %}
+            {% set monthly_ratio = [states('sensor.' + item.entity + '_energy_cost_monthly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_monthly')|float(0),0.05]|max) %}
+            {% set weekly_ratio = [states('sensor.' + item.entity + '_energy_cost_weekly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_weekly')|float(0),0.05]|max) %}
+            {% set today_ratio = [states('sensor.' + item.entity + '_energy_cost_today')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_today')|float(0),0.05]|max) %}
+            {% endif %}
             {{{
               'type': 'markdown',
               'content': '<ha-icon icon="mdi:' + item.icon + '"></ha-icon>&emsp;' + item.name,
@@ -79,11 +84,11 @@ template:
                       'entity': 'sensor.' + item.entity + '_energy_cost_savings_yearly',
                       'color': 'darkgreen',
                     },
-                  ],
+                  ] if item.entity not in ("export", "electricity_provider_service", "battery") else ['sensor.' + item.entity + '_energy_cost_yearly'],
                   'hours_to_show': 240,
                   'points_per_hour': 0.05,
                   'min_bound_range': 0.5,
-                  'lower_bound': -0.1,
+                  'lower_bound' if item.entity != "export" else 'upper_bound': "~-0.1" if item.entity != "export" else "~0",
                   'update_interval': 3600,
                   'animate': true,
                   'font_size': 50,
@@ -92,10 +97,11 @@ template:
                   'group': true,
                   'align_state': 'center',
                   'color_thresholds': [
+                    { 'value': good_earnings_per_hour * sustained_cost_hours_per_day_modifier * 8760, 'color': '#713cc1ff' },
                     { 'value': 0, 'color': '#0066cc' },
-                    { 'value': good_cost_per_hour * 8760, 'color': '#c1bb3c' },
-                    { 'value': ok_cost_per_hour * 8760, 'color': '#ff8100' },
-                    { 'value': bad_cost_per_hour * 8760, 'color': '#ff4d00' },
+                    { 'value': good_cost_per_hour * sustained_cost_hours_per_day_modifier * 8760, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * sustained_cost_hours_per_day_modifier * 8760, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * sustained_cost_hours_per_day_modifier * 8760, 'color': '#ff0000ff' },
                   ],
                   'show': {
                     'icon': false,
@@ -128,11 +134,11 @@ template:
                       'entity': 'sensor.' + item.entity + '_energy_cost_savings_monthly',
                       'color': 'darkgreen',
                     },
-                  ],
+                  ] if item.entity not in ("export", "electricity_provider_service", "battery") else ['sensor.' + item.entity + '_energy_cost_monthly'],
                   'hours_to_show': 240,
                   'points_per_hour': 0.05,
                   'min_bound_range': 0.5,
-                  'lower_bound': -0.1,
+                  'lower_bound' if item.entity != "export" else 'upper_bound': "~-0.1" if item.entity != "export" else "~0",
                   'update_interval': 3600,
                   'animate': true,
                   'font_size': 50,
@@ -141,10 +147,11 @@ template:
                   'group': true,
                   'align_state': 'center',
                   'color_thresholds': [
+                    { 'value': good_earnings_per_hour * sustained_cost_hours_per_day_modifier * 720, 'color': '#713cc1ff' },
                     { 'value': 0, 'color': '#0066cc' },
-                    { 'value': good_cost_per_hour * 720, 'color': '#c1bb3c' },
-                    { 'value': ok_cost_per_hour * 720, 'color': '#ff8100' },
-                    { 'value': bad_cost_per_hour * 720, 'color': '#ff4d00' },
+                    { 'value': good_cost_per_hour * sustained_cost_hours_per_day_modifier * 720, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * sustained_cost_hours_per_day_modifier * 720, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * sustained_cost_hours_per_day_modifier * 720, 'color': '#ff0000ff' },
                   ],
                   'show': {
                     'icon': false,
@@ -177,11 +184,11 @@ template:
                       'entity': 'sensor.' + item.entity + '_energy_cost_savings_weekly',
                       'color': 'darkgreen',
                     },
-                  ],
+                  ] if item.entity not in ("export", "electricity_provider_service", "battery") else ['sensor.' + item.entity + '_energy_cost_weekly'],
                   'hours_to_show': 168,
                   'points_per_hour': 0.1,
                   'min_bound_range': 0.5,
-                  'lower_bound': -0.1,
+                  'lower_bound' if item.entity != "export" else 'upper_bound': "~-0.1" if item.entity != "export" else "~0",
                   'update_interval': 3600,
                   'animate': true,
                   'font_size': 50,
@@ -190,10 +197,11 @@ template:
                   'group': true,
                   'align_state': 'center',
                   'color_thresholds': [
+                    { 'value': good_earnings_per_hour * sustained_cost_hours_per_day_modifier * 168, 'color': '#713cc1ff' },
                     { 'value': 0, 'color': '#0066cc' },
-                    { 'value': good_cost_per_hour * 168, 'color': '#c1bb3c' },
-                    { 'value': ok_cost_per_hour * 168, 'color': '#ff8100' },
-                    { 'value': bad_cost_per_hour * 168, 'color': '#ff4d00' },
+                    { 'value': good_cost_per_hour * sustained_cost_hours_per_day_modifier * 168, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * sustained_cost_hours_per_day_modifier * 168, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * sustained_cost_hours_per_day_modifier * 168, 'color': '#ff0000ff' },
                   ],
                   'show': {
                     'icon': false,
@@ -226,11 +234,11 @@ template:
                       'entity': 'sensor.' + item.entity + '_energy_cost_savings_today',
                       'color': 'darkgreen',
                     },
-                  ],
+                  ] if item.entity not in ("export", "electricity_provider_service", "battery") else ['sensor.' + item.entity + '_energy_cost_today'],
                   'hours_to_show': max(now().hour, 1),
                   'points_per_hour': 20 / max(now().hour, 1),
                   'min_bound_range': 0.5,
-                  'lower_bound': -0.1,
+                  'lower_bound' if item.entity != "export" else 'upper_bound': "~-0.1" if item.entity != "export" else "~0",
                   'update_interval': 60,
                   'animate': true,
                   'font_size': 50,
@@ -239,10 +247,11 @@ template:
                   'group': true,
                   'align_state': 'center',
                   'color_thresholds': [
+                    { 'value': good_earnings_per_hour * sustained_cost_hours_per_day_modifier * 24, 'color': '#713cc1ff' },
                     { 'value': 0, 'color': '#0066cc' },
-                    { 'value': good_cost_per_hour * 24, 'color': '#c1bb3c' },
-                    { 'value': ok_cost_per_hour * 24, 'color': '#ff8100' },
-                    { 'value': bad_cost_per_hour * 24, 'color': '#ff4d00' },
+                    { 'value': good_cost_per_hour * sustained_cost_hours_per_day_modifier * 24, 'color': '#c1bb3c' },
+                    { 'value': ok_cost_per_hour * sustained_cost_hours_per_day_modifier * 24, 'color': '#ff8100' },
+                    { 'value': bad_cost_per_hour * sustained_cost_hours_per_day_modifier * 24, 'color': '#ff0000ff' },
                   ],
                   'show': {
                     'icon': false,
@@ -276,11 +285,11 @@ template:
                       'entity': 'sensor.' + item.entity + '_power_cost_savings',
                       'color': 'darkgreen',
                     },
-                  ],
+                  ] if item.entity not in ("export", "electricity_provider_service", "battery") else ['sensor.' + item.entity + '_power_cost'],
                   'hours_to_show': 1,
                   'points_per_hour': 20,
                   'min_bound_range': 0.5,
-                  'lower_bound': -0.1,
+                  'lower_bound' if item.entity != "export" else 'upper_bound': "~-0.1" if item.entity != "export" else "~0",
                   'update_interval': 10,
                   'animate': true,
                   'font_size': 50,
@@ -289,10 +298,11 @@ template:
                   'group': true,
                   'align_state': 'center',
                   'color_thresholds': [
+                    { 'value': good_earnings_per_hour, 'color': '#713cc1ff' },
                     { 'value': 0, 'color': '#0066cc' },
                     { 'value': good_cost_per_hour, 'color': '#c1bb3c' },
                     { 'value': ok_cost_per_hour, 'color': '#ff8100' },
-                    { 'value': bad_cost_per_hour, 'color': '#ff4d00' },
+                    { 'value': bad_cost_per_hour, 'color': '#ff0000ff' },
                   ],
                   'show': {
                     'icon': false,
@@ -319,6 +329,7 @@ template:
                 }
               ]
             }}},
+            {% if item.entity not in ("export", "electricity_provider_service", "battery") %}
             {{{
               'type': 'horizontal-stack',
               'cards': [
@@ -410,7 +421,7 @@ template:
                   'show_name': false,
                   'show_icon': false,
                   'show_units': true,
-                  'variables': { 'ratio': "[[[ return Math.max(0,parseFloat(states['sensor." + item.entity + "_power_cost'].state)) / (Math.max(0,parseFloat(entity.state)) + 0.0001) + 0.0001 ]]]" },
+                  'variables': { 'ratio': "[[[ return Math.max(0.05,parseFloat(states['sensor." + item.entity + "_power_cost'].state)) / (Math.max(0.05,parseFloat(entity.state))) ]]]" },
                   'triggers_update': [ 'sensor.' + item.entity + '_power_cost' ],
                   'styles': {
                     'card': [
@@ -426,6 +437,7 @@ template:
                 },
               ]
             }}},
+            {% endif %}
             {% if not loop.last %}
             {{{
               'type' : 'entities',
@@ -433,7 +445,7 @@ template:
                 'type': 'divider',
                 'style': {
                   'margin': '-15px -26px 0 -26px',
-                  'height': ('5' if loop.first else '1') + 'px !important',
+                  'height': ('5' if loop.index == 3 else '1') + 'px !important',
                 } 
               }],
               'card_mod': {
