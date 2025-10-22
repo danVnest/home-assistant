@@ -212,22 +212,16 @@
                   },
                   "sub_button": [
                     {
-                      "entity": "sensor.total_energy_cost_monthly",
+                      "entity": "sensor.power_meter_power_grid_import",
                       "show_state": true,
                       "show_background": false,
-                      "tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/electricity"
-                      }
+                      "icon": "mdi:home-lightning-bolt"
                     },
                     {
-                      "entity": "sensor.total_energy_cost_savings_monthly",
+                      "entity": "sensor.power_meter_power_grid_export",
                       "show_state": true,
                       "show_background": false,
-                      "tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/electricity"
-                      }
+                      "icon": "mdi:transmission-tower-import"
                     },
                     {
                       "entity": "sensor.total_power_cost",
@@ -261,18 +255,87 @@
                   ],
                   "visibility": [
                     {
-                      "condition": "numeric_state",
-                      "entity": "sensor.electricity_general_price",
-                      "above": 0.4
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.electricity_general_price",
+                          "above": 0.34
+                        },
+                        {
+                          "condition": "state",
+                          "entity": "sensor.battery_time_remaining",
+                          "state": "0"
+                        }
+                      ]
                     }
                   ],
-                  "styles": ".bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), red)\n} .bubble-sub-button-4 {\n  color: color-mix(in srgb, var(--color-mix-in-base), green)\n}\n${card.querySelector('.bubble-state').innerText = 'Minimise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.total_energy_cost_yearly'].state) + '/y spent'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.total_energy_cost_savings_yearly'].state) + '/y saved'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n${card.querySelector('.bubble-sub-button-4 .bubble-sub-button-name-container').innerText =  parseFloat(hass.states['sensor.total_power_cost_savings'].state).toFixed(2) + '/h saving'}\n${card.querySelector('.bubble-sub-button-5 .bubble-sub-button-name-container').innerText = (parseFloat(hass.states['sensor.battery_time_remaining'].state) >= 1 ? parseFloat(hass.states['sensor.battery_time_remaining'].state).toFixed(0) + 'h' : Math.round(parseFloat(hass.states['sensor.battery_time_remaining'].state) * 60) + 'm')\n + ' battery left'}\n",
+                  "styles": ".bubble-sub-button-1 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_import'].state < 500 ? 'green' : 'red'})\n} .bubble-sub-button-2 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_export'].state > 1000 ? 'green' : 'red'})\n} .bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), red)\n} .bubble-sub-button-4 {\n  color: color-mix(in srgb, var(--color-mix-in-base), green)\n}\n${card.querySelector('.bubble-state').innerText = 'Minimise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_import'].state/1000) + 'kW import'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_export'].state/1000) + 'kW export'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n${card.querySelector('.bubble-sub-button-4 .bubble-sub-button-name-container').innerText =  parseFloat(hass.states['sensor.total_power_cost_savings'].state).toFixed(2) + '/h saving'}\n${card.querySelector('.bubble-sub-button-5 .bubble-sub-button-name-container').innerText = (parseFloat(hass.states['sensor.battery_time_remaining'].state) >= 1 ? parseFloat(hass.states['sensor.battery_time_remaining'].state).toFixed(0) + 'h' : Math.round(parseFloat(hass.states['sensor.battery_time_remaining'].state) * 60) + 'm')\n + ' battery left'}\n",
                   "modules": [
                     "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
                     "color": "var(--amber-color)"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Negative power cost",
+                  "entity": "sensor.electricity_general_price",
+                  "icon": "mdi:lightning-bolt",
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/electricity"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/lovelace/electricity"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.power_meter_power_grid_import",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:home-lightning-bolt"
+                    },
+                    {
+                      "entity": "sensor.power_meter_power_grid_export",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:transmission-tower-import"
+                    },
+                    {
+                      "entity": "sensor.total_power_cost",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.battery_state_of_charge",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:fuel-cell"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.electricity_general_price",
+                      "below": 0
+                    }
+                  ],
+                  "styles": ".bubble-sub-button-1 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_import'].state > 1000 ? 'green' : 'red'})\n} .bubble-sub-button-2 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_export'].state < 100 ? 'green' : 'red'})\n} .bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.total_power_cost'].state <= 0 ? 'green' : 'red'})\n}\n${card.querySelector('.bubble-state').innerText = 'Maximise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_import'].state/1000) + 'kW import'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_export'].state/1000) + 'kW export'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n",
+                  "modules": [
+                    "normalised_sub_button_size",
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "var(--green-color)"
                   }
                 },
                 {
