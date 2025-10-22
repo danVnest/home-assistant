@@ -77,7 +77,7 @@ template:
             {%- set discharge = states('sensor.power_meter_power_battery_discharge')|float -%}
             {{-
               ((level - reserve) / 100 * states('sensor.battery_maximum_capacity')|float / 
-              [discharge if discharge > 200 else states('sensor.power_meter_power_load_consumed')|float, 1]|max)|round(2)
+              [discharge if discharge > 200 else states('sensor.power_meter_power_load_consumed')|float, 200]|max)|round(2)
             -}}
           {% endif %}
         unit_of_measurement: h
