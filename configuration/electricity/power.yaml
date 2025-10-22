@@ -321,20 +321,20 @@ template:
   - sensor:
       - name: Battery solar charge power
         unique_id: battery_solar_charge_power
-        state: "{{ states('sensor.power_meter_power_battery_charge')|float * states('sensor.power_meter_relative_autonomy')|float / 100 }}"
+        state: "{{ states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_grid_charge_power')|float }}"
         unit_of_measurement: W
         device_class: power
         state_class: measurement
         icon: mdi:battery-heart-variant
-        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.power_meter_relative_autonomy') }}"
+        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.battery_grid_charge_power') }}"
       - name: Battery grid charge power
         unique_id: battery_grid_charge_power
-        state: "{{ states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_solar_charge_power')|float }}"
+        state: "{{ [states('sensor.power_meter_power_grid_import')|float - states('sensor.power_meter_power_load_consumed')|float, 0]|max }}"
         unit_of_measurement: W
         device_class: power
         state_class: measurement
         icon: mdi:battery-charging
-        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.battery_solar_charge_power') }}"
+        availability: "{{ has_value('sensor.power_meter_power_grid_import') and has_value('sensor.power_meter_power_load_consumed') }}"
       - name: Battery consumption power
         unique_id: battery_consumption_power
         state: "{{ [states('sensor.power_meter_power_battery_discharge')|float - states('sensor.power_meter_power_grid_export')|float, 0]|max }}"
