@@ -1,14 +1,4 @@
 template:
-  - binary_sensor:
-      - name: Plants need watering
-        unique_id: plants_need_watering
-        state: >
-          {{
-            states('sensor.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=10) or
-            states('sensor.dry_plants')|int > 0
-          }}
-        icon: mdi:watering-can
-        availability: "{{ has_value('sensor.plants_last_watered') and has_value('sensor.dry_plants') }}"
   - sensor:
       - name: Dry plants
         unique_id: dry_plants
@@ -40,6 +30,29 @@ template:
             has_value('binary_sensor.soil_moist_office')
           }}
 
+  - triggers:
+      - trigger: state
+        entity_id: sensor.dry_plants
+        not_to:
+          - "unknown"
+          - "unavailable"
+      - trigger: time_pattern
+        minutes: 0
+    binary_sensor:
+      - name: Plants need watering
+        unique_id: plants_need_watering
+        state: >
+          {{
+            states('sensor.plants_last_watered')|as_datetime|as_local < now() - timedelta(days=5) or
+            states('sensor.dry_plants')|int >= 50
+          }}
+        icon: mdi:watering-can
+        availability: "{{ has_value('sensor.plants_last_watered') and has_value('sensor.dry_plants') }}"
+
+  - triggers:
+      - trigger: time_pattern
+        minutes: 0
+    sensor:
       - name: Front and back side days since watered
         unique_id: front_and_back_side_days_since_watered
         state: "{{ ((now() - states('sensor.front_and_back_side_last_watered')|as_datetime).total_seconds() / 60 / 60 / 24)|round(5) }}"
