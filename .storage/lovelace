@@ -266,6 +266,11 @@
                           "condition": "state",
                           "entity": "sensor.battery_time_remaining",
                           "state": "0"
+                        },
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.battery_export_power",
+                          "above": 500
                         }
                       ]
                     }
@@ -1428,8 +1433,8 @@
                       "show_background": false
                     },
                     {
-                      "entity": "sensor.dog_bed_area_apparent_temperature",
-                      "icon": "mdi:dog-side",
+                      "entity": "sensor.dining_room_apparent_temperature",
+                      "icon": "mdi:table-chair",
                       "show_state": true,
                       "show_background": false
                     },
@@ -2895,7 +2900,7 @@
                   "transparency_zero_lines": 0,
                   "disable_dots": false,
                   "card_mod": {
-                    "style": "#battery-state-of-charge-text::after {\n  content: \" {{ (states['sensor.battery_time_remaining'].state|int(0)|string + 'h') if states['sensor.battery_time_remaining'].state|float(1) >= 1 else ((states['sensor.battery_time_remaining'].state|float * 60)|round|string + 'm') }}\";\n}\n"
+                    "style": "#battery-state-of-charge-text::after {\n  content: \" {{ ((states['sensor.battery_time_remaining'].state|int|string + 'h') if states['sensor.battery_time_remaining'].state|float >= 1 else ((states['sensor.battery_time_remaining'].state|float * 60)|round|string + 'm')) if has_value('sensor.battery_time_remaining') else '' }}\";\n}\n"
                   }
                 },
                 {
@@ -3051,26 +3056,21 @@
                   "filter": {
                     "exclude": [
                       {
-                        "state": "<5"
+                        "state": "=0"
                       },
                       {
-                        "state": "un*"
+                        "state": "unknown"
+                      },
+                      {
+                        "state": "unavailable"
                       }
                     ]
                   },
                   "sort": {
                     "method": "state",
                     "numeric": true,
-                    "reverse": true
-                  }
-                },
-                {
-                  "type": "markdown",
-                  "content": "**Power** shows the current electricity usage across the home, while **energy** shows electricity usage over time.\nEnergy shows today’s usage by default, but you can change the day or time period using the controls shown.\n\nPower and energy is tracked in the groups shown based on sensors and logic.\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage.\n\n- *Standby*\nThe total estimated power usage of all devices in standby. This total is only shown for reference as each component’s power is already included in other groups. When the standby power drops it is because a component is no longer in standby mode.\n</details>",
-                  "card_mod": {
-                    "style": {
-                      "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
-                    }
+                    "reverse": true,
+                    "count": 12
                   }
                 }
               ],
@@ -3092,10 +3092,19 @@
                   "type": "energy-date-selection"
                 },
                 {
-                  "type": "energy-usage-graph"
+                  "type": "energy-usage-graph",
+                  "card_mod": {
+                    "style": "ha-card {\n  --chart-max-height: 150px;\n}\n"
+                  }
                 },
                 {
-                  "type": "energy-devices-detail-graph"
+                  "type": "energy-devices-detail-graph",
+                  "card_mod": {
+                    "style": {
+                      ".": "ha-card {\n  --chart-max-height: 150px;\n}",
+                      "ha-chart-base$": ".chart-legend {\n  max-height: 30px !important;\n  overflow-y: scroll !important;\n}"
+                    }
+                  }
                 }
               ],
               "column_span": 1
@@ -3141,130 +3150,6 @@
                   "type": "vertical-stack",
                   "cards": [
                     {
-                      "type": "glance",
-                      "title": "Daily averages",
-                      "entities": [
-                        {
-                          "entity": "sensor.average_daily_solar_production",
-                          "name": "Produced"
-                        },
-                        {
-                          "entity": "sensor.average_daily_energy_export",
-                          "name": "Exported"
-                        },
-                        {
-                          "entity": "sensor.average_daily_solar_storage",
-                          "name": "Solar stored"
-                        },
-                        {
-                          "entity": "sensor.average_daily_grid_storage",
-                          "name": "Grid stored"
-                        },
-                        {
-                          "entity": "sensor.average_daily_energy_consumption",
-                          "name": "Total used"
-                        },
-                        {
-                          "entity": "sensor.average_daily_solar_consumption",
-                          "name": "Solar used"
-                        },
-                        {
-                          "entity": "sensor.average_daily_battery_consumption",
-                          "name": "Battery used"
-                        },
-                        {
-                          "entity": "sensor.average_daily_grid_consumption",
-                          "name": "Grid used"
-                        },
-                        {
-                          "entity": "sensor.average_daily_total_energy_cost",
-                          "name": "Net cost"
-                        },
-                        {
-                          "entity": "sensor.average_daily_total_energy_cost_savings",
-                          "name": "Total savings"
-                        },
-                        {
-                          "entity": "sensor.average_daily_grid_cost",
-                          "name": "Grid cost"
-                        },
-                        {
-                          "entity": "sensor.average_daily_energy_export_earnings_minus_battery_charging_cost",
-                          "name": "Export earnings"
-                        }
-                      ],
-                      "columns": 4,
-                      "card_mod": {
-                        "style": {
-                          ".entity$": {
-                            ".": "div:not(.name) {\n  font-size: 12px !important;\n}\nstate-badge {\n  margin: -3px !important;\n  --mdc-icon-size: 30px !important;\n}\n"
-                          }
-                        }
-                      }
-                    },
-                    {
-                      "type": "glance",
-                      "title": "Daily maximums",
-                      "entities": [
-                        {
-                          "entity": "sensor.maximum_daily_solar_production",
-                          "name": "Produced"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_energy_export",
-                          "name": "Exported"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_solar_storage",
-                          "name": "Solar stored"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_grid_storage",
-                          "name": "Grid stored"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_energy_consumption",
-                          "name": "Total used"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_solar_consumption",
-                          "name": "Solar used"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_battery_consumption",
-                          "name": "Battery used"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_grid_consumption",
-                          "name": "Grid used"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_total_energy_cost",
-                          "name": "Net cost"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_total_energy_cost_savings",
-                          "name": "Total savings"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_grid_cost",
-                          "name": "Grid cost"
-                        },
-                        {
-                          "entity": "sensor.maximum_daily_energy_export_earnings_minus_battery_charging_cost",
-                          "name": "Export earnings"
-                        }
-                      ],
-                      "columns": 4,
-                      "card_mod": {
-                        "style": {
-                          ".entity$": {
-                            ".": "div:not(.name) {\n  font-size: 12px !important;\n}\nstate-badge {\n  margin: -3px !important;\n  --mdc-icon-size: 30px !important;\n}\n"
-                          }
-                        }
-                      }
-                    },
-                    {
                       "type": "entities",
                       "title": "Electricity pricing now",
                       "entities": [
@@ -3290,6 +3175,141 @@
                         {
                           "entity": "input_number.energy_cost_subscription",
                           "name": "Subscription"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "custom:plotly-graph",
+                      "title": "Daily statistics",
+                      "config": {
+                        "staticPlot": true
+                      },
+                      "defaults": {
+                        "yaxes": {
+                          "showgrid": false,
+                          "zeroline": false
+                        },
+                        "entity": {
+                          "line": {
+                            "width": 0.5
+                          }
+                        }
+                      },
+                      "layout": {
+                        "margin": {
+                          "t": 20,
+                          "l": 60,
+                          "r": 60
+                        },
+                        "paper_bgcolor": "transparent",
+                        "plot_bgcolor": "rgba(0,0,0,0.2)",
+                        "showlegend": false,
+                        "hovermode": false,
+                        "clickmode": "none",
+                        "xaxis": {
+                          "showgrid": false
+                        },
+                        "yaxis": {
+                          "title": "kWh",
+                          "rangemode": "tozero"
+                        },
+                        "yaxis2": {
+                          "title": "$",
+                          "side": "right",
+                          "rangemode": "tozero",
+                          "overlaying": "y"
+                        }
+                      },
+                      "raw_plotly_config": true,
+                      "card_mod": {
+                        "style": "ha-card {\n  background-color: var(--ha-card-background)\n}\n"
+                      },
+                      "entities": [
+                        {
+                          "entity": "sensor.daily_solar_production",
+                          "type": "box",
+                          "name": "Produced",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_production'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_energy_export",
+                          "type": "box",
+                          "name": "Exported",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_solar_storage",
+                          "type": "box",
+                          "name": "Solar stored",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_grid_storage",
+                          "type": "box",
+                          "name": "Grid stored",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_energy_consumption",
+                          "type": "box",
+                          "name": "Total used",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_solar_consumption",
+                          "type": "box",
+                          "name": "Solar used",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_battery_consumption",
+                          "type": "box",
+                          "name": "Battery used",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_battery_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_grid_consumption",
+                          "type": "box",
+                          "name": "Grid used",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_total_energy_cost",
+                          "type": "box",
+                          "name": " ",
+                          "y": [
+                            0
+                          ],
+                          "opacity": 0,
+                          "hoverinfo": "skip"
+                        },
+                        {
+                          "entity": "sensor.daily_total_energy_cost",
+                          "type": "box",
+                          "name": "Net cost",
+                          "yaxis": "y2",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_total_energy_cost_savings",
+                          "type": "box",
+                          "name": "Total savings",
+                          "yaxis": "y2",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost_savings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_grid_cost",
+                          "type": "box",
+                          "name": "Grid cost",
+                          "yaxis": "y2",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_energy_export_earnings",
+                          "type": "box",
+                          "name": "Export earnings",
+                          "yaxis": "y2",
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export_earnings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         }
                       ]
                     },

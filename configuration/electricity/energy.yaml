@@ -163,175 +163,121 @@ template:
         state_class: total_increasing
         icon: mdi:calendar-start
 
-      - name: Average daily solar production
-        unique_id: average_daily_solar_production
-        state: >
-          {%- set total_produced_before_battery_install = 8851354 -%}
-          {{
-            ((states('sensor.solar_energy_produced')|float + total_produced_before_battery_install) /
-            1000 / states('sensor.days_since_solar_installation')|float)|round(1)
-          }}
+      - name: Daily solar production
+        unique_id: daily_solar_production
+        state: "{{ (state_attr('sensor.solar_production_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: >
+            {%- set total_produced_before_battery_install = 8851354 -%}
+            {%- if has_value('sensor.solar_energy_produced') and has_value('sensor.days_since_solar_installation') -%}
+              {{-
+                ((states('sensor.solar_energy_produced')|float + total_produced_before_battery_install) /
+                1000 / states('sensor.days_since_solar_installation')|float)|round(3)
+              -}}
+            {%- else -%}
+              {{- None -}}
+            {%- endif -%}
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:solar-power-variant
-        availability: "{{ has_value('sensor.solar_energy_produced') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Average daily energy export
-        unique_id: average_daily_energy_export
-        state: >
-          {%- set total_export_before_battery_install = 4506078 -%}
-          {{
-            ((states('sensor.smart_meter_real_energy_produced')|float - total_export_before_battery_install) /
-            1000 / states('sensor.days_since_battery_installation')|float)|round(1)
-          }}
+        availability: "{{ has_value('sensor.solar_production_today') }}"
+      - name: Daily energy export
+        unique_id: daily_energy_export
+        state: "{{ (state_attr('sensor.energy_export_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: >
+            {%- set total_export_before_battery_install = 4506078 -%}
+            {%- if has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_solar_installation') -%}
+              {{-
+                ((states('sensor.smart_meter_real_energy_produced')|float - total_export_before_battery_install) /
+                1000 / states('sensor.days_since_battery_installation')|float)|round(3)
+              -}}
+            {%- else -%}
+              {{- None -}}
+            {%- endif -%}
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:transmission-tower-import
-        availability: "{{ has_value('sensor.smart_meter_real_energy_produced') and has_value('sensor.days_since_battery_installation') }}"
-      - name: Average daily solar storage
-        unique_id: average_daily_solar_storage
-        state: "{{ (states('sensor.battery_energy_solar_charged')|float / 1000 / states('sensor.days_since_battery_installation')|float)|round(1) }}"
+        availability: "{{ has_value('sensor.energy_export_today') }}"
+      - name: Daily solar storage
+        unique_id: daily_solar_storage
+        state: "{{ (state_attr('sensor.solar_storage_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: "{{ (states('sensor.battery_energy_solar_charged')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-heart-variant
-        availability: "{{ has_value('sensor.battery_energy_charged') and has_value('sensor.days_since_battery_installation') }}"
-      - name: Average daily grid storage
-        unique_id: average_daily_grid_storage
-        state: "{{ (states('sensor.battery_energy_grid_charged')|float / 1000 / states('sensor.days_since_battery_installation')|float)|round(1) }}"
+        availability: "{{ has_value('sensor.solar_storage_today') }}"
+      - name: Daily grid storage
+        unique_id: Daily_grid_storage
+        state: "{{ (state_attr('sensor.grid_storage_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: "{{ (states('sensor.battery_energy_grid_charged')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-charging
-        availability: "{{ has_value('sensor.battery_energy_grid_charged') and has_value('sensor.days_since_battery_installation') }}"
-      - name: Average daily energy consumption
-        unique_id: average_daily_energy_consumption
-        state: "{{ (states('sensor.total_energy_consumed')|float / 1000 / states('sensor.days_since_solar_installation')|float)|round(1) }}"
+        availability: "{{ has_value('sensor.grid_storage_today') }}"
+      - name: Daily energy consumption
+        unique_id: daily_energy_consumption
+        state: "{{ (state_attr('sensor.energy_consumption_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: "{{ (states('sensor.total_energy_consumed')|float(0) / 1000 / states('sensor.days_since_solar_installation')|float(1))|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-lightning-bolt
-        availability: "{{ has_value('sensor.total_energy_consumed') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Average daily solar consumption
-        unique_id: average_daily_solar_consumption
-        state: "{{ (states('sensor.solar_energy_consumed')|float / 1000 / states('sensor.days_since_battery_installation')|float)|round(1) }}"
+        availability: "{{ has_value('sensor.energy_consumption_today') }}"
+      - name: Daily solar consumption
+        unique_id: daily_solar_consumption
+        state: "{{ (state_attr('sensor.solar_consumption_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: "{{ (states('sensor.solar_energy_consumed')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-sound-in
-        availability: "{{ has_value('sensor.solar_energy_consumed') and has_value('sensor.days_since_battery_installation') }}"
-      - name: Average daily battery consumption
-        unique_id: average_daily_battery_consumption
-        state: "{{ (states('sensor.battery_energy_consumed')|float / 1000 / states('sensor.days_since_battery_installation')|float)|round(1) }}"
+        availability: "{{ has_value('sensor.solar_consumption_today') }}"
+      - name: Daily battery consumption
+        unique_id: daily_battery_consumption
+        state: "{{ (state_attr('sensor.battery_consumption_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: "{{ (states('sensor.battery_energy_consumed')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-battery
-        availability: "{{ has_value('sensor.battery_energy_consumed') and has_value('sensor.days_since_battery_installation') }}"
-      - name: Average daily grid consumption
-        unique_id: average_daily_grid_consumption
-        state: >
-          {%- set total_grid_consumed_before_battery_install = 3113933 -%}
-          {{
-            ((states('sensor.smart_meter_real_energy_consumed')|float - total_grid_consumed_before_battery_install) /
-            1000 / states('sensor.days_since_battery_installation')|float)|round(1)
-          }}
+        availability: "{{ has_value('sensor.battery_consumption_today') }}"
+      - name: Daily grid consumption
+        unique_id: daily_grid_consumption
+        state: "{{ (state_attr('sensor.grid_consumption_today', 'last_period')|float / 1000)|round(3) }}"
+        attributes:
+          average: >
+            {%- set total_grid_consumed_before_battery_install = 3113933 -%}
+            {%- if has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_solar_installation') -%}
+              {{-
+                ((states('sensor.smart_meter_real_energy_consumed')|float - total_grid_consumed_before_battery_install) /
+                1000 / states('sensor.days_since_battery_installation')|float)|round(3)
+              -}}
+            {%- else -%}
+              {{- None -}}
+            {%- endif -%}
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-import-outline
-        availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.days_since_battery_installation') }}"
-
-      - name: Minimum daily solar production
-        unique_id: minimum_daily_solar_production
-        state: "{{ [state_attr('sensor.solar_production_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:solar-power-variant
-      - name: Minimum daily energy export
-        unique_id: minimum_daily_energy_export
-        state: "{{ [state_attr('sensor.energy_export_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:transmission-tower-import
-      - name: Minimum daily solar storage
-        unique_id: minimum_daily_solar_storage
-        state: "{{ [state_attr('sensor.solar_storage_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:battery-heart-variant
-      - name: Minimum daily grid storage
-        unique_id: minimum_daily_grid_storage
-        state: "{{ [state_attr('sensor.grid_storage_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:battery-charging
-      - name: Minimum daily energy consumption
-        unique_id: minimum_daily_energy_consumption
-        state: "{{ [state_attr('sensor.energy_consumption_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-lightning-bolt
-      - name: Minimum daily solar consumption
-        unique_id: minimum_daily_solar_consumption
-        state: "{{ [state_attr('sensor.solar_consumption_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-sound-in
-      - name: Minimum daily battery consumption
-        unique_id: minimum_daily_battery_consumption
-        state: "{{ [state_attr('sensor.battery_consumption_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-battery
-      - name: Minimum daily grid consumption
-        unique_id: minimum_daily_grid_consumption
-        state: "{{ [state_attr('sensor.grid_consumption_today', 'last_period')|float(99)/1000, this.state|float(99)]|min|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-import-outline
-
-      - name: Maximum daily solar production
-        unique_id: maximum_daily_solar_production
-        state: "{{ [state_attr('sensor.solar_production_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:solar-power-variant
-      - name: Maximum daily energy export
-        unique_id: maximum_daily_energy_export
-        state: "{{ [state_attr('sensor.energy_export_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:transmission-tower-import
-      - name: Maximum daily solar storage
-        unique_id: maximum_daily_solar_storage
-        state: "{{ [state_attr('sensor.solar_storage_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:battery-heart-variant
-      - name: Maximum daily grid storage
-        unique_id: maximum_daily_grid_storage
-        state: "{{ [state_attr('sensor.grid_storage_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:battery-charging
-      - name: Maximum daily energy consumption
-        unique_id: maximum_daily_energy_consumption
-        state: "{{ [state_attr('sensor.energy_consumption_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-lightning-bolt
-      - name: Maximum daily solar consumption
-        unique_id: maximum_daily_solar_consumption
-        state: "{{ [state_attr('sensor.solar_consumption_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-sound-in
-      - name: Maximum daily battery consumption
-        unique_id: maximum_daily_battery_consumption
-        state: "{{ [state_attr('sensor.battery_consumption_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-battery
-      - name: Maximum daily grid consumption
-        unique_id: maximum_daily_grid_consumption
-        state: "{{ [state_attr('sensor.grid_consumption_today', 'last_period')|float(0)/1000, this.state|float(0)]|max|round(1) }}"
-        unit_of_measurement: kWh/day
-        state_class: total
-        icon: mdi:home-import-outline
+        availability: "{{ has_value('sensor.grid_consumption_today') }}"
 
 utility_meter:
   solar_production_today:
