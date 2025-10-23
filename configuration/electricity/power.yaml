@@ -383,17 +383,26 @@ sensor:
     name: Washer power
     source: sensor.washer_energy
     unit: kW
-    time_window: 00:15:00
+    time_window:
+      minutes: 15 # ≈ washer energy update frequency
+    max_sub_interval:
+      minutes: 1
   - platform: derivative
     name: Dryer power
     source: sensor.dryer_energy
     unit: kW
-    time_window: 00:15:00
+    time_window:
+      minutes: 15 # ≈ dryer energy update frequency
+    max_sub_interval:
+      minutes: 1
   - platform: derivative
     name: Dan's phone charger power
     source: sensor.dan_s_phone_charger_energy
     unit: kW
-    time_window: 00:15:00
+    time_window:
+      minutes: 15 # updates vary from <5 minutes when fast-charging, to ≈30 minutes when approaching max charge
+    max_sub_interval:
+      minutes: 1
 
 homeassistant:
   customize:
