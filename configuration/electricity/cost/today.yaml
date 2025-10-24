@@ -282,7 +282,7 @@ template:
     sensor:
       - name: Daily total energy cost
         unique_id: daily_total_energy_cost
-        state: "{{ (state_attr('sensor.total_energy_cost_today', 'last_period')|float / 1000)|round(2) }}"
+        state: "{{ state_attr('sensor.total_energy_cost_today', 'last_period')|float|round(2) }}"
         attributes:
           average: >
             {%- set cost_incorrect_start_offset = -478.89 -%}
@@ -302,7 +302,7 @@ template:
         availability: "{{ has_value('sensor.total_energy_cost_today') }}"
       - name: Daily total energy cost savings
         unique_id: daily_total_energy_cost_savings
-        state: "{{ (state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float / 1000)|round(2) }}"
+        state: "{{ state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float|round(2) }}"
         attributes:
           average: >
             {%- set cost_savings_incorrect_start_offset = 506.89 -%}
@@ -322,7 +322,7 @@ template:
         availability: "{{ has_value('sensor.total_energy_cost_savings_today') }}"
       - name: Daily grid cost
         unique_id: daily_grid_cost
-        state: "{{ (state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float / 1000)|round(2) }}"
+        state: "{{ state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float|round(2) }}"
         attributes:
           average: "{{ ((states('sensor.grid_cost')|float(0)) / states('sensor.days_since_solar_installation')|float(1))|round(2) }}"
           minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(2) }}"
@@ -333,7 +333,7 @@ template:
         availability: "{{ has_value('sensor.total_energy_cost_savings_today') }}"
       - name: Daily energy export earnings
         unique_id: daily_energy_export_earnings
-        state: "{{ -1 * (state_attr('sensor.export_energy_cost_today', 'last_period')|float / 1000)|round(2) }}"
+        state: "{{ (state_attr('sensor.export_energy_cost_today', 'last_period')|float * -1)|round(2) }}"
         attributes:
           average: >
             {%- set initial_earnings = 231.51 -%}
