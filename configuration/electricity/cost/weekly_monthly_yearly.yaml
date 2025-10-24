@@ -98,24 +98,6 @@ sensor:
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Battery energy cost savings last week
-        unique_id: battery_energy_cost_savings_last_week
-        where: '"entity_id" = ''battery_energy_cost_savings'' AND time >= now() - 7d'
-        group_function: first
-        measurement: '"$"'
-        unit_of_measurement: $
-      - name: Battery energy cost savings last month
-        unique_id: battery_energy_cost_savings_last_month
-        where: '"entity_id" = ''battery_energy_cost_savings'' AND time >= now() - 30d'
-        group_function: first
-        measurement: '"$"'
-        unit_of_measurement: $
-      - name: Battery energy cost savings last year
-        unique_id: battery_energy_cost_savings_last_year
-        where: '"entity_id" = ''battery_energy_cost_savings'' AND time >= now() - 365d'
-        group_function: first
-        measurement: '"$"'
-        unit_of_measurement: $
 
       - name: Lights energy cost last week
         unique_id: lights_energy_cost_last_week
