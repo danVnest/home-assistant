@@ -322,7 +322,7 @@ template:
         availability: "{{ has_value('sensor.total_energy_cost_savings_today') }}"
       - name: Daily grid cost
         unique_id: daily_grid_cost
-        state: "{{ state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float|round(2) }}"
+        state: "{{ state_attr('sensor.grid_cost_today', 'last_period')|float|round(2) }}"
         attributes:
           average: "{{ ((states('sensor.grid_cost')|float(0)) / states('sensor.days_since_solar_installation')|float(1))|round(2) }}"
           minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(2) }}"
@@ -330,7 +330,7 @@ template:
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost_savings_today') }}"
+        availability: "{{ has_value('sensor.grid_cost_today') }}"
       - name: Daily energy export earnings
         unique_id: daily_energy_export_earnings
         state: "{{ (state_attr('sensor.export_energy_cost_today', 'last_period')|float * -1)|round(2) }}"
