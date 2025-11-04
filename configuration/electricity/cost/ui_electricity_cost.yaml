@@ -11,11 +11,11 @@ template:
         state: "{{ now() }}"
         attributes:
           template: >
-            {% set good_earnings_per_hour = -0.5 %}
-            {% set good_cost_per_hour = 0.1 %}
-            {% set ok_cost_per_hour = 0.5 %}
-            {% set sustained_cost_hours_per_day_modifier = 3 %}
-            [{% set items = [
+            {%- set good_earnings_per_hour = -0.5 -%}
+            {%- set good_cost_per_hour = 0.1 -%}
+            {%- set ok_cost_per_hour = 0.5 -%}
+            {%- set sustained_cost_hours_per_day_modifier = 3 -%}
+            [{%- set items = [
               {'entity': 'total', 'name': 'Total', 'icon': 'home-lightning-bolt'},
               {'entity': 'total_excluding_battery_and_export', 'name': 'Total (excluding battery and export)', 'icon': 'home-lightbulb'},
               {'entity': 'export', 'name': 'Export', 'icon': 'transmission-tower-import'}] + [
@@ -42,17 +42,17 @@ template:
               {'entity': 'sensors', 'name': 'Sensors', 'icon': 'motion-sensor', 'state': states("sensor._energy_cost_weekly")|float(0) + states("sensor._energy_cost_savings_weekly")|float(0)},
               {'entity': 'paludarium_picture_frame_camera', 'name': 'Paludarium, picture frame, camera', 'icon': 'fishbowl', 'state': states("sensor.paludarium_picture_frame_camera_energy_cost_weekly")|float(0) + states("sensor.paludarium_picture_frame_camera_energy_cost_savings_weekly")|float(0)},
               {'entity': 'standby', 'name': 'Standby', 'icon': 'power-standby', 'state': states("sensor.standby_energy_cost_weekly")|float(0) + states("sensor.standby_energy_cost_savings_weekly")|float(0)},
-            ]|sort(attribute='state', reverse=true) %}
-            {% for item in items %}
-            {% set bad_cost_per_hour = 1 if not item.entity.startswith("total") else 3 %}
-            {% if item.entity not in ("export", "electricity_provider_service", "battery") %}
-            {% set max_ratio = 2 if item.entity.startswith("total") else 10 %}
-            {% set yearly_ratio = [states('sensor.' + item.entity + '_energy_cost_yearly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_yearly')|float(0),0.05]|max) %}
-            {% set monthly_ratio = [states('sensor.' + item.entity + '_energy_cost_monthly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_monthly')|float(0),0.05]|max) %}
-            {% set weekly_ratio = [states('sensor.' + item.entity + '_energy_cost_weekly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_weekly')|float(0),0.05]|max) %}
-            {% set today_ratio = [states('sensor.' + item.entity + '_energy_cost_today')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_today')|float(0),0.05]|max) %}
-            {% endif %}
-            {{{
+            ]|sort(attribute='state', reverse=true) -%}
+            {%- for item in items -%}
+            {%- set bad_cost_per_hour = 1 if not item.entity.startswith("total") else 3 -%}
+            {%- if item.entity not in ("export", "electricity_provider_service", "battery") -%}
+            {%- set max_ratio = 2 if item.entity.startswith("total") else 10 -%}
+            {%- set yearly_ratio = [states('sensor.' + item.entity + '_energy_cost_yearly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_yearly')|float(0),0.05]|max) -%}
+            {%- set monthly_ratio = [states('sensor.' + item.entity + '_energy_cost_monthly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_monthly')|float(0),0.05]|max) -%}
+            {%- set weekly_ratio = [states('sensor.' + item.entity + '_energy_cost_weekly')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_weekly')|float(0),0.05]|max) -%}
+            {%- set today_ratio = [states('sensor.' + item.entity + '_energy_cost_today')|float(0),0.05]|max / ([states('sensor.' + item.entity + '_energy_cost_savings_today')|float(0),0.05]|max) -%}
+            {%- endif -%}
+            {{-{
               'type': 'markdown',
               'content': '<ha-icon icon="mdi:' + item.icon + '"></ha-icon>&emsp;' + item.name,
               'card_mod': {
@@ -72,8 +72,8 @@ template:
                   "}"
                 }
               }
-            }}},
-            {{{
+            }-}},
+            {{-{
               'type': 'horizontal-stack',
               'cards': [
                 {
@@ -328,9 +328,9 @@ template:
                   }
                 }
               ]
-            }}},
-            {% if item.entity not in ("export", "electricity_provider_service", "battery") %}
-            {{{
+            }-}},
+            {%- if item.entity not in ("export", "electricity_provider_service", "battery") -%}
+            {{-{
               'type': 'horizontal-stack',
               'cards': [
                 {
@@ -436,10 +436,10 @@ template:
                   }
                 },
               ]
-            }}},
-            {% endif %}
-            {% if not loop.last %}
-            {{{
+            }-}},
+            {%- endif -%}
+            {%- if not loop.last -%}
+            {{-{
               'type' : 'entities',
               'entities': [{
                 'type': 'divider',
@@ -455,6 +455,6 @@ template:
                     "margin-bottom: -40px;"
                   "}"
               }
-            }}},
-            {% endif %}
-            {% endfor %}]
+            }-}},
+            {%- endif -%}
+            {%- endfor -%}]
