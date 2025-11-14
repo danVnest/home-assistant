@@ -3150,31 +3150,92 @@
                   "type": "vertical-stack",
                   "cards": [
                     {
-                      "type": "entities",
-                      "title": "Electricity pricing now",
-                      "entities": [
+                      "type": "custom:apexcharts-card",
+                      "header": {
+                        "title": "Price history & forecast",
+                        "standard_format": true
+                      },
+                      "graph_span": "2d",
+                      "span": {
+                        "offset": "+1d"
+                      },
+                      "now": {
+                        "show": true,
+                        "label": "now"
+                      },
+                      "apex_config": {
+                        "float_precision": 2,
+                        "legend": {
+                          "position": "top",
+                          "floating": true,
+                          "customLegendItems": [
+                            "Import price",
+                            "Export price"
+                          ]
+                        },
+                        "tooltip": {
+                          "x": {
+                            "format": "h:mmtt dddd"
+                          },
+                          "y": {
+                            "formatter": "EVAL:function(value, { series, seriesIndex, dataPointIndex, w }) {\n    return '<div class=\"custom-tooltip\">' +\n    '<span style=\"font-weight: 400;\">' + '$' + (series[seriesIndex][dataPointIndex] || 0).toFixed(2) + ' per kWh</b></span>' +\n    '</div>';\n  }\n"
+                          }
+                        },
+                        "xaxis": {
+                          "labels": {
+                            "format": "htt"
+                          },
+                          "tooltip": {
+                            "enabled": false
+                          }
+                        }
+                      },
+                      "all_series_config": {
+                        "stroke_width": 1.5
+                      },
+                      "yaxis": [
+                        {
+                          "id": "first",
+                          "align_to": 0.1,
+                          "apex_config": {
+                            "labels": {
+                              "formatter": "EVAL:function(value) {\n  return \"$\" + value.toFixed(2);\n}\n"
+                            }
+                          }
+                        }
+                      ],
+                      "series": [
                         {
                           "entity": "sensor.electricity_general_price",
-                          "name": "General grid"
-                        },
-                        {
-                          "entity": "sensor.electricity_controlled_load_price",
-                          "name": "Controlled load"
+                          "name": "Import price",
+                          "type": "line",
+                          "color": "#44739e",
+                          "extend_to": "now",
+                          "float_precision": 2
                         },
                         {
                           "entity": "sensor.electricity_feed_in_price",
-                          "name": "Export"
+                          "name": "Export price",
+                          "type": "line",
+                          "color": "orange",
+                          "extend_to": "now",
+                          "float_precision": 2
                         },
                         {
-                          "type": "divider"
+                          "entity": "sensor.electricity_general_forecast",
+                          "name": "Forecast import price",
+                          "type": "line",
+                          "color": "#44739e",
+                          "opacity": 0.67,
+                          "data_generator": "const forecasts = entity.attributes.forecasts;\nconst result = forecasts.map(e => [\n  new Date(e.start_time).getTime(),\n  parseFloat(e.per_kwh || 0)\n]);\nreturn result;\n"
                         },
                         {
-                          "entity": "input_number.energy_cost_service",
-                          "name": "Service"
-                        },
-                        {
-                          "entity": "input_number.energy_cost_subscription",
-                          "name": "Subscription"
+                          "entity": "sensor.electricity_feed_in_forecast",
+                          "name": "Forecast export price",
+                          "type": "line",
+                          "color": "orange",
+                          "opacity": 0.67,
+                          "data_generator": "const forecasts = entity.attributes.forecasts;\nconst result = forecasts.map(e => [\n  new Date(e.start_time).getTime(),\n  parseFloat(e.per_kwh || 0)\n]);\nreturn result;\n"
                         }
                       ]
                     },
@@ -3190,6 +3251,7 @@
                           "zeroline": false
                         },
                         "entity": {
+                          "boxpoints": false,
                           "line": {
                             "width": 0.5
                           }
@@ -3202,7 +3264,7 @@
                           "r": 60
                         },
                         "paper_bgcolor": "transparent",
-                        "plot_bgcolor": "rgba(0,0,0,0.2)",
+                        "plot_bgcolor": "transparent",
                         "showlegend": false,
                         "hovermode": false,
                         "clickmode": "none",
@@ -3220,6 +3282,7 @@
                           "overlaying": "y"
                         }
                       },
+                      "hours_to_show": "1h",
                       "raw_plotly_config": true,
                       "card_mod": {
                         "style": "ha-card {\n  background-color: var(--ha-card-background)\n}\n"
@@ -3229,49 +3292,49 @@
                           "entity": "sensor.daily_solar_production",
                           "type": "box",
                           "name": "Produced",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_production'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_production'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_energy_export",
                           "type": "box",
                           "name": "Exported",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_solar_storage",
                           "type": "box",
                           "name": "Solar stored",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_grid_storage",
                           "type": "box",
                           "name": "Grid stored",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_storage'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_energy_consumption",
                           "type": "box",
                           "name": "Total used",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_solar_consumption",
                           "type": "box",
                           "name": "Solar used",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_solar_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_battery_consumption",
                           "type": "box",
                           "name": "Battery used",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_battery_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_battery_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_grid_consumption",
                           "type": "box",
                           "name": "Grid used",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_consumption'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_total_energy_cost",
@@ -3288,28 +3351,152 @@
                           "type": "box",
                           "name": "Net cost",
                           "yaxis": "y2",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_total_energy_cost_savings",
                           "type": "box",
                           "name": "Total savings",
                           "yaxis": "y2",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost_savings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_total_energy_cost_savings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_grid_cost",
                           "type": "box",
                           "name": "Grid cost",
                           "yaxis": "y2",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_grid_cost'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
                         },
                         {
                           "entity": "sensor.daily_energy_export_earnings",
                           "type": "box",
                           "name": "Export earnings",
                           "yaxis": "y2",
-                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export_earnings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                          "y": "$ex {\n  var sensor = hass.states['sensor.daily_energy_export_earnings'];\n  var avg = parseFloat(sensor.attributes[\"average\"]);\n  return [parseFloat(sensor.attributes[\"minimum\"]), avg, avg, avg, parseFloat(sensor.attributes[\"maximum\"])];\n}\n"
+                        },
+                        {
+                          "entity": "sensor.daily_solar_production",
+                          "x": [
+                            "Produced"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_energy_export",
+                          "x": [
+                            "Exported"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_solar_storage",
+                          "x": [
+                            "Solar stored"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_grid_storage",
+                          "x": [
+                            "Grid stored"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_energy_consumption",
+                          "x": [
+                            "Total used"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_solar_consumption",
+                          "x": [
+                            "Solar used"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_battery_consumption",
+                          "x": [
+                            "Battery used"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_grid_consumption",
+                          "x": [
+                            "Grid used"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_total_energy_cost",
+                          "yaxis": "y2",
+                          "x": [
+                            "Net cost"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_total_energy_cost_savings",
+                          "yaxis": "y2",
+                          "x": [
+                            "Total savings"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_grid_cost",
+                          "yaxis": "y2",
+                          "x": [
+                            "Grid cost"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
+                        },
+                        {
+                          "entity": "sensor.daily_energy_export_earnings",
+                          "yaxis": "y2",
+                          "x": [
+                            "Export earnings"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "gold"
+                          }
                         }
                       ]
                     },
@@ -3330,6 +3517,20 @@
                           "entity": "sensor.solar_and_battery_years_to_beat_investment",
                           "attribute": "text",
                           "name": "Beat investment in"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "entities",
+                      "title": "Additional costs",
+                      "entities": [
+                        {
+                          "entity": "input_number.energy_cost_service",
+                          "name": "Service"
+                        },
+                        {
+                          "entity": "input_number.energy_cost_subscription",
+                          "name": "Subscription"
                         }
                       ]
                     },
