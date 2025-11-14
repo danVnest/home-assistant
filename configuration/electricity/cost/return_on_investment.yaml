@@ -1,5 +1,4 @@
 template:
-  # TODO: update total_energy_cost_savings_monthly to yearly after the first year with battery installed
   - sensor:
       - name: Solar and battery return on investment
         unique_id: solar_and_battery_return_on_investment
@@ -22,24 +21,25 @@ template:
     sensor:
       - name: Solar and battery years to break even
         unique_id: solar_and_battery_years_to_break_even
-        state: "{{ (states('sensor.solar_and_battery_return_on_investment')|float / states('sensor.total_energy_cost_savings_monthly')|float / -12)|round(1) }}"
+        state: "{{ (-1 * states('sensor.solar_and_battery_return_on_investment')|float / states('sensor.total_energy_cost_savings_yearly')|float)|round(1) }}"
         unit_of_measurement: years
         state_class: measurement
         icon: mdi:calendar
-        availability: "{{ has_value('sensor.solar_and_battery_return_on_investment') and has_value('sensor.total_energy_cost_savings_monthly') }}"
+        availability: "{{ has_value('sensor.solar_and_battery_return_on_investment') and has_value('sensor.total_energy_cost_savings_yearly') }}"
       - name: Solar and battery years to beat investment
         unique_id: solar_and_battery_years_to_beat_investment
         state: >
           {% set install_costs = 20189.98 %}
-          {% set annual_return_rate = 0.06 %}
-          {% set monthly_return_rate = (1 + annual_return_rate) ** (1/12) - 1 %}
-          {% set monthly_savings = states('sensor.total_energy_cost_savings_monthly')|float %}
-          {% set break_even_month = (states('sensor.solar_and_battery_years_to_break_even')|float * 12)|int %}
-          {% set investment = install_costs * (1 + monthly_return_rate) ** break_even_month %}
-          {% set var = namespace(savings = 0, investment = investment, diff = investment, beat_investment_year = -100) %}
-          {%- for month in range(break_even_month, 600) -%}
+          {% set resale_percentage = 0.4 %}
+          {% set investment_monthly_return_rate = 1.06 ** (1/12) %}
+          {% set monthly_savings = states('sensor.total_energy_cost_savings_yearly')|float / 12 %}
+          {% set months_since_install = (states('sensor.days_since_battery_installation')|float / 365 * 12)|int %}
+          {% set months_to_break_even = (-1 * (states('sensor.solar_and_battery_return_on_investment')|float + install_costs * resale_percentage) / monthly_savings)|int %}
+          {% set investment = install_costs * investment_monthly_return_rate ** (months_since_install + months_to_break_even) - monthly_savings * (months_since_install + months_to_break_even) %}
+          {% set var = namespace(savings = 0, investment = investment, diff = investment, beat_investment_year = None) %}
+          {%- for month in range(months_to_break_even, 600) -%}
             {%- set var.savings = var.savings + monthly_savings -%}
-            {%- set var.investment = var.investment * (1 + monthly_return_rate) -%}
+            {%- set var.investment = var.investment * investment_monthly_return_rate - monthly_savings -%}
             {%- if var.savings >= var.investment -%}
               {%- set var.beat_investment_year = (month / 12)|round(1) -%}
               {%- break -%}
@@ -52,8 +52,11 @@ template:
         unit_of_measurement: years
         state_class: measurement
         icon: mdi:calendar
+        attributes:
+          text: "{{ (this.state + ' years') if this.state|int(-100) != -100 else 'never' }}"
         availability: >
           {{
-            has_value('sensor.total_energy_cost_savings_monthly') and
-            has_value('sensor.solar_and_battery_years_to_break_even')
+            has_value('sensor.total_energy_cost_savings_yearly') and
+            has_value('sensor.days_since_battery_installation') and
+            has_value('sensor.solar_and_battery_return_on_investment')
           }}
