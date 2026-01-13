@@ -1,0 +1,25 @@
+indicate_unavailable_entities:
+  name: Indicate unavailable entities
+  version: '1.0'
+  creator: danVnest
+  description: ''
+  supported:
+    - button
+    - calendar
+    - climate
+    - cover
+    - horizontal-buttons-stack
+    - media-player
+    - pop-up
+    - select
+    - separator
+  code: |-
+    ${(() => {
+      for (let i = 1; i <= 99; i++) {
+        const button = card.querySelector(`.bubble-sub-button-${i}`);
+        if (!button) break;
+        const entityID = button.dataset?.entity;
+        if (!entityID || !hass.states[entityID]) entity.style.setProperty("border", "var(--button-border-error)", "important");
+      }
+    })()}
+  editor: ''

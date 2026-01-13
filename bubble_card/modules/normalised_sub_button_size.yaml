@@ -1,0 +1,18 @@
+normalised_sub_button_size:
+  name: Normalised sub-button size
+  version: v1.0
+  creator: danVnest
+  description: Make sub-buttons the same width and left-justify them.
+  supported:
+    - calendar
+    - pop-up
+    - cover
+    - button
+    - media-player
+    - climate
+    - select
+  code: |
+    .bubble-sub-button {
+      width: 100%;
+      justify-content: left !important;
+    }

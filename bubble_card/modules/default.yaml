@@ -1,0 +1,26 @@
+default:
+  name: Default
+  version: ''
+  creator: ''
+  description: Empty and enabled by default. Add your custom styles and/or JS templates here to apply them to all cards by pressing the <ha-icon icon="mdi:pencil"></ha-icon> button above.
+  supported:
+    - button
+    - calendar
+    - climate
+    - cover
+    - horizontal-buttons-stack
+    - media-player
+    - pop-up
+    - select
+    - separator
+  code: |-
+    .bubble-main-icon {
+      opacity: 1 !important;
+    } .bubble-icon-container, .bubble-icon-container::before {
+      background: transparent !important;
+    } .bubble-state {
+      opacity: 0.7 !important;
+    } .bubble-sub-button.background-off, .bubble-sub-button.background-on {
+      color: var(--button-color);
+    }
+  is_global: true

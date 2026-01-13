@@ -1,0 +1,36 @@
+datetime_to_relative_time:
+  name: Datetime to relative time
+  version: '1.0'
+  creator: danVnest
+  description: Converts a datetime state to its relative equivalent from the current time (e.g. 2 hours ago or in 53 minutes).
+  supported:
+    - button
+    - calendar
+    - climate
+    - cover
+    - horizontal-buttons-stack
+    - media-player
+    - pop-up
+    - select
+    - separator
+  code: |-
+    ${card.querySelector('.bubble-state').innerText = (() => {
+      const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+      const entity = hass.states[this.config.datetime_to_relative_time?.entity];
+      const attribute = entity?.attributes[this.config.datetime_to_relative_time?.attribute];
+      const datetime = attribute || entity?.state || state;
+      const seconds = Math.round((new Date() - new Date(datetime)) / 1000);
+      if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');
+      const minutes = Math.round(seconds / 60);
+      if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');
+      const hours = Math.round(minutes / 60);
+      if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');
+      return rtf.format(-Math.round(hours / 24), 'day');
+    })()}
+  editor:
+    - name: entity
+      selector:
+        entity: {}
+    - name: attribute
+      selector:
+        attribute: {}
