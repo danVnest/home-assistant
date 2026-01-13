@@ -6,8 +6,8 @@ Climate:
     temperature: 1 # difference between actual device target temperature and the temperature which triggers device off
     humidity: 10 # difference between actual device target humidity and the humidity which triggers device off
   fan:
-    cooling_per_speed: 0.049 # degrees reduction in apparent temperature for each percent of fan speed
-    cooling_reduction_factor_when_reverse: 3.5 # the factor of which cooling is reduced when a fan is in reverse
+    cooling_per_speed: 0.1 # degrees reduction in apparent temperature for each percent of fan speed (max fan_airspeed = 0.1*100/0.7)
+    cooling_reduction_factor_when_reverse: 3.5 # the factor of which cooling is reduced when a fan is in reverse (also see fan_airspeed macro)
     reversing_delay: 5 # number of seconds to allow between fan reversal steps
   aircon_reduce_fan:
     delay: 15 # number of seconds before the aircon fan reduces after its closest door opens

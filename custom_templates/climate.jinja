@@ -1,6 +1,9 @@
 {%- macro fan_airspeed(room) -%}
     {%- set entity_id = 'fan.' + room -%}
-    {%- set max_airspeed = 7 if state_attr(entity_id, 'direction') == "forward" else 2 -%}
+    {%- set max_airspeed = 0.1*100/0.7 -%}
+    {%- if state_attr(entity_id, 'direction') == "reverse" -%}
+        {%- set max_airspeed = max_airpseed / 3.5 -%}
+    {%- endif -%}
     {%- if states(entity_id) == "on" -%}
         {{- max_airspeed * state_attr(entity_id, 'percentage') / 100 -}}
     {%- else -%}
