@@ -44,16 +44,25 @@
 
 {%- macro aircon_power(room) -%}
     {%- set entity_id = 'climate.' + room + '_aircon' -%}
-    {%- set max_power_temp_diff = 5 -%}
     {%- set max_airspeed = 3 -%}
     {%- set mode = states(entity_id) -%}
-    {%- set temperature_difference = state_attr(entity_id, 'current_temperature')|float(0) - state_attr(entity_id, 'temperature')|float(0) -%}
-    {%- if mode == "heat" -%}
-        {%- set temperature_difference = -temperature_difference -%}
-    {%- elif mode == "heat_cool" -%}
-        {%- set temperature_difference = temperature_difference|abs -%}
-    {%- endif-%}
-    {%- set compressor_power = (200 + 920 * max(0, min(1, temperature_difference / max_power_temp_diff))) if mode != "fan_only" else 0 -%}
+    {%- if mode == "fan_only" -%}
+        {%- set heat_pump_power_factor = 0 -%}
+    {%- else -%}
+        {%- set max_power_temperature_factor = 15 -%}
+        {%- set indoor_temperature = state_attr(entity_id, 'current_temperature')|float(24) -%}
+        {%- set target_temperature = state_attr(entity_id, 'temperature')|float(24) -%}
+        {%- set outdoor_temperature = states('sensor.outside_apparent_temperature')|float(25) -%}
+        {%- set indoor_difference = indoor_temperature - target_temperature -%}
+        {%- set outdoor_difference = outdoor_temperature - target_temperature -%}
+        {%- set temperature_factor = indoor_difference + 2 * outdoor_difference -%}
+        {%- if mode == "heat" -%}
+            {%- set temperature_factor = -temperature_factor -%}
+        {%- elif mode == "heat_cool" -%}
+            {%- set temperature_factor = temperature_factor|abs -%}
+        {%- endif -%}
+        {%- set heat_pump_power_factor = 0.2 + 0.8 * max(0, min(1, temperature_factor / max_power_temperature_factor)) -%}
+    {%- endif -%}
     {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed')|float(0) / max_airspeed -%}
-    {{- compressor_power + fan_power -}}
+    {{- heat_pump_power_factor * (2500 if room == 'living_room' else 1120) + fan_power -}}
 {%- endmacro -%}
