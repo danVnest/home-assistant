@@ -23,6 +23,8 @@ appdaemon:
     HASS:
       type: hass
       token: !env_var SUPERVISOR_TOKEN
+      ws_timeout: 120
+      ws_max_msg_size: 0
 http:
   url: http://0.0.0.0:5050
 hadashboard:
