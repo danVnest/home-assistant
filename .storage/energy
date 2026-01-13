@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "minor_version": 1,
+  "minor_version": 2,
   "key": "energy",
   "data": {
     "energy_sources": [
@@ -118,6 +118,7 @@
         "stat_consumption": "sensor.paludarium_picture_frame_camera_energy",
         "name": "Paludarium, picture frame, camera"
       }
-    ]
+    ],
+    "device_consumption_water": []
   }
 }
