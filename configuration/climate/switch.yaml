@@ -1,10 +1,8 @@
-switch:
-  - platform: template
-    switches:
-      nursery_heater:
-        friendly_name: Nursery heater
+template:
+  - switch:
+      - name: Nursery heater
         unique_id: nursery_heater
-        value_template: "{{ states('climate.nursery_heater') == 'heat' }}"
+        state: "{{ states('climate.nursery_heater') == 'heat' }}"
         turn_on:
           action: climate.turn_on
           target:
@@ -13,10 +11,10 @@ switch:
           action: climate.turn_off
           target:
             entity_id: climate.nursery_heater
-      office_heater:
-        friendly_name: Office heater
+        availability: "{{ has_value('climate.nursery_heater') }}"
+      - name: Office heater
         unique_id: office_heater
-        value_template: >
+        state: >
           {{
           states('switch.office_heater_dumb') == 'on' and 
           states('sensor.office_heater_power')|float(0) > 250
@@ -29,11 +27,11 @@ switch:
           action: switch.turn_off
           target:
             entity_id: switch.office_heater_dumb
+        availability: "{{ has_value('switch.office_heater_dumb') and has_value('sensor.office_heater_power')}}"
 
-      bedroom_humidifier:
-        friendly_name: Bedroom humidifier
+      - name: Bedroom humidifier
         unique_id: bedroom_humidifier
-        value_template: "{{ states('humidifier.bedroom') not in ('off', 'unavailable', 'unknown') }}"
+        state: "{{ states('humidifier.bedroom') != 'off' }}"
         turn_on:
           action: humidifier.turn_on
           target:
@@ -42,10 +40,10 @@ switch:
           action: humidifier.turn_off
           target:
             entity_id: humidifier.bedroom
-      nursery_humidifier:
-        friendly_name: Nursery humidifier
+        availability: "{{ has_value('humidifier.bedroom') }}"
+      - name: Nursery humidifier
         unique_id: nursery_humidifier
-        value_template: "{{ states('humidifier.nursery') not in ('off', 'unavailable', 'unknown') }}"
+        state: "{{ states('humidifier.nursery') != 'off' }}"
         turn_on:
           action: humidifier.turn_on
           target:
@@ -54,11 +52,11 @@ switch:
           action: humidifier.turn_off
           target:
             entity_id: humidifier.nursery
+        availability: "{{ has_value('humidifier.nursery') }}"
 
-      living_room_aircon:
-        friendly_name: Living room aircon
+      - name: Living room aircon
         unique_id: living_room_aircon
-        value_template: "{{ states('climate.living_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
+        state: "{{ states('climate.living_room_aircon') != 'off' }}"
         turn_on:
           action: climate.turn_on
           target:
@@ -67,11 +65,10 @@ switch:
           action: climate.turn_off
           target:
             entity_id: climate.living_room_aircon
-
-      dining_room_aircon:
-        friendly_name: Dining room aircon
+        availability: "{{ has_value('climate.living_room_aircon') }}"
+      - name: Dining room aircon
         unique_id: dining_room_aircon
-        value_template: "{{ states('climate.dining_room_aircon') not in ('off', 'unavailable', 'unknown') }}"
+        state: "{{ states('climate.dining_room_aircon') != 'off' }}"
         turn_on:
           action: climate.turn_on
           target:
@@ -80,11 +77,10 @@ switch:
           action: climate.turn_off
           target:
             entity_id: climate.dining_room_aircon
-
-      bedroom_aircon:
-        friendly_name: Bedroom aircon
+        availability: "{{ has_value('climate.dining_room_aircon') }}"
+      - name: Bedroom aircon
         unique_id: bedroom_aircon
-        value_template: "{{ states('climate.bedroom_aircon') not in ('off', 'unavailable', 'unknown') }}"
+        state: "{{ states('climate.bedroom_aircon') != 'off' }}"
         turn_on:
           action: climate.turn_on
           target:
@@ -93,3 +89,4 @@ switch:
           action: climate.turn_off
           target:
             entity_id: climate.bedroom_aircon
+        availability: "{{ has_value('climate.bedroom_aircon') }}"
