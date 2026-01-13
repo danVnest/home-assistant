@@ -1,3 +1,23 @@
+automation:
+  - alias: Timeout security camera streams
+    id: timeout_security_camera_streams
+    mode: parallel
+    triggers:
+      - trigger: state
+        entity_id:
+          - camera.entryway
+          - camera.living_room
+          - camera.back_door
+          - camera.back_deck
+          - camera.garage
+        to: streaming
+        for:
+          minutes: 3
+    actions:
+      - action: eufy_security.stop_p2p_livestream
+        target:
+          entity_id: "{{ trigger.entity_id }}"
+
 template:
   - sensor:
       - name: Security monitoring
