@@ -69,6 +69,7 @@ powercalc:
               - 100 -> 26.1
           standby_power: 0.25 # estimate (equal split between fan and light)
         - entity_id: switch.office_heater
+          unique_id: office_heater_energy
           power_sensor_id: sensor.office_heater_power
           ignore_unavailable_state: true
           energy_integration_method: left
@@ -167,6 +168,7 @@ powercalc:
           unique_id: tv_speakers_pc_home_assistant_router_relay_security_hub
           entities:
             - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
+              unique_id: tv_pc_home_assistant_router_relay_security_hub_energy
               power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_power
               ignore_unavailable_state: true
               energy_integration_method: left
@@ -197,14 +199,17 @@ powercalc:
                 # ≈20W subwoofer, ≈10W * 2 rear @ 100% volume
                 # standby from https://www.lg.com/uk/speakers/soundbars/sp11ra/?srsltid=AfmBOopZ7O31FooCpPHhw462bAGGP_GJ9nZR9T5n9rWonUcFKXETGE2i
         - entity_id: switch.dishwasher
+          unique_id: dishwasher_energy
           power_sensor_id: sensor.dishwasher_power
           ignore_unavailable_state: true
           energy_integration_method: left
         - entity_id: switch.fridge
+          unique_id: fridge_energy
           power_sensor_id: sensor.fridge_power
           ignore_unavailable_state: true
           energy_integration_method: left
         - entity_id: switch.freezer_mini_fridge_routers
+          unique_id: freezer_mini_fridge_routers_energy
           power_sensor_id: sensor.freezer_mini_fridge_routers_power
           ignore_unavailable_state: true
           energy_integration_method: left
@@ -212,18 +217,22 @@ powercalc:
           unique_id: kitchen_appliances
           entities:
             - entity_id: switch.microwave
+              unique_id: microwave_energy
               power_sensor_id: sensor.microwave_power
               ignore_unavailable_state: true
               energy_integration_method: left
             - entity_id: switch.toaster_blender
+              unique_id: toaster_blender_energy
               power_sensor_id: sensor.toaster_blender_power
               ignore_unavailable_state: true
               energy_integration_method: left
             - entity_id: switch.kettle_milk_frother
+              unique_id: kettle_milk_frother_energy
               power_sensor_id: sensor.kettle_milk_frother_power
               ignore_unavailable_state: true
               energy_integration_method: left
             - entity_id: switch.kitchen_switch
+              unique_id: kitchen_switch_energy
               power_sensor_id: sensor.kitchen_switch_power
               ignore_unavailable_state: true
               energy_integration_method: left
@@ -235,6 +244,7 @@ powercalc:
           unique_id: office_desk_computer_monitor_cooler_fish_tank
           entities:
             - entity_id: switch.office_desk
+              unique_id: office_desk_energy
               power_sensor_id: sensor.office_desk_power
               ignore_unavailable_state: true
               energy_integration_method: left
@@ -307,6 +317,7 @@ powercalc:
             - power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_power
               energy_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_energy
         - entity_id: switch.paludarium_picture_frame_camera
+          unique_id: paludarium_picture_frame_camera_energy
           name: Paludarium, picture frame, camera
           power_sensor_id: sensor.paludarium_picture_frame_camera_power
           ignore_unavailable_state: true
