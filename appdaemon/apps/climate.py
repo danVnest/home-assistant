@@ -661,7 +661,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
-        self.preferred_fan_mode = self.fan_mode
+        self.preferred_fan_mode = "auto"
         self.preferred_swing_mode = (
             "both" if "both" in self.get_attribute("swing_modes") else "rangefull"
         )
