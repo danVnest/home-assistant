@@ -290,13 +290,6 @@ class Device:
             if not self.control_enabled:
                 return
             self.control_enabled = False
-            self.controller.notify(
-                "Automatic control is now disabled for the "
-                f"{self.device.friendly_name.lower()} to prevent it from immediately "
-                f"overriding {user}'s manual adjustments",
-                title=f"{self.device.friendly_name.title()} Control Disabled",
-                targets="anyone_home_else_all",
-            )
 
     def __handle_control_enabled(
         self,
