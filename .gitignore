@@ -9,14 +9,18 @@ secrets.yaml
 !.storage/core.area_registry
 !.storage/core.floor_registry
 !.storage/energy
-!.storage/lovelace
+!.storage/frontend_theme
+!.storage/frontend.system_data
+!.storage/lovelace*
 
 # Custom components (keeping manifests and customisations)
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/apparent_temperature/sensor.py
 cuboai_*
+go2rtc*
 themes/*/*.jpg
+watchman_report.txt
 
 # Logs
 home-assistant.log*
@@ -37,8 +41,8 @@ deps
 image
 tts
 www
-go2rtc*
 webostv.conf
+zwavejs*
 
 # Visual Studio Code
 .vscode

@@ -5,14 +5,8 @@ colorise_entities:
   description: ''
   supported:
     - button
-    - calendar
-    - climate
-    - cover
-    - horizontal-buttons-stack
-    - media-player
-    - pop-up
     - select
-    - separator
+    - sub-buttons
   code: |-
     ${(() => {
       const formulateAndSetButtonColor = (entity, button) => {

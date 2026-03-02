@@ -13,6 +13,7 @@ default:
     - pop-up
     - select
     - separator
+    - sub-buttons
   code: |-
     .bubble-main-icon {
       opacity: 1 !important;

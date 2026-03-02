@@ -1,0 +1,399 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.dashboard_development",
+  "data": {
+    "config": {
+      "views": [
+        {
+          "path": "development",
+          "title": "Development",
+          "visible": [
+            {
+              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
+            },
+            {
+              "user": "d678a59ca9604e2ba14c3ac3705ba943"
+            }
+          ],
+          "icon": "mdi:cog",
+          "badges": [
+            {
+              "type": "custom:auto-entities",
+              "card": {
+                "type": "glance"
+              },
+              "filter": {
+                "include": [
+                  {
+                    "domain": "update"
+                  }
+                ],
+                "exclude": [
+                  {
+                    "state": "Up-to-date"
+                  }
+                ]
+              },
+              "show_empty": false
+            }
+          ],
+          "cards": [
+            {
+              "type": "entity",
+              "entity": "sensor.tv_state"
+            },
+            {
+              "entities": [
+                {
+                  "entity": "input_select.scene"
+                },
+                {
+                  "entity": "group.climate_control"
+                },
+                {
+                  "entity": "group.any_aircon"
+                },
+                {
+                  "entity": "group.any_fans"
+                },
+                {
+                  "entity": "group.any_heaters"
+                },
+                {
+                  "entity": "group.any_humidifiers"
+                },
+                {
+                  "entity": "input_boolean.pets_home_alone"
+                }
+              ],
+              "hours_to_show": 36,
+              "refresh_interval": 0,
+              "title": "Control History",
+              "type": "history-graph"
+            },
+            {
+              "type": "entities",
+              "entities": [
+                "input_boolean.development_mode"
+              ]
+            },
+            {
+              "entities": [
+                {
+                  "entity": "counter.warnings"
+                },
+                {
+                  "entity": "counter.errors"
+                }
+              ],
+              "hours_to_show": 72,
+              "refresh_interval": 0,
+              "title": "Warnings & Errors",
+              "type": "history-graph"
+            },
+            {
+              "entities": [
+                {
+                  "entity": "sensor.front_door_camera_battery_level",
+                  "name": "Front door camera"
+                },
+                {
+                  "entity": "sensor.back_door_camera_battery_level",
+                  "name": "Back door camera"
+                },
+                {
+                  "entity": "sensor.entryway_camera_battery_level",
+                  "name": "Entryway camera"
+                },
+                {
+                  "entity": "sensor.door_lock_battery_level",
+                  "name": "Lock"
+                },
+                {
+                  "entity": "sensor.entryway_multisensor_battery_level",
+                  "name": "Entryway multisensor"
+                },
+                {
+                  "entity": "sensor.hall_multisensor_battery_level",
+                  "name": "Hall multisensor"
+                },
+                {
+                  "entity": "sensor.bathroom_multisensor_battery_level",
+                  "name": "Bathroom multisensor"
+                },
+                {
+                  "entity": "sensor.dining_room_multisensor_battery_level",
+                  "name": "Dining room multisensor"
+                },
+                {
+                  "entity": "sensor.kitchen_door_sensor_battery_level",
+                  "name": "Kitchen door"
+                },
+                {
+                  "entity": "sensor.kitchen_button_battery_level",
+                  "name": "Kitchen button"
+                },
+                {
+                  "entity": "sensor.bedroom_button_battery_level",
+                  "name": "Bedroom button"
+                },
+                {
+                  "entity": "sensor.nest_protect_entryway_battery_level",
+                  "name": "Entryway fire alarm"
+                },
+                {
+                  "entity": "sensor.nest_protect_living_room_battery_level",
+                  "name": "Living room fire alarm"
+                },
+                {
+                  "entity": "sensor.nest_protect_garage_battery_level",
+                  "name": "Garage fire alarm"
+                },
+                {
+                  "entity": "sensor.toothbrush_battery_level",
+                  "name": "Toothbrush"
+                },
+                {
+                  "entity": "sensor.soil_sensor_vegetable_garden_sun_battery_level",
+                  "name": "Vegetable garden (sun) soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_vegetable_garden_shade_battery_level",
+                  "name": "Vegetable garden (shade) soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_front_deck_battery_level",
+                  "name": "Front deck soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_back_deck_battery_level",
+                  "name": "Back deck soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_carport_pots_battery_level",
+                  "name": "Carport pots soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_dining_room_battery_level",
+                  "name": "Dining room soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_living_room_battery_level",
+                  "name": "Living room soil sensor"
+                },
+                {
+                  "entity": "sensor.soil_sensor_office_battery_level",
+                  "name": "Office soil sensor"
+                }
+              ],
+              "refresh_interval": 0,
+              "title": "Battery Levels",
+              "type": "history-graph",
+              "logarithmic_scale": false,
+              "hours_to_show": 240
+            },
+            {
+              "entity": "media_player.tv",
+              "type": "media-control"
+            },
+            {
+              "type": "media-control",
+              "entity": "media_player.tv_speakers"
+            }
+          ]
+        },
+        {
+          "title": "Statistics",
+          "path": "statistics",
+          "icon": "mdi:chart-box",
+          "cards": [
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "binary_sensor.rachel_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_asleep_probability"
+                },
+                {
+                  "entity": "sensor.rachel_hours_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_hours_asleep_yesterday"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "binary_sensor.dan_asleep"
+                },
+                {
+                  "entity": "sensor.dan_asleep_probability"
+                },
+                {
+                  "entity": "sensor.dan_hours_asleep"
+                },
+                {
+                  "entity": "sensor.dan_hours_asleep_yesterday"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "sensor.bedroom_bed_occupied_probability"
+                }
+              ]
+            },
+            {
+              "type": "history-graph",
+              "entities": [
+                {
+                  "entity": "binary_sensor.rachel_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_asleep_probability"
+                },
+                {
+                  "entity": "binary_sensor.dan_asleep"
+                },
+                {
+                  "entity": "sensor.dan_asleep_probability"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_bed_occupied"
+                },
+                {
+                  "entity": "sensor.bedroom_bed_occupied_probability"
+                }
+              ],
+              "hours_to_show": 72
+            },
+            {
+              "chart_type": "bar",
+              "period": "month",
+              "type": "statistics-graph",
+              "entities": [
+                "sensor.anyone_asleep_ratio_while_asleep",
+                "sensor.bedroom_occupancy_ratio_while_asleep",
+                "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep",
+                "sensor.anyone_asleep_ratio_while_asleep",
+                "sensor.bedroom_bed_occupied_ratio_while_asleep",
+                "sensor.bedroom_light_off_ratio_while_asleep",
+                "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep",
+                "sensor.rachel_s_phone_s_still_ratio_while_asleep",
+                "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep",
+                "sensor.dan_s_phone_still_ratio_while_asleep",
+                "sensor.dan_s_phone_plugged_in_ratio_while_asleep",
+                "sensor.anyone_asleep_ratio_while_awake",
+                "sensor.bedroom_occupancy_ratio_while_awake",
+                "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake",
+                "sensor.anyone_asleep_ratio_while_awake",
+                "sensor.bedroom_bed_occupied_ratio_while_awake",
+                "sensor.bedroom_light_off_ratio_while_awake",
+                "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake",
+                "sensor.rachel_s_phone_s_still_ratio_while_awake",
+                "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake",
+                "sensor.dan_s_phone_still_ratio_while_awake",
+                "sensor.dan_s_phone_plugged_in_ratio_while_awake"
+              ],
+              "stat_types": [
+                "mean",
+                "min",
+                "max"
+              ],
+              "title": "Long term statistics",
+              "logarithmic_scale": false,
+              "hide_legend": false
+            },
+            {
+              "type": "entities",
+              "title": "While asleep",
+              "entities": [
+                {
+                  "entity": "sensor.bedroom_occupancy_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.anyone_asleep_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.bedroom_bed_occupied_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.bedroom_light_off_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_s_phone_s_still_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.dan_s_phone_still_ratio_while_asleep"
+                },
+                {
+                  "entity": "sensor.dan_s_phone_plugged_in_ratio_while_asleep"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "title": "While awake",
+              "entities": [
+                {
+                  "entity": "sensor.bedroom_occupancy_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.bedroom_presence_sensor_distance_in_bed_range_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.anyone_asleep_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.bedroom_bed_occupied_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.bedroom_light_off_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.rachel_was_asleep_within_the_last_5_minutes_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.rachel_s_phone_s_still_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.rachel_s_phone_s_sleep_confidence_high_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.dan_s_phone_still_ratio_while_awake"
+                },
+                {
+                  "entity": "sensor.dan_s_phone_plugged_in_ratio_while_awake"
+                }
+              ]
+            }
+          ],
+          "visible": [
+            {
+              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
+            },
+            {
+              "user": "037b9dab7fb04176b342f8c42a79bb17"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

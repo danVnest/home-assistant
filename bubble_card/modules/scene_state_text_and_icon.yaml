@@ -4,15 +4,7 @@ scene_state_text_and_icon:
   creator: danVnest
   description: Adjust text and icon based on scene state.
   supported:
-    - button
-    - calendar
-    - climate
-    - cover
-    - horizontal-buttons-stack
-    - media-player
-    - pop-up
     - select
-    - separator
   code: |-
     ${card.querySelector('.bubble-name').innerText = state + " scene"}
 

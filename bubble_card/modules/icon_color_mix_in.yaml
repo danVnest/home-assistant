@@ -6,12 +6,11 @@ icon_color_mix_in:
     Set the icon's color from a predefined list of colors.
     This color is then mixed-in with the default theme's color so it looks good in both light and dark theme variants.
   supported:
-    - calendar
-    - pop-up
-    - cover
     - button
-    - media-player
+    - calendar
     - climate
+    - cover
+    - pop-up
     - select
   code: |
     .bubble-icon {

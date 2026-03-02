@@ -13,6 +13,7 @@ home-assistant-default:
     - pop-up
     - select
     - separator
+    - sub-buttons
   code: |-
     :host {
         --bubble-main-background-color: var(--ha-card-background, var(--card-background-color, #fff));

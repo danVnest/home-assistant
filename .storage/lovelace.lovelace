@@ -1,7 +1,7 @@
 {
   "version": 1,
   "minor_version": 1,
-  "key": "lovelace",
+  "key": "lovelace.lovelace",
   "data": {
     "config": {
       "title": "Smart Nest",
@@ -149,12 +149,13 @@
                   ],
                   "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
                   "modules": [
-                    "normalised_sub_button_size",
-                    "icon_color_mix_in"
+                    "icon_color_mix_in",
+                    "default"
                   ],
                   "icon_color_mix_in": {
                     "color": "red"
-                  }
+                  },
+                  "icon_border_progress": []
                 },
                 {
                   "type": "custom:bubble-card",
@@ -185,7 +186,6 @@
                   ],
                   "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['counter.errors'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['counter.warnings'].state === '1.0' ? '': 's') }\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -277,7 +277,6 @@
                   ],
                   "styles": ".bubble-sub-button-1 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_import'].state < 500 ? 'green' : 'red'})\n} .bubble-sub-button-2 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_export'].state > 1000 ? 'green' : 'red'})\n} .bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), red)\n} .bubble-sub-button-4 {\n  color: color-mix(in srgb, var(--color-mix-in-base), green)\n}\n${card.querySelector('.bubble-state').innerText = 'Minimise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_import'].state/1000) + 'kW import'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_export'].state/1000) + 'kW export'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n${card.querySelector('.bubble-sub-button-4 .bubble-sub-button-name-container').innerText =  parseFloat(hass.states['sensor.total_power_cost_savings'].state).toFixed(2) + '/h saving'}\n${card.querySelector('.bubble-sub-button-5 .bubble-sub-button-name-container').innerText = (parseFloat(hass.states['sensor.battery_time_remaining'].state) >= 1 ? parseFloat(hass.states['sensor.battery_time_remaining'].state).toFixed(0) + 'h' : Math.round(parseFloat(hass.states['sensor.battery_time_remaining'].state) * 60) + 'm')\n + ' battery left'}\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -329,14 +328,33 @@
                   ],
                   "visibility": [
                     {
-                      "condition": "numeric_state",
-                      "entity": "sensor.electricity_general_price",
-                      "below": 0
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.electricity_general_price",
+                          "below": 0
+                        },
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "numeric_state",
+                              "entity": "sensor.power_meter_power_grid_export",
+                              "above": 500
+                            },
+                            {
+                              "condition": "numeric_state",
+                              "entity": "sensor.electricity_feed_in_price",
+                              "below": 0.01
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "styles": ".bubble-sub-button-1 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_import'].state > 1000 ? 'green' : 'red'})\n} .bubble-sub-button-2 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.power_meter_power_grid_export'].state < 100 ? 'green' : 'red'})\n} .bubble-sub-button-3 {\n  color: color-mix(in srgb, var(--color-mix-in-base), ${hass.states['sensor.total_power_cost'].state <= 0 ? 'green' : 'red'})\n}\n${card.querySelector('.bubble-state').innerText = 'Maximise usage'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_import'].state/1000) + 'kW import'}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.power_meter_power_grid_export'].state/1000) + 'kW export'}\n${card.querySelector('.bubble-sub-button-3 .bubble-sub-button-name-container').innerText = parseFloat(hass.states['sensor.total_power_cost'].state).toFixed(2) + '/h now'}\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -405,9 +423,8 @@
                       ]
                     }
                   ],
-                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button {\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_bedroom'].state === 'on' ? 'Napping' : 'Not napping'}\";\n} .bubble-sub-button-2 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_nursery'].state === 'on' ? 'Napping' : 'Not napping'}\";\n}\n",
+                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .icon-without-state {\n  margin-right: 2px\n} .bubble-sub-button {\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_bedroom'].state === 'on' ? 'Napping' : 'Not napping'}\";\n} .bubble-sub-button-2 .bubble-sub-button-name-container::before {\n  content: \" ${hass.states['input_boolean.napping_in_nursery'].state === 'on' ? 'Napping' : 'Not napping'}\";\n}\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "scene_state_text_and_icon"
                   ]
                 },
@@ -472,10 +489,7 @@
                       ]
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n",
-                  "modules": [
-                    "normalised_sub_button_size"
-                  ]
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
                 },
                 {
                   "type": "map",
@@ -685,7 +699,6 @@
                     }
                   ],
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -741,7 +754,6 @@
                   ],
                   "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -800,7 +812,6 @@
                   ],
                   "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
@@ -820,172 +831,188 @@
                 },
                 {
                   "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "name",
+                  "card_type": "sub-buttons",
                   "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "group.all_lights",
-                      "name": "All",
-                      "show_name": true,
-                      "double_tap_action": {
-                        "action": "toggle"
+                  "scrolling_effect": false,
+                  "sub_button": {
+                    "bottom_layout": "rows",
+                    "bottom": [
+                      {
+                        "name": "Top",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "group.all_lights",
+                            "name": "All",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.entryway_lights",
+                            "name": "Entryway",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_entryway_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.kitchen_lights",
+                            "name": "Kitchen",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_kitchen_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.tv_lights",
+                            "name": "TV",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_tv_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.dining_room_lights",
+                            "name": "Dining",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_dining_room_lights"
+                              }
+                            }
+                          }
+                        ]
                       },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "script.toggle_group",
-                        "data": {
-                          "group": "group.all_light_control"
-                        }
+                      {
+                        "name": "Bottom",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "light.hall",
+                            "name": "Hall",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_hall_light"
+                              }
+                            },
+                            "content_layout": "icon-left"
+                          },
+                          {
+                            "entity": "light.bathroom",
+                            "name": "Bathroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bathroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.bedroom",
+                            "name": "Bedroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bedroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.nursery",
+                            "name": "Nursery",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_nursery_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.office",
+                            "name": "Office",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_office_light"
+                              }
+                            }
+                          }
+                        ]
                       }
-                    },
-                    {
-                      "entity": "light.hall",
-                      "name": "Hall",
-                      "show_name": true,
-                      "light_background": false,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_hall_light"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "group.entryway_lights",
-                      "name": "Entryway",
-                      "show_name": true,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_entryway_lights"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "light.bathroom",
-                      "name": "Bathroom",
-                      "show_name": true,
-                      "light_background": false,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_bathroom_light"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "group.kitchen_lights",
-                      "name": "Kitchen",
-                      "show_name": true,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "script.toggle_group",
-                        "data": {
-                          "group": "group.all_kitchen_light_control"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "light.bedroom",
-                      "name": "Bedroom",
-                      "show_name": true,
-                      "light_background": false,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_bedroom_light"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "group.tv_lights",
-                      "name": "TV",
-                      "show_name": true,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_tv_lights"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "light.nursery",
-                      "name": "Nursery",
-                      "show_name": true,
-                      "light_background": false,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_nursery_light"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "group.dining_room_lights",
-                      "name": "Dining",
-                      "show_name": true,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_dining_room_lights"
-                        }
-                      }
-                    },
-                    {
-                      "entity": "light.office",
-                      "name": "Office",
-                      "show_name": true,
-                      "light_background": false,
-                      "double_tap_action": {
-                        "action": "toggle"
-                      },
-                      "hold_action": {
-                        "action": "call-service",
-                        "service": "input_boolean.toggle",
-                        "target": {
-                          "entity_id": "input_boolean.control_office_light"
-                        }
-                      }
-                    }
-                  ],
-                  "styles": ".bubble-name-container {\n  max-width: 0px !important;\n} .bubble-icon-container {\n  display: none;\n} .bubble-sub-button-container {\n  margin: auto !important;\n  padding: 0 !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                    ]
+                  },
+                  "styles": ".bubble-sub-button {\n  padding: 0 4px;\n} .bubble-sub-button-group {\n  gap: 4px;\n} .icon-with-state {\n  margin-right: 2px\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 12px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "colorise_entities",
                     "indicate_unavailable_entities"
-                  ]
+                  ],
+                  "rows": 1.144
                 }
               ]
             },
@@ -1396,7 +1423,6 @@
                   ],
                   "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.extreme_forecast'].attributes.text }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.next_rain_forecast'].attributes.text }\n",
                   "modules": [
-                    "normalised_sub_button_size",
                     "colorise_entities"
                   ]
                 },
@@ -1458,9 +1484,9 @@
                     }
                   ],
                   "modules": [
-                    "normalised_sub_button_size",
                     "colorise_entities"
-                  ]
+                  ],
+                  "button_action": {}
                 }
               ],
               "column_span": 1
@@ -1687,7 +1713,6 @@
                       ],
                       "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
                       "modules": [
-                        "normalised_sub_button_size",
                         "icon_color_mix_in"
                       ],
                       "icon_color_mix_in": {
@@ -2428,6 +2453,255 @@
           "badges": [],
           "cards": [
             {
+              "type": "markdown",
+              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% for alert in alerts %}\n  {% if alert['image'] %}![img]({{ alert['image'] }}){% endif %}\n  **{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}** in nursery at **{{ as_timestamp(alert['created'])|timestamp_custom('%I:%M** %p on %d.%m.%Y ', true) }}\n{% endfor %}",
+              "visibility": [
+                {
+                  "condition": "state",
+                  "entity": "sensor.cuboai_last_alert",
+                  "state_not": "No alerts"
+                }
+              ]
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Front door",
+              "entity": "camera.front_door",
+              "poster": "image.front_door_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.front_door_camera_enabled'].state === 'on' ? (states['sensor.front_door_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.front_door_camera_enabled'].state === 'on' ? (states['sensor.front_door_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.front_door_camera_enabled'].state === 'on' ? 'camera.front_door' :'switch.front_door_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.front_door_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.front_door_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Entryway",
+              "entity": "camera.entryway",
+              "poster": "image.entryway_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.entryway_camera_enabled'].state === 'on' ? (states['sensor.entryway_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.entryway_camera_enabled'].state === 'on' ? (states['sensor.entryway_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.entryway_camera_enabled'].state === 'on' ? 'camera.entryway' :'switch.entryway_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.entryway_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.entryway_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Living room",
+              "entity": "camera.living_room",
+              "poster": "image.living_room_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.living_room_camera_enabled'].state === 'on' ? (states['sensor.living_room_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.living_room_camera_enabled'].state === 'on' ? (states['sensor.living_room_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.living_room_camera_enabled'].state === 'on' ? 'camera.living_room' :'switch.living_room_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.living_room_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.living_room_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Back deck",
+              "entity": "camera.back_deck",
+              "poster": "image.back_deck_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.back_deck_camera_enabled'].state === 'on' ? (states['sensor.back_deck_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.back_deck_camera_enabled'].state === 'on' ? (states['sensor.back_deck_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.back_deck_camera_enabled'].state === 'on' ? 'camera.back_deck' :'switch.back_deck_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.back_deck_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.back_deck_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Back door",
+              "entity": "camera.back_door",
+              "poster": "image.back_door_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.back_door_camera_enabled'].state === 'on' ? (states['sensor.back_door_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.back_door_camera_enabled'].state === 'on' ? (states['sensor.back_door_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.back_door_camera_enabled'].state === 'on' ? 'camera.back_door' :'switch.back_door_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.back_door_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.back_door_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "custom:webrtc-camera",
+              "title": "Garage",
+              "entity": "camera.garage",
+              "poster": "image.garage_event_image",
+              "ui": true,
+              "shortcuts": [
+                {
+                  "name": "play/pause/enable",
+                  "icon": "${states['switch.garage_camera_enabled'].state === 'on' ? (states['sensor.garage_stream_status'].state !== 'StreamStatus.IDLE' ? 'mdi:pause' :'mdi:play') :'mdi:power'}",
+                  "service": "${ states['switch.garage_camera_enabled'].state === 'on' ? (states['sensor.garage_stream_status'].state !== 'StreamStatus.IDLE' ? 'eufy_security.stop_p2p_livestream':'eufy_security.start_p2p_livestream') :'switch.turn_on'}",
+                  "service_data": {
+                    "entity_id": "${ states['switch.garage_camera_enabled'].state === 'on' ? 'camera.garage' :'switch.garage_camera_enabled' }"
+                  }
+                },
+                {
+                  "name": "disable",
+                  "icon": "${ states['switch.garage_camera_enabled'].state === 'on' ? 'mdi:cctv-off' :'' }",
+                  "service": "switch.turn_off",
+                  "service_data": {
+                    "entity_id": "switch.garage_camera_enabled"
+                  }
+                }
+              ],
+              "style": ".mode {display: none} .header {top: unset; bottom: 6px; left: unset; right: 6px;}"
+            },
+            {
+              "type": "history-graph",
+              "title": "Motion",
+              "entities": [
+                {
+                  "entity": "input_select.scene"
+                },
+                {
+                  "entity": "lock.door_lock",
+                  "name": "Front door lock"
+                },
+                {
+                  "entity": "binary_sensor.front_door_motion_detected",
+                  "name": "Front door"
+                },
+                {
+                  "entity": "binary_sensor.entryway_multisensor_motion",
+                  "name": "Entryway"
+                },
+                {
+                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
+                  "name": "Kitchen"
+                },
+                {
+                  "entity": "binary_sensor.kitchen_door_motion",
+                  "name": "Kitchen door"
+                },
+                {
+                  "entity": "binary_sensor.back_deck_motion_detected",
+                  "name": "Back deck"
+                },
+                {
+                  "entity": "binary_sensor.living_room_presence_sensor_occupancy",
+                  "name": "Living room"
+                },
+                {
+                  "entity": "binary_sensor.living_room_motion_detected",
+                  "name": "Living room camera"
+                },
+                {
+                  "entity": "binary_sensor.dining_room_multisensor_motion",
+                  "name": "Dining room"
+                },
+                {
+                  "entity": "binary_sensor.dining_room_balcony_door_motion",
+                  "name": "Dining room balcony door"
+                },
+                {
+                  "entity": "binary_sensor.hall_multisensor_motion",
+                  "name": "Hall"
+                },
+                {
+                  "entity": "binary_sensor.bathroom_multisensor_motion",
+                  "name": "Bathroom"
+                },
+                {
+                  "entity": "binary_sensor.office_presence_sensor_occupancy",
+                  "name": "Office"
+                },
+                {
+                  "entity": "binary_sensor.nursery_presence_sensor_occupancy",
+                  "name": "Nursery"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
+                  "name": "Bedroom"
+                },
+                {
+                  "entity": "binary_sensor.bedroom_balcony_door_motion",
+                  "name": "Bedroom balcony door"
+                },
+                {
+                  "entity": "binary_sensor.back_door_motion_detected",
+                  "name": "Back door"
+                },
+                {
+                  "entity": "binary_sensor.garage_motion_detected",
+                  "name": "Garage"
+                }
+              ],
+              "hours_to_show": 24
+            },
+            {
               "aspect_ratio": "2",
               "default_zoom": 12,
               "auto_fit": true,
@@ -2441,324 +2715,7 @@
               ],
               "hours_to_show": 1,
               "type": "map",
-              "theme_mode": "dark"
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.front_door",
-              "poster": "image.front_door_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.front_door"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.front_door"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.entryway",
-              "poster": "image.entryway_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.entryway"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.entryway"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.living_room",
-              "poster": "image.living_room_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.living_room"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.living_room"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.back_deck",
-              "poster": "image.back_deck_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.back_deck"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.back_deck"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.back_door",
-              "poster": "image.back_door_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.back_door"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.back_door"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "custom:webrtc-camera",
-              "entity": "camera.garage",
-              "poster": "image.garage_event_image",
-              "ui": true,
-              "shortcuts": [
-                {
-                  "name": "Play",
-                  "icon": "mdi:play",
-                  "service": "camera.turn_on",
-                  "service_data": {
-                    "entity_id": "camera.garage"
-                  }
-                },
-                {
-                  "name": "Stop",
-                  "icon": "mdi:stop",
-                  "service": "camera.turn_off",
-                  "service_data": {
-                    "entity_id": "camera.garage"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "markdown",
-              "title": "Nursery camera alerts",
-              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% if alerts %}\n{% for alert in alerts %}\n**{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}**\n  {{ as_timestamp(alert['created']) | timestamp_custom('%Y-%m-%d %H:%M', true) }}\n  {% if alert['image'] %}![img]({{ alert['image'] }}){% else %}-{% endif %}\n{% endfor %}\n{% else %}\n_No recent alerts_\n{% endif %}\n"
-            },
-            {
-              "type": "history-graph",
-              "entities": [
-                {
-                  "entity": "binary_sensor.front_door_motion",
-                  "name": "Front door"
-                },
-                {
-                  "entity": "lock.door_lock",
-                  "name": "Front door lock"
-                },
-                {
-                  "entity": "binary_sensor.entryway_multisensor_motion",
-                  "name": "Entryway"
-                },
-                {
-                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
-                  "name": "Kitchen"
-                },
-                {
-                  "entity": "binary_sensor.kitchen_door_motion",
-                  "name": "Kitchen door"
-                },
-                {
-                  "entity": "binary_sensor.back_deck_motion_detected",
-                  "name": "Back deck"
-                },
-                {
-                  "entity": "binary_sensor.living_room_presence_sensor_occupancy",
-                  "name": "Living room"
-                },
-                {
-                  "entity": "binary_sensor.living_room_motion_detected",
-                  "name": "Living room camera"
-                },
-                {
-                  "entity": "binary_sensor.dining_room_multisensor_motion",
-                  "name": "Dining room"
-                },
-                {
-                  "entity": "binary_sensor.dining_room_balcony_door_motion",
-                  "name": "Dining room balcony door"
-                },
-                {
-                  "entity": "binary_sensor.hall_multisensor_motion",
-                  "name": "Hall"
-                },
-                {
-                  "entity": "binary_sensor.bathroom_multisensor_motion",
-                  "name": "Bathroom"
-                },
-                {
-                  "entity": "binary_sensor.office_presence_sensor_occupancy",
-                  "name": "Office"
-                },
-                {
-                  "entity": "binary_sensor.nursery_presence_sensor_occupancy",
-                  "name": "Nursery"
-                },
-                {
-                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
-                  "name": "Bedroom"
-                },
-                {
-                  "entity": "binary_sensor.bedroom_balcony_door_motion",
-                  "name": "Bedroom balcony door"
-                },
-                {
-                  "entity": "binary_sensor.back_door_motion_detected",
-                  "name": "Back door"
-                },
-                {
-                  "entity": "binary_sensor.garage_motion_detected",
-                  "name": "Garage"
-                }
-              ],
-              "title": "Motion in last hour",
-              "logarithmic_scale": false,
-              "hours_to_show": 1
-            },
-            {
-              "type": "history-graph",
-              "entities": [
-                {
-                  "entity": "binary_sensor.front_door_motion",
-                  "name": "Front door"
-                },
-                {
-                  "entity": "lock.door_lock",
-                  "name": "Front door lock"
-                },
-                {
-                  "entity": "binary_sensor.entryway_multisensor_motion",
-                  "name": "Entryway"
-                },
-                {
-                  "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
-                  "name": "Kitchen"
-                },
-                {
-                  "entity": "binary_sensor.kitchen_door_motion",
-                  "name": "Kitchen door"
-                },
-                {
-                  "entity": "binary_sensor.back_deck_motion_detected",
-                  "name": "Back deck"
-                },
-                {
-                  "entity": "binary_sensor.living_room_presence_sensor_occupancy",
-                  "name": "Living room"
-                },
-                {
-                  "entity": "binary_sensor.living_room_motion_detected",
-                  "name": "Living room camera"
-                },
-                {
-                  "entity": "binary_sensor.dining_room_multisensor_motion",
-                  "name": "Dining room"
-                },
-                {
-                  "entity": "binary_sensor.dining_room_balcony_door_motion",
-                  "name": "Dining room balcony door"
-                },
-                {
-                  "entity": "binary_sensor.hall_multisensor_motion",
-                  "name": "Hall"
-                },
-                {
-                  "entity": "binary_sensor.bathroom_multisensor_motion",
-                  "name": "Bathroom"
-                },
-                {
-                  "entity": "binary_sensor.office_presence_sensor_occupancy",
-                  "name": "Office"
-                },
-                {
-                  "entity": "binary_sensor.nursery_presence_sensor_occupancy",
-                  "name": "Nursery"
-                },
-                {
-                  "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
-                  "name": "Bedroom"
-                },
-                {
-                  "entity": "binary_sensor.bedroom_balcony_door_motion",
-                  "name": "Bedroom balcony door"
-                },
-                {
-                  "entity": "binary_sensor.back_door_motion_detected",
-                  "name": "Back door"
-                },
-                {
-                  "entity": "binary_sensor.garage_motion_detected",
-                  "name": "Garage"
-                }
-              ],
-              "logarithmic_scale": false,
-              "hours_to_show": 24,
-              "title": "Motion over 24 hours"
-            }
-          ],
-          "visible": [
-            {
-              "user": "15ff7a86d4ae4d38a60003ad4064ff78"
-            },
-            {
-              "user": "037b9dab7fb04176b342f8c42a79bb17"
+              "theme_mode": "auto"
             }
           ]
         },
@@ -3198,6 +3155,8 @@
                           "id": "first",
                           "align_to": 0.1,
                           "apex_config": {
+                            "logarithmic": true,
+                            "logBase": 3,
                             "labels": {
                               "formatter": "EVAL:function(value) {\n  return \"$\" + value.toFixed(2);\n}\n"
                             }

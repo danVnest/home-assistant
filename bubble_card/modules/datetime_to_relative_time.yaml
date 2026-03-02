@@ -5,14 +5,7 @@ datetime_to_relative_time:
   description: Converts a datetime state to its relative equivalent from the current time (e.g. 2 hours ago or in 53 minutes).
   supported:
     - button
-    - calendar
-    - climate
-    - cover
-    - horizontal-buttons-stack
-    - media-player
-    - pop-up
     - select
-    - separator
   code: |-
     ${card.querySelector('.bubble-state').innerText = (() => {
       const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });

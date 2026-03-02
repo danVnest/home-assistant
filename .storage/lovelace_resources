@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace_resources",
+  "data": {
+    "items": [
+      {
+        "id": "db33372b7c14402f8c2cb51186c0c7fc",
+        "url": "/webrtc/webrtc-camera.js?v=v3.6.1",
+        "type": "module"
+      },
+      {
+        "id": "953d4f6b63c4405ba2c51b5eb1750c5f",
+        "url": "/hacsfiles/lovelace-auto-entities/auto-entities.js?hacstag=1677445841161",
+        "type": "module"
+      },
+      {
+        "id": "3381f7eb0221467a819b888f52a8faa6",
+        "url": "/hacsfiles/power-flow-card-plus/power-flow-card-plus.js?hacstag=618081815026",
+        "type": "module"
+      },
+      {
+        "id": "84218685b64f474f822a6ea89436fbf1",
+        "url": "/hacsfiles/lovelace-card-mod/card-mod.js?hacstag=190927524421",
+        "type": "module"
+      },
+      {
+        "id": "892df41fc7294e76bea2def91a3f6704",
+        "url": "/hacsfiles/mini-graph-card/mini-graph-card-bundle.js?hacstag=1512800620130",
+        "type": "module"
+      },
+      {
+        "id": "f78c6bcca1f5416e94f8811481a0c8f1",
+        "url": "/hacsfiles/Bubble-Card/bubble-card.js?hacstag=680112919311",
+        "type": "module"
+      },
+      {
+        "id": "e1c31949c8874ed6848dc33828272f7a",
+        "url": "/hacsfiles/lovelace-template-entity-row/template-entity-row.js?hacstag=231674882141",
+        "type": "module"
+      },
+      {
+        "id": "3ec67b1d3fe749c5a78827a1fe3f6e9b",
+        "url": "/hacsfiles/bar-card/bar-card.js?hacstag=979786390408",
+        "type": "module"
+      },
+      {
+        "id": "a0fd4b1fecfe47bfac807be16ef79c24",
+        "url": "/hacsfiles/mushroom-strategy/mushroom-strategy.js?hacstag=619284862250",
+        "type": "module"
+      },
+      {
+        "id": "cc652ae954cf487cbcdf30751940a577",
+        "url": "/hacsfiles/apexcharts-card/apexcharts-card.js?hacstag=331701152223",
+        "type": "module"
+      },
+      {
+        "id": "22c0ae78a3b3497eae6d659dbda3c712",
+        "url": "/hacsfiles/lovelace-plotly-graph-card/plotly-graph-card.js?hacstag=413812496335",
+        "type": "module"
+      },
+      {
+        "id": "6439df8b3a9e420cad2462a1f8f9977a",
+        "url": "/hacsfiles/button-card/button-card.js?hacstag=146194325701",
+        "type": "module"
+      }
+    ]
+  }
+}

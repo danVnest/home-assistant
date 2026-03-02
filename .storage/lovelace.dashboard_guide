@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.dashboard_guide",
+  "data": {
+    "config": {
+      "views": [
+        {
+          "type": "sections",
+          "path": "",
+          "sections": [
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Guide",
+                  "heading_style": "title",
+                  "icon": "mdi:text-box"
+                },
+                {
+                  "type": "markdown",
+                  "content": "TODO: make this page redirect to /lovelace/guide",
+                  "layout_options": {
+                    "grid_columns": "full"
+                  },
+                  "card_mod": {
+                    "style": {
+                      "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: 1.5px solid var(--accent-color);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
+                    }
+                  }
+                }
+              ],
+              "column_span": 2
+            }
+          ],
+          "max_columns": 4,
+          "title": "Guide",
+          "cards": [],
+          "icon": "mdi:text-box"
+        }
+      ]
+    }
+  }
+}

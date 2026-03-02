@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "minor_version": 1,
+  "key": "lovelace.dashboard_areas",
+  "data": {
+    "config": {
+      "strategy": {
+        "type": "custom:mushroom-strategy",
+        "options": {
+          "areas": {
+            "undisclosed": {
+              "hidden": true
+            }
+          }
+        }
+      },
+      "views": []
+    }
+  }
+}
