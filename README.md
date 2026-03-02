@@ -20,13 +20,14 @@ The remaining dashboards include detailed settings, controls, and sensors for li
 
 This home automation system is comprised of the following devices:
 
-- [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5/) with NVME running Home Assistant
-- [Orbi AC3000 Mesh WiFi System](https://www.netgear.com/home/wifi/mesh/rbk50)
+- [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5) with NVME running Home Assistant
+- [Eero 7 Mesh WiFi System](https://www.amazon.com.au/dp/B0DB6GQFRV)
 - [Zooz USB Z-Wave controller](https://www.getzooz.com/zooz-zst10-s2-stick)
 - [ZigBee hub](https://www.aliexpress.com/item/1005006592375647.html)
 - [Hank Z-Wave One buttons](https://www.simplysmart123.com/buttons/hank-z-wave-plus-one-button-scene-controller)
 - [Ewelink smart button](https://www.aliexpress.com/item/1005006766811512.html)
 - [Screek F2 mmWave presence sensors](https://docs.screek.io/f2)
+- [Screek L13 mmWave presence sensors](https://docs.screek.io/l13)
 - [Zooz 4-in-1 sensors](https://www.getzooz.com/zooz-zse40-4-in-1-sensor)
 - [Tuya temperature and humidity sensors](https://www.aliexpress.com/item/1005006534648116.html)
 - [Tuya door/window sensors](https://www.aliexpress.com/item/1005006128680908.html)
