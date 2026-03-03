@@ -1444,49 +1444,65 @@
                     "action": "navigate",
                     "navigation_path": "/lovelace/climate"
                   },
-                  "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "sensor.living_room_apparent_temperature",
-                      "icon": "mdi:sofa",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.kitchen_apparent_temperature",
-                      "icon": "mdi:fridge",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.dining_room_apparent_temperature",
-                      "icon": "mdi:table-chair",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.office_apparent_temperature",
-                      "icon": "mdi:desktop-classic",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.bedroom_apparent_temperature",
-                      "icon": "mdi:bed",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.nursery_apparent_temperature",
-                      "icon": "mdi:cradle",
-                      "show_state": true,
-                      "show_background": false
-                    }
-                  ],
+                  "sub_button": {
+                    "main": [
+                      {
+                        "name": "Top",
+                        "group": [
+                          {
+                            "entity": "sensor.kitchen_apparent_temperature",
+                            "icon": "mdi:fridge",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.living_room_apparent_temperature",
+                            "icon": "mdi:sofa",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.dining_room_apparent_temperature",
+                            "icon": "mdi:table-chair",
+                            "show_state": true,
+                            "show_background": false
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Bottom",
+                        "group": [
+                          {
+                            "entity": "sensor.bedroom_apparent_temperature",
+                            "icon": "mdi:bed",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.nursery_apparent_temperature",
+                            "icon": "mdi:cradle",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.office_apparent_temperature",
+                            "icon": "mdi:desktop-classic",
+                            "show_state": true,
+                            "show_background": false
+                          }
+                        ]
+                      }
+                    ],
+                    "main_layout": "rows",
+                    "bottom": []
+                  },
                   "modules": [
                     "colorise_entities"
                   ],
-                  "button_action": {}
+                  "button_action": {},
+                  "slider_fill_orientation": "left",
+                  "slider_value_position": "right",
+                  "card_layout": "large-2-rows"
                 }
               ],
               "column_span": 1
@@ -1699,7 +1715,7 @@
                           "show_background": false
                         },
                         {
-                          "entity": "sensor.frozen_devices",
+                          "entity": "sensor.frozen_entities",
                           "show_state": true,
                           "show_background": false
                         }
@@ -1850,7 +1866,30 @@
                   "type": "glance"
                 },
                 {
+                  "show_name": true,
+                  "show_icon": true,
+                  "show_state": true,
                   "entities": [
+                    {
+                      "entity": "sensor.entryway_apparent_temperature",
+                      "name": "Entryway"
+                    },
+                    {
+                      "entity": "sensor.kitchen_apparent_temperature",
+                      "name": "Kitchen"
+                    },
+                    {
+                      "entity": "sensor.living_room_apparent_temperature",
+                      "name": "Living room"
+                    },
+                    {
+                      "entity": "sensor.dining_room_apparent_temperature",
+                      "name": "Dining room"
+                    },
+                    {
+                      "entity": "sensor.bathroom_apparent_temperature",
+                      "name": "Bathroom"
+                    },
                     {
                       "entity": "sensor.bedroom_apparent_temperature",
                       "name": "Bedroom"
@@ -1862,41 +1901,21 @@
                     {
                       "entity": "sensor.office_apparent_temperature",
                       "name": "Office"
-                    },
-                    {
-                      "entity": "sensor.dining_room_apparent_temperature",
-                      "name": "Dining room"
-                    },
-                    {
-                      "entity": "sensor.living_room_apparent_temperature",
-                      "name": "Living room"
-                    },
-                    {
-                      "entity": "sensor.dog_bed_area_apparent_temperature",
-                      "name": "Dog bed area"
-                    },
-                    {
-                      "entity": "sensor.kitchen_apparent_temperature",
-                      "name": "Kitchen"
-                    },
-                    {
-                      "entity": "sensor.bathroom_apparent_temperature",
-                      "name": "Bathroom"
-                    },
-                    {
-                      "entity": "sensor.entryway_apparent_temperature",
-                      "name": "Entryway"
                     }
                   ],
-                  "show_name": true,
-                  "columns": 3,
-                  "type": "glance"
+                  "type": "glance",
+                  "columns": 4
                 },
                 {
                   "type": "glance",
                   "entities": [
                     {
-                      "entity": "input_number.humidifier_target"
+                      "entity": "sensor.weighted_average_inside_humidity",
+                      "name": "Inside"
+                    },
+                    {
+                      "entity": "sensor.outside_humidity",
+                      "name": "Outside"
                     },
                     {
                       "entity": "sensor.bedroom_humidity",
@@ -2124,8 +2143,8 @@
                       "name": "Dining room"
                     },
                     {
-                      "entity": "sensor.dog_bed_area_apparent_temperature",
-                      "name": "Dog bed area"
+                      "entity": "sensor.dining_room_wall_apparent_temperature",
+                      "name": "Dining room wall"
                     },
                     {
                       "entity": "sensor.entryway_apparent_temperature",
@@ -2156,6 +2175,14 @@
                 },
                 {
                   "entities": [
+                    {
+                      "entity": "sensor.weighted_average_inside_humidity",
+                      "name": "Inside"
+                    },
+                    {
+                      "entity": "sensor.outside_humidity",
+                      "name": "Outside"
+                    },
                     {
                       "entity": "sensor.bedroom_humidity",
                       "name": "Bedroom"

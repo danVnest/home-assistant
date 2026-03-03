@@ -81,6 +81,13 @@ template:
         unit_of_measurement: devices
         icon: mdi:battery-charging
 
+      - name: Dining room wall temperature sensor battery level
+        unique_id: dining_room_wall_temperature_sensor_battery_level
+        state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dining_room_wall') }}"
+        unit_of_measurement: "%"
+        device_class: battery
+        state_class: measurement
+        availability: "{{ has_value('sensor.dining_room_wall_temperature_sensor_battery_state') }}"
       - name: Nursery temperature sensor battery level
         unique_id: nursery_temperature_sensor_battery_level
         state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('nursery') }}"
@@ -95,13 +102,7 @@ template:
         device_class: battery
         state_class: measurement
         availability: "{{ has_value('sensor.office_temperature_sensor_battery_state') }}"
-      - name: Dog bed area temperature sensor battery level
-        unique_id: dog_bed_area_temperature_sensor_battery_level
-        state: "{% from 'batteries.jinja' import temperature_sensor_battery %}{{ temperature_sensor_battery('dog_bed_area') }}"
-        unit_of_measurement: "%"
-        device_class: battery
-        state_class: measurement
-        availability: "{{ has_value('sensor.dog_bed_area_temperature_sensor_battery_state') }}"
+
       - name: Soil sensor entryway battery level
         unique_id: soil_sensor_entryway_battery_level
         state: "{% from 'batteries.jinja' import soil_sensor_battery %}{{ soil_sensor_battery('entryway') }}"

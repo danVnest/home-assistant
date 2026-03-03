@@ -1,5 +1,68 @@
 template:
   - sensor:
+      - name: Entryway airspeed
+        unique_id: entryway_airspeed
+        state: "{{ 0 }}"
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+      - name: Kitchen airspeed
+        unique_id: kitchen_airspeed
+        state: "{{ states('sensor.living_room_aircon_airspeed') }}"
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+        availability: "{{ has_value('sensor.living_room_aircon_airspeed') }}"
+      - name: Living room aircon airspeed
+        unique_id: living_room_aircon_airspeed
+        state: >
+          {% from 'climate.jinja' import aircon_airspeed %}
+          {{ aircon_airspeed('living_room') }}
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+        availability: >
+          {{
+            has_value('climate.living_room_aircon') and
+            state_attr('climate.living_room_aircon', 'fan_mode') is not none and
+            state_attr('climate.living_room_aircon', 'current_temperature') is not none and
+            (state_attr('climate.living_room_aircon', 'temperature') is not none or states('climate.living_room_aircon') == "fan_only")
+          }}
+      - name: Living room airspeed
+        unique_id: living_room_airspeed
+        state: "{{ states('sensor.living_room_aircon_airspeed')|float / 3}}"
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+        availability: "{{ has_value('sensor.living_room_aircon_airspeed') }}"
+      - name: Dining room aircon airspeed
+        unique_id: dining_room_aircon_airspeed
+        state: >
+          {% from 'climate.jinja' import aircon_airspeed %}
+          {{ aircon_airspeed('dining_room') }}
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+        availability: >
+          {{
+            has_value('climate.dining_room_aircon') and
+            state_attr('climate.dining_room_aircon', 'fan_mode') is not none and
+            state_attr('climate.dining_room_aircon', 'current_temperature') is not none and
+            (state_attr('climate.dining_room_aircon', 'temperature') is not none or states('climate.dining_room_aircon') == "fan_only")
+          }}
+      - name: Dining room airspeed
+        unique_id: dining_room_airspeed
+        state: "{{ states('sensor.dining_room_aircon_airspeed') }}"
+        unit_of_measurement: "m/s"
+        device_class: wind_speed
+        state_class: measurement
+        icon: mdi:weather-windy
+        availability: "{{ has_value('sensor.dining_room_aircon_airspeed') }}"
       - name: Bathroom airspeed
         unique_id: bathroom_airspeed
         state: "{{ 0 }}"
@@ -46,76 +109,6 @@ template:
         state_class: measurement
         icon: mdi:weather-windy
         availability: "{{ has_value('sensor.bedroom_fan_airspeed') and has_value('sensor.bedroom_aircon_airspeed') }}"
-      - name: Dining room aircon airspeed
-        unique_id: dining_room_aircon_airspeed
-        state: >
-          {% from 'climate.jinja' import aircon_airspeed %}
-          {{ aircon_airspeed('dining_room') }}
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-        availability: >
-          {{
-            has_value('climate.dining_room_aircon') and
-            state_attr('climate.dining_room_aircon', 'fan_mode') is not none and
-            state_attr('climate.dining_room_aircon', 'current_temperature') is not none and
-            (state_attr('climate.dining_room_aircon', 'temperature') is not none or states('climate.dining_room_aircon') == "fan_only")
-          }}
-      - name: Dining room airspeed
-        unique_id: dining_room_airspeed
-        state: "{{ states('sensor.dining_room_aircon_airspeed') }}"
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-        availability: "{{ has_value('sensor.dining_room_aircon_airspeed') }}"
-      - name: Dog bed area airspeed
-        unique_id: dog_bed_area_airspeed
-        state: "{{ 0 }}"
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-      - name: Entryway airspeed
-        unique_id: entryway_airspeed
-        state: "{{ 0 }}"
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-      - name: Kitchen airspeed
-        unique_id: kitchen_airspeed
-        state: "{{ states('sensor.living_room_aircon_airspeed') }}"
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-        availability: "{{ has_value('sensor.living_room_aircon_airspeed') }}"
-      - name: Living room aircon airspeed
-        unique_id: living_room_aircon_airspeed
-        state: >
-          {% from 'climate.jinja' import aircon_airspeed %}
-          {{ aircon_airspeed('living_room') }}
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-        availability: >
-          {{
-            has_value('climate.living_room_aircon') and
-            state_attr('climate.living_room_aircon', 'fan_mode') is not none and
-            state_attr('climate.living_room_aircon', 'current_temperature') is not none and
-            (state_attr('climate.living_room_aircon', 'temperature') is not none or states('climate.living_room_aircon') == "fan_only")
-          }}
-      - name: Living room airspeed
-        unique_id: living_room_airspeed
-        state: "{{ states('sensor.living_room_aircon_airspeed')|float / 3}}"
-        unit_of_measurement: "m/s"
-        device_class: wind_speed
-        state_class: measurement
-        icon: mdi:weather-windy
-        availability: "{{ has_value('sensor.living_room_aircon_airspeed') }}"
       - name: Nursery airspeed
         unique_id: nursery_airspeed
         state: >
