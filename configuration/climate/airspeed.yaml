@@ -21,7 +21,7 @@ template:
             has_value('climate.bedroom_aircon') and
             state_attr('climate.bedroom_aircon', 'fan_mode') is not none and
             state_attr('climate.bedroom_aircon', 'current_temperature') is not none and
-            state_attr('climate.bedroom_aircon', 'temperature') is not none
+            (state_attr('climate.bedroom_aircon', 'temperature') is not none or states('climate.bedroom_aircon') == "fan_only")
           }}
       - name: Bedroom fan airspeed
         unique_id: bedroom_fan_airspeed
@@ -60,7 +60,7 @@ template:
             has_value('climate.dining_room_aircon') and
             state_attr('climate.dining_room_aircon', 'fan_mode') is not none and
             state_attr('climate.dining_room_aircon', 'current_temperature') is not none and
-            state_attr('climate.dining_room_aircon', 'temperature') is not none
+            (state_attr('climate.dining_room_aircon', 'temperature') is not none or states('climate.dining_room_aircon') == "fan_only")
           }}
       - name: Dining room airspeed
         unique_id: dining_room_airspeed
@@ -106,7 +106,7 @@ template:
             has_value('climate.living_room_aircon') and
             state_attr('climate.living_room_aircon', 'fan_mode') is not none and
             state_attr('climate.living_room_aircon', 'current_temperature') is not none and
-            state_attr('climate.living_room_aircon', 'temperature') is not none
+            (state_attr('climate.living_room_aircon', 'temperature') is not none or states('climate.living_room_aircon') == "fan_only")
           }}
       - name: Living room airspeed
         unique_id: living_room_airspeed

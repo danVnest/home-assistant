@@ -28,7 +28,7 @@
             {%- set fan_strength = 0.65 -%}
         {%- elif fan_strength == 'high' -%}
             {%- set fan_strength = 0.8 -%}
-        {%- elif fan_strength == 'strong' -%}
+        {%- elif fan_strength == 'strong' or mode == "fan_only" -%}
             {%- set fan_strength = 1 -%}
         {%- elif fan_strength == 'auto' -%}
             {%- set temperature_difference = state_attr(entity_id, 'current_temperature') - state_attr(entity_id, 'temperature') -%}
