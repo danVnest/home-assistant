@@ -1,11 +1,43 @@
-template:
-  - trigger:
-      - trigger: event
-        event_type: bubble_card_update_modules
-    sensor:
-      - name: "Bubble Card Modules"
-        state: "saved"
-        icon: "mdi:puzzle"
-        attributes:
-          modules: "{{ trigger.event.data.modules }}"
-          last_updated: "{{ trigger.event.data.last_updated }}"
+panel_custom:
+  - name: panel-redirect
+    url_path: climate-redirect
+    sidebar_title: Climate
+    sidebar_icon: mdi:thermometer
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/climate
+  - name: panel-redirect
+    url_path: lights-redirect
+    sidebar_title: Lights
+    sidebar_icon: mdi:lightbulb-variant
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/lights
+  - name: panel-redirect
+    url_path: presence-redirect
+    sidebar_title: Presence
+    sidebar_icon: mdi:cctv
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/presence
+  - name: panel-redirect
+    url_path: electricity-redirect
+    sidebar_title: Electricity
+    sidebar_icon: mdi:lightning-bolt
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/electricity
+  - name: panel-redirect
+    url_path: plants-redirect
+    sidebar_title: Plants
+    sidebar_icon: mdi:grass
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/plants
+  - name: panel-redirect
+    url_path: guide-redirect
+    sidebar_title: Guide
+    sidebar_icon: mdi:text-box
+    module_url: /local/panel-redirect.js
+    config:
+      target: /lovelace/guide

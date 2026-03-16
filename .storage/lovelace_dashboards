@@ -23,15 +23,6 @@
         "url_path": "dashboard-areas"
       },
       {
-        "id": "dashboard_guide",
-        "show_in_sidebar": true,
-        "icon": "mdi:text-box",
-        "title": "Guide",
-        "require_admin": false,
-        "mode": "storage",
-        "url_path": "dashboard-guide"
-      },
-      {
         "id": "dashboard_development",
         "show_in_sidebar": true,
         "icon": "mdi:cog",
