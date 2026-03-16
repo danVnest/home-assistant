@@ -3,8 +3,7 @@ Climate:
   class: Climate
   inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
   target_buffer:
-    temperature: 1 # difference between actual device target temperature and the temperature which triggers device off
-    humidity: 10 # difference between actual device target humidity and the humidity which triggers device off
+    heater_temperature: 2 # difference between actual heater target temperature and the temperature which triggers device off
   fan:
     cooling_per_speed: 0.1 # degrees reduction in apparent temperature for each percent of fan speed (max fan_airspeed = 0.1*100/0.7)
     cooling_reduction_factor_when_reverse: 3.5 # the factor of which cooling is reduced when a fan is in reverse (also see fan_airspeed macro)

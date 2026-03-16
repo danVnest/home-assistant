@@ -236,8 +236,48 @@ input_number:
     unit_of_measurement: °C
     mode: box
     icon: mdi:thermometer-low
-  humidifier_target:
+  target_humidity:
     name: Target humidity
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  sleep_target_humidity:
+    name: Target humidity
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  high_humidity_aircon_trigger:
+    name: Aircon dries once above
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  sleep_high_humidity_aircon_trigger:
+    name: Aircon dries once above
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  low_humidity_humidifier_trigger:
+    name: Humidifier on once below
+    min: 25
+    max: 95
+    step: 5
+    unit_of_measurement: "%"
+    mode: box
+    icon: mdi:water-check
+  sleep_low_humidity_humidifier_trigger:
+    name: Humidifier on once below
     min: 25
     max: 95
     step: 5

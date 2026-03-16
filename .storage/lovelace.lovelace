@@ -2070,6 +2070,15 @@
                 },
                 {
                   "entity": "input_number.low_temperature_aircon_trigger"
+                },
+                {
+                  "entity": "input_number.target_humidity"
+                },
+                {
+                  "entity": "input_number.high_humidity_aircon_trigger"
+                },
+                {
+                  "entity": "input_number.low_humidity_humidifier_trigger"
                 }
               ],
               "show_header_toggle": false,
@@ -2090,6 +2099,15 @@
                 },
                 {
                   "entity": "input_number.sleep_low_temperature_aircon_trigger"
+                },
+                {
+                  "entity": "input_number.sleep_target_humidity"
+                },
+                {
+                  "entity": "input_number.sleep_high_humidity_aircon_trigger"
+                },
+                {
+                  "entity": "input_number.sleep_low_humidity_humidifier_trigger"
                 }
               ],
               "show_header_toggle": false,
@@ -2131,22 +2149,6 @@
                       "name": "Outside"
                     },
                     {
-                      "entity": "sensor.bathroom_apparent_temperature",
-                      "name": "Bathroom"
-                    },
-                    {
-                      "entity": "sensor.bedroom_apparent_temperature",
-                      "name": "Bedroom"
-                    },
-                    {
-                      "entity": "sensor.dining_room_apparent_temperature",
-                      "name": "Dining room"
-                    },
-                    {
-                      "entity": "sensor.dining_room_wall_apparent_temperature",
-                      "name": "Dining room wall"
-                    },
-                    {
                       "entity": "sensor.entryway_apparent_temperature",
                       "name": "Entryway"
                     },
@@ -2157,6 +2159,18 @@
                     {
                       "entity": "sensor.living_room_apparent_temperature",
                       "name": "Living room"
+                    },
+                    {
+                      "entity": "sensor.dining_room_apparent_temperature",
+                      "name": "Dining room"
+                    },
+                    {
+                      "entity": "sensor.bathroom_apparent_temperature",
+                      "name": "Bathroom"
+                    },
+                    {
+                      "entity": "sensor.bedroom_apparent_temperature",
+                      "name": "Bedroom"
                     },
                     {
                       "entity": "sensor.nursery_apparent_temperature",
@@ -2184,12 +2198,36 @@
                       "name": "Outside"
                     },
                     {
+                      "entity": "sensor.entryway_multisensor_humidity",
+                      "name": "Entryway"
+                    },
+                    {
+                      "entity": "sensor.kitchen_humidity",
+                      "name": "Kitchen"
+                    },
+                    {
+                      "entity": "sensor.living_room_humidity",
+                      "name": "Living room"
+                    },
+                    {
+                      "entity": "sensor.dining_room_humidity",
+                      "name": "Dining room"
+                    },
+                    {
+                      "entity": "sensor.bathroom_multisensor_humidity",
+                      "name": "Bathroom"
+                    },
+                    {
                       "entity": "sensor.bedroom_humidity",
                       "name": "Bedroom"
                     },
                     {
                       "entity": "sensor.nursery_humidity",
                       "name": "Nursery"
+                    },
+                    {
+                      "entity": "sensor.office_sensor_humidity",
+                      "name": "Office"
                     }
                   ],
                   "refresh_interval": 0,

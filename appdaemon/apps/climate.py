@@ -448,8 +448,6 @@ class ClimateDevice(Device):
 
     def __init__(
         self,
-        *,
-        monitor_humidity_only: bool = False,
         **kwargs: dict,
     ):
         """Initialise with device parameters and prepare for environment changes."""
@@ -457,32 +455,17 @@ class ClimateDevice(Device):
             **kwargs,
         )
         self.temperature_sensors = []
-        self.humidity_sensors = []
         for room in (self.room, *self.linked_rooms):
-            if not monitor_humidity_only:
-                temperature_sensor_id = (
-                    f"sensor.{room}_apparent_temperature_ignoring_wind"
-                )
-                self.temperature_sensors.append(
-                    self.controller.get_entity(temperature_sensor_id),
-                )
-                self.controller.listen_state(
-                    self.handle_sensor_change,
-                    temperature_sensor_id,
-                    duration=0.5,
-                    constrain_input_boolean=self.control_input_boolean,
-                )
-            else:
-                humidity_sensor_id = f"sensor.{room}_humidity"
-                self.humidity_sensors.append(
-                    self.controller.get_entity(humidity_sensor_id),
-                )
-                self.controller.listen_state(
-                    self.handle_sensor_change,
-                    humidity_sensor_id,
-                    duration=0.5,
-                    constrain_input_boolean=self.control_input_boolean,
-                )
+            temperature_sensor_id = f"sensor.{room}_apparent_temperature_ignoring_wind"
+            self.temperature_sensors.append(
+                self.controller.get_entity(temperature_sensor_id),
+            )
+            self.controller.listen_state(
+                self.handle_sensor_change,
+                temperature_sensor_id,
+                duration=0.5,
+                constrain_input_boolean=self.control_input_boolean,
+            )
         self.adjustment_delay = self.constants["adjustment_delay"]
         self.adjustment_timer = None
 
@@ -498,8 +481,9 @@ class ClimateDevice(Device):
     def room_humidity(self) -> float:
         """Get average humidity from all sensors in the room."""
         return sum(
-            float(humidity_sensor.state) for humidity_sensor in self.humidity_sensors
-        ) / len(self.humidity_sensors)
+            float(temperature_sensor.attributes["humidity_source_value"])
+            for temperature_sensor in self.temperature_sensors
+        ) / len(self.temperature_sensors)
 
     # TODO: consider making a TemperatureChecker class with all the following checks
     # e.g. to switch room_temperature and inside_temperature
@@ -583,6 +567,20 @@ class ClimateDevice(Device):
                 mode == "off"
                 and (self.too_hot_or_cold and not self.too_hot_or_cold_outside),
             ),
+        )
+
+    @property
+    def too_dry(self) -> bool:
+        """Check if room is too dry based on desired target humidity settings."""
+        return self.room_humidity < self.controller.get_setting(
+            "low_humidity_humidifier_trigger",
+        )
+
+    @property
+    def too_humid(self) -> bool:
+        """Check if room is too humid based on desired target humidity settings."""
+        return self.room_humidity > self.controller.get_setting(
+            "high_humidity_aircon_trigger",
         )
 
     def handle_sensor_change(
@@ -692,12 +690,12 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     @property
     def best_mode_for_conditions(self) -> str:
-        """Determine best climate mode (cool/heat) for the current room temperature."""
-        return (
-            "cool"
-            if self.above_target_temperature or self.closer_to_hot_than_cold
-            else "heat"
-        )
+        """Determine best climate mode (cool/heat/dry) for current room conditions."""
+        if self.too_humid and not self.too_hot_or_cold:
+            return "dry"
+        if self.above_target_temperature or self.closer_to_hot_than_cold:
+            return "cool"
+        return "heat"
 
     @property
     def target_temperature(self) -> float:
@@ -708,11 +706,7 @@ class Aircon(ClimateDevice, PresenceDevice):
     def desired_target_temperature(self) -> float:
         """Get the desired room target temperature based on settings and conditions."""
         mode = self.best_mode_for_conditions
-        return self.controller.get_setting(
-            mode + "ing_target_temperature",
-        ) + self.constants["target_buffer"]["temperature"] * (
-            1 if mode == "heat" else -1
-        )  # TODO: potentially remove target_buffer"]["temperature?
+        return self.controller.get_setting(mode + "ing_target_temperature")
 
     @property
     def fan_mode(self) -> str:
@@ -742,9 +736,6 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.fan_mode = self.preferred_fan_mode
         if self.swing_mode != self.preferred_swing_mode:
             self.call_service("set_swing_mode", swing_mode=self.preferred_swing_mode)
-        # TODO: add a temperature buffer on min/max trigger and targets in pet mode for efficiency !! IMPORTANT
-        # What about cooling? Fans? Take into account pet presence in each room?
-        # Bayesian probably can do a good job of detecting pet presence, and/or increase vacating delay
 
     def turn_off_after_delay(self, **kwargs: dict):
         """Turn aircon off after the required delay when a door opens."""
@@ -779,7 +770,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             return None
         if not self.on:
             if (
-                self.too_hot_or_cold
+                (self.too_hot_or_cold or self.too_humid)
                 and (self.ignoring_vacancy or not self.vacant)
                 and not self.door_open
             ):
@@ -789,7 +780,10 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.notify_if_turning_on_for_pets()
         elif (
             self.door_open
-            or self.within_target_temperatures
+            or (
+                self.within_target_temperatures
+                and self.room_humidity < self.controller.get_setting("target_humidity")
+            )
             or (not self.ignoring_vacancy and self.vacant)
         ):
             if check_if_would_adjust_only:
@@ -965,11 +959,8 @@ class Fan(ClimateDevice, PresenceDevice):
 
     @property
     def target_temperature(self) -> float:
-        """Get the fan's target temperature (including buffer to prevent toggling)."""
-        return (
-            self.controller.get_setting("cooling_target_temperature")
-            + self.constants["target_buffer"]["temperature"]
-        )
+        """Get the fan's target temperature."""
+        return self.controller.get_setting("cooling_target_temperature")
 
     @property
     def cooling_effect(self) -> float:
@@ -1241,12 +1232,12 @@ class Heater(ClimateDevice, PresenceDevice):
         self.turn_on()
 
     @property
-    def room_too_cold(self) -> bool:
+    def too_cold(self) -> bool:
         """Check if room is too cold based on desired target temperature settings."""
         return (
             self.room_temperature
             < self.desired_target_temperature
-            - self.constants["target_buffer"]["temperature"]
+            - self.constants["target_buffer"]["heater_temperature"]
         )
 
     @property
@@ -1255,7 +1246,7 @@ class Heater(ClimateDevice, PresenceDevice):
         return (
             self.room_temperature
             > self.desired_target_temperature
-            + self.constants["target_buffer"]["temperature"]
+            + self.constants["target_buffer"]["heater_temperature"]
         )
 
     def adjust_for_conditions(
@@ -1271,7 +1262,7 @@ class Heater(ClimateDevice, PresenceDevice):
         elif self.control_enabled or check_if_would_adjust_only:
             if not self.on:
                 if (
-                    self.room_too_cold
+                    self.too_cold
                     and (self.ignoring_vacancy or not self.vacant)
                     and (self.door and self.door.state == "off")
                 ):
@@ -1333,7 +1324,6 @@ class Humidifier(ClimateDevice, PresenceDevice):
             device_id=device_id,
             controller=controller,
             control_input_boolean_suffix="_humidifier",
-            monitor_humidity_only=True,
             room=room,
             linked_rooms=linked_rooms,
         )
@@ -1365,11 +1355,6 @@ class Humidifier(ClimateDevice, PresenceDevice):
         self.already_notified_of_empty_water_tank = False
 
     @property
-    def desired_target_humidity(self) -> float:
-        """Get the humidifier's target humidity."""
-        return float(self.controller.get_state("input_number.humidifier_target"))
-
-    @property
     def target_humidity(self) -> float:
         """Get the humidifier's target humidity."""
         return self.get_attribute("humidity")
@@ -1377,7 +1362,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
     @target_humidity.setter
     def target_humidity(self, target: float):
         """Set the humidifier's target humidity."""
-        if self.target_humidity != self.desired_target_humidity:
+        if self.target_humidity != self.controller.get_setting("target_humidity"):
             self.call_service("set_humidity", humidity=target)
 
     @property
@@ -1393,7 +1378,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
     def turn_on_for_conditions(self):
         """Turn the humidifier on and adjust the target humidity if appropriate."""
         self.set_constant_humidity_mode()
-        self.target_humidity = self.desired_target_humidity
+        self.target_humidity = self.controller.get_setting("target_humidity")
         self.turn_on()
 
     @property
@@ -1427,22 +1412,6 @@ class Humidifier(ClimateDevice, PresenceDevice):
             )
             self.already_notified_of_empty_water_tank = True
 
-    @property
-    def room_too_dry(self) -> bool:
-        """Check if room is too dry based on desired target humidity settings."""
-        return (
-            self.room_humidity
-            < self.desired_target_humidity - self.constants["target_buffer"]["humidity"]
-        )
-
-    @property
-    def room_too_humid(self) -> bool:
-        """Check if room is too humid based on desired target humidity settings."""
-        return (
-            self.room_humidity
-            > self.desired_target_humidity + self.constants["target_buffer"]["humidity"]
-        )
-
     def adjust_for_conditions(
         self,
         *,
@@ -1452,7 +1421,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
         if (
-            self.room_too_dry
+            self.too_dry
             and not self.on
             and (
                 self.ignoring_vacancy
@@ -1466,7 +1435,7 @@ class Humidifier(ClimateDevice, PresenceDevice):
                 return True
             self.turn_on_for_conditions()
         elif self.on and (
-            self.room_too_humid
+            self.too_humid
             or (
                 (self.controller.control.scene != "Sleep" or self.vacant)
                 and not self.ignoring_vacancy
@@ -1477,12 +1446,12 @@ class Humidifier(ClimateDevice, PresenceDevice):
             self.turn_off()
         elif self.on and (
             not self.constant_humidity_mode
-            or self.target_humidity != self.desired_target_humidity
+            or self.target_humidity != self.controller.get_setting("target_humidity")
         ):
             if check_if_would_adjust_only:
                 return True
             self.set_constant_humidity_mode()
-            self.target_humidity = self.desired_target_humidity
+            self.target_humidity = self.controller.get_setting("target_humidity")
         return False
 
     def sync_lighting(
