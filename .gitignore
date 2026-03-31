@@ -4,7 +4,13 @@
 ip_bans.yaml
 secrets.yaml
 
-# System configuration (keeping some edits made through GUI)
+# System files (keeping notable configurations made via the GUI)
+*.db
+*.db-shm
+*.db-wal
+.cache
+.ha_run.lock
+.ruff_cache
 .storage/*
 !.storage/core.area_registry
 !.storage/core.floor_registry
@@ -12,8 +18,19 @@ secrets.yaml
 !.storage/frontend_theme
 !.storage/frontend.system_data
 !.storage/lovelace*
+__pycache__
+appdaemon/compiled
+appdaemon/namespaces
+blueprints
+deps
+image
+tts
+webostv.conf
+www/*
+!www/panel-redirect.js
+zwavejs*
 
-# Custom components (keeping manifests and customisations)
+# Custom components (keeping manifests and alterations)
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/apparent_temperature/sensor.py
@@ -26,23 +43,6 @@ watchman_report.txt
 home-assistant.log*
 appdaemon/logs
 *.log
-
-# System files
-*.db
-*.db-shm
-*.db-wal
-.ha_run.lock
-.ruff_cache
-__pycache__
-appdaemon/compiled
-appdaemon/namespaces
-blueprints
-deps
-image
-tts
-www
-webostv.conf
-zwavejs*
 
 # Visual Studio Code
 .vscode
