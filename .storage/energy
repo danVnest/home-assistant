@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "minor_version": 2,
+  "minor_version": 3,
   "key": "energy",
   "data": {
     "energy_sources": [
@@ -13,23 +13,15 @@
       },
       {
         "type": "grid",
-        "flow_from": [
-          {
-            "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
-            "stat_cost": null,
-            "entity_energy_price": "sensor.electricity_general_price",
-            "number_energy_price": null
-          }
-        ],
-        "flow_to": [
-          {
-            "stat_energy_to": "sensor.smart_meter_real_energy_produced",
-            "stat_compensation": null,
-            "entity_energy_price": "sensor.electricity_feed_in_price",
-            "number_energy_price": null
-          }
-        ],
-        "cost_adjustment_day": 0.0
+        "cost_adjustment_day": 0.0,
+        "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
+        "stat_cost": null,
+        "entity_energy_price": "sensor.electricity_general_price",
+        "number_energy_price": null,
+        "stat_energy_to": "sensor.smart_meter_real_energy_produced",
+        "stat_compensation": null,
+        "entity_energy_price_export": "sensor.electricity_feed_in_price",
+        "number_energy_price_export": null
       },
       {
         "type": "battery",
