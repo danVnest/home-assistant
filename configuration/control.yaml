@@ -169,6 +169,24 @@ template:
           }}
         icon: mdi:washing-machine
         availability: "{{ has_value('sensor.washer_start_time') and has_value('sensor.dryer_start_time') }}"
+  - triggers:
+      - trigger: event
+        event_type: localtuya_device_dp_triggered
+    conditions:
+      - condition: template
+        value_template: >
+          {{
+            trigger.event.data.device_id in ['bf9428682b24aed4a9paaa', 'bf3a40d46b789ec295bdtp'] and 
+            trigger.event.data.value in ['single_click', 'double_click', 'long_press']
+          }}
+    sensor:
+      - name: Bedroom button event
+        unique_id: bedroom_button_event
+        state: "{{ trigger.event.time_fired }}"
+        device_class: timestamp
+        attributes:
+          type: "{{ trigger.event.data.value }}"
+          button: "{{ 'Dan''s' if trigger.event.data.device_id == 'bf9428682b24aed4a9paaa' else 'Rachel''s' }}"
 
 automation:
   - alias: Turn TV on if not already on
