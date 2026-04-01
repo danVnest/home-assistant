@@ -3250,6 +3250,103 @@
                           "id": "first",
                           "align_to": 0.1,
                           "apex_config": {
+                            "labels": {
+                              "formatter": "EVAL:function(value) {\n  return \"$\" + value.toFixed(2);\n}\n"
+                            }
+                          }
+                        }
+                      ],
+                      "series": [
+                        {
+                          "entity": "sensor.electricity_general_price",
+                          "name": "Import price",
+                          "type": "line",
+                          "color": "#44739e",
+                          "extend_to": "now",
+                          "float_precision": 2
+                        },
+                        {
+                          "entity": "sensor.electricity_feed_in_price",
+                          "name": "Export price",
+                          "type": "line",
+                          "color": "orange",
+                          "extend_to": "now",
+                          "float_precision": 2
+                        },
+                        {
+                          "entity": "sensor.electricity_general_forecast",
+                          "name": "Forecast import price",
+                          "type": "line",
+                          "color": "#44739e",
+                          "opacity": 0.67,
+                          "data_generator": "const forecasts = entity.attributes.forecasts;\nconst result = forecasts.map(e => [\n  new Date(e.start_time).getTime(),\n  parseFloat(e.per_kwh || 0)\n]);\nreturn result;\n"
+                        },
+                        {
+                          "entity": "sensor.electricity_feed_in_forecast",
+                          "name": "Forecast export price",
+                          "type": "line",
+                          "color": "orange",
+                          "opacity": 0.67,
+                          "data_generator": "const forecasts = entity.attributes.forecasts;\nconst result = forecasts.map(e => [\n  new Date(e.start_time).getTime(),\n  parseFloat(e.per_kwh || 0)\n]);\nreturn result;\n"
+                        }
+                      ],
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.maximum_forecast_grid_power_cost",
+                          "below": 1
+                        }
+                      ]
+                    },
+                    {
+                      "type": "custom:apexcharts-card",
+                      "header": {
+                        "title": "Price history & forecast",
+                        "standard_format": true
+                      },
+                      "graph_span": "2d",
+                      "span": {
+                        "offset": "+1d"
+                      },
+                      "now": {
+                        "show": true,
+                        "label": "now"
+                      },
+                      "apex_config": {
+                        "float_precision": 2,
+                        "legend": {
+                          "position": "top",
+                          "floating": true,
+                          "customLegendItems": [
+                            "Import price",
+                            "Export price"
+                          ]
+                        },
+                        "tooltip": {
+                          "x": {
+                            "format": "h:mmtt dddd"
+                          },
+                          "y": {
+                            "formatter": "EVAL:function(value, { series, seriesIndex, dataPointIndex, w }) {\n    return '<div class=\"custom-tooltip\">' +\n    '<span style=\"font-weight: 400;\">' + '$' + (series[seriesIndex][dataPointIndex] || 0).toFixed(2) + ' per kWh</b></span>' +\n    '</div>';\n  }\n"
+                          }
+                        },
+                        "xaxis": {
+                          "labels": {
+                            "format": "htt"
+                          },
+                          "tooltip": {
+                            "enabled": false
+                          }
+                        }
+                      },
+                      "all_series_config": {
+                        "stroke_width": 1.5
+                      },
+                      "yaxis": [
+                        {
+                          "id": "first",
+                          "align_to": 0.1,
+                          "apex_config": {
                             "logarithmic": true,
                             "logBase": 3,
                             "labels": {
@@ -3290,6 +3387,13 @@
                           "color": "orange",
                           "opacity": 0.67,
                           "data_generator": "const forecasts = entity.attributes.forecasts;\nconst result = forecasts.map(e => [\n  new Date(e.start_time).getTime(),\n  parseFloat(e.per_kwh || 0)\n]);\nreturn result;\n"
+                        }
+                      ],
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.maximum_forecast_grid_power_cost",
+                          "above": 1
                         }
                       ]
                     },

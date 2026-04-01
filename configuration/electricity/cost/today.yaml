@@ -271,6 +271,13 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.battery_energy_cost') and has_value('sensor.export_energy_cost') }}"
+      - name: Maximum forecast grid power cost
+        unique_id: maximum_forecast_grid_cost
+        state: "{{ state_attr('sensor.electricity_general_forecast', 'forecasts')|map(attribute='per_kwh')|max|round(2) }}"
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.electricity_general_forecast') and state_attr('sensor.electricity_general_forecast', 'forecasts') is not none }}"
 
   - triggers:
       - trigger: time
