@@ -221,11 +221,6 @@ powercalc:
               power_sensor_id: sensor.microwave_power
               ignore_unavailable_state: true
               energy_integration_method: left
-            - entity_id: switch.toaster_blender
-              unique_id: toaster_blender_energy
-              power_sensor_id: sensor.toaster_blender_power
-              ignore_unavailable_state: true
-              energy_integration_method: left
             - entity_id: switch.kettle_milk_frother
               unique_id: kettle_milk_frother_energy
               power_sensor_id: sensor.kettle_milk_frother_power
@@ -312,8 +307,6 @@ powercalc:
               energy_sensor_id: sensor.office_heater_switch_device_energy
             - power_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_power
               energy_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_energy
-            - power_sensor_id: sensor.toaster_blender_switch_device_power
-              energy_sensor_id: sensor.toaster_blender_switch_device_energy
             - power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_power
               energy_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_energy
         - entity_id: switch.paludarium_picture_frame_camera
