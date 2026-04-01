@@ -187,7 +187,7 @@ template:
         state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
         device_class: motion
         icon: mdi:door
-        availability: "{{ states.binary_sensor.kitchen_door.last_changed|default != '' }}"
+        availability: "{{ has_value('binary_sensor.kitchen_door') and states.binary_sensor.kitchen_door.last_changed|default != '' }}"
       - name: Dining room balcony door motion
         unique_id: dining_room_balcony_door_motion
         state: "{{ now() - states.binary_sensor.dining_room_balcony_door.last_changed < timedelta(seconds=30) }}"
