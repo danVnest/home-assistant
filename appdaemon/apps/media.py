@@ -59,7 +59,7 @@ class Media(App):
         """Check if the TV is currently playing or not."""
         if not self.on:
             return False
-        if self.device.attributes.source == "PC" and self.pc_on:
+        if self.device.attributes.get("source") == "PC" and self.pc_on:
             return True
         return (
             self.play_state.state == "playing"
@@ -70,12 +70,12 @@ class Media(App):
     @property
     def muted(self) -> bool:
         """Check if the TV is currently muted or not."""
-        return self.device.attributes.is_volume_muted is True
+        return self.device.attributes.get("is_volume_muted") is True
 
     @property
     def pc_on(self) -> bool:
         """Check if the PC is currently on or not."""
-        return subprocess.call(["ping", "-c", "1", self.constants["pc_ip"]]) == 0  # noqa: S603, S607
+        return subprocess.call(["ping", "-c", "1", "PC.local"]) == 0  # noqa: S607
 
     def turn_off(self):
         """Turn the TV off."""
@@ -94,7 +94,6 @@ class Media(App):
 
     def load_app_launcher_and_state_reporter(self):
         """Start the LG TV app launcher app & media state reporting service."""
-        del kwargs
         if not self.on:
             self.log(
                 "TV was turned off before state sensor setup completed",
