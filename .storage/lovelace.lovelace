@@ -555,6 +555,36 @@
                 },
                 {
                   "type": "custom:bubble-card",
+                  "card_type": "select",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "entity": "select.robovac_scene",
+                  "name": "Clean house",
+                  "icon": "mdi:robot-vacuum-variant",
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": "auto"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "select",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
+                  "entity": "select.robovac_clean_room",
+                  "name": "Clean room",
+                  "icon": "mdi:robot-vacuum-variant",
+                  "grid_options": {
+                    "columns": 6,
+                    "rows": "auto"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
                   "entity": "select.washer",
