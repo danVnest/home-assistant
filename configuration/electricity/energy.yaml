@@ -177,8 +177,8 @@ template:
             {%- else -%}
               {{- None -}}
             {%- endif -%}
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:solar-power-variant
@@ -197,8 +197,8 @@ template:
             {%- else -%}
               {{- None -}}
             {%- endif -%}
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:transmission-tower-import
@@ -208,8 +208,8 @@ template:
         state: "{{ (state_attr('sensor.solar_storage_today', 'last_period')|float / 1000)|round(3) }}"
         attributes:
           average: "{{ (states('sensor.battery_energy_solar_charged')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-heart-variant
@@ -219,8 +219,8 @@ template:
         state: "{{ (state_attr('sensor.grid_storage_today', 'last_period')|float / 1000)|round(3) }}"
         attributes:
           average: "{{ (states('sensor.battery_energy_grid_charged')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:battery-charging
@@ -230,8 +230,8 @@ template:
         state: "{{ (state_attr('sensor.energy_consumption_today', 'last_period')|float / 1000)|round(3) }}"
         attributes:
           average: "{{ (states('sensor.total_energy_consumed')|float(0) / 1000 / states('sensor.days_since_solar_installation')|float(1))|round(3) }}"
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-lightning-bolt
@@ -241,8 +241,8 @@ template:
         state: "{{ (state_attr('sensor.solar_consumption_today', 'last_period')|float / 1000)|round(3) }}"
         attributes:
           average: "{{ (states('sensor.solar_energy_consumed')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-sound-in
@@ -252,8 +252,8 @@ template:
         state: "{{ (state_attr('sensor.battery_consumption_today', 'last_period')|float / 1000)|round(3) }}"
         attributes:
           average: "{{ (states('sensor.battery_energy_consumed')|float(0) / 1000 / states('sensor.days_since_battery_installation')|float(1))|round(3) }}"
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-battery
@@ -272,8 +272,8 @@ template:
             {%- else -%}
               {{- None -}}
             {%- endif -%}
-          minimum: "{{ [this.state|float(99), this.attributes.minimum|float(99)]|min|round(3) }}"
-          maximum: "{{ [this.state|float(0), this.attributes.maximum|float(0)]|max|round(3) }}"
+          minimum: "{{ [this.state|float(99), this.attributes.minimum|default|float(99)]|min|round(3) }}"
+          maximum: "{{ [this.state|float(0), this.attributes.maximum|default|float(0)]|max|round(3) }}"
         unit_of_measurement: kWh/day
         state_class: total
         icon: mdi:home-import-outline
