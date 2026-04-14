@@ -52,6 +52,10 @@ template:
   - triggers:
       - trigger: time_pattern
         minutes: 0
+      - trigger: event
+        event_type:
+          - homeassistant_started
+          - event_template_reloaded
     sensor:
       - name: Front and back side days since watered
         unique_id: front_and_back_side_days_since_watered
