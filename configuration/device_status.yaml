@@ -196,8 +196,8 @@ automation:
             {% set allowed_entities = [
               'sensor.power_meter_relative_self_consumption',
               'sensor.tv_state',
-            ] + integration_entities('iBeacon Tracker') +
-            integration_entities('netgear')|select('search', '_ssid$')|list
+            ] + integration_entities('iBeacon Tracker') + 
+            integration_entities('tplink_router')|select('match', 'device_tracker')|list
             %}
             {% set unknown_allowed_entities =
                 [

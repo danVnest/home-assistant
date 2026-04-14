@@ -21,7 +21,7 @@ The remaining dashboards include detailed settings, controls, and sensors for li
 This home automation system is comprised of the following devices:
 
 - [Raspberry Pi 5](https://www.raspberrypi.com/products/raspberry-pi-5) with NVME running Home Assistant
-- [Eero 7 Mesh WiFi System](https://www.amazon.com.au/dp/B0DB6GQFRV)
+- [TP-Link Archer BE550/9300 WiFi 7 Router](https://www.tp-link.com/au/home-networking/wifi-router/archer-be550)
 - [Zooz USB Z-Wave controller](https://www.getzooz.com/zooz-zst10-s2-stick)
 - [ZigBee hub](https://www.aliexpress.com/item/1005006592375647.html)
 - [Hank Z-Wave One buttons](https://www.simplysmart123.com/buttons/hank-z-wave-plus-one-button-scene-controller)
