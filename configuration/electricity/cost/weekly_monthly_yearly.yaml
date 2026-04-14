@@ -513,39 +513,39 @@ sensor:
         measurement: '"$"'
         unit_of_measurement: $
 
-      - name: Freezer, mini fridge, routers energy cost last week
-        unique_id: freezer_mini_fridge_routers_energy_cost_last_week
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 7d'
+      - name: Freezer energy cost last week
+        unique_id: freezer_energy_cost_last_week
+        where: '"entity_id" = ''freezer_energy_cost'' AND time >= now() - 7d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Freezer, mini fridge, routers energy cost last month
-        unique_id: freezer_mini_fridge_routers_energy_cost_last_month
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 30d'
+      - name: Freezer energy cost last month
+        unique_id: freezer_energy_cost_last_month
+        where: '"entity_id" = ''freezer_energy_cost'' AND time >= now() - 30d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Freezer, mini fridge, routers energy cost last year
-        unique_id: freezer_mini_fridge_routers_energy_cost_last_year
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost'' AND time >= now() - 365d'
+      - name: Freezer energy cost last year
+        unique_id: freezer_energy_cost_last_year
+        where: '"entity_id" = ''freezer_energy_cost'' AND time >= now() - 365d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Freezer, mini fridge, routers energy cost savings last week
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_last_week
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 7d'
+      - name: Freezer energy cost savings last week
+        unique_id: freezer_energy_cost_savings_last_week
+        where: '"entity_id" = ''freezer_energy_cost_savings'' AND time >= now() - 7d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Freezer, mini fridge, routers energy cost savings last month
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_last_month
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 30d'
+      - name: Freezer energy cost savings last month
+        unique_id: freezer_energy_cost_savings_last_month
+        where: '"entity_id" = ''freezer_energy_cost_savings'' AND time >= now() - 30d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
-      - name: Freezer, mini fridge, routers energy cost savings last year
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_last_year
-        where: '"entity_id" = ''freezer_mini_fridge_routers_energy_cost_savings'' AND time >= now() - 365d'
+      - name: Freezer energy cost savings last year
+        unique_id: freezer_energy_cost_savings_last_year
+        where: '"entity_id" = ''freezer_energy_cost_savings'' AND time >= now() - 365d'
         group_function: first
         measurement: '"$"'
         unit_of_measurement: $
@@ -1510,48 +1510,48 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.fridge_energy_cost_savings') and has_value('sensor.fridge_energy_cost_savings_last_year') }}"
 
-      - name: Freezer, mini fridge, routers energy cost weekly
-        unique_id: freezer_mini_fridge_routers_energy_cost_weekly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_week')|float)|round(2) }}"
+      - name: Freezer energy cost weekly
+        unique_id: freezer_energy_cost_weekly
+        state: "{{ (states('sensor.freezer_energy_cost')|float - states('sensor.freezer_energy_cost_last_week')|float)|round(2) }}"
         unit_of_measurement: $/week
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_week') }}"
-      - name: Freezer, mini fridge, routers energy cost monthly
-        unique_id: freezer_mini_fridge_routers_energy_cost_monthly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_month')|float)|round(2) }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost') and has_value('sensor.freezer_energy_cost_last_week') }}"
+      - name: Freezer energy cost monthly
+        unique_id: freezer_energy_cost_monthly
+        state: "{{ (states('sensor.freezer_energy_cost')|float - states('sensor.freezer_energy_cost_last_month')|float)|round(2) }}"
         unit_of_measurement: $/month
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_month') }}"
-      - name: Freezer, mini fridge, routers energy cost yearly
-        unique_id: freezer_mini_fridge_routers_energy_cost_yearly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_last_year')|float)|round(2) }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost') and has_value('sensor.freezer_energy_cost_last_month') }}"
+      - name: Freezer energy cost yearly
+        unique_id: freezer
+        state: "{{ (states('sensor.freezer_energy_cost')|float - states('sensor.freezer_energy_cost_last_year')|float)|round(2) }}"
         unit_of_measurement: $/year
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_last_year') }}"
-      - name: Freezer, mini fridge, routers energy cost savings weekly
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_weekly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week')|float)|round(2) }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost') and has_value('sensor.freezer_energy_cost_last_year') }}"
+      - name: Freezer energy cost savings weekly
+        unique_id: freezer_energy_cost_savings_weekly
+        state: "{{ (states('sensor.freezer_energy_cost_savings')|float - states('sensor.freezer_energy_cost_savings_last_week')|float)|round(2) }}"
         unit_of_measurement: $/week
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_week') }}"
-      - name: Freezer, mini fridge, routers energy cost savings monthly
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_monthly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month')|float)|round(2) }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost_savings') and has_value('sensor.freezer_energy_cost_savings_last_week') }}"
+      - name: Freezer energy cost savings monthly
+        unique_id: freezer_energy_cost_savings_monthly
+        state: "{{ (states('sensor.freezer_energy_cost_savings')|float - states('sensor.freezer_energy_cost_savings_last_month')|float)|round(2) }}"
         unit_of_measurement: $/month
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_month') }}"
-      - name: Freezer, mini fridge, routers energy cost savings yearly
-        unique_id: freezer_mini_fridge_routers_energy_cost_savings_yearly
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_energy_cost_savings')|float - states('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year')|float)|round(2) }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost_savings') and has_value('sensor.freezer_energy_cost_savings_last_month') }}"
+      - name: Freezer energy cost savings yearly
+        unique_id: freezer_energy_cost_savings_yearly
+        state: "{{ (states('sensor.freezer_energy_cost_savings')|float - states('sensor.freezer_energy_cost_savings_last_year')|float)|round(2) }}"
         unit_of_measurement: $/year
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings') and has_value('sensor.freezer_mini_fridge_routers_energy_cost_savings_last_year') }}"
+        availability: "{{ has_value('sensor.freezer_energy_cost_savings') and has_value('sensor.freezer_energy_cost_savings_last_year') }}"
 
       - name: Washer energy cost weekly
         unique_id: washer_energy_cost_weekly

@@ -3055,8 +3055,8 @@
                       "icon": "mdi:fridge"
                     },
                     {
-                      "entity": "sensor.freezer_mini_fridge_routers_power",
-                      "name": "Freezer, mini fridge, routers",
+                      "entity": "sensor.freezer_power",
+                      "name": "Freezer",
                       "icon": "mdi:fridge-industrial"
                     },
                     {

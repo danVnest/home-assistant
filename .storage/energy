@@ -75,8 +75,8 @@
         "name": "Fridge"
       },
       {
-        "stat_consumption": "sensor.freezer_mini_fridge_routers_energy",
-        "name": "Freezer, mini fridge, routers"
+        "stat_consumption": "sensor.freezer_energy",
+        "name": "Freezer"
       },
       {
         "stat_consumption": "sensor.washer_energy",

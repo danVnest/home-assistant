@@ -219,16 +219,16 @@ sensor:
       minutes: 1
 
   - platform: integration
-    name: Freezer, mini fridge, routers energy cost
-    unique_id: freezer_mini_fridge_routers_energy_cost
-    source: sensor.freezer_mini_fridge_routers_power_cost
+    name: Freezer energy cost
+    unique_id: freezer_energy_cost
+    source: sensor.freezer_power_cost
     method: left
     max_sub_interval:
       minutes: 1
   - platform: integration
-    name: Freezer, mini fridge, routers energy cost savings
-    unique_id: freezer_mini_fridge_routers_energy_cost_savings
-    source: sensor.freezer_mini_fridge_routers_power_cost_savings
+    name: Freezer energy cost savings
+    unique_id: freezer_energy_cost_savings
+    source: sensor.freezer_power_cost_savings
     method: left
     max_sub_interval:
       minutes: 1

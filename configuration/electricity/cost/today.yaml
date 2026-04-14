@@ -86,10 +86,10 @@ utility_meter:
     unique_id: fridge_energy_cost_today
     source: sensor.fridge_energy_cost
     cycle: daily
-  freezer_mini_fridge_routers_energy_cost_today:
-    name: Freezer, mini fridge, routers energy cost today
-    unique_id: freezer_mini_fridge_routers_energy_cost_today
-    source: sensor.freezer_mini_fridge_routers_energy_cost
+  freezer_energy_cost_today:
+    name: Freezer energy cost today
+    unique_id: freezer_energy_cost_today
+    source: sensor.freezer_energy_cost
     cycle: daily
   washer_energy_cost_today:
     name: Washer energy cost today
@@ -203,10 +203,10 @@ utility_meter:
     unique_id: fridge_energy_cost_savings_today
     source: sensor.fridge_energy_cost_savings
     cycle: daily
-  freezer_mini_fridge_routers_energy_cost_savings_today:
-    name: Freezer, mini fridge, routers energy cost savings today
-    unique_id: freezer_mini_fridge_routers_energy_cost_savings_today
-    source: sensor.freezer_mini_fridge_routers_energy_cost_savings
+  freezer_energy_cost_savings_today:
+    name: Freezer energy cost savings today
+    unique_id: freezer_energy_cost_savings_today
+    source: sensor.freezer_energy_cost_savings
     cycle: daily
   washer_energy_cost_savings_today:
     name: Washer energy cost savings today

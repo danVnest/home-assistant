@@ -271,20 +271,20 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.fridge_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
 
-      - name: Freezer, mini fridge, routers power cost
-        unique_id: freezer_mini_fridge_routers_power_cost
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
+      - name: Freezer power cost
+        unique_id: freezer_power_cost
+        state: "{{ (states('sensor.freezer_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
-      - name: Freezer, mini fridge, routers power cost savings
-        unique_id: freezer_mini_fridge_routers_power_cost_savings
-        state: "{{ (states('sensor.freezer_mini_fridge_routers_power')|float * states('sensor.savings_from_solar_and_battery_per_wh')|float)|round(9) }}"
+        availability: "{{ has_value('sensor.freezer_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
+      - name: Freezer power cost savings
+        unique_id: freezer_power_cost_savings
+        state: "{{ (states('sensor.freezer_power')|float * states('sensor.savings_from_solar_and_battery_per_wh')|float)|round(9) }}"
         unit_of_measurement: $/h
         state_class: measurement
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.freezer_mini_fridge_routers_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
+        availability: "{{ has_value('sensor.freezer_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
 
       - name: Washer power cost
         unique_id: washer_power_cost

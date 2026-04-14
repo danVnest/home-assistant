@@ -208,9 +208,9 @@ powercalc:
           power_sensor_id: sensor.fridge_power
           ignore_unavailable_state: true
           energy_integration_method: left
-        - entity_id: switch.freezer_mini_fridge_routers
-          unique_id: freezer_mini_fridge_routers_energy
-          power_sensor_id: sensor.freezer_mini_fridge_routers_power
+        - entity_id: switch.freezer
+          unique_id: freezer_energy
+          power_sensor_id: sensor.freezer_power
           ignore_unavailable_state: true
           energy_integration_method: left
         - create_group: Kitchen appliances
@@ -291,8 +291,8 @@ powercalc:
                 value: 0.048 # estimate
             - power_sensor_id: sensor.dishwasher_switch_device_power
               energy_sensor_id: sensor.dishwasher_switch_device_energy
-            - power_sensor_id: sensor.freezer_mini_fridge_routers_switch_device_power
-              energy_sensor_id: sensor.freezer_mini_fridge_routers_switch_device_energy
+            - power_sensor_id: sensor.freezer_switch_device_power
+              energy_sensor_id: sensor.freezer_switch_device_energy
             - power_sensor_id: sensor.fridge_switch_device_power
               energy_sensor_id: sensor.fridge_switch_device_energy
             - power_sensor_id: sensor.kettle_milk_frother_switch_device_power
