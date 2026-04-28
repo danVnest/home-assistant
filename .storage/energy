@@ -8,75 +8,96 @@
         "type": "solar",
         "stat_energy_from": "sensor.solar_energy_produced",
         "config_entry_solar_forecast": [
-          "01J70GAMKRWSDDJSQ0PANJBDP6"
-        ]
-      },
-      {
-        "type": "grid",
-        "cost_adjustment_day": 0.0,
-        "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
-        "stat_cost": null,
-        "entity_energy_price": "sensor.electricity_general_price",
-        "number_energy_price": null,
-        "stat_energy_to": "sensor.smart_meter_real_energy_produced",
-        "stat_compensation": null,
-        "entity_energy_price_export": "sensor.electricity_feed_in_price",
-        "number_energy_price_export": null
+          "01KPMN3TYZPBW5FSPSG7916XPN"
+        ],
+        "stat_rate": "sensor.power_meter_power_photovoltaics"
       },
       {
         "type": "battery",
         "stat_energy_from": "sensor.battery_energy_discharged",
-        "stat_energy_to": "sensor.battery_energy_charged"
+        "stat_energy_to": "sensor.battery_energy_charged",
+        "power_config": {
+          "stat_rate": "sensor.power_meter_power_battery"
+        },
+        "stat_rate": "sensor.power_meter_power_battery"
+      },
+      {
+        "type": "grid",
+        "stat_energy_from": "sensor.smart_meter_real_energy_consumed",
+        "stat_energy_to": "sensor.smart_meter_real_energy_produced",
+        "stat_cost": null,
+        "stat_compensation": null,
+        "entity_energy_price": "sensor.electricity_general_price",
+        "number_energy_price": null,
+        "entity_energy_price_export": "sensor.electricity_feed_in_price",
+        "number_energy_price_export": null,
+        "cost_adjustment_day": 0.0,
+        "power_config": {
+          "stat_rate": "sensor.power_meter_power_grid"
+        },
+        "stat_rate": "sensor.power_meter_power_grid"
       }
     ],
     "device_consumption": [
       {
         "stat_consumption": "sensor.all_light_energy",
-        "name": "Lights"
+        "name": "Lights",
+        "stat_rate": "sensor.all_light_power"
       },
       {
         "stat_consumption": "sensor.living_room_aircon_energy",
-        "name": "Living room aircon"
+        "name": "Living room aircon",
+        "stat_rate": "sensor.living_room_aircon_power"
       },
       {
         "stat_consumption": "sensor.dining_room_aircon_energy",
-        "name": "Dining room aircon"
+        "name": "Dining room aircon",
+        "stat_rate": "sensor.dining_room_aircon_power"
       },
       {
         "stat_consumption": "sensor.bedroom_aircon_energy",
-        "name": "Bedroom aircon"
+        "name": "Bedroom aircon",
+        "stat_rate": "sensor.bedroom_aircon_power"
       },
       {
         "stat_consumption": "sensor.office_heater_energy",
-        "name": "Office heater"
+        "name": "Office heater",
+        "stat_rate": "sensor.office_heater_power"
       },
       {
         "stat_consumption": "sensor.nursery_heater_energy",
-        "name": "Nursery heater"
+        "name": "Nursery heater",
+        "stat_rate": "sensor.nursery_heater_power"
       },
       {
         "stat_consumption": "sensor.all_fan_energy",
-        "name": "Fans"
+        "name": "Fans",
+        "stat_rate": "sensor.all_fan_power"
       },
       {
         "stat_consumption": "sensor.all_humidifier_energy",
-        "name": "Humidifiers"
+        "name": "Humidifiers",
+        "stat_rate": "sensor.all_humidifier_power"
       },
       {
         "stat_consumption": "sensor.kitchen_appliances_energy",
-        "name": "Kitchen appliances"
+        "name": "Kitchen appliances",
+        "stat_rate": "sensor.kitchen_appliances_power"
       },
       {
         "stat_consumption": "sensor.dishwasher_energy",
-        "name": "Dishwasher"
+        "name": "Dishwasher",
+        "stat_rate": "sensor.dishwasher_power"
       },
       {
         "stat_consumption": "sensor.fridge_energy",
-        "name": "Fridge"
+        "name": "Fridge",
+        "stat_rate": "sensor.fridge_power"
       },
       {
         "stat_consumption": "sensor.freezer_energy",
-        "name": "Freezer"
+        "name": "Freezer",
+        "stat_rate": "sensor.freezer_power"
       },
       {
         "stat_consumption": "sensor.washer_energy",
@@ -88,27 +109,33 @@
       },
       {
         "stat_consumption": "sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_energy",
-        "name": "TV, speakers, PC, Home Assistant, router relay, security hub"
+        "name": "TV, speakers, PC, Home Assistant, router relay, security hub",
+        "stat_rate": "sensor.tv_speakers_pc_home_assistant_router_relay_security_hub_power"
       },
       {
         "stat_consumption": "sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy",
-        "name": "Water heater, oven & stove, guest suite, garage, all other"
+        "name": "Water heater, oven & stove, guest suite, garage, all other",
+        "stat_rate": "sensor.water_heater_oven_stove_guest_suite_garage_all_other_power"
       },
       {
         "stat_consumption": "sensor.office_desk_computer_monitor_cooler_fish_tank_energy",
-        "name": "Office desk, computer & monitor, cooler, fish tank"
+        "name": "Office desk, computer & monitor, cooler, fish tank",
+        "stat_rate": "sensor.office_desk_computer_monitor_cooler_fish_tank_power"
       },
       {
         "stat_consumption": "sensor.phone_chargers_energy",
-        "name": "Phone chargers"
+        "name": "Phone chargers",
+        "stat_rate": "sensor.phone_chargers_power"
       },
       {
         "stat_consumption": "sensor.sensors_energy",
-        "name": "Sensors"
+        "name": "Sensors",
+        "stat_rate": "sensor.sensors_power"
       },
       {
         "stat_consumption": "sensor.paludarium_picture_frame_camera_energy",
-        "name": "Paludarium, picture frame, camera"
+        "name": "Paludarium, picture frame, camera",
+        "stat_rate": "sensor.paludarium_picture_frame_camera_power"
       }
     ],
     "device_consumption_water": []
