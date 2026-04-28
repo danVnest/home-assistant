@@ -55,8 +55,8 @@ template:
         unique_id: dark_outside
         state: >
           {{
-            states('sensor.weather_station_illuminance')|float(9999) < 2000 or 
-            states('sun.sun') == 'below_horizon'
+            states('sun.sun') == 'below_horizon' or
+            states('sensor.weather_station_illuminance')|float(10001) < 10000
           }}
         delay_off: 0:05
         icon: mdi:theme-light-dark
