@@ -3905,7 +3905,7 @@
                   "entities": [
                     {
                       "type": "custom:template-entity-row",
-                      "entity": "switch.front_and_back_side_water",
+                      "entity": "valve.side_tap_front_and_back_side",
                       "name": "Front & back side",
                       "icon": "mdi:grass",
                       "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('front_and_back_side') }}",
@@ -3913,7 +3913,7 @@
                     },
                     {
                       "type": "custom:template-entity-row",
-                      "entity": "switch.ferns_water",
+                      "entity": "valve.side_tap_ferns",
                       "name": "Ferns",
                       "icon": "mdi:palm-tree",
                       "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('ferns') }}",
@@ -3921,7 +3921,7 @@
                     },
                     {
                       "type": "custom:template-entity-row",
-                      "entity": "switch.back_fence_water",
+                      "entity": "valve.side_tap_back_fence",
                       "name": "Back fence",
                       "icon": "mdi:fence",
                       "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('back_fence') }}",
@@ -3929,7 +3929,7 @@
                     },
                     {
                       "type": "custom:template-entity-row",
-                      "entity": "switch.vegetable_garden_water",
+                      "entity": "valve.back_tap_vegetable_garden",
                       "name": "Vegetable garden",
                       "icon": "mdi:sprout",
                       "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('vegetable_garden') }}",
@@ -3937,7 +3937,7 @@
                     },
                     {
                       "type": "custom:template-entity-row",
-                      "entity": "switch.lawn_water",
+                      "entity": "valve.back_tap_lawn",
                       "name": "Lawn",
                       "icon": "mdi:wave",
                       "secondary": "{% from 'plants.jinja' import next_water %}{{ next_water('lawn') }}",
@@ -3955,20 +3955,31 @@
                   "show_header_toggle": false,
                   "entities": [
                     {
-                      "entity": "switch.side_tap_smart_watering_program",
-                      "name": "Side tap",
-                      "icon": "mdi:water-pump"
+                      "entity": "switch.side_tap_front_and_back_side_smart_watering",
+                      "name": "Front and back side",
+                      "icon": "mdi:grass"
                     },
                     {
-                      "entity": "switch.back_tap_smart_watering_program",
-                      "name": "Back tap",
-                      "icon": "mdi:water-pump"
+                      "entity": "switch.side_tap_ferns_smart_watering",
+                      "name": "Ferns",
+                      "icon": "mdi:palm-tree"
+                    },
+                    {
+                      "entity": "switch.side_tap_back_fence_smart_watering",
+                      "name": "Back fence",
+                      "icon": "mdi:fence"
+                    },
+                    {
+                      "entity": "switch.back_tap_vegetable_garden_smart_watering",
+                      "name": "Vegetable garden",
+                      "icon": "mdi:sprout"
+                    },
+                    {
+                      "entity": "switch.back_tap_lawn_smart_watering",
+                      "name": "Lawn",
+                      "icon": "mdi:wave"
                     }
-                  ],
-                  "layout_options": {
-                    "grid_columns": 2,
-                    "grid_rows": "auto"
-                  }
+                  ]
                 },
                 {
                   "type": "entities",
@@ -3985,11 +3996,7 @@
                       "name": "Back tap",
                       "icon": "mdi:weather-rainy"
                     }
-                  ],
-                  "layout_options": {
-                    "grid_columns": 2,
-                    "grid_rows": "auto"
-                  }
+                  ]
                 },
                 {
                   "type": "history-graph",
