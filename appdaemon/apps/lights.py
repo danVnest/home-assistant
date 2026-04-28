@@ -593,7 +593,7 @@ class Lights(App):
                     self.lights[light_name].ignore_vacancy()
                     self.lights[light_name].turn_off()
                 self.log(
-                    f"Kitchen light levels are high ({new}lx), "
+                    f"The 'kitchen' light level is high ({new}lx), "
                     "automatic lighting disabled",
                 )
         elif (
@@ -611,7 +611,8 @@ class Lights(App):
                     ),
                 )
             self.log(
-                f"Kitchen light levels are low ({new}lx), automatic lighting enabled",
+                f"The 'kitchen' light level is low ({new}lx), "
+                "automatic lighting enabled",
             )
 
     def handle_bedroom_illuminance_change(
@@ -632,7 +633,8 @@ class Lights(App):
             and float(new) >= self.constants["illuminance"]["bedroom_morning_max"]
         ):
             self.log(
-                f"Bedroom light levels are high ({new}lx), transitioning to day scene",
+                f"The 'bedroom' light level is high ({new}lx), "
+                "transitioning to day scene",
             )
             self.napping_in_bedroom = False
             self.control.scene = "Day"
@@ -670,7 +672,7 @@ class Lights(App):
                 self.lights[room].ignore_vacancy()
                 self.lights[room].turn_off()
                 self.log(
-                    f"The {room}'s light levels are high ({illuminance}lx), "
+                    f"The '{room}' light level is high ({illuminance}lx), "
                     "automatic lighting disabled",
                 )
         elif (
@@ -688,7 +690,7 @@ class Lights(App):
                 ),
             )
             self.log(
-                f"The '{room}'s' light levels are low ({illuminance}lx), "
+                f"The '{room}' light level is low ({illuminance}lx), "
                 "automatic lighting enabled",
             )
 
