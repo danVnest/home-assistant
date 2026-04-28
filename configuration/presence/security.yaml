@@ -93,7 +93,7 @@ template:
         from: "off"
         not_to:
           - "unknown"
-          - "unavaiable"
+          - "unavailable"
     sensor:
       - name: Security monitoring start time
         unique_id: security_monitoring_start_time

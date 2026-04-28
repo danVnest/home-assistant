@@ -100,7 +100,7 @@ template:
         not_from:
           - "0"
           - "unknown"
-          - "unavaiable"
+          - "unavailable"
           - none
     sensor:
       - name: Plants last watered
