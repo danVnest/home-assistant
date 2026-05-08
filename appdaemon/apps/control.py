@@ -171,9 +171,8 @@ class Control(App):
         self.climate.transition_to_scene(new_scene)
         if new_scene == "Sleep" or "Away" in new_scene:
             self.presence.lock_door()
-            self.turn_on("switch.entryway_camera_enabled")
-            self.turn_on("switch.back_door_camera_enabled")
-            self.turn_on("switch.garage_camera_enabled")
+            for area in ("entryway", "back_door", "back_deck", "garage"):
+                self.turn_on(f"switch.{area}_camera_enabled")
             if new_scene == "Sleep":
                 self.napping_in_bedroom = True
             else:
@@ -190,10 +189,8 @@ class Control(App):
                 # TODO: https://app.asana.com/0/1207020279479204/1203851145721573/f
                 # media off unless in guest mode
         else:
-            self.turn_off("switch.entryway_camera_enabled")
-            self.turn_off("switch.living_room_camera_enabled")
-            self.turn_off("switch.back_door_camera_enabled")
-            self.turn_off("switch.garage_camera_enabled")
+            for area in ("entryway", "living_room", "back_door", "back_deck", "garage"):
+                self.turn_off(f"switch.{area}_camera_enabled")
             if new_scene == "TV" and not self.media.on:
                 self.media.turn_on()
         self.call_service(
