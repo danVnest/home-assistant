@@ -218,7 +218,7 @@ class Control(App):
             self.scene = (
                 "Morning"
                 if self.now_is_between(
-                    self.get_setting("morning_time"),
+                    self.entities.input_datetime.morning_time.state,
                     self.constants["day_time"],
                 )
                 else "Sleep"
@@ -277,7 +277,7 @@ class Control(App):
             self.handle_morning_time
             if name == "morning_time"
             else self.handle_bed_times,
-            self.get_setting(name),
+            self.get_state(f"input_datetime.{name}"),
             timer_name=name,
         )
 
@@ -285,9 +285,9 @@ class Control(App):
     def valid_time_settings(self) -> bool:
         """Check if morning and bed times are appropriate."""
         return (
-            self.parse_time(self.get_setting("morning_time"))
+            self.parse_time(self.entities.input_datetime.morning_time.state)
             < self.parse_time(self.constants["day_time"])
-            < self.parse_time(self.get_setting("bed_time"))
+            < self.parse_time(self.entities.input_datetime.bed_time.state)
         )
 
     def handle_morning_time(self, **kwargs: dict):
@@ -323,7 +323,9 @@ class Control(App):
     @property
     def bed_time(self) -> bool:
         """Return if the time is after bed time (and before midnight)."""
-        return self.time() > self.parse_time(self.get_setting("bed_time"))
+        return self.time() > self.parse_time(
+            self.entities.input_datetime.bed_time.state,
+        )
 
     def handle_z_wave_button(
         self,
@@ -582,8 +584,8 @@ class Control(App):
         elif "door" in setting:
             self.climate.update_door_check_delay(float(new))
         else:
-            device_type = setting.split("_")[0]
-            if setting.endswith("vacating_delay") and device_type in (
+            device_type, setting_type = setting.split("_", maxsplit=1)
+            if setting_type == "vacating_delay" and device_type in (
                 "aircon",
                 "fan",
                 "heater",

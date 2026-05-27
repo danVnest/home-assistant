@@ -163,7 +163,7 @@ class Lights(App):
 
     def transition_to_tv_scene(self):
         """Configure lighting for the tv scene."""
-        kelvin = int(float(self.entities.input_number.tv_kelvin.state))
+        kelvin = self.get_setting("tv_kelvin")
         self.lights["entryway"].set_presence_adjustments(
             occupied=(
                 self.get_setting("tv_motion_brightness"),
@@ -425,7 +425,7 @@ class Lights(App):
             circadian_progress = (
                 0
                 if (
-                    self.parse_time(self.get_setting("morning_time"))
+                    self.parse_time(self.entities.input_datetime.morning_time.state)
                     < self.time()
                     < self.circadian["start_time"].time()
                 )
@@ -692,6 +692,11 @@ class Lights(App):
                 f"The '{room}' light level is low ({illuminance}lx), "
                 "automatic lighting enabled",
             )
+
+    def get_setting(self, setting_name: str) -> int:
+        """Get a UI input_number setting values as an integer."""
+        return int(float(self.get_state(f"input_number.{setting_name}")))
+        # TODO: better to be explicit, replace this method when refactoring this app
 
     @property
     def lights(self) -> Lights:
