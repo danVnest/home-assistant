@@ -55,7 +55,7 @@ template:
             {{-{
               'type': 'markdown',
               'content': '<ha-icon icon="mdi:' + item.icon + '"></ha-icon>&emsp;' + item.name,
-              'card_mod': {
+              'uix': {
                 'style': {
                   '.': "ha-card {"
                     "background: none;"
@@ -111,7 +111,7 @@ template:
                     'labels': false,
                     'loading_indicator': false,
                   },
-                  'card_mod': {
+                  'uix': {
                     'style':
                       "ha-card {"
                         "background: rgb(var(--rgb-card-background-color));"
@@ -161,7 +161,7 @@ template:
                     'labels': false,
                     'loading_indicator': false,
                   },
-                  'card_mod': {
+                  'uix': {
                     'style':
                       "ha-card {"
                         "background: rgb(var(--rgb-card-background-color));"
@@ -211,7 +211,7 @@ template:
                     'labels': false,
                     'loading_indicator': false,
                   },
-                  'card_mod': {
+                  'uix': {
                     'style':
                       "ha-card {"
                         "background: rgb(var(--rgb-card-background-color));"
@@ -261,7 +261,7 @@ template:
                     'labels': false,
                     'loading_indicator': false,
                   },
-                  'card_mod': {
+                  'uix': {
                     'style':
                       "ha-card {"
                         "background: rgb(var(--rgb-card-background-color));"
@@ -312,7 +312,7 @@ template:
                     'labels': false,
                     'loading_indicator': false,
                   },
-                  'card_mod': {
+                  'uix': {
                     'style':
                       "ha-card {"
                         "background: rgb(var(--rgb-card-background-color));"
@@ -448,7 +448,7 @@ template:
                   'height': ('5' if loop.index == 3 else '1') + 'px !important',
                 } 
               }],
-              'card_mod': {
+              'uix': {
                 'style':
                   "ha-card {"
                     "background: none;"

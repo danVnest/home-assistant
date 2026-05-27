@@ -71,7 +71,7 @@
                   "entity": "binary_sensor.dog_water_bowl",
                   "features_position": "bottom",
                   "vertical": false,
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
                       "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Since';\n}\n"
@@ -97,7 +97,7 @@
                   ],
                   "features_position": "bottom",
                   "vertical": false,
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
                       "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'System functionality limited since';\n}\n"
@@ -546,7 +546,7 @@
                     }
                   ],
                   "theme_mode": "auto",
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       ".": "ha-card {\n  background: transparent;\n}\n",
                       "ha-map$": "#map {\n  background: transparent;\n} .leaflet-tile-pane {\n  opacity: 0.5;\n} .leaflet-control-container {\n  opacity: 0.75;\n} .leaflet-control-attribution {\n  opacity: 0.1;\n}\n"
@@ -1541,42 +1541,42 @@
               "type": "grid",
               "cards": [
                 {
-                  "type": "vertical-stack",
-                  "cards": [
-                    {
-                      "type": "custom:bubble-card",
-                      "card_type": "pop-up",
-                      "hash": "#device-issues",
-                      "button_type": "state",
-                      "name": "Device issues",
-                      "entity": "group.unavailable_entities",
-                      "icon": "mdi:alert-circle",
-                      "sub_button": [
-                        {
-                          "icon": "mdi:refresh",
-                          "show_background": false,
-                          "tap_action": {
-                            "action": "perform-action",
-                            "perform_action": "automation.trigger",
-                            "target": {
-                              "entity_id": "automation.update_device_issue_and_battery_groups"
-                            }
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#device-issues",
+                  "button_type": "state",
+                  "name": "Device issues",
+                  "entity": "group.unavailable_entities",
+                  "icon": "mdi:alert-circle",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
                           }
                         }
-                      ],
-                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
-                      "modules": [
-                        "icon_color_mix_in",
-                        "datetime_to_relative_time"
-                      ],
-                      "icon_color_mix_in": {
-                        "color": "red"
-                      },
-                      "datetime_to_relative_time": {
-                        "entity": "automation.update_device_issue_and_battery_groups",
-                        "attribute": "last_triggered"
                       }
-                    },
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "cards": [
                     {
                       "type": "tile",
                       "visibility": [
@@ -1593,20 +1593,28 @@
                       "state_content": "last_changed",
                       "vertical": false,
                       "features_position": "bottom",
-                      "card_mod": {
+                      "uix": {
                         "style": {
                           "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
                           "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Disconnected';\n}\n"
                         }
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
                       "type": "markdown",
                       "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n1. If the system was recently restarted or reconnected, wait up to 10 minutes or so for configuration to complete\n\n1. Check the device is plugged in or has sufficient battery charge\n\n1. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n1. Try reloading home assistant\n\n1. Try restarting home assistant\n\n1. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details> {%- if states('sensor.device_issues')|int(1) > 15 -%}\n  15 of {{ states('sensor.device_issues')|int }} device issues are shown below. Resolve these to see the remaining issues.\n{%- endif -%}",
-                      "card_mod": {
+                      "uix": {
                         "style": {
                           "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"
                         }
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
@@ -1616,6 +1624,10 @@
                       },
                       "filter": {
                         "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
@@ -1628,48 +1640,52 @@
                       },
                       "filter": {
                         "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     }
                   ]
                 },
                 {
-                  "type": "vertical-stack",
-                  "cards": [
-                    {
-                      "type": "custom:bubble-card",
-                      "card_type": "pop-up",
-                      "hash": "#low-batteries",
-                      "button_type": "state",
-                      "name": "Low batteries",
-                      "entity": "group.low_batteries",
-                      "icon": "mdi:battery-low",
-                      "card_layout": "large",
-                      "sub_button": [
-                        {
-                          "icon": "mdi:refresh",
-                          "show_background": false,
-                          "tap_action": {
-                            "action": "perform-action",
-                            "perform_action": "automation.trigger",
-                            "target": {
-                              "entity_id": "automation.update_device_issue_and_battery_groups"
-                            }
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#low-batteries",
+                  "button_type": "state",
+                  "name": "Low batteries",
+                  "entity": "group.low_batteries",
+                  "icon": "mdi:battery-low",
+                  "card_layout": "large",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
                           }
                         }
-                      ],
-                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
-                      "modules": [
-                        "icon_color_mix_in",
-                        "datetime_to_relative_time"
-                      ],
-                      "icon_color_mix_in": {
-                        "color": "red"
-                      },
-                      "datetime_to_relative_time": {
-                        "entity": "automation.update_device_issue_and_battery_groups",
-                        "attribute": "last_triggered"
                       }
-                    },
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "cards": [
                     {
                       "type": "tile",
                       "entity": "binary_sensor.internet",
@@ -1684,16 +1700,24 @@
                           "state_not": "on"
                         }
                       ],
-                      "card_mod": {
+                      "uix": {
                         "style": {
                           "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
                           "ha-tile-info$": "state-display {\n  opacity: 0.7;\n}\nstate-display::before {\n  content: 'Disconnected';\n}\n"
                         }
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
                       "type": "markdown",
-                      "content": "Once a battery is too flat for the device to function its battery level may not be reported, and as such appear as \"unavailable\". This can also occur when a battery is ok but the device can't connect. It can be worth checking other device issues first in this case.\n\nBatteries with low levels are still functional, but it is recommended to charge or replace them soon to keep the system functional."
+                      "content": "Once a battery is too flat for the device to function its battery level may not be reported, and as such appear as \"unavailable\". This can also occur when a battery is ok but the device can't connect. It can be worth checking other device issues first in this case.\n\nBatteries with low levels are still functional, but it is recommended to charge or replace them soon to keep the system functional.",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
                     },
                     {
                       "type": "custom:auto-entities",
@@ -1705,6 +1729,10 @@
                       },
                       "sort": {
                         "method": "state"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
@@ -1717,6 +1745,10 @@
                       },
                       "filter": {
                         "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
@@ -1763,50 +1795,58 @@
                       ],
                       "icon_color_mix_in": {
                         "color": "red"
+                      },
+                      "grid_options": {
+                        "columns": 12
                       }
                     }
-                  ]
+                  ],
+                  "rows": 1
                 },
                 {
-                  "type": "vertical-stack",
-                  "cards": [
-                    {
-                      "type": "custom:bubble-card",
-                      "card_type": "pop-up",
-                      "hash": "#charging-batteries",
-                      "button_type": "state",
-                      "name": "Charging batteries",
-                      "entity": "group.charging_batteries",
-                      "icon": "mdi:battery-charging",
-                      "sub_button": [
-                        {
-                          "icon": "mdi:refresh",
-                          "show_background": false,
-                          "tap_action": {
-                            "action": "perform-action",
-                            "perform_action": "automation.trigger",
-                            "target": {
-                              "entity_id": "automation.update_device_issue_and_battery_groups"
-                            }
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#charging-batteries",
+                  "button_type": "state",
+                  "name": "Charging batteries",
+                  "entity": "group.charging_batteries",
+                  "icon": "mdi:battery-charging",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
                           }
                         }
-                      ],
-                      "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
-                      "modules": [
-                        "datetime_to_relative_time",
-                        "icon_color_mix_in"
-                      ],
-                      "datetime_to_relative_time": {
-                        "entity": "automation.update_device_issue_and_battery_groups",
-                        "attribute": "last_triggered"
-                      },
-                      "icon_color_mix_in": {
-                        "color": "yellow"
                       }
-                    },
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "datetime_to_relative_time",
+                    "icon_color_mix_in"
+                  ],
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "icon_color_mix_in": {
+                    "color": "yellow"
+                  },
+                  "cards": [
                     {
                       "type": "markdown",
-                      "content": "Devices with integrated batteries that report their charge status are displayed here. You will be notified when a device is fully charged."
+                      "content": "Devices with integrated batteries that report their charge status are displayed here. You will be notified when a device is fully charged.",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
                     },
                     {
                       "type": "custom:auto-entities",
@@ -1818,6 +1858,10 @@
                       },
                       "sort": {
                         "method": "state"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     },
                     {
@@ -1830,35 +1874,48 @@
                       },
                       "filter": {
                         "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
                       }
                     }
                   ]
                 },
                 {
-                  "type": "vertical-stack",
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#weather",
+                  "button_type": "name",
+                  "name": "Weather",
+                  "icon": "mdi:text-box",
+                  "show_name": true,
+                  "card_layout": "large",
+                  "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n}\n",
+                  "sub_button": {
+                    "main": [],
+                    "bottom": []
+                  },
                   "cards": [
-                    {
-                      "type": "custom:bubble-card",
-                      "card_type": "pop-up",
-                      "hash": "#weather",
-                      "button_type": "name",
-                      "name": "Weather",
-                      "icon": "mdi:text-box",
-                      "show_name": true,
-                      "card_layout": "large",
-                      "styles": ".large .bubble-icon-container {\n  min-width: 36px !important;\n  min-height: 36px !important;\n}\n"
-                    },
                     {
                       "type": "weather-forecast",
                       "show_current": false,
                       "show_forecast": true,
                       "entity": "weather.pirateweather",
-                      "forecast_type": "daily"
+                      "forecast_type": "daily",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
                     },
                     {
                       "type": "tile",
                       "entity": "sensor.pirateweather_nearest_storm_distance",
-                      "name": "Nearest storm"
+                      "name": "Nearest storm",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
                     }
                   ]
                 }
@@ -2951,7 +3008,7 @@
                   "watt_threshold": 1000,
                   "transparency_zero_lines": 0,
                   "disable_dots": false,
-                  "card_mod": {
+                  "uix": {
                     "style": "#battery-state-of-charge-text::after {\n  content: \" {{ ((states['sensor.battery_time_remaining'].state|int|string + 'h') if states['sensor.battery_time_remaining'].state|float >= 1 else ((states['sensor.battery_time_remaining'].state|float * 60)|round|string + 'm')) if has_value('sensor.battery_time_remaining') else '' }}\";\n}\n"
                   }
                 },
@@ -2994,7 +3051,7 @@
                     ],
                     "unit_of_measurement": "W",
                     "decimal": 0,
-                    "card_mod": {
+                    "uix": {
                       "style": "bar-card-iconbar {\n  --paper-item-icon-color: var(--text-secondary-color) !important;\n  padding-left: 10px;\n  justify-content: left;\n} bar-card-name {\n  white-space: nowrap;\n  width: 100%;\n  padding-right: 10px;\n} bar-card-value {\n  padding-right: 5px\n} bar-card-currentbar, bar-card-backgroundbar {\n  border-radius: 10px !important;\n} bar-card-currentbar {\n  opacity: 0.5;\n}"
                     }
                   },
@@ -3108,7 +3165,7 @@
                   "filter": {
                     "exclude": [
                       {
-                        "state": "=0"
+                        "state": "<10"
                       },
                       {
                         "state": "unknown"
@@ -3145,13 +3202,13 @@
                 },
                 {
                   "type": "energy-usage-graph",
-                  "card_mod": {
+                  "uix": {
                     "style": "ha-card {\n  --chart-max-height: 150px;\n}\n"
                   }
                 },
                 {
                   "type": "energy-devices-detail-graph",
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       ".": "ha-card {\n  --chart-max-height: 150px;\n}",
                       "ha-chart-base$": ".chart-legend {\n  max-height: 30px !important;\n  overflow-y: scroll !important;\n}"
@@ -3170,7 +3227,7 @@
                   "grid_options": {
                     "columns": 24
                   },
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
                     }
@@ -3184,7 +3241,7 @@
                 },
                 {
                   "type": "custom:mod-card",
-                  "card_mod": {
+                  "uix": {
                     "style": "ha-card {\n  background: var(--ha-card-background);\n  border: var(--ha-card-border-width) solid var(--divider-color);\n  padding: 10px;\n}"
                   },
                   "card": {
@@ -3442,7 +3499,7 @@
                       },
                       "hours_to_show": "1h",
                       "raw_plotly_config": true,
-                      "card_mod": {
+                      "uix": {
                         "style": "ha-card {\n  background-color: var(--ha-card-background)\n}\n"
                       },
                       "entities": [
@@ -3695,7 +3752,7 @@
                     {
                       "type": "markdown",
                       "content": "**Energy costs** are determined by the energy's source (grid, solar and/or battery). The energy used is multiplied by the **grid pricing** shown below, where the proportion of imported (grid) and produced (solar/battery) energy contributes to costs and savings respectively. **Savings** represent how much extra would have needed to be spent if the solar panels and battery had never been installed.\n\n- *Yearly, monthly, and weekly* costs/savings are rolling totals, so a change indicates more/less usage than the previous period.\n- *Today’s* costs/savings reset to $0 at midnight.\n- *Real-time* costs/savings are based on current power usage if it would be maintained for an hour.\n\nThe graphs show how costs change over their respective time periods, and are colour coded by <font color=#0066cc>low</font>, <font color=#c1bb3c>moderate</font>, and <font color=#ff4d00>high</font> costs. Negative costs (from solar/battery export earnings or negative grid costs during an energy surpless) are colour coded between <font color=#0066cc>low</font> and <font color=#6666cc>high</font>. Savings are always plotted in <font color=darkgreen>green</font>, but the savings value below the graph varies for comparatively <font color=darkgreen>high</font> and <font color=#ff4d00>low</font> savings.\n\nGroups are shown in order of highest to lowest total weekly cost + savings.\n\nSelect an option below for more details:\n\n<details><summary><i>Noteworthy groups</i></summary>\n\n- *Total*\nCosts for all devices, reduced by export earnings, but also including fixed daily & monthly electricity provider costs. Savings are from using solar/battery instead of the grid, for all devices - with export earnings added and battery charging costs subtracted. Both total costs and savings can be negative (e.g. negative costs when export earnings are high, negative savings when battery charging costs exceed solar savings).\n\n- *Export*\nExport costs are purely the costs associated with exporting solar and battery power/energy (i.e. battery charging costs are not included). This value is usually negative, indicating earnings.\n\n- *Electricity provider service*\nThe fixed daily service and monthly subscription costs charged by the provider, totalled per timeframe.\n\n- *Water heater, oven & stove, guest suite, garage, all other*\nComponents of this group could not be directly tracked, so the group is derived from total reported usage at the inverter minus all other tracked usage. The water heater can use the controlled load power supply, but is not accurately reflected here or in total costs.\n\n- *Battery*\nThis only includes costs from charging the battery from the grid. Battery export earnings are not subtracted.\n\n- *Standby*\nTotal estimated costs and savings of all devices in standby. This total is only shown for reference as each component is already included in other groups.\n</details>\n\n<details><summary><i>Price history & forecast</i></summary>\n\nThe **price history & forecast** chart shows import/export pricing for the previous 24 hours as well as the forecast for the next 24 hours. Above the chart is the real-time cost per kWh if energy is consumed from the grid, as well as the current price paid for any energy exported.\n\n</details>\n\n<details><summary><i>Daily statistics</i></summary>\n\n**Daily statistics** for energy production, export, storage, usage, and costs are shown in a box plot - highlighting minimum, average, and maximum values. The current values from the past 24 hours is shown as yellow points. These values are calculated for every 24 hour period since the system was installed, and as such indicates weather and seasonal variation. Export earnings have battery charging costs subtracted to give a more realistic value. Similarly, **daily maximums** are the highest ever recorded values across a single day. Some of these values are also used to calculate the **return on investment** (details below).\n</details>\n\n<details><summary><i>Return on investment</i></summary>\n\nThe **return on investment** section below shows a calculation for the current total amount saved through the use of the solar and battery system, minus install costs. This value will improve over time, and based on these projected savings the time taken to break even is estimated.\n\nIt is also useful to compare projected savings (minus install costs) with likely returns if the funds spent on installing the solar system had instead been invested at 6% per annum (after tax). If savings are sufficiently high then eventually they will outweigh the expected returns from standard investments (shown in years required to **beat investment in**). In order to be a meaningful comparison savings also takes into account the projected increase in house value the solar and battery system provides, which is estimated to cover 40% of the install costs.\n</details>\n<details><summary><i>Additional costs</i></summary>\nThe electricity provider's daily property service and monthly subscription fees should be adjusted here manually to reflect actual values if they change. These are factored into the total energy costs and also shown in the cost breakdown.\n</details>",
-                      "card_mod": {
+                      "uix": {
                         "style": {
                           "ha-markdown$": "font {\n  text-shadow: 0.5px 0.5px 0.5px var(--primary-text-color), 0 0 2px var(--rgb-card-background-color), 0 0 5px var(--rgb-card-background-color);\n}\nsummary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}"
                         }
@@ -3779,7 +3836,7 @@
                     "title": "Soil",
                     "state_color": false,
                     "columns": 4,
-                    "card_mod": {
+                    "uix": {
                       "style": {
                         ".entity$": {
                           ".": "div:not(.name) {\n  font-size: 12px !important;\n}\nstate-badge {\n  margin: -3px !important;\n  --mdc-icon-size: 30px !important;\n}\n",
@@ -4054,7 +4111,7 @@
                   "layout_options": {
                     "grid_columns": "full"
                   },
-                  "card_mod": {
+                  "uix": {
                     "style": {
                       "ha-markdown$": "ha-icon {\n  --mdc-icon-size: 12px;\n  margin: 3px;\n} summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 180px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}\nspan {\n  text-shadow: 0px 0px 2px var(--accent-color);\n}\np:nth-of-type(2) span {\n  text-shadow: 0px 0px 2px green;\n}"
                     }

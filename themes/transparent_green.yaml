@@ -1,5 +1,5 @@
 Transparent Green:
-  card-mod-theme: "Transparent Green"
+  uix-theme: "Transparent Green"
   modes:
     light:
       background-image: "center / cover no-repeat fixed url('https://cdn.jsdelivr.net/gh/basnijholt/lovelace-ios-themes@a37376d918fcfe4785be99910dc9a7200ac37da9/themes/homekit-bg-light-green.jpg')"
@@ -77,8 +77,8 @@ Transparent Green:
   input-disabled-ink-color: var(--disabled-text-color)
   input-dropdown-icon-color: var(--primary-text-color)
   codemirror-property: var(--accent-color)
-  # Card Mod
-  card-mod-card-yaml: |
+  # UI eXtension
+  uix-card-yaml: |
     $: |
       h1.card-header {
         --ha-card-header-font-size: 16px !important;
