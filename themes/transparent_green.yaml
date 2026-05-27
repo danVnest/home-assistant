@@ -36,6 +36,17 @@ Transparent Green:
   cool-color: var(--light-blue-color)
   cold-color: var(--blue-color)
   color-mix-in-base: var(--light-primary-color) 75%
+  ha-color-primary-05: var(--ha-color-green-05)
+  ha-color-primary-10: var(--ha-color-green-10)
+  ha-color-primary-20: var(--ha-color-green-20)
+  ha-color-primary-30: var(--ha-color-green-30)
+  ha-color-primary-40: var(--ha-color-green-40)
+  ha-color-primary-50: var(--ha-color-green-50)
+  ha-color-primary-60: var(--ha-color-green-60)
+  ha-color-primary-70: var(--ha-color-green-70)
+  ha-color-primary-80: var(--ha-color-green-80)
+  ha-color-primary-90: var(--ha-color-green-90)
+  ha-color-primary-95: var(--ha-color-green-95)
   # Text
   primary-text-color: var(--light-primary-color)
   secondary-text-color: var(--light-primary-color)
@@ -53,29 +64,32 @@ Transparent Green:
   ha-card-border-width: 0
   bubble-pop-up-main-background-color: var(--ha-card-background)
   bubble-select-list-background-color: var(--secondary-background-color)
-  # Icons & Buttons
+  # Icons
   state-icon-color: var(--primary-text-color)
   state-icon-unavailable-color: var(--disabled-text-color)
+  # Buttons
   button-color: rgb(235, 255, 245)
   button-color-active: rgb(30, 60, 40)
   bubble-sub-button-background-color: var(--inactive-color)
-  button-border-auto: 1.5px solid green #
-  button-border-semi: 1.5px solid darkolivegreen #
-  button-border-manual: 1.5px solid grey #
-  button-border-error: 1.5px solid red #
+  button-border-auto: 1.5px solid green
+  button-border-semi: 1.5px solid darkolivegreen
+  button-border-manual: 1.5px solid grey
+  button-border-error: 1.5px solid red
   button-border-info: 1.5px solid var(--accent-color)
-  wa-color-brand-fill-normal: var(--button-color)
-  wa-color-brand-on-normal: var(--primary-color)
   # Switches
-  switch-checked-button-color: var(--primary-text-color)
-  switch-unchecked-button-color: var(--primary-text-color)
-  # Inputs
-  input-ink-color: var(--primary-text-color)
-  input-fill-color: transparent
-  input-disabled-fill-color: transparent
-  input-label-ink-color: var(--primary-text-color)
-  input-disabled-ink-color: var(--disabled-text-color)
-  input-dropdown-icon-color: var(--primary-text-color)
+  ha-switch-background-color: var(--ha-card-background)
+  ha-switch-checked-background-color: var(--primary-color)
+  ha-switch-thumb-background-color: var(--primary-text-color)
+  ha-switch-thumb-border-color: var(--primary-text-color)
+  ha-switch-checked-thumb-background-color: var(--primary-text-color)
+  ha-switch-checked-thumb-border-color: var(--primary-text-color)
+  ha-switch-border-color: transparent
+  ha-switch-checked-border-color: transparent
+  # Sliders
+  ha-slider-track-color: var(--ha-card-background)
+  ha-slider-thumb-color: var(--primary-text-color)
+  # Text Inputs
+  ha-color-form-background: transparent
   codemirror-property: var(--accent-color)
   # UI eXtension
   uix-card-yaml: |
