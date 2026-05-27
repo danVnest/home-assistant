@@ -10,18 +10,8 @@
         "type": "module"
       },
       {
-        "id": "953d4f6b63c4405ba2c51b5eb1750c5f",
-        "url": "/hacsfiles/lovelace-auto-entities/auto-entities.js?hacstag=1677445841161",
-        "type": "module"
-      },
-      {
         "id": "3381f7eb0221467a819b888f52a8faa6",
-        "url": "/hacsfiles/power-flow-card-plus/power-flow-card-plus.js?hacstag=618081815036",
-        "type": "module"
-      },
-      {
-        "id": "84218685b64f474f822a6ea89436fbf1",
-        "url": "/hacsfiles/lovelace-card-mod/card-mod.js?hacstag=190927524421",
+        "url": "/hacsfiles/power-flow-card-plus/power-flow-card-plus.js?hacstag=618081815037",
         "type": "module"
       },
       {
@@ -31,12 +21,7 @@
       },
       {
         "id": "f78c6bcca1f5416e94f8811481a0c8f1",
-        "url": "/hacsfiles/Bubble-Card/bubble-card.js?hacstag=680112919316",
-        "type": "module"
-      },
-      {
-        "id": "e1c31949c8874ed6848dc33828272f7a",
-        "url": "/hacsfiles/lovelace-template-entity-row/template-entity-row.js?hacstag=231674882141",
+        "url": "/hacsfiles/Bubble-Card/bubble-card.js?hacstag=680112919322",
         "type": "module"
       },
       {
@@ -62,6 +47,21 @@
       {
         "id": "6439df8b3a9e420cad2462a1f8f9977a",
         "url": "/hacsfiles/button-card/button-card.js?hacstag=146194325701",
+        "type": "module"
+      },
+      {
+        "id": "08179ea2c5a24c82abb0b1674f65f47e",
+        "url": "/hacsfiles/lovelace-auto-entities/auto-entities.js?hacstag=1014247535220",
+        "type": "module"
+      },
+      {
+        "id": "d9fbcfb00182402ebf4296ba5269eb8c",
+        "url": "/hacsfiles/lovelace-template-entity-row/template-entity-row.js?hacstag=1101615687221",
+        "type": "module"
+      },
+      {
+        "id": "371a09df7517491ea49f2260586c17bf",
+        "url": "/uix/uix.js?v=7.3.0",
         "type": "module"
       }
     ]
