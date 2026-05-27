@@ -48,9 +48,14 @@ template:
   - binary_sensor:
       - name: TV playing
         unique_id: tv_playing
-        state: "{{ states('sensor.tv_state') == 'playing' and states('media_player.tv') == 'on' }}"
+        state: >
+          {{
+            states('media_player.tv') == 'on' and
+            (states('sensor.tv_state') == 'playing' or
+            (states('device_tracker.pc') == 'home' and state_attr('media_player.tv', 'source') == 'PC'))
+          }}
         icon: mdi:play-pause
-        availability: "{{ has_value('sensor.tv_state') or states('media_player.tv') == 'off' }}"
+        availability: "{{ states('sensor.tv_state') != 'unavailable' or states('media_player.tv') == 'off' }}"
       - name: Dark outside
         unique_id: dark_outside
         state: >

@@ -1,5 +1,4 @@
 Media:
   module: media
   class: Media
-  state_change_delay: 3 # number of seconds delay before handling a change in state
   # log_level: DEBUG

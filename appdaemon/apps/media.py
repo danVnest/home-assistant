@@ -6,7 +6,6 @@ User defined variables are configued in media.yaml
 """
 
 import logging
-import subprocess
 from typing import TYPE_CHECKING
 
 from app import App
@@ -22,8 +21,6 @@ class Media(App):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.device: Entity = self.get_entity("media_player.tv")
-        self.play_state: Entity = self.get_entity("sensor.tv_state")
-        self.last_valid_play_state = None
 
     def initialize(self):
         """Start listening to TV states.
@@ -32,21 +29,19 @@ class Media(App):
         """
         super().initialize()
         self.listen_state(self.handle_state_change, self.device.entity_id)
-        self.listen_state(
-            self.handle_state_change,
-            self.play_state.entity_id,
-            duration=self.constants["state_change_delay"],
-        )
-        # TODO: https://app.asana.com/0/1207020279479204/1207033183115382/f
-        # try without state_change_delay, I'd previously removed it!
-        for muted in [True, False]:
+        for state in [True, False]:
+            self.listen_state(
+                self.handle_state_change,
+                "binary_sensor.tv_playing",
+                old="off" if state else "on",
+                new="on" if state else "off",
+            )
             self.listen_state(
                 self.handle_state_change,
                 self.device.entity_id,
                 attribute="is_volume_muted",
-                old=not muted,
-                new=muted,
-                duration=self.constants["state_change_delay"],
+                old=not state,
+                new=state,
             )
 
     @property
@@ -57,25 +52,12 @@ class Media(App):
     @property
     def playing(self) -> bool:
         """Check if the TV is currently playing or not."""
-        if not self.on:
-            return False
-        if self.device.attributes.get("source") == "PC" and self.pc_on:
-            return True
-        return (
-            self.play_state.state == "playing"
-            if self.play_state.state != "unavailable"
-            else self.last_valid_play_state == "playing"
-        )
+        return self.entities.binary_sensor.tv_playing.state == "on"
 
     @property
     def muted(self) -> bool:
         """Check if the TV is currently muted or not."""
         return self.device.attributes.get("is_volume_muted") is True
-
-    @property
-    def pc_on(self) -> bool:
-        """Check if the PC is currently on or not."""
-        return subprocess.call(["ping", "-c", "1", "PC.local"]) == 0  # noqa: S607
 
     def turn_off(self):
         """Turn the TV off."""
@@ -92,23 +74,6 @@ class Media(App):
         self.device.call_service("media_pause")
         self.log("TV media is now paused", level="DEBUG")
 
-    def load_app_launcher_and_state_reporter(self):
-        """Start the LG TV app launcher app & media state reporting service."""
-        if not self.on:
-            self.log(
-                "TV was turned off before state sensor setup completed",
-                level="DEBUG",
-            )
-            return
-        self.log(
-            "Loading app launcher & media state reporting service on TV",
-            level="DEBUG",
-        )
-        self.device.call_service(
-            "select_source",
-            source="App Launcher & Media State Reporter",
-        )
-
     def handle_state_change(
         self,
         entity: str,
@@ -124,16 +89,16 @@ class Media(App):
                 f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')",
                 level="DEBUG",
             )
-        if entity == self.play_state.entity_id:
-            if new not in ("unavailable", "unknown"):
-                self.last_valid_play_state = new
-            else:
-                self.log(
-                    "TV state sensor unavailable, using last valid state",
-                    level="DEBUG",
-                )
-        elif attribute == "state" and new == "on":
-            self.load_app_launcher_and_state_reporter()
+        if (
+            entity == self.device.entity_id
+            and attribute == "state"
+            and new == "on"
+            and self.entities.sensor.tv_state.state == "unavailable"
+        ):
+            self.device.call_service(
+                "select_source",
+                source="App Launcher & Media State Reporter",
+            )
         if self.on and self.playing and not self.muted:
             if self.control.scene == "Night":
                 self.control.scene = "TV"

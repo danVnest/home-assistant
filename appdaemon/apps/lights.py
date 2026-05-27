@@ -189,14 +189,13 @@ class Lights(App):
             transition_period=self.get_setting("tv_transition_period"),
             vacating_delay=self.get_setting("tv_vacating_delay"),
         )
-        self.lights["tv"].adjust(
-            self.get_setting("tv_brightness"),
-            kelvin,
-        )
+        light_names = ["tv"]
         if self.control.napping_in_bedroom or self.control.napping_in_nursery:
             self.lights["hall"].turn_off()
         else:
-            self.lights["hall"].adjust(self.get_setting("tv_brightness"), kelvin)
+            light_names.extend("hall")
+        for light_name in light_names:
+            self.lights[light_name].adjust(self.get_setting("tv_brightness"), kelvin)
         self.lights["dining_room"].set_presence_adjustments(
             entered=(self.get_setting("tv_motion_brightness"), kelvin),
             occupied=(
