@@ -537,6 +537,11 @@ class Lights(App):
             * self.constants["illuminance"]["lighting_factor"][room]
         )
 
+    @property
+    def dark_outside(self) -> bool:
+        """Return if it is currently dark outside."""
+        return self.entities.binary_sensor.dark_outside.state == "on"
+
     def handle_dark_outside(
         self,
         entity: str,

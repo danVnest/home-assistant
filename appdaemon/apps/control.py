@@ -205,12 +205,8 @@ class Control(App):
         if keep_bright and self.scene == "Bright":
             self.scene = "Bright"
         elif not self.presence.anyone_home:
-            self.scene = (
-                "Away (Night)"
-                if self.entities.binary_sensor.dark_outside.state == "on"
-                else "Away (Day)"
-            )
-        elif self.entities.binary_sensor.dark_outside.state == "off":
+            self.scene = "Away (Night)" if self.lights.dark_outside else "Away (Day)"
+        elif not self.lights.dark_outside:
             self.scene = "Day"
         elif self.media.playing:
             self.scene = "TV"
