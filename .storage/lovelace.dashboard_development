@@ -31,7 +31,7 @@
                 ],
                 "exclude": [
                   {
-                    "state": "Up-to-date"
+                    "state": "off"
                   }
                 ]
               },
@@ -40,8 +40,10 @@
           ],
           "cards": [
             {
-              "type": "entity",
-              "entity": "sensor.tv_state"
+              "type": "entities",
+              "entities": [
+                "input_boolean.development_mode"
+              ]
             },
             {
               "entities": [
@@ -71,12 +73,6 @@
               "refresh_interval": 0,
               "title": "Control History",
               "type": "history-graph"
-            },
-            {
-              "type": "entities",
-              "entities": [
-                "input_boolean.development_mode"
-              ]
             },
             {
               "entities": [
@@ -192,14 +188,6 @@
               "type": "history-graph",
               "logarithmic_scale": false,
               "hours_to_show": 240
-            },
-            {
-              "entity": "media_player.tv",
-              "type": "media-control"
-            },
-            {
-              "type": "media-control",
-              "entity": "media_player.tv_speakers"
             }
           ]
         },
