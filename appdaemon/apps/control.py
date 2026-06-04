@@ -204,7 +204,7 @@ class Control(App):
         self.log("Detecting current appropriate scene")
         if keep_bright and self.scene == "Bright":
             self.scene = "Bright"
-        elif not self.presence.anyone_home:
+        elif not self.presence.anyone_home and self.presence.manual_guest_mode == "off":
             self.scene = "Away (Night)" if self.lights.dark_outside else "Away (Day)"
         elif not self.lights.dark_outside:
             self.scene = "Day"
@@ -367,27 +367,14 @@ class Control(App):
         """Handle a single press of the living room button."""
         del kwargs
         self.log("Living room button pressed")
-        self.log("Enabling automatic control for all lights and climate devices")
-        for device_group in (
-            self.lights.lights,
-            self.climate.aircons,
-            self.climate.fans,
-            self.climate.heaters,
-            self.climate.humidifiers,
-        ):
-            for device in device_group.values():
-                device.control_enabled = True
-        self.reset_scene()
-        # TODO: enable guest mode
-        # TODO: toggle TV if can't get it working automatically?
+        self.scene = "Sleep"
 
     def handle_living_room_button_double_press(self):
         """Handle a double press of the living room button."""
         self.log("Living room button double pressed")
-        if self.scene != "Bright":
-            self.scene = "Bright"
-        else:
-            self.reset_scene()
+        self.reset_scene()
+        if self.scene in ("Sleep", "Day"):
+            self.scene = "Night"
 
     def handle_living_room_button_long_press(self):
         """Handle a long press of the living room button."""
@@ -468,7 +455,7 @@ class Control(App):
     def handle_bedroom_button_single_press(self, button: str):
         """Handle a single press of a bedroom button."""
         self.log(f"{button} pressed")
-        if self.napping_in_bedroom and self.scene == "Night":
+        if self.napping_in_bedroom:
             self.scene = "Sleep"
         else:
             self.napping_in_bedroom = True
@@ -527,9 +514,9 @@ class Control(App):
             self.climate.toggle_airconditioning(user="voice control")
         elif "lock" in data:
             if self.presence.door_locked:
-                self.presence.unlock_door()
+                self.presence.unlock_door(force=True)
             else:
-                self.presence.lock_door()
+                self.presence.lock_door(force=True)
 
     def handle_ui_settings_change(
         self,

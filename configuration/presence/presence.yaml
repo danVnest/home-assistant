@@ -81,8 +81,47 @@ binary_sensor:
   #       prob_given_false: 0.1 # When I am awake, I occasionally AC charge my phone
   #       to_state: "ac"
 
+input_boolean:
+  manual_guest_mode:
+    name: Manual guest mode
+    icon: mdi:account-multiple
+
 template:
   - binary_sensor:
+      - name: Anyone home
+        unique_id: anyone_home
+        state: "{{ states('binary_sensor.resident_home') == 'on' or states('binary_sensor.guest_home') == 'on' }}"
+        device_class: occupancy
+        icon: mdi:account-multiple
+        availability: "{{ has_value('binary_sensor.resident_home') or has_value('binary_sensor.guest_home') }}"
+      - name: Resident home
+        unique_id: resident_home
+        state: "{{ states('person.dan') == 'home' or states('person.rachel') == 'home' }}"
+        device_class: occupancy
+        icon: mdi:account-multiple
+        availability: "{{ has_value('person.dan') or has_value('person.rachel') }}"
+      - name: Guest home
+        unique_id: guest_home
+        state: >
+          {{
+            states('person.linda') == 'home' or
+            states('person.larry') == 'home' or
+            states('person.rianne') == 'home' or
+            states('person.sylvia') == 'home' or
+            states('person.tim') == 'home' or
+            states('person.clare') == 'home'
+          }}
+        device_class: occupancy
+        icon: mdi:account-multiple
+        availability: >
+          {{
+            has_value('person.linda') or
+            has_value('person.larry') or
+            has_value('person.rianne') or
+            has_value('person.sylvia') or
+            has_value('person.tim') or
+            has_value('person.clare')
+          }}
       - name: Desk occupied
         unique_id: desk_occupied
         state: >

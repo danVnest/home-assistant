@@ -103,12 +103,8 @@ class Presence(App):
 
     @property
     def anyone_home(self) -> bool:
-        """Check if anyone is home."""
-        # del kwargs  # required to overwrite inbuilt function
-        # TODO: if defining as property overrides kwargs version, try elsewhere?
-        return any(
-            person["state"] == "home" for person in self.entities.person.values()
-        )
+        """Check if anyone is home, including guests."""
+        return self.entities.binary_sensor.anyone_home.state == "on"
 
     @property
     def pets_home_alone(self) -> bool:
@@ -130,21 +126,24 @@ class Presence(App):
                 # TODO: don't do this, create specific self.climate.handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
     @property
+    def manual_guest_mode(self) -> bool:
+        """Get manual guest mode input from Home Assistant."""
+        return self.entities.input_boolean.manual_guest_mode.state == "on"
+
+    @property
     def door_locked(self) -> bool:
         """True if the front door is locked."""
         return self.entities.lock.door_lock.state == "locked"
 
-    def lock_door(self):
+    def lock_door(self, *, force: bool = False):
         """Lock the front door if not already locked."""
-        if not self.door_locked:
+        if not self.door_locked and (force or self.manual_guest_mode != "on"):
             self.call_service("lock/lock", entity_id="lock.door_lock")
 
-    def unlock_door(self):
+    def unlock_door(self, *, force: bool = False):
         """Unlock the front door if not already unlocked."""
-        if self.door_locked:
+        if self.door_locked and (force or self.manual_guest_mode != "on"):
             self.call_service("lock/unlock", entity_id="lock.door_lock")
-
-    # TODO: probably move above to Climate
 
     def handle_presence_change(
         self,
@@ -157,6 +156,16 @@ class Presence(App):
         """Change scene if everyone has left home or if someone has come back."""
         del attribute, kwargs
         self.log(f"'{entity}' is '{new}'")
+        if self.manual_guest_mode == "on":
+            if self.entities.binary_sensor.resident_home.state == "on":
+                self.log("Resident is home, turning off manual guest mode")
+                self.call_service(
+                    "input_boolean/turn_off",
+                    entity_id="input_boolean.manual_guest_mode",
+                )
+            else:
+                self.log("Manual guest mode is on, ignoring guest presence change")
+                return
         if new == "home":
             self.unlock_door()
             if "Away" in self.control.scene:
@@ -165,35 +174,21 @@ class Presence(App):
         else:
             if old == "home":
                 self.lock_door()
-            if (
-                "Away" not in self.control.scene
-                and self.get_state(
-                    f"person.{'rachel' if entity.endswith('dan') else 'dan'}",
-                )
-                != "home"
-            ):
+            if "Away" not in self.control.scene and not self.anyone_home:
                 self.control.scene = (
-                    "Away (Night)"
-                    if self.entities.binary_sensor.dark_outside.state == "on"
-                    else "Away (Day)"
+                    "Away (Night)" if self.lights.dark_outside else "Away (Day)"
                 )
 
     def handle_new_device(self, event_name: str, data: dict, **kwargs: dict):
         """If not home and someone adds a device, notify."""
         del event_name
         self.log(f"New device added: '{data}', '{kwargs}'")
-        if (
-            "Away" in self.control.scene
-            and self.date() - self.last_device_date
-            > timedelta(
-                hours=self.constants["new_device_notification_delay"],
-            )
-        ):
-            self.notify(
-                f'A guest has added a device: "{data["host_name"]}"',
-                title="Guest Device",
-            )
-            self.last_device_date = self.date()
+        self.notify(
+            f'A guest has added a device: "{data["host_name"]}"',
+            title="Guest Device",
+            targets="dan",
+        )
+        self.last_device_date = self.date()
 
     def handle_doorbell(
         self,
@@ -206,8 +201,7 @@ class Presence(App):
         """Handle doorbell when it rings."""
         del entity, attribute, old, new, kwargs
         self.notify(
-            f"Someone rung the doorbell "
-            f"(door is {self.entities.lock.door_lock.state})",
+            f"Someone rung the doorbell (door is {self.entities.lock.door_lock.state})",
             title="Doorbell",
         )
         if self.media.playing:
@@ -389,7 +383,6 @@ class Room:
                 vacating_delay + self.seconds_in_room(),
                 constrain_input_boolean=control_input_boolean,
             )
-
         self.controller.log(
             f"Registered callback for '{self.room_id}' with handle: {handle}",
             level="DEBUG",

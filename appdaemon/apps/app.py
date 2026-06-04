@@ -68,12 +68,13 @@ class App(hass.Hass):
         targets = kwargs.get("targets", "all")
         if targets == "anyone_home_else_all":
             targets = "anyone_home" if self.presence.anyone_home else "all"
-        for person, info in self.entities.person.items():
+        for person in ("dan", "rachel"):
             if any(
                 (
                     targets == "all",
-                    targets == "anyone_home" and info["state"] == "home",
                     targets == person,
+                    targets == "anyone_home"
+                    and self.get_state(f"person.{person}") == "home",
                 ),
             ):
                 data = {"tag": kwargs["title"]}
