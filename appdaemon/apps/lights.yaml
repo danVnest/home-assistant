@@ -7,14 +7,11 @@ Lights:
   night_to_day_delay: 600 # seconds it has to be light outside before transitioning to day scene
   illuminance:
     bedroom_morning_max: 10 # bedroom illuminance above this triggers transition to day scene
-    auto_on: # illuminance below this enables automatic lighting
-      bedroom: 30
-      nursery: 15
-      kitchen: 25
-    auto_off: # illuminance above this disables automatic lighting
+    auto_threshold: # automatic lighting below this threshold, disabled above
       bedroom: 40
       nursery: 20
       kitchen: 75
+    auto_off_delay: 5 # minutes illuminance has to exceed threshold before disabling automatic lighting
     lighting_factor: # multiplied by light brightness to estimate powered illuminance
       bedroom: 5
       nursery: 15

@@ -27,6 +27,12 @@ class Lights(App):
         self.constants["kelvin_per_step"] = 20
         self.constants["max_steps_per_second"] = 2
         # TODO: these constants should either be in yaml or determined another way (remove in app.py as well)
+        self.last_low_illuminance_time = {
+            "kitchen": None,
+            "bedroom": None,
+            "nursery": None,
+        }
+        self.auto_off_delay = None
 
     def initialize(self):
         """Initialise lights and start listening to scene events.
@@ -101,7 +107,12 @@ class Lights(App):
         )
         # TODO: https://app.asana.com/0/1207020279479204/1207351651288716/f
         # add to Light definition?
+        self.auto_off_delay = datetime.timedelta(
+            minutes=self.constants["illuminance"]["auto_off_delay"],
+        )
+        init_time = self.datetime() - self.auto_off_delay
         for room in ("kitchen", "bedroom", "nursery"):
+            self.last_low_illuminance_time[room] = init_time
             self.listen_state(
                 getattr(self, f"handle_{room}_illuminance_change"),
                 f"sensor.{room}_presence_sensor_illuminance",
@@ -515,7 +526,7 @@ class Lights(App):
         return (
             float(self.get_state(f"sensor.{room}_presence_sensor_illuminance"))
             - self.lighting_illuminance(room)
-            >= self.constants["illuminance"]["auto_off"][room]
+            >= self.constants["illuminance"]["auto_threshold"][room]
         )
 
     def lighting_illuminance(self, room: str) -> float:
@@ -583,10 +594,14 @@ class Lights(App):
             or not self.lights["kitchen"].control_enabled
         ):
             return
-        if not self.lights["kitchen"].ignoring_vacancy:
+        if (
+            float(new) - self.lighting_illuminance("kitchen")
+            > self.constants["illuminance"]["auto_threshold"]["kitchen"]
+        ):
             if (
-                float(new) - self.lighting_illuminance("kitchen")
-                >= self.constants["illuminance"]["auto_off"]["kitchen"]
+                not self.lights["kitchen"].ignoring_vacancy
+                and self.datetime()
+                > self.last_low_illuminance_time["kitchen"] + self.auto_off_delay
             ):
                 for light_name in ("kitchen", "kitchen_strip"):
                     self.lights[light_name].ignore_vacancy()
@@ -595,24 +610,23 @@ class Lights(App):
                     f"The 'kitchen' light level is high ({new}lx), "
                     "automatic lighting disabled",
                 )
-        elif (
-            float(new) - self.lighting_illuminance("kitchen")
-            <= self.constants["illuminance"]["auto_on"]["kitchen"]
-        ):
-            for light_name in ("kitchen", "kitchen_strip"):
-                self.lights[light_name].set_presence_adjustments(
-                    occupied=(
-                        self.constants["max_brightness"],
-                        self.lights[light_name].kelvin_limits["max"],
-                    ),
-                    vacating_delay=self.get_setting(
-                        "morning_vacating_delay",
-                    ),
+        else:
+            self.last_low_illuminance_time["kitchen"] = self.datetime()
+            if self.lights["kitchen"].ignoring_vacancy:
+                for light_name in ("kitchen", "kitchen_strip"):
+                    self.lights[light_name].set_presence_adjustments(
+                        occupied=(
+                            self.constants["max_brightness"],
+                            self.lights[light_name].kelvin_limits["max"],
+                        ),
+                        vacating_delay=self.get_setting(
+                            "morning_vacating_delay",
+                        ),
+                    )
+                self.log(
+                    f"The 'kitchen' light level is low ({new}lx), "
+                    "automatic lighting enabled",
                 )
-            self.log(
-                f"The 'kitchen' light level is low ({new}lx), "
-                "automatic lighting enabled",
-            )
 
     def handle_bedroom_illuminance_change(
         self,
@@ -663,10 +677,14 @@ class Lights(App):
 
     def handle_room_illuminance_change(self, illuminance: float, room: str):
         """Change room vacancy lighting based on illuminance levels (and napping)."""
-        if not self.lights[room].ignoring_vacancy:
+        if (
+            illuminance - self.lighting_illuminance(room)
+            > self.constants["illuminance"]["auto_threshold"][room]
+        ):
             if (
-                illuminance - self.lighting_illuminance(room)
-                >= self.constants["illuminance"]["auto_off"][room]
+                not self.lights[room].ignoring_vacancy
+                and self.datetime()
+                > self.last_low_illuminance_time[room] + self.auto_off_delay
             ):
                 self.lights[room].ignore_vacancy()
                 self.lights[room].turn_off()
@@ -674,24 +692,22 @@ class Lights(App):
                     f"The '{room}' light level is high ({illuminance}lx), "
                     "automatic lighting disabled",
                 )
-        elif (
-            not self.control.napping_in(room)
-            and illuminance - self.lighting_illuminance(room)
-            <= self.constants["illuminance"]["auto_on"][room]
-        ):
-            self.lights[room].set_presence_adjustments(
-                occupied=(
-                    self.constants["max_brightness"],
-                    self.lights[room].kelvin_limits["max"],
-                ),
-                vacating_delay=self.get_setting(
-                    f"{room}_vacating_delay",
-                ),
-            )
-            self.log(
-                f"The '{room}' light level is low ({illuminance}lx), "
-                "automatic lighting enabled",
-            )
+        else:
+            self.last_low_illuminance_time[room] = self.datetime()
+            if self.lights[room].ignoring_vacancy and not self.control.napping_in(room):
+                self.lights[room].set_presence_adjustments(
+                    occupied=(
+                        self.constants["max_brightness"],
+                        self.lights[room].kelvin_limits["max"],
+                    ),
+                    vacating_delay=self.get_setting(
+                        f"{room}_vacating_delay",
+                    ),
+                )
+                self.log(
+                    f"The '{room}' light level is low ({illuminance}lx), "
+                    "automatic lighting enabled",
+                )
 
     def get_setting(self, setting_name: str) -> int:
         """Get a UI input_number setting values as an integer."""
