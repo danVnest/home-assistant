@@ -408,20 +408,6 @@ class Climate(App):
         )
 
     @property
-    def outside_temperature_nicer(self) -> bool:
-        """Check if outside is a nicer temperature than inside."""
-        mode = self.entities.climate.bedroom_aircon.state
-        # TODO: use aircon group state instead?
-        return any(
-            (
-                mode == "heat" and self.hotter_outside,
-                mode == "cool" and self.colder_outside,
-                mode == "off"
-                and (self.too_hot_or_cold and not self.too_hot_or_cold_outside),
-            ),
-        )
-
-    @property
     def too_hot_or_cold(self) -> bool:
         """Check if temperature inside is above or below the max/min triggers."""
         return not (
@@ -433,13 +419,9 @@ class Climate(App):
     @property
     def closer_to_hot_than_cold(self) -> bool:
         """Return if temperature inside is closer to needing cooling than heating."""
-        return (
-            self.inside_temperature
-            > (
-                self.get_setting("cooling_target_temperature")
-                + self.get_setting("heating_target_temperature")
-            )
-            / 2
+        return self.inside_temperature + self.outside_temperature > (
+            self.get_setting("cooling_target_temperature")
+            + self.get_setting("heating_target_temperature")
         )
 
 
@@ -553,20 +535,6 @@ class ClimateDevice(Device):
             self.controller.get_setting("low_temperature_aircon_trigger")
             <= self.controller.outside_temperature
             <= self.controller.get_setting("high_temperature_aircon_trigger")
-        )
-
-    @property
-    def outside_temperature_nicer(self) -> bool:
-        """Check if outside is a nicer temperature than inside."""
-        mode = self.controller.entities.climate.bedroom_aircon.state
-        # TODO: use aircon group state instead?
-        return any(
-            (
-                mode == "heat" and self.hotter_outside,
-                mode == "cool" and self.colder_outside,
-                mode == "off"
-                and (self.too_hot_or_cold and not self.too_hot_or_cold_outside),
-            ),
         )
 
     @property
@@ -879,7 +847,15 @@ class Aircon(ClimateDevice, PresenceDevice):
 
     def suggest_if_temperature_outside_nicer(self):
         """Suggest opening up the house if outside is nicer."""
-        if self.outside_temperature_nicer and self.controller.presence.anyone_home:
+        if (
+            (self.device.state == "heat" and self.hotter_outside)
+            or (self.device.state == "cool" and self.colder_outside)
+            or (
+                self.device.state == "off"
+                and self.too_hot_or_cold
+                and not self.too_hot_or_cold_outside
+            )
+        ) and self.controller.presence.anyone_home:
             self.controller.suggest(
                 f"Outside ({self.controller.outside_temperature:.1f}°) "
                 f"is a more pleasant temperature than the {self.room} "
