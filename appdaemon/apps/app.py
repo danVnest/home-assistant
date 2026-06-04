@@ -154,13 +154,13 @@ class Device:
         self.device_id = device_id
         self.device_type, device_name = controller.split_entity(device_id)
         self.device: Entity = controller.get_entity(device_id)
+        self.room = room
+        self.linked_rooms = linked_rooms
         self.controller = controller
         self.constants = controller.constants
         self.control_input_boolean = (
             "input_boolean.control_" + device_name + control_input_boolean_suffix
         )
-        self.room = room
-        self.linked_rooms = linked_rooms
         self.last_adjustment_time = self.controller.get_now_ts()
         devices = [self.device_id]
         if self.device_type == "group":
@@ -284,6 +284,11 @@ class Device:
             if not self.control_enabled:
                 return
             self.control_enabled = False
+            self.log(
+                "Automatic control is now disabled for the "
+                f"{self.device.friendly_name.lower()} to prevent it from immediately "
+                f"overriding {user}'s manual adjustments",
+            )
 
     def __handle_control_enabled(
         self,
