@@ -21,7 +21,7 @@
       },
       {
         "id": "f78c6bcca1f5416e94f8811481a0c8f1",
-        "url": "/hacsfiles/Bubble-Card/bubble-card.js?hacstag=680112919322",
+        "url": "/hacsfiles/Bubble-Card/bubble-card.js?hacstag=680112919323",
         "type": "module"
       },
       {
@@ -51,7 +51,7 @@
       },
       {
         "id": "08179ea2c5a24c82abb0b1674f65f47e",
-        "url": "/hacsfiles/lovelace-auto-entities/auto-entities.js?hacstag=1014247535220",
+        "url": "/hacsfiles/lovelace-auto-entities/auto-entities.js?hacstag=1014247535231",
         "type": "module"
       },
       {
@@ -61,7 +61,7 @@
       },
       {
         "id": "371a09df7517491ea49f2260586c17bf",
-        "url": "/uix/uix.js?v=7.3.0",
+        "url": "/uix/uix.js?v=7.4.2",
         "type": "module"
       }
     ]
