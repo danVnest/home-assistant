@@ -323,6 +323,20 @@ powercalc:
 
 template:
   - sensor:
+      - name: Power autonomy
+        unique_id: power_autonomy
+        state: >
+          {% set solar_battery_usage = states('sensor.power_meter_power_photovoltaics')|float + states('sensor.power_meter_power_battery_discharge')|float %}
+          {{ solar_battery_usage / (solar_battery_usage + states('sensor.power_meter_power_grid_import')|float) * 100 }}
+        unit_of_measurement: "%"
+        state_class: measurement
+        icon: mdi:home-percent
+        availability: >
+          {{
+            has_value('sensor.power_meter_power_photovoltaics') and 
+            has_value('sensor.power_meter_power_battery_discharge') and 
+            has_value('sensor.power_meter_power_grid_import')
+          }}
       - name: Battery solar charge power
         unique_id: battery_solar_charge_power
         state: "{{ states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_grid_charge_power')|float }}"
