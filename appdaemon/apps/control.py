@@ -71,44 +71,6 @@ class Control(App):
                 f"event.{room}_button",
             )
         self.listen_event(self.handle_ifttt, "ifttt_webhook_received")
-        for battery in (
-            "front_door_camera",
-            "back_door_camera",
-            "entryway_camera",
-            "door_lock",
-            "entryway_multisensor",
-            "dining_room_multisensor",
-            "hall_multisensor",
-            "bathroom_multisensor",
-            "nursery_temperature_sensor",
-            "office_temperature_sensor",
-            "dog_bed_area_temperature_sensor",
-            "kitchen_door_sensor",
-            "dining_room_balcony_door_sensor",
-            "bedroom_balcony_door_sensor",
-            "living_room_button",
-            "nursery_button",
-            "dan_s_bedroom_button",
-            "rachel_s_bedroom_button",
-            "nest_protect_entryway",
-            "nest_protect_living_room",
-            "nest_protect_garage",
-            "toothbrush",
-            "side_tap",
-            "back_tap",
-            "soil_sensor_entryway",
-            "soil_sensor_guest_suite",
-            "soil_sensor_stairway",
-            "soil_sensor_back_deck",
-            "soil_sensor_living_room",
-            "soil_sensor_dining_room",
-            "soil_sensor_bathroom",
-            "soil_sensor_office",
-        ):
-            self.listen_state(
-                self.handle_battery_level_change,
-                f"sensor.{battery}_battery_level",
-            )
         self.set_timer("morning_time")
         self.run_daily(self.handle_day_time, self.constants["day_time"])
         self.set_timer("nursery_time")
@@ -187,8 +149,6 @@ class Control(App):
                 # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
                 # clear above notification when not Away?
                 self.media.turn_off()
-                # TODO: https://app.asana.com/0/1207020279479204/1203851145721573/f
-                # media off unless in guest mode
         else:
             for area in ("entryway", "living_room", "back_door", "back_deck", "garage"):
                 self.turn_off(f"switch.{area}_camera_enabled")
@@ -597,30 +557,6 @@ class Control(App):
             f"Invalid value for setting '{setting_id}' - reverted to previous",
             title="Invalid Setting",
         )
-
-    def handle_battery_level_change(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        **kwargs: dict,
-    ):
-        """Notify if a device's battery is low."""
-        del attribute, kwargs
-        # TODO: https://app.asana.com/0/1207020279479204/1207033183115380/f
-        # convert all of these unavailable checks to try float?
-        # TODO: https://app.asana.com/0/1207020279479204/1205753645479424/f
-        # don't just check for battery level, periodically check for last date of any update
-        # TODO: https://app.asana.com/0/1207020279479204/1207033183175577/f
-        # notify of low battery level only once per day and only if different to previous (or unavailable/old date)
-        if new in ("unavailable", "unknown", None):
-            self.log(f"'{entity}' is '{new}'", level="WARNING")
-        elif float(new) <= self.constants["notify_battery_level"] and (
-            old in ("unavailable", "unknown", None)
-            or float(old) >= self.constants["notify_battery_level"]
-        ):
-            self.notify(f"{entity} is low ({new}%)", title="Low Battery", targets="dan")
 
     def heartbeat(self, **kwargs: dict):
         """Send a heartbeat then handle if it is received or not."""

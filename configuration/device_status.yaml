@@ -260,7 +260,7 @@ automation:
         data:
           object_id: low_batteries
           entities: >
-            {% set low_battery_threshold = 25 %}
+            {% set low_battery_threshold = 20 %}
             {% set entities = states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list|sort %}
             {% set battery_levels = entities|map('states')|map('float', 0)|list %}
             {{ zip(entities, battery_levels)|selectattr(1, '<=', low_battery_threshold)|map(attribute=0)|list }}
