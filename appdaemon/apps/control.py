@@ -31,6 +31,7 @@ class Control(App):
             "nursery_button": None,
             "nursery_button_last_press": 0,
         }
+        self.log_listener = None
         self.is_all_initialised = False
 
     def initialize(self):
@@ -39,7 +40,7 @@ class Control(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.listen_log(self.handle_log)
+        self.log_listener = self.listen_log(self.increment_log_issue_counter, "WARNING")
         if self.entities.input_boolean.development_mode.state == "off":
             self.set_production_mode()
         self.call_service("counter/reset", entity_id="counter.warnings")
@@ -651,11 +652,11 @@ class Control(App):
                     >= self.constants["heartbeat"]["max_fail_count"]
                 ):
                     self.log("Restarting Home Assistant to fix any broken entities")
-                    self.cancel_listen_log(self.handle_log)
+                    self.cancel_listen_log(self.log_listener)
                     self.call_service("homeassistant/restart")
             self.timers["heartbeat_fail_count"] = 0
 
-    def handle_log(
+    def increment_log_issue_counter(
         self,
         app_name: str,
         timestamp: datetime.datetime,
