@@ -1924,7 +1924,11 @@
                         "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
                       },
                       "sort": {
+                        "numeric": true,
                         "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
                       },
                       "grid_options": {
                         "columns": 12,
@@ -1941,6 +1945,13 @@
                       },
                       "filter": {
                         "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
                       },
                       "grid_options": {
                         "columns": 12,
@@ -2053,7 +2064,11 @@
                         "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
                       },
                       "sort": {
+                        "numeric": true,
                         "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
                       },
                       "grid_options": {
                         "columns": 12,
@@ -2070,6 +2085,13 @@
                       },
                       "filter": {
                         "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
                       },
                       "grid_options": {
                         "columns": 12,
