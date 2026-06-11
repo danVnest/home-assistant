@@ -51,7 +51,7 @@
                   "entity": "input_select.scene"
                 },
                 {
-                  "entity": "group.climate_control"
+                  "entity": "group.any_climate_control"
                 },
                 {
                   "entity": "group.any_aircon"

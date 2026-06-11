@@ -107,7 +107,7 @@ sensor:
   - platform: history_stats
     name: Rachel's phone's still ratio while asleep
     unique_id: rachel_phone_still_ratio_while_asleep
-    entity_id: binary_sensor.rachel_s_phone_s_still
+    entity_id: binary_sensor.rachel_s_phone_still
     state: "on"
     type: ratio
     end: "{{ today_at('06:00') - timedelta(days=1) }}"
@@ -196,7 +196,7 @@ sensor:
   - platform: history_stats
     name: Rachel's phone's still ratio while awake
     unique_id: rachel_phone_still_ratio_while_awake
-    entity_id: binary_sensor.rachel_s_phone_s_still
+    entity_id: binary_sensor.rachel_s_phone_still
     state: "on"
     type: ratio
     start: "{{ today_at('09:00') - timedelta(days=1) }}"

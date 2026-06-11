@@ -1280,7 +1280,7 @@
                         },
                         {
                           "condition": "state",
-                          "entity": "binary_sensor.bedroom_room_aircon_filter_clean_required",
+                          "entity": "binary_sensor.bedroom_aircon_filter_clean_required",
                           "state": "on"
                         }
                       ]

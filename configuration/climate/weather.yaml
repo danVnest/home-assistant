@@ -80,7 +80,7 @@ template:
         unit_of_measurement: h
         device_class: duration
         state_class: measurement
-        icon: "{{ 'mdi:weather-rainy' if states('sensor.next_rain_forecast_text') != 'no rain for 7 days' else 'mdi:weather-sunny' }}"
+        icon: "{{ 'mdi:weather-rainy' if this.state|int(0) < 168 else 'mdi:weather-sunny' }}"
         attributes:
           text: >
             {%- if not has_value('sensor.next_rain_forecast') -%}

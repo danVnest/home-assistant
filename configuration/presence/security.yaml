@@ -71,7 +71,7 @@ template:
             states('sensor.motion_detected_count_garage')|int(0) +
             states('sensor.motion_detected_count_back_door')|int(0) +
             states('sensor.motion_detected_count_back_deck')|int(0) +
-            states('sensor.motion_detected_count_front_door_doorbell')|int(0) + (
+            states('sensor.motion_detected_count_front_door')|int(0) + (
             (
               states('sensor.motion_detected_count_entryway')|int(0) +
               states('sensor.motion_detected_count_living_room_camera')|int(0) +
