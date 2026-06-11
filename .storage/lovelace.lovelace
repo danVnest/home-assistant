@@ -1791,7 +1791,7 @@
                         {
                           "condition": "numeric_state",
                           "entity": "sensor.missing_entities",
-                          "state_not": 0
+                          "above": 0
                         }
                       ],
                       "modules": [
