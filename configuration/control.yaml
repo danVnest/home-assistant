@@ -175,6 +175,32 @@ template:
         icon: mdi:washing-machine
         availability: "{{ has_value('sensor.washer_start_time') and has_value('sensor.dryer_start_time') }}"
   - triggers:
+      - trigger: state
+        entity_id: select.robovac_scene
+        to: unknown
+        not_from:
+          - unknown
+          - unavailable
+    sensor:
+      - name: Robovac last cleaned house time
+        unique_id: robovac_last_cleaned_house_time
+        state: "{{ now() }}"
+        device_class: timestamp
+  - triggers:
+      - trigger: state
+        entity_id:
+          - select.robovac_clean_room
+          - select.robovac_scene
+        to: unknown
+        not_from:
+          - unknown
+          - unavailable
+    sensor:
+      - name: Robovac last cleaned room time
+        unique_id: robovac_last_cleaned_room_time
+        state: "{{ now() }}"
+        device_class: timestamp
+  - triggers:
       - trigger: event
         event_type: localtuya_device_dp_triggered
     conditions:
