@@ -33,7 +33,12 @@ template:
         icon: mdi:home-alert
       - name: Device issues
         unique_id: device_issues
-        state: "{{ states('sensor.unavailable_entities')|int(1) + states('sensor.frozen_entities')|int(1) }}"
+        state: >
+          {{
+            states('sensor.unavailable_entities')|int(1) + 
+            states('sensor.frozen_entities')|int(1) + 
+            states('sensor.missing_entities')|int(1)
+          }}
         state_class: total
         icon: mdi:alert-circle
       - name: Unavailable entities
@@ -189,6 +194,7 @@ automation:
       - action: homeassistant.update_entity
         target:
           entity_id: sensor.disabled_entities
+      - action: watchman.report
       - action: group.set
         data:
           object_id: unavailable_entities

@@ -53,14 +53,13 @@
                   ]
                 },
                 {
-                  "type": "tile",
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "binary_sensor.dog_water_bowl",
                   "name": "WARNING: Dog water bowl is empty",
-                  "state_content": "last_changed",
-                  "icon": "mdi:cup-water",
-                  "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
-                  "layout_options": {
-                    "grid_columns": 4
-                  },
+                  "show_state": false,
+                  "show_last_changed": true,
                   "visibility": [
                     {
                       "condition": "state",
@@ -68,26 +67,22 @@
                       "state_not": "on"
                     }
                   ],
-                  "entity": "binary_sensor.dog_water_bowl",
-                  "features_position": "bottom",
-                  "vertical": false,
-                  "uix": {
-                    "style": {
-                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
-                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Since';\n}\n"
-                    }
-                  }
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n}\n"
                 },
                 {
-                  "type": "tile",
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
                   "entity": "binary_sensor.internet",
                   "name": "WARNING: Internet is disconnected",
-                  "state_content": "last_changed",
-                  "icon": "mdi:close-network",
-                  "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
-                  "layout_options": {
-                    "grid_columns": 4
-                  },
+                  "show_state": false,
+                  "show_last_changed": true,
                   "visibility": [
                     {
                       "condition": "state",
@@ -95,14 +90,13 @@
                       "state_not": "on"
                     }
                   ],
-                  "features_position": "bottom",
-                  "vertical": false,
-                  "uix": {
-                    "style": {
-                      "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
-                      "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'System functionality limited since';\n}\n"
-                    }
-                  }
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"System functionality limited since \";\n  white-space: pre;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1751,7 +1745,13 @@
                   },
                   "cards": [
                     {
-                      "type": "tile",
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected - reconnect to resolve issues",
+                      "show_state": false,
+                      "show_last_changed": true,
                       "visibility": [
                         {
                           "condition": "state",
@@ -1759,23 +1759,36 @@
                           "state_not": "on"
                         }
                       ],
-                      "entity": "binary_sensor.internet",
-                      "name": "Internet is disconnected - reconnect to fix issues",
-                      "icon": "mdi:close-network",
-                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
-                      "state_content": "last_changed",
-                      "vertical": false,
-                      "features_position": "bottom",
-                      "uix": {
-                        "style": {
-                          "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
-                          "ha-tile-info$": "state-display {\n  opacity: 0.7;\n} state-display::before {\n  content: 'Disconnected';\n}\n"
-                        }
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
                       },
-                      "grid_options": {
-                        "columns": 12,
-                        "rows": "auto"
-                      }
+                      "styles": ".bubble-state::before {\n  content: \"System functionality limited since \";\n  white-space: pre;\n}\n"
+                    },
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "sensor.missing_entities",
+                      "name": "missing entities - check watchman_report.txt",
+                      "show_state": false,
+                      "show_last_changed": true,
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.missing_entities",
+                          "state_not": 0
+                        }
+                      ],
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
+                      "styles": ".bubble-name::before {\n  content: \"${state} \";\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n"
                     },
                     {
                       "type": "markdown",
@@ -1860,12 +1873,13 @@
                   },
                   "cards": [
                     {
-                      "type": "tile",
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
                       "entity": "binary_sensor.internet",
-                      "name": "Internet is disconnected - batteries may be unavailable",
-                      "state_content": "last_changed",
-                      "icon": "mdi:close-network",
-                      "color": "color-mix(in srgb, var(--color-mix-in-base), red)",
+                      "name": "Internet is disconnected",
+                      "show_state": false,
+                      "show_last_changed": true,
                       "visibility": [
                         {
                           "condition": "state",
@@ -1873,16 +1887,13 @@
                           "state_not": "on"
                         }
                       ],
-                      "uix": {
-                        "style": {
-                          "ha-tile-icon$": ":host {\n  --tile-icon-color: color-mix(in srgb, var(--color-mix-in-base), red) !important;\n}\n",
-                          "ha-tile-info$": "state-display {\n  opacity: 0.7;\n}\nstate-display::before {\n  content: 'Disconnected';\n}\n"
-                        }
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
                       },
-                      "grid_options": {
-                        "columns": 12,
-                        "rows": "auto"
-                      }
+                      "styles": ".bubble-state::before {\n  content: \"Batteries may not have updated since \";\n  white-space: pre;\n}\n"
                     },
                     {
                       "type": "markdown",
