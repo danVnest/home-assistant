@@ -19,7 +19,7 @@ template:
               {'entity': 'total', 'name': 'Total', 'icon': 'home-lightning-bolt'},
               {'entity': 'total_excluding_battery_and_export', 'name': 'Total (excluding battery and export)', 'icon': 'home-lightbulb'},
               {'entity': 'export', 'name': 'Export', 'icon': 'transmission-tower-import'}] + [
-              {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states("sensor.electricity_provider_service_energy_cost_weekly")|float(0))|float(0)},
+              {'entity': 'electricity_provider_service', 'name': 'Electricity provider service', 'icon': 'factory', 'state': states("sensor.electricity_provider_service_energy_cost_weekly")|float(0)},
               {'entity': 'battery', 'name': 'Battery', 'icon': 'fuel-cell', 'state': states("sensor.battery_energy_cost_weekly")|float(0)},
               {'entity': 'lights', 'name': 'Lights', 'icon': 'lightbulb-group', 'state': states("sensor.lights_energy_cost_weekly")|float(0) + states("sensor.lights_energy_cost_savings_weekly")|float(0)},
               {'entity': 'living_room_aircon', 'name': 'Living room aircon', 'icon': 'air-conditioner', 'state': states("sensor.living_room_aircon_energy_cost_weekly")|float(0) + states("sensor.living_room_aircon_energy_cost_savings_weekly")|float(0)},
