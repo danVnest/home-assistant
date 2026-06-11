@@ -89,105 +89,23 @@
               "type": "history-graph"
             },
             {
-              "entities": [
-                {
-                  "entity": "sensor.front_door_camera_battery_level",
-                  "name": "Front door camera"
-                },
-                {
-                  "entity": "sensor.back_door_camera_battery_level",
-                  "name": "Back door camera"
-                },
-                {
-                  "entity": "sensor.entryway_camera_battery_level",
-                  "name": "Entryway camera"
-                },
-                {
-                  "entity": "sensor.door_lock_battery_level",
-                  "name": "Lock"
-                },
-                {
-                  "entity": "sensor.entryway_multisensor_battery_level",
-                  "name": "Entryway multisensor"
-                },
-                {
-                  "entity": "sensor.hall_multisensor_battery_level",
-                  "name": "Hall multisensor"
-                },
-                {
-                  "entity": "sensor.bathroom_multisensor_battery_level",
-                  "name": "Bathroom multisensor"
-                },
-                {
-                  "entity": "sensor.dining_room_multisensor_battery_level",
-                  "name": "Dining room multisensor"
-                },
-                {
-                  "entity": "sensor.kitchen_door_sensor_battery_level",
-                  "name": "Kitchen door"
-                },
-                {
-                  "entity": "sensor.kitchen_button_battery_level",
-                  "name": "Kitchen button"
-                },
-                {
-                  "entity": "sensor.bedroom_button_battery_level",
-                  "name": "Bedroom button"
-                },
-                {
-                  "entity": "sensor.nest_protect_entryway_battery_level",
-                  "name": "Entryway fire alarm"
-                },
-                {
-                  "entity": "sensor.nest_protect_living_room_battery_level",
-                  "name": "Living room fire alarm"
-                },
-                {
-                  "entity": "sensor.nest_protect_garage_battery_level",
-                  "name": "Garage fire alarm"
-                },
-                {
-                  "entity": "sensor.toothbrush_battery_level",
-                  "name": "Toothbrush"
-                },
-                {
-                  "entity": "sensor.soil_sensor_vegetable_garden_sun_battery_level",
-                  "name": "Vegetable garden (sun) soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_vegetable_garden_shade_battery_level",
-                  "name": "Vegetable garden (shade) soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_front_deck_battery_level",
-                  "name": "Front deck soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_back_deck_battery_level",
-                  "name": "Back deck soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_carport_pots_battery_level",
-                  "name": "Carport pots soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_dining_room_battery_level",
-                  "name": "Dining room soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_living_room_battery_level",
-                  "name": "Living room soil sensor"
-                },
-                {
-                  "entity": "sensor.soil_sensor_office_battery_level",
-                  "name": "Office soil sensor"
-                }
-              ],
-              "refresh_interval": 0,
-              "title": "Battery Levels",
-              "type": "history-graph",
-              "logarithmic_scale": false,
-              "hours_to_show": 240
+              "type": "custom:auto-entities",
+              "card": {
+                "type": "history-graph",
+                "title": "Battery Levels",
+                "hours_to_show": 240,
+                "refresh_interval": 0
+              },
+              "filter": {
+                "template": "{{ states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list }}"
+              },
+              "sort": {
+                "numeric": true,
+                "method": "state"
+              },
+              "rename": {
+                "find": ".attery level"
+              }
             }
           ]
         },
