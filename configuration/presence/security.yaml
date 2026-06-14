@@ -92,8 +92,8 @@ template:
         entity_id: sensor.security_monitoring
         from: "off"
         not_to:
-          - "unknown"
-          - "unavailable"
+          - unknown
+          - unavailable
     sensor:
       - name: Security monitoring start time
         unique_id: security_monitoring_start_time

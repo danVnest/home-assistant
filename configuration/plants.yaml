@@ -34,8 +34,8 @@ template:
       - trigger: state
         entity_id: sensor.dry_plants
         not_to:
-          - "unknown"
-          - "unavailable"
+          - unknown
+          - unavailable
       - trigger: time_pattern
         minutes: 0
     binary_sensor:
@@ -99,9 +99,8 @@ template:
         to: "0"
         not_from:
           - "0"
-          - "unknown"
-          - "unavailable"
-          - none
+          - unknown
+          - unavailable
     sensor:
       - name: Plants last watered
         unique_id: plants_last_watered
