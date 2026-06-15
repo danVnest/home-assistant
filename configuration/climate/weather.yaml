@@ -37,14 +37,6 @@ template:
             {%- else -%}
               {{- this.state -}}
             {%- endif -%}
-          text: >
-            {%- if has_value('sensor.extreme_forecast') -%}
-              {{- this.state|float|round(1)|string + '°C in ' + this.attributes.hours_until|string + ' hours' -}}
-            {%- elif this.state == 'unknown' -%}
-              Nice for 10 hours
-            {%- else -%}
-              Extreme forecast unavailable
-            {%- endif -%}
         availability: >
           {{ 
             has_value('sensor.outside_apparent_temperature_2h_forecast') and
@@ -81,17 +73,6 @@ template:
         device_class: duration
         state_class: measurement
         icon: "{{ 'mdi:weather-rainy' if this.state|int(0) < 168 else 'mdi:weather-sunny' }}"
-        attributes:
-          text: >
-            {%- if not has_value('sensor.next_rain_forecast') -%}
-              Rain forecast unavailable
-            {%- elif this.state|int(1) == 0 -%}
-              Raining now
-            {%- elif this.state|int == 168 -%}
-              No rain for 7 days
-            {%- else -%}
-              {{- 'Rain in ' + ((this.state|int|string + ' hour') if this.state|float < 24 else ((this.state|float / 24)|int|string + ' day')) + ('s' if this.state|int not in (1, 24) else '') -}}
-            {%- endif -%}
   - triggers:
       - trigger: state
         entity_id: sensor.next_rain_forecast

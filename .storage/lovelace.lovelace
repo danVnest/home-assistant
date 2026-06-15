@@ -1630,7 +1630,7 @@
                       "show_background": false
                     }
                   ],
-                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.extreme_forecast'].attributes.text }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.next_rain_forecast'].attributes.text }\n",
+                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (() => {\n  const extreme_forecast = hass.states['sensor.extreme_forecast'];\n  if (extreme_forecast.state == 'unavailable') return 'Extreme forecast unavailable';\n  if (extreme_forecast.state == 'unknown') return 'Nice for 10 hours';\n  return `${parseFloat(extreme_forecast.state).toFixed(1)} °C in ${extreme_forecast.attributes.hours_until} hours`\n})()}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = (() => {\n  const next_rain_forecast = hass.states['sensor.next_rain_forecast'];\n  if (next_rain_forecast.state == 'unavailable') return 'Rain forecast unavailable';\n  const hours = parseFloat(next_rain_forecast.state).toFixed(0) - 167;\n  if (hours == 0) return 'Raining now';\n  if (hours == 168) return 'No rain for 7 days';\n  return `Rain in ${hours < 24 ? `${hours} hour` : `${Math.round(hours / 24)} day`}${(hours == 1 || hours == 24) ? 's' : ''}`;\n})()}\n",
                   "modules": [
                     "colorise_entities"
                   ]
@@ -3977,10 +3977,10 @@
                           "name": "Break even in"
                         },
                         {
-                          "type": "attribute",
+                          "type": "custom:template-entity-row",
+                          "name": "Beat investment in",
                           "entity": "sensor.solar_and_battery_years_to_beat_investment",
-                          "attribute": "text",
-                          "name": "Beat investment in"
+                          "state": "{% if states('sensor.solar_and_battery_years_to_beat_investment')|int(-100) != -100 %} {{ states('sensor.solar_and_battery_years_to_beat_investment') }} years {% else %} never {% endif %}\n"
                         }
                       ]
                     },

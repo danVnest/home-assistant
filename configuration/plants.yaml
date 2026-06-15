@@ -16,8 +16,6 @@ template:
            {{- (100 * sensors|select('is_state', 'off')|list|count / sensors|count)|round -}}
         unit_of_measurement: "%"
         icon: mdi:grass
-        attributes:
-          text: "{{ this.state|string + '% are dry'}}"
         availability: >
           {{
             has_value('binary_sensor.soil_moist_entryway') and

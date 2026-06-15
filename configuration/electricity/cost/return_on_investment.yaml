@@ -52,9 +52,6 @@ template:
         unit_of_measurement: years
         state_class: measurement
         icon: mdi:calendar
-        attributes:
-          text: "{{ (this.state + ' years') if this.state|int(-100) != -100 else 'never' }}"
-          # NOTE: this.state is the previous state (not the new one calculated above) for trigger-based template sensors, so text will be 1 day old
         availability: >
           {{
             has_value('sensor.total_energy_cost_savings_yearly') and
