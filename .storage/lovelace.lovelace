@@ -56,29 +56,6 @@
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "binary_sensor.dog_water_bowl",
-                  "name": "WARNING: Dog water bowl is empty",
-                  "show_state": false,
-                  "show_last_changed": true,
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.dog_water_bowl",
-                      "state_not": "on"
-                    }
-                  ],
-                  "modules": [
-                    "icon_color_mix_in"
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "red"
-                  },
-                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
                   "entity": "binary_sensor.internet",
                   "name": "WARNING: Internet is disconnected",
                   "show_state": false,
@@ -184,6 +161,144 @@
                   ],
                   "icon_color_mix_in": {
                     "color": "red"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.low_batteries",
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#low-batteries"
+                    }
+                  },
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.low_batteries",
+                        "show_state": true,
+                        "show_background": false
+                      },
+                      {
+                        "entity": "sensor.low_batteries",
+                        "show_state": false,
+                        "show_background": false,
+                        "show_attribute": true,
+                        "attribute": "unavailable",
+                        "icon": "mdi:battery-unknown"
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "visibility": [
+                    {
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.low_batteries",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "rows": 1.125
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.charging_batteries",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#charging-batteries"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "charged",
+                      "icon": "mdi:battery"
+                    },
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "above_50",
+                      "icon": "mdi:battery-50"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.charged_batteries",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "yellow"
                   }
                 },
                 {
@@ -421,184 +536,226 @@
                   "modules": [
                     "scene_state_text_and_icon"
                   ]
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Tasks",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:checkbox-marked-outline"
                 },
                 {
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "lock.door_lock",
+                  "entity": "binary_sensor.dog_water_bowl",
+                  "name": "URGENT: Dog water bowl is empty",
                   "show_state": false,
                   "show_last_changed": true,
-                  "name": "Front door",
-                  "card_layout": "large-2-rows",
-                  "button_action": {
-                    "double_tap_action": {
-                      "action": "toggle"
-                    },
-                    "hold_action": {
-                      "action": "toggle"
-                    }
-                  },
-                  "sub_button": [
+                  "visibility": [
                     {
-                      "entity": "sensor.security_monitoring",
-                      "show_state": true,
-                      "show_background": false,
-                      "tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "double_tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "hold_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      }
-                    },
-                    {
-                      "entity": "sensor.security_monitoring",
-                      "show_attribute": true,
-                      "attribute": "count_text",
-                      "show_background": false,
-                      "tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "double_tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "hold_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "visibility": [
-                        {
-                          "condition": "state",
-                          "entity": "sensor.security_monitoring",
-                          "state_not": "off"
-                        }
-                      ]
+                      "condition": "state",
+                      "entity": "binary_sensor.dog_water_bowl",
+                      "state_not": "on"
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "input_boolean.manual_guest_mode",
+                  "entity": "binary_sensor.plants_need_watering",
                   "show_state": false,
-                  "name": "guest mode",
                   "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "/lovelace/plants"
+                  },
                   "button_action": {
-                    "double_tap_action": {
-                      "action": "toggle"
-                    },
-                    "hold_action": {
-                      "action": "toggle"
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "/lovelace/plants"
                     }
                   },
                   "sub_button": [
                     {
-                      "entity": "binary_sensor.guest_home",
-                      "show_state": true,
+                      "entity": "sensor.dry_plants",
                       "show_background": false,
-                      "tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "double_tap_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      },
-                      "hold_action": {
-                        "action": "navigate",
-                        "navigation_path": "/lovelace/presence"
-                      }
+                      "show_state": true
+                    },
+                    {
+                      "entity": "sensor.plants_last_watered",
+                      "show_background": false,
+                      "show_state": true
                     }
                   ],
                   "visibility": [
                     {
-                      "condition": "or",
-                      "conditions": [
-                        {
-                          "condition": "state",
-                          "state": "on"
-                        },
-                        {
-                          "condition": "state",
-                          "entity": "binary_sensor.guest_home",
-                          "state": "on"
-                        }
-                      ]
+                      "condition": "state",
+                      "entity": "binary_sensor.plants_need_watering",
+                      "state": "on"
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['input_boolean.manual_guest_mode'].state == 'on' ? 'var(--accent-color)' : 'var(--primary-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::before {\n  content: '${(state == 'on' ? 'Manual ' : 'Automatic ') }' !important;\n  white-space: pre;\n} ${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (hass.states['binary_sensor.guest_home'].state == 'on' ? 'G' : 'No g') + 'uest devices detected' }\n"
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "blue"
+                  },
+                  "styles": ".bubble-sub-button-1 .bubble-sub-button-name-container::after {\n  content: ' are dry' !important;\n  white-space: pre;\n} ${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = \"watered \" + (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const seconds = Math.round((new Date() - new Date(hass.states['sensor.plants_last_watered'].state)) / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  const hours = Math.round(minutes / 60);\n  if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');\n  return rtf.format(-Math.round(hours / 24), 'day');\n})()}\n"
                 },
                 {
-                  "type": "map",
-                  "entities": [
-                    {
-                      "entity": "person.dan"
-                    },
-                    {
-                      "entity": "person.rachel"
-                    }
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "select.washer",
+                  "icon": "mdi:washing-machine",
+                  "name": "Washing needs to be done",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
                   ],
-                  "hours_to_show": 1,
-                  "layout_options": {
-                    "grid_columns": 4,
-                    "grid_rows": 2
+                  "icon_color_mix_in": {
+                    "color": "var(--blue-color)"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "sensor.washer_completion_time"
                   },
                   "visibility": [
                     {
-                      "condition": "or",
-                      "conditions": [
-                        {
-                          "condition": "and",
-                          "conditions": [
-                            {
-                              "condition": "user",
-                              "users": [
-                                "15ff7a86d4ae4d38a60003ad4064ff78"
-                              ]
-                            },
-                            {
-                              "condition": "state",
-                              "entity": "person.rachel",
-                              "state_not": "home"
-                            }
-                          ]
-                        },
-                        {
-                          "condition": "and",
-                          "conditions": [
-                            {
-                              "condition": "user",
-                              "users": [
-                                "9a175674be354863afb9634adc4b8980"
-                              ]
-                            },
-                            {
-                              "condition": "state",
-                              "entity": "person.dan",
-                              "state_not": "home"
-                            }
-                          ]
-                        }
-                      ]
+                      "condition": "state",
+                      "entity": "binary_sensor.washer_or_dryer_run_today",
+                      "state": "off"
                     }
                   ],
-                  "theme_mode": "auto",
-                  "uix": {
-                    "style": {
-                      ".": "ha-card {\n  background: transparent;\n}\n",
-                      "ha-map$": "#map {\n  background: transparent;\n} .leaflet-tile-pane {\n  opacity: 0.5;\n} .leaflet-control-container {\n  opacity: 0.75;\n} .leaflet-control-attribution {\n  opacity: 0.1;\n}\n"
+                  "styles": ".bubble-state::before {\n  content: 'Last washed ';\n  white-space: pre;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "select.washer",
+                  "icon": "mdi:washing-machine",
+                  "name": "Washing",
+                  "modules": [
+                    "icon_border_progress",
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_border_progress": [
+                    {
+                      "button": "main",
+                      "source": "sensor.washer_completion_percentage",
+                      "condition": [
+                        {
+                          "condition": "numeric_state",
+                          "entity_id": "sensor.washer_completion_percentage",
+                          "above": 0
+                        }
+                      ],
+                      "color_stops": {
+                        "0": {
+                          "color": "rgb(234, 174, 101)",
+                          "percent": 25
+                        },
+                        "1": {
+                          "color": "rgb(101, 157, 234)",
+                          "percent": 75
+                        }
+                      },
+                      "interpolate_colors": true
                     }
-                  }
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "var(--blue-color)"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "sensor.washer_completion_time"
+                  },
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.washer_or_dryer_run_today",
+                      "state_not": "off"
+                    }
+                  ],
+                  "styles": ".bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "select.dryer",
+                  "icon": "mdi:tumble-dryer",
+                  "name": "Drying",
+                  "icon_border_progress": [
+                    {
+                      "button": "main",
+                      "source": "sensor.dryer_completion_percentage",
+                      "condition": [
+                        {
+                          "condition": "numeric_state",
+                          "entity_id": "sensor.dryer_completion_percentage",
+                          "above": 0
+                        }
+                      ],
+                      "color_stops": {
+                        "0": {
+                          "color": "rgb(101, 157, 234)",
+                          "percent": 25
+                        },
+                        "1": {
+                          "color": "rgb(234, 207, 101)",
+                          "percent": 75
+                        }
+                      },
+                      "interpolate_colors": true
+                    }
+                  ],
+                  "modules": [
+                    "icon_border_progress",
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "var(--orange-color)"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "sensor.dryer_completion_time"
+                  },
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.washer_or_dryer_run_today",
+                      "state_not": "off"
+                    }
+                  ],
+                  "styles": ".bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -757,487 +914,7 @@
                 {
                   "type": "custom:bubble-card",
                   "card_type": "button",
-                  "button_type": "state",
-                  "entity": "select.washer",
-                  "icon": "mdi:washing-machine",
-                  "name": "Washing",
-                  "modules": [
-                    "icon_border_progress",
-                    "icon_color_mix_in",
-                    "datetime_to_relative_time"
-                  ],
-                  "icon_border_progress": [
-                    {
-                      "button": "main",
-                      "source": "sensor.washer_completion_percentage",
-                      "condition": [
-                        {
-                          "condition": "numeric_state",
-                          "entity_id": "sensor.washer_completion_percentage",
-                          "above": 0
-                        }
-                      ],
-                      "color_stops": {
-                        "0": {
-                          "color": "rgb(234, 174, 101)",
-                          "percent": 25
-                        },
-                        "1": {
-                          "color": "rgb(101, 157, 234)",
-                          "percent": 75
-                        }
-                      },
-                      "interpolate_colors": true
-                    }
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "var(--blue-color)"
-                  },
-                  "datetime_to_relative_time": {
-                    "entity": "sensor.washer_completion_time"
-                  },
-                  "grid_options": {
-                    "columns": 6
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.washer_or_dryer_run_today",
-                      "state_not": "off"
-                    }
-                  ],
-                  "styles": ".bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "select.dryer",
-                  "icon": "mdi:tumble-dryer",
-                  "name": "Drying",
-                  "icon_border_progress": [
-                    {
-                      "button": "main",
-                      "source": "sensor.dryer_completion_percentage",
-                      "condition": [
-                        {
-                          "condition": "numeric_state",
-                          "entity_id": "sensor.dryer_completion_percentage",
-                          "above": 0
-                        }
-                      ],
-                      "color_stops": {
-                        "0": {
-                          "color": "rgb(101, 157, 234)",
-                          "percent": 25
-                        },
-                        "1": {
-                          "color": "rgb(234, 207, 101)",
-                          "percent": 75
-                        }
-                      },
-                      "interpolate_colors": true
-                    }
-                  ],
-                  "modules": [
-                    "icon_border_progress",
-                    "icon_color_mix_in",
-                    "datetime_to_relative_time"
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "var(--orange-color)"
-                  },
-                  "datetime_to_relative_time": {
-                    "entity": "sensor.dryer_completion_time"
-                  },
-                  "grid_options": {
-                    "columns": 6
-                  },
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.washer_or_dryer_run_today",
-                      "state_not": "off"
-                    }
-                  ],
-                  "styles": ".bubble-name::after {\n  content: ' ${state === \"stop\" ? \"done\" : (state === \"paused\" ? \"\" : \"\")}';\n  white-space: pre;\n} .bubble-state::before {\n  content: 'Finish${state === \"run\" ? \"ing\" : \"ed\"} ';\n  white-space: pre;\n}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "binary_sensor.plants_need_watering",
-                  "show_state": false,
-                  "card_layout": "large-2-rows",
-                  "tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
-                  },
-                  "double_tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
-                  },
-                  "hold_action": {
-                    "action": "navigate",
-                    "navigation_path": "/lovelace/plants"
-                  },
-                  "button_action": {
-                    "tap_action": {
-                      "action": "navigate",
-                      "navigation_path": "/lovelace/plants"
-                    }
-                  },
-                  "sub_button": [
-                    {
-                      "entity": "sensor.dry_plants",
-                      "show_background": false,
-                      "show_attribute": true,
-                      "attribute": "text"
-                    },
-                    {
-                      "entity": "sensor.plants_last_watered",
-                      "show_background": false,
-                      "show_state": true
-                    }
-                  ],
-                  "visibility": [
-                    {
-                      "condition": "state",
-                      "entity": "binary_sensor.plants_need_watering",
-                      "state": "on"
-                    }
-                  ],
-                  "modules": [
-                    "icon_color_mix_in"
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "blue"
-                  },
-                  "styles": "${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = \"watered \" + (() => {\n  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });\n  const seconds = Math.round((new Date() - new Date(hass.states['sensor.plants_last_watered'].state)) / 1000);\n  if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');\n  const minutes = Math.round(seconds / 60);\n  if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');\n  const hours = Math.round(minutes / 60);\n  if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');\n  return rtf.format(-Math.round(hours / 24), 'day');\n})()}\n"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "sensor.low_batteries",
-                  "card_layout": "large-2-rows",
-                  "tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#low-batteries"
-                  },
-                  "double_tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#low-batteries"
-                  },
-                  "hold_action": {
-                    "action": "navigate",
-                    "navigation_path": "#low-batteries"
-                  },
-                  "button_action": {
-                    "tap_action": {
-                      "action": "navigate",
-                      "navigation_path": "#low-batteries"
-                    }
-                  },
-                  "sub_button": [
-                    {
-                      "entity": "sensor.low_batteries",
-                      "show_state": true,
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.low_batteries",
-                      "show_state": false,
-                      "show_background": false,
-                      "show_attribute": true,
-                      "attribute": "unavailable",
-                      "icon": "mdi:battery-unknown"
-                    }
-                  ],
-                  "visibility": [
-                    {
-                      "condition": "numeric_state",
-                      "entity": "sensor.low_batteries",
-                      "above": 0
-                    }
-                  ],
-                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
-                  "modules": [
-                    "icon_color_mix_in"
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "red"
-                  }
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "button_type": "state",
-                  "entity": "sensor.charging_batteries",
-                  "show_state": false,
-                  "card_layout": "large-2-rows",
-                  "tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#charging-batteries"
-                  },
-                  "double_tap_action": {
-                    "action": "navigate",
-                    "navigation_path": "#charging-batteries"
-                  },
-                  "hold_action": {
-                    "action": "navigate",
-                    "navigation_path": "#charging-batteries"
-                  },
-                  "button_action": {
-                    "tap_action": {
-                      "action": "navigate",
-                      "navigation_path": "#charging-batteries"
-                    }
-                  },
-                  "sub_button": [
-                    {
-                      "entity": "sensor.charging_batteries",
-                      "show_state": false,
-                      "show_attribute": true,
-                      "show_background": false,
-                      "attribute": "charged",
-                      "icon": "mdi:battery"
-                    },
-                    {
-                      "entity": "sensor.charging_batteries",
-                      "show_state": false,
-                      "show_attribute": true,
-                      "show_background": false,
-                      "attribute": "above_50",
-                      "icon": "mdi:battery-50"
-                    }
-                  ],
-                  "visibility": [
-                    {
-                      "condition": "numeric_state",
-                      "entity": "sensor.charged_batteries",
-                      "above": 0
-                    }
-                  ],
-                  "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
-                  "modules": [
-                    "icon_color_mix_in"
-                  ],
-                  "icon_color_mix_in": {
-                    "color": "yellow"
-                  }
-                }
-              ]
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Lights",
-                  "heading_style": "subtitle",
-                  "icon": "mdi:lightbulb-variant"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "sub-buttons",
-                  "card_layout": "large-2-rows",
-                  "scrolling_effect": false,
-                  "sub_button": {
-                    "bottom_layout": "rows",
-                    "bottom": [
-                      {
-                        "name": "Top",
-                        "buttons_layout": "inline",
-                        "group": [
-                          {
-                            "entity": "group.all_lights",
-                            "name": "All",
-                            "show_name": true,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "script.toggle_group",
-                              "data": {
-                                "group": "group.all_light_control"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "group.entryway_lights",
-                            "name": "Entryway",
-                            "show_name": true,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_entryway_lights"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "group.kitchen_lights",
-                            "name": "Kitchen",
-                            "show_name": true,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "script.toggle_group",
-                              "data": {
-                                "group": "group.all_kitchen_light_control"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "group.tv_lights",
-                            "name": "TV",
-                            "show_name": true,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_tv_lights"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "group.dining_room_lights",
-                            "name": "Dining",
-                            "show_name": true,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_dining_room_lights"
-                              }
-                            }
-                          }
-                        ]
-                      },
-                      {
-                        "name": "Bottom",
-                        "buttons_layout": "inline",
-                        "group": [
-                          {
-                            "entity": "light.hall",
-                            "name": "Hall",
-                            "show_name": true,
-                            "light_background": false,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_hall_light"
-                              }
-                            },
-                            "content_layout": "icon-left"
-                          },
-                          {
-                            "entity": "light.bathroom",
-                            "name": "Bathroom",
-                            "show_name": true,
-                            "light_background": false,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_bathroom_light"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "light.bedroom",
-                            "name": "Bedroom",
-                            "show_name": true,
-                            "light_background": false,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_bedroom_light"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "light.nursery",
-                            "name": "Nursery",
-                            "show_name": true,
-                            "light_background": false,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_nursery_light"
-                              }
-                            }
-                          },
-                          {
-                            "entity": "light.office",
-                            "name": "Office",
-                            "show_name": true,
-                            "light_background": false,
-                            "double_tap_action": {
-                              "action": "toggle"
-                            },
-                            "hold_action": {
-                              "action": "call-service",
-                              "service": "input_boolean.toggle",
-                              "target": {
-                                "entity_id": "input_boolean.control_office_light"
-                              }
-                            }
-                          }
-                        ]
-                      }
-                    ]
-                  },
-                  "styles": ".bubble-sub-button {\n  padding: 0 4px;\n} .bubble-sub-button-group {\n  gap: 4px;\n} .icon-with-state {\n  margin-right: 2px\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 12px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
-                  "modules": [
-                    "colorise_entities",
-                    "indicate_unavailable_entities"
-                  ],
-                  "rows": 1.144
-                }
-              ]
-            },
-            {
-              "type": "grid",
-              "cards": [
-                {
-                  "type": "heading",
-                  "heading": "Climate",
-                  "heading_style": "subtitle",
-                  "icon": "mdi:thermometer"
-                },
-                {
-                  "type": "custom:bubble-card",
-                  "card_type": "button",
-                  "name": "WARNING: Aircon filters need cleaning",
+                  "name": "Aircon filters need cleaning",
                   "button_type": "state",
                   "entity": "group.all_aircon",
                   "icon": "mdi:air-filter",
@@ -1303,8 +980,20 @@
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
-                    "color": "red"
+                    "color": "brown"
                   }
+                }
+              ],
+              "column_span": 1
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Climate",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:thermometer"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -1630,7 +1319,7 @@
                       "show_background": false
                     }
                   ],
-                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (() => {\n  const extreme_forecast = hass.states['sensor.extreme_forecast'];\n  if (extreme_forecast.state == 'unavailable') return 'Extreme forecast unavailable';\n  if (extreme_forecast.state == 'unknown') return 'Nice for 10 hours';\n  return `${parseFloat(extreme_forecast.state).toFixed(1)} °C in ${extreme_forecast.attributes.hours_until} hours`\n})()}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = (() => {\n  const next_rain_forecast = hass.states['sensor.next_rain_forecast'];\n  if (next_rain_forecast.state == 'unavailable') return 'Rain forecast unavailable';\n  const hours = parseFloat(next_rain_forecast.state).toFixed(0) - 167;\n  if (hours == 0) return 'Raining now';\n  if (hours == 168) return 'No rain for 7 days';\n  return `Rain in ${hours < 24 ? `${hours} hour` : `${Math.round(hours / 24)} day`}${(hours == 1 || hours == 24) ? 's' : ''}`;\n})()}\n",
+                  "styles": "${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (() => {\n  const extreme_forecast = hass.states['sensor.extreme_forecast'];\n  if (extreme_forecast.state == 'unavailable') return 'Extreme forecast unavailable';\n  if (extreme_forecast.state == 'unknown') return 'Nice for 10 hours';\n  return `${parseFloat(extreme_forecast.state).toFixed(1)} °C in ${extreme_forecast.attributes.hours_until} hours`\n})()}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = (() => {\n  const next_rain_forecast = hass.states['sensor.next_rain_forecast'];\n  if (next_rain_forecast.state == 'unavailable') return 'Rain forecast unavailable';\n  const hours = parseFloat(next_rain_forecast.state).toFixed(0);\n  if (hours == 0) return 'Raining now';\n  if (hours == 168) return 'No rain for 7 days';\n  return `Rain in ${hours < 24 ? `${hours} hour` : `${Math.round(hours / 24)} day`}${(hours == 1 || hours == 24) ? 's' : ''}`;\n})()}\n",
                   "modules": [
                     "colorise_entities"
                   ]
@@ -1715,6 +1404,391 @@
                 }
               ],
               "column_span": 1
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Lights",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:lightbulb-variant"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "sub-buttons",
+                  "card_layout": "large-2-rows",
+                  "scrolling_effect": false,
+                  "sub_button": {
+                    "bottom_layout": "rows",
+                    "bottom": [
+                      {
+                        "name": "Top",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "group.all_lights",
+                            "name": "All",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.entryway_lights",
+                            "name": "Entryway",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_entryway_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.kitchen_lights",
+                            "name": "Kitchen",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_kitchen_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.tv_lights",
+                            "name": "TV",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_tv_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.dining_room_lights",
+                            "name": "Dining",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_dining_room_lights"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Bottom",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "light.hall",
+                            "name": "Hall",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_hall_light"
+                              }
+                            },
+                            "content_layout": "icon-left"
+                          },
+                          {
+                            "entity": "light.bathroom",
+                            "name": "Bathroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bathroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.bedroom",
+                            "name": "Bedroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bedroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.nursery",
+                            "name": "Nursery",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_nursery_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.office",
+                            "name": "Office",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_office_light"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "styles": ".bubble-sub-button {\n  padding: 0 4px;\n} .bubble-sub-button-group {\n  gap: 4px;\n} .icon-with-state {\n  margin-right: 2px\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 12px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
+                  ],
+                  "rows": 1.144
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Presence",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:account-multiple"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "lock.door_lock",
+                  "show_state": false,
+                  "show_last_changed": true,
+                  "name": "Front door",
+                  "card_layout": "large-2-rows",
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "toggle"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.security_monitoring",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      }
+                    },
+                    {
+                      "entity": "sensor.security_monitoring",
+                      "show_attribute": true,
+                      "attribute": "count_text",
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "sensor.security_monitoring",
+                          "state_not": "off"
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "input_boolean.manual_guest_mode",
+                  "show_state": false,
+                  "name": "guest mode",
+                  "card_layout": "large-2-rows",
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "toggle"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "binary_sensor.guest_home",
+                      "show_state": true,
+                      "show_background": false,
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/presence"
+                      }
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "state",
+                          "state": "on"
+                        },
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.guest_home",
+                          "state": "on"
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['input_boolean.manual_guest_mode'].state == 'on' ? 'var(--accent-color)' : 'var(--primary-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::before {\n  content: '${(state == 'on' ? 'Manual ' : 'Automatic ') }' !important;\n  white-space: pre;\n} ${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (hass.states['binary_sensor.guest_home'].state == 'on' ? 'G' : 'No g') + 'uest devices detected' }\n"
+                },
+                {
+                  "type": "map",
+                  "entities": [
+                    {
+                      "entity": "person.dan"
+                    },
+                    {
+                      "entity": "person.rachel"
+                    }
+                  ],
+                  "hours_to_show": 1,
+                  "layout_options": {
+                    "grid_columns": 4,
+                    "grid_rows": 2
+                  },
+                  "visibility": [
+                    {
+                      "condition": "or",
+                      "conditions": [
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "15ff7a86d4ae4d38a60003ad4064ff78"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.rachel",
+                              "state_not": "home"
+                            }
+                          ]
+                        },
+                        {
+                          "condition": "and",
+                          "conditions": [
+                            {
+                              "condition": "user",
+                              "users": [
+                                "9a175674be354863afb9634adc4b8980"
+                              ]
+                            },
+                            {
+                              "condition": "state",
+                              "entity": "person.dan",
+                              "state_not": "home"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "theme_mode": "auto",
+                  "uix": {
+                    "style": {
+                      ".": "ha-card {\n  background: transparent;\n}\n",
+                      "ha-map$": "#map {\n  background: transparent;\n} .leaflet-tile-pane {\n  opacity: 0.5;\n} .leaflet-control-container {\n  opacity: 0.75;\n} .leaflet-control-attribution {\n  opacity: 0.1;\n}\n"
+                    }
+                  }
+                }
+              ]
             },
             {
               "type": "grid",
