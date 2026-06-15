@@ -124,7 +124,7 @@ class Control(App):
     @property
     def scene(self) -> str:
         """Get scene from Home Assistant."""
-        return self.get_state("input_select.scene")
+        return self.entities.input_select.scene.state
 
     @scene.setter
     def scene(self, new_scene: str):
@@ -186,7 +186,7 @@ class Control(App):
     @property
     def napping_in_bedroom(self) -> bool:
         """Get bedroom napping state from Home Assistant."""
-        return self.get_state("input_boolean.napping_in_bedroom") == "on"
+        return self.entities.input_boolean.napping_in_bedroom.state == "on"
 
     @napping_in_bedroom.setter
     def napping_in_bedroom(self, napping: bool):
@@ -196,7 +196,7 @@ class Control(App):
     @property
     def napping_in_nursery(self) -> bool:
         """Get nursery napping state from Home Assistant."""
-        return self.get_state("input_boolean.napping_in_nursery") == "on"
+        return self.entities.input_boolean.napping_in_nursery.state == "on"
 
     @napping_in_nursery.setter
     def napping_in_nursery(self, napping: bool):

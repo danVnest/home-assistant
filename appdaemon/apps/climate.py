@@ -259,7 +259,7 @@ class Climate(App):
 
     def suggest_if_extreme_forecast_and_control_disabled(self):
         """Suggest user enables more control if extreme temperatures are forecast."""
-        extreme_forecast = self.get_state("sensor.extreme_forecast")
+        extreme_forecast = self.entities.sensor.extreme_forecast.state
         if extreme_forecast not in (None, "unavailable", "unknown") and any(
             not device.control_enabled
             for device_group in (
