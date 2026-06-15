@@ -1,6 +1,6 @@
 """Implements home safety automations.
 
-Monitors fire and baby safety sensors,
+Monitors fire and baby safety sensors, as well as dog water bowl level,
 triggering corresponding alarm routines when appropriate.
 
 User defined variables are configured in safety.yaml
@@ -10,23 +10,52 @@ from app import App
 
 
 class Safety(App):
-    """Set up fire and baby safety sensors."""
+    """Set up safety sensors."""
 
     def __init__(self, *args, **kwargs):
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
         self.fire_sensors = {"entryway": None, "living_room": None, "garage": None}
-        # TODO: https://app.asana.com/0/1207020279479204/1205753645479427/f
-        # add , "low_battery", "lost_power", "sock_disconnected", "sock_off") ?
 
     def initialize(self):
-        """Initialise listeners for fire and baby sensors.
+        """Initialise listeners for safety sensors.
 
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
         for sensor_id in self.fire_sensors:
             self.fire_sensors[sensor_id] = FireSensor(sensor_id, self)
+        self.listen_state(
+            self.handle_dog_water_bowl_empty,
+            "binary_sensor.dog_water_bowl",
+            new="off",
+            duration=60,
+        )
+
+    @property
+    def dog_water_bowl_empty(self) -> bool:
+        """Return whether dog water bowl is empty."""
+        return self.entities.binary_sensor.dog_water_bowl.state == "off"
+
+    def handle_dog_water_bowl_empty(
+        self,
+        entity: str,
+        attribute: str,
+        old,
+        new,
+        **kwargs: dict,
+    ):
+        """Handle dog water bowl empty ."""
+        del entity, attribute, old, new, kwargs
+        self.notify(
+            "Refill the dog water bowl as soon as possible",
+            title="Dog Water Bowl Empty",
+            critical=(
+                self.control.scene != "Sleep"
+                and not self.control.napping_in_bedroom
+                and not self.control.napping_in_nursery
+            ),
+        )
 
 
 class FireSensor:
