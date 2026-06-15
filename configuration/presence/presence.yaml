@@ -220,28 +220,66 @@ template:
         # TODO: add device_class: plug and switch sensor from _unplugged to plugged?
         icon: mdi:cellphone-dock
         availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
-
+  - triggers:
+    - trigger: state
+      entity_id: binary_sensor.kitchen_door
+      not_from:
+        - unknown
+        - unavailable
+      not_to:
+        - unknown
+        - unavailable
+    binary_sensor:
       - name: Kitchen door motion
         unique_id: kitchen_door_motion
-        state: "{{ now() - states.binary_sensor.kitchen_door.last_changed < timedelta(seconds=30) }}"
+        state: on
+        auto_off: 0:00:30
         device_class: motion
         icon: mdi:door
-        availability: "{{ has_value('binary_sensor.kitchen_door') and states.binary_sensor.kitchen_door.last_changed|default != '' }}"
+  - triggers:
+    - trigger: state
+      entity_id: binary_sensor.dining_room_balcony_door
+      not_from:
+        - unknown
+        - unavailable
+      not_to:
+        - unknown
+        - unavailable
+    binary_sensor:
       - name: Dining room balcony door motion
         unique_id: dining_room_balcony_door_motion
-        state: "{{ now() - states.binary_sensor.dining_room_balcony_door.last_changed < timedelta(seconds=30) }}"
+        state: on
+        auto_off: 0:00:30
         device_class: motion
         icon: mdi:door
-        availability: "{{ states.binary_sensor.dining_room_balcony_door.last_changed|default != '' }}"
+  - triggers:
+    - trigger: state
+      entity_id: binary_sensor.bedroom_balcony_door
+      not_from:
+        - unknown
+        - unavailable
+      not_to:
+        - unknown
+        - unavailable
+    binary_sensor:
       - name: Bedroom balcony door motion
         unique_id: bedroom_balcony_door_motion
-        state: "{{ now() - states.binary_sensor.bedroom_balcony_door.last_changed < timedelta(seconds=30) }}"
+        state: on
         device_class: motion
         icon: mdi:door
-        availability: "{{ states.binary_sensor.bedroom_balcony_door.last_changed|default != '' }}"
+  - triggers:
+    - trigger: state
+      entity_id: binary_sensor.nursery_door
+      not_from:
+        - unknown
+        - unavailable
+      not_to:
+        - unknown
+        - unavailable
+    binary_sensor:
       - name: Nursery door motion
         unique_id: nursery_door_motion
-        state: "{{ now() - states.binary_sensor.nursery_door.last_changed < timedelta(seconds=30) }}"
+        state: on
+        auto_off: 0:00:30
         device_class: motion
         icon: mdi:door
-        availability: "{{ states.binary_sensor.nursery_door.last_changed|default != '' }}"
