@@ -34,6 +34,7 @@ zwavejs*
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/apparent_temperature/sensor.py
+!custom_components/tplink_router/device_tracker.py
 cuboai_*
 go2rtc*
 themes/*/*.jpg
