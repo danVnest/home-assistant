@@ -3311,7 +3311,7 @@
                       "display_zero_tolerance": 50
                     }
                   },
-                  "clickable_entities": false,
+                  "clickable_entities": true,
                   "display_zero_lines": {
                     "mode": "show",
                     "transparency": 50,
@@ -3322,15 +3322,15 @@
                     ]
                   },
                   "use_new_flow_rate_model": true,
-                  "w_decimals": 0,
-                  "kw_decimals": 1,
                   "min_flow_rate": 0.75,
                   "max_flow_rate": 6,
                   "max_expected_power": 2000,
                   "min_expected_power": 0.01,
-                  "watt_threshold": 1000,
                   "transparency_zero_lines": 0,
                   "disable_dots": false,
+                  "kilo_threshold": 1000,
+                  "base_decimals": 0,
+                  "kilo_decimals": 1,
                   "uix": {
                     "style": "#battery-state-of-charge-text::after {\n  content: \" {{ ((states['sensor.battery_time_remaining'].state|int|string + 'h') if states['sensor.battery_time_remaining'].state|float >= 1 else ((states['sensor.battery_time_remaining'].state|float * 60)|round|string + 'm')) if has_value('sensor.battery_time_remaining') else '' }}\";\n}\n"
                   }
