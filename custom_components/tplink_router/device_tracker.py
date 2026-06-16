@@ -7,6 +7,7 @@ from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from tplinkrouterc6u import Device
 
@@ -72,7 +73,7 @@ def update_items(
             coordinator.hass.bus.fire(EVENT_OFFLINE, tracked[mac].data)
 
 
-class TPLinkTracker(CoordinatorEntity, ScannerEntity):
+class TPLinkTracker(CoordinatorEntity, RestoreEntity, ScannerEntity):
     """Representation of network device."""
 
     def __init__(
@@ -159,3 +160,13 @@ class TPLinkTracker(CoordinatorEntity, ScannerEntity):
     @property
     def entity_registry_enabled_default(self) -> bool:
         return True
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        last_state = await self.async_get_last_state()
+        if last_state is None:
+            return
+        self.data = last_state.attributes.get("data")
+        self.active = last_state.attributes.get("active")
+        self.async_write_ha_state()
+
