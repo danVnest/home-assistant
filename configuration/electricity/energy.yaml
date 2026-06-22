@@ -165,6 +165,13 @@ template:
         state_class: total_increasing
         icon: mdi:calendar-start
 
+  - triggers:
+    - trigger: state
+      entity_id: sensor.days_since_battery_installation
+      not_to:
+        - unknown
+        - unavailable
+    sensor:
       - name: Daily solar production
         unique_id: daily_solar_production
         state: "{{ (state_attr('sensor.solar_production_today', 'last_period')|float / 1000)|round(3) }}"

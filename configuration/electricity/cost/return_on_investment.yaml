@@ -12,12 +12,11 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.total_energy_cost_savings') }}"
   - triggers:
-      - trigger: time
-        at: "00:00:00"
-      - trigger: event
-        event_type:
-          - homeassistant_started
-          - event_template_reloaded
+      - trigger: state
+        entity_id: sensor.days_since_battery_installation
+        not_to:
+          - unknown
+          - unavailable
     sensor:
       - name: Solar and battery years to break even
         unique_id: solar_and_battery_years_to_break_even

@@ -290,12 +290,11 @@ template:
         availability: "{{ has_value('sensor.electricity_general_forecast') and state_attr('sensor.electricity_general_forecast', 'forecasts') is not none }}"
 
   - triggers:
-      - trigger: time
-        at: "00:01:00" # 1 minute delay to ensure daily utility meters update first
-      - trigger: event
-        event_type:
-          - homeassistant_started
-          - event_template_reloaded
+      - trigger: state
+        entity_id: sensor.days_since_solar_installation
+        not_to:
+          - unknown
+          - unavailable
     sensor:
       - name: Daily total energy cost
         unique_id: daily_total_energy_cost
