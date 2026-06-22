@@ -5,6 +5,7 @@ from typing import TypeAlias
 from homeassistant.components.device_tracker.config_entry import ScannerEntity
 from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_HOME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -166,7 +167,4 @@ class TPLinkTracker(CoordinatorEntity, RestoreEntity, ScannerEntity):
         last_state = await self.async_get_last_state()
         if last_state is None:
             return
-        self.data = last_state.attributes.get("data")
-        self.active = last_state.attributes.get("active")
-        self.async_write_ha_state()
-
+        self.active = last_state.state == STATE_HOME
