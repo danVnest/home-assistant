@@ -846,6 +846,43 @@ sensor:
         measurement: '"$"'
         unit_of_measurement: $
 
+      - name: Robovac energy cost last week
+        unique_id: robovac_energy_cost_last_week
+        where: '"entity_id" = ''robovac_energy_cost'' AND time >= now() - 7d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Robovac energy cost last month
+        unique_id: robovac_energy_cost_last_month
+        where: '"entity_id" = ''robovac_energy_cost'' AND time >= now() - 30d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Robovac energy cost last year
+        unique_id: robovac_energy_cost_last_year
+        where: '"entity_id" = ''robovac_energy_cost'' AND time >= now() - 365d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Robovac energy cost savings last week
+        unique_id: robovac_energy_cost_savings_last_week
+        where: '"entity_id" = ''robovac_energy_cost_savings'' AND time >= now() - 7d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Robovac energy cost savings last month
+        unique_id: robovac_energy_cost_savings_last_month
+        where: '"entity_id" = ''robovac_energy_cost_savings'' AND time >= now() - 30d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+      - name: Robovac energy cost savings last year
+        unique_id: robovac_energy_cost_savings_last_year
+        where: '"entity_id" = ''robovac_energy_cost_savings'' AND time >= now() - 365d'
+        group_function: first
+        measurement: '"$"'
+        unit_of_measurement: $
+
       - name: Standby energy cost last week
         unique_id: standby_energy_cost_last_week
         where: '"entity_id" = ''standby_energy_cost'' AND time >= now() - 7d'
@@ -1896,6 +1933,49 @@ template:
         state_class: total
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings') and has_value('sensor.paludarium_picture_frame_camera_energy_cost_savings_last_year') }}"
+
+      - name: Robovac energy cost weekly
+        unique_id: robovac_energy_cost_weekly
+        state: "{{ (states('sensor.robovac_energy_cost')|float - states('sensor.robovac_energy_cost_last_week')|float)|round(2) }}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost') and has_value('sensor.robovac_energy_cost_last_week') }}"
+      - name: Robovac energy cost monthly
+        unique_id: robovac_energy_cost_monthly
+        state: "{{ (states('sensor.robovac_energy_cost')|float - states('sensor.robovac_energy_cost_last_month')|float)|round(2) }}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost') and has_value('sensor.robovac_energy_cost_last_month') }}"
+      - name: Robovac energy cost yearly
+        unique_id: robovac_energy_cost_yearly
+        state: "{{ (states('sensor.robovac_energy_cost')|float - states('sensor.robovac_energy_cost_last_year')|float)|round(2) }}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost') and has_value('sensor.robovac_energy_cost_last_year') }}"
+      - name: Robovac energy cost savings weekly
+        unique_id: robovac_energy_cost_savings_weekly
+        state: "{{ (states('sensor.robovac_energy_cost_savings')|float - states('sensor.robovac_energy_cost_savings_last_week')|float)|round(2) }}"
+        unit_of_measurement: $/week
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost_savings') and has_value('sensor.robovac_energy_cost_savings_last_week') }}"
+      - name: Robovac energy cost savings monthly
+        unique_id: robovac_energy_cost_savings_monthly
+        state: "{{ (states('sensor.robovac_energy_cost_savings')|float - states('sensor.robovac_energy_cost_savings_last_month')|float)|round(2) }}"
+        unit_of_measurement: $/month
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost_savings') and has_value('sensor.robovac_energy_cost_savings_last_month') }}"
+      - name: Robovac energy cost savings yearly
+        unique_id: robovac_energy_cost_savings_yearly
+        state: "{{ (states('sensor.robovac_energy_cost_savings')|float - states('sensor.robovac_energy_cost_savings_last_year')|float)|round(2) }}"
+        unit_of_measurement: $/year
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_energy_cost_savings') and has_value('sensor.robovac_energy_cost_savings_last_year') }}"
 
       - name: Standby energy cost weekly
         unique_id: standby_energy_cost_weekly

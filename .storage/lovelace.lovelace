@@ -3480,6 +3480,11 @@
                       "icon": "mdi:fishbowl"
                     },
                     {
+                      "entity": "sensor.robovac_power",
+                      "name": "Robovac",
+                      "icon": "mdi:robot-vacuum-variant"
+                    },
+                    {
                       "entity": "sensor.all_standby_power",
                       "name": "Standby",
                       "icon": "mdi:power-standby"

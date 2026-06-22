@@ -354,6 +354,21 @@ sensor:
       minutes: 1
 
   - platform: integration
+    name: Robovac energy cost
+    unique_id: robovac_energy_cost
+    source: sensor.robovac_power_cost
+    method: left
+    max_sub_interval:
+      minutes: 1
+  - platform: integration
+    name: Robovac energy cost savings
+    unique_id: robovac_energy_cost_savings
+    source: sensor.robovac_power_cost_savings
+    method: left
+    max_sub_interval:
+      minutes: 1
+
+  - platform: integration
     name: Standby energy cost
     unique_id: standby_energy_cost
     source: sensor.standby_power_cost

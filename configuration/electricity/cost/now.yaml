@@ -406,6 +406,21 @@ template:
         icon: mdi:currency-usd
         availability: "{{ has_value('sensor.paludarium_picture_frame_camera_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
 
+      - name: Robovac power cost
+        unique_id: robovac_power_cost
+        state: "{{ (states('sensor.robovac_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_power') and has_value('sensor.effective_energy_cost_per_wh') }}"
+      - name: Robovac power cost savings
+        unique_id: robovac_power_cost_savings
+        state: "{{ (states('sensor.robovac_power')|float * states('sensor.savings_from_solar_and_battery_per_wh')|float)|round(9) }}"
+        unit_of_measurement: $/h
+        state_class: measurement
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.robovac_power') and has_value('sensor.savings_from_solar_and_battery_per_wh') }}"
+
       - name: Standby power cost
         unique_id: standby_power_cost
         state: "{{ (states('sensor.all_standby_power')|float * states('sensor.effective_energy_cost_per_wh')|float)|round(9) }}"

@@ -315,6 +315,12 @@ powercalc:
           power_sensor_id: sensor.paludarium_picture_frame_camera_power
           ignore_unavailable_state: true
           energy_integration_method: left
+        - entity_id: switch.robovac
+          unique_id: robovac_energy
+          name: Robovac
+          power_sensor_id: sensor.robovac_power
+          ignore_unavailable_state: true
+          energy_integration_method: left
     - entity_id: sensor.dummy
       name: Water heater, oven & stove, guest suite, garage, all other
       unique_id: water_heater_oven_stove_guest_suite_garage_all_other

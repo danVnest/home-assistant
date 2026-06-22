@@ -136,6 +136,11 @@
         "stat_consumption": "sensor.paludarium_picture_frame_camera_energy",
         "name": "Paludarium, picture frame, camera",
         "stat_rate": "sensor.paludarium_picture_frame_camera_power"
+      },
+      {
+        "stat_consumption": "sensor.robovac_energy",
+        "stat_rate": "sensor.robovac_power",
+        "name": "Robovac"
       }
     ],
     "device_consumption_water": []

@@ -131,6 +131,11 @@ utility_meter:
     unique_id: paludarium_picture_frame_camera_energy_cost_today
     source: sensor.paludarium_picture_frame_camera_energy_cost
     cycle: daily
+  robovac_energy_cost_today:
+    name: Robovac energy cost today
+    unique_id: robovac_energy_cost_today
+    source: sensor.robovac_energy_cost
+    cycle: daily
   all_standby_energy_cost_today:
     name: Standby energy cost today
     unique_id: all_standby_energy_cost_today
@@ -247,6 +252,11 @@ utility_meter:
     name: Paludarium, picture frame, camera energy cost savings today
     unique_id: paludarium_picture_frame_camera_energy_cost_savings_today
     source: sensor.paludarium_picture_frame_camera_energy_cost_savings
+    cycle: daily
+  robovac_energy_cost_savings_today:
+    name: Robovac energy cost savings today
+    unique_id: robovac_energy_cost_savings_today
+    source: sensor.robovac_energy_cost_savings
     cycle: daily
   all_standby_energy_cost_savings_today:
     name: Standby energy cost savings today
