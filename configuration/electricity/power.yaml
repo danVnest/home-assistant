@@ -177,26 +177,22 @@ powercalc:
               unique_id: tv_subwoofer_and_rear_speakers
               fixed:
                 power: >
-                  {%-
-                    set volume = state_attr('media_player.tv_speakers', 'volume_level')|float(0)
-                    if not state_attr('media_player.tv_speakers', 'is_volume_muted')|default(False) else 0
-                  -%}
                   {%- if state_attr('media_player.tv', 'sound_output')|default == "external_arc" -%}
-                    {{- 12 + 4 * volume * (1 + 6 * volume) if states('binary_sensor.tv_playing') == "on" else 12 -}}
-                  {%-
-                    elif state_attr('media_player.tv_speakers', 'source')|default == "Bluetooth" and
-                    '24:E8:53:AB:AC:DF (LG_Speaker_SP11RA_2463)' in
-                    state_attr('sensor.rachel_s_phone_bluetooth_connection', 'connected_paired_devices')|default and
-                    states('binary_sensor.rachel_s_phone_music_active') == "on"
-                  -%}
-                    {{- 12 + 4 * volume * (1 + 6 * volume) -}}
+                    {%-
+                      set volume = state_attr('media_player.tv', 'volume_level')|float(0)
+                      if (
+                        states('binary_sensor.tv_playing') == "on" and 
+                        not state_attr('media_player.tv', 'is_volume_muted')|default(False)
+                      ) else 0
+                    -%}
+                    {{- 15 + 33 * volume * (1 + volume) -}}
                   {%- else -%}
                     2
                   {%- endif -%}
                 # formula derived from the following measurements made with a smart switch
-                # ≈4W * 3 when on @ 0% volume
-                # ≈10W subwoofer, ≈5W * 2 rear @ 50% volume
-                # ≈20W subwoofer, ≈10W * 2 rear @ 100% volume
+                # ≈5W * 3 when on @ 0% volume
+                # ≈20W subwoofer, ≈10W * 2 rear @ 50% volume
+                # ≈40W subwoofer, ≈20W * 2 rear @ 100% volume
                 # standby from https://www.lg.com/uk/speakers/soundbars/sp11ra/?srsltid=AfmBOopZ7O31FooCpPHhw462bAGGP_GJ9nZR9T5n9rWonUcFKXETGE2i
         - entity_id: switch.dishwasher
           unique_id: dishwasher_energy
