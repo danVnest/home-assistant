@@ -31,5 +31,7 @@ recorder:
       - sensor.*_presence_sensor_illuminance
 sun:
 system_health:
+system_log:
+  fire_event: true
 wake_on_lan:
 zeroconf:

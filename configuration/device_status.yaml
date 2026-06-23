@@ -178,6 +178,20 @@ command_line:
     state_class: measurement
 
 automation:
+  - alias: Count system warnings and errors
+    id: count_system_warnings_and_errors
+    description: Count system warnings and errors
+    mode: queued
+    triggers:
+      - trigger: event
+        event_type: system_log_event
+    conditions:
+      - condition: template
+        value_template: "{{ trigger is defined and trigger.event.data.level in ('WARNING', 'ERROR') }}"
+    actions:
+      - action: counter.increment
+        target:
+          entity_id: counter.{{ trigger.event.data.level|lower }}s
   - alias: Update device issue and battery groups
     id: update_device_issue_and_battery_groups
     description: Update device issue and battery groups
@@ -225,9 +239,9 @@ automation:
             {% set disabled_entities = state_attr('sensor.disabled_entities', 'entities')|map(attribute='entity_id')|list %}
             {% set delay_minutes = 5 %}
             {{ states
+                |rejectattr('domain', 'in', ['button', 'device_tracker', 'event', 'group', 'image', 'select'])
                 |rejectattr('entity_id', 'in', allowed_entities + unknown_allowed_entities + long_unknown_allowed_entities + disabled_entities)
                 |rejectattr('entity_id', 'has_value')
-                |rejectattr('domain', 'in', ['button', 'event', 'group', 'image', 'select', 'device_tracker'])
                 |rejectattr('last_changed', 'ge', (now().timestamp() - delay_minutes * 60)|as_datetime)
                 |map(attribute='entity_id')|list
             }}
