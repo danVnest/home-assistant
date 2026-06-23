@@ -14,15 +14,6 @@
         "require_admin": false
       },
       {
-        "id": "dashboard_areas",
-        "show_in_sidebar": true,
-        "icon": "mdi:home",
-        "title": "Areas",
-        "require_admin": false,
-        "mode": "storage",
-        "url_path": "dashboard-areas"
-      },
-      {
         "id": "dashboard_development",
         "show_in_sidebar": true,
         "icon": "mdi:cog",
