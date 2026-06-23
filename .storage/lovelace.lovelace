@@ -3102,6 +3102,9 @@
                   "entity": "binary_sensor.guest_home"
                 },
                 {
+                  "entity": "input_boolean.pets_home_alone"
+                },
+                {
                   "entity": "lock.door_lock",
                   "name": "Front door lock"
                 },
@@ -4414,8 +4417,9 @@
               ]
             }
           ],
-          "max_columns": 4,
-          "cards": []
+          "max_columns": 2,
+          "cards": [],
+          "dense_section_placement": true
         },
         {
           "title": "Guide",
@@ -4449,7 +4453,8 @@
               "column_span": 2
             }
           ],
-          "max_columns": 4
+          "max_columns": 2,
+          "dense_section_placement": true
         }
       ]
     }

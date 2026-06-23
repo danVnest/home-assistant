@@ -6,7 +6,6 @@
     "config": {
       "views": [
         {
-          "path": "development",
           "title": "Development",
           "visible": [
             {
@@ -38,76 +37,993 @@
               "show_empty": false
             }
           ],
-          "cards": [
+          "cards": [],
+          "type": "sections",
+          "sections": [
             {
-              "type": "entities",
-              "entities": [
-                "input_boolean.development_mode"
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Navigation",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:compass"
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/integrations"
+                  },
+                  "vertical": false,
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/entities"
+                  },
+                  "vertical": false,
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/state"
+                  },
+                  "label": "States & attributes",
+                  "icon": "mdi:state-machine",
+                  "vertical": false,
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/event"
+                  },
+                  "label": "Events",
+                  "vertical": false,
+                  "icon": "mdi:home-sound-in-outline",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/history"
+                  },
+                  "vertical": false,
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/logbook"
+                  },
+                  "vertical": false,
+                  "label": "Activity log",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/yaml"
+                  },
+                  "label": "YAML reload",
+                  "icon": "mdi:reload",
+                  "vertical": false,
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/template"
+                  },
+                  "label": "Template editor",
+                  "vertical": false,
+                  "icon": "mdi:code-braces",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/action"
+                  },
+                  "vertical": false,
+                  "label": "Actions",
+                  "icon": "mdi:gesture-tap-hold",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/hacs"
+                  },
+                  "vertical": false,
+                  "label": "Custom components",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/logs"
+                  },
+                  "label": "Logs",
+                  "vertical": false,
+                  "icon": "mdi:text",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "shortcut",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "/config/developer-tools/statistics"
+                  },
+                  "label": "Database checks",
+                  "vertical": false,
+                  "icon": "mdi:database",
+                  "uix": {
+                    "style": "ha-card {\n  border: 2px solid var(--primary-color);\n}\n"
+                  }
+                },
+                {
+                  "type": "heading",
+                  "heading": "Control",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:alpha-a-circle"
+                },
+                {
+                  "type": "entities",
+                  "entities": [
+                    {
+                      "entity": "input_boolean.development_mode",
+                      "name": "AppDaemon development mode"
+                    }
+                  ]
+                },
+                {
+                  "type": "heading",
+                  "heading": "Status",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:home-assistant",
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 768px)"
+                    }
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "binary_sensor.internet",
+                  "name": "WARNING: Internet is disconnected",
+                  "show_state": false,
+                  "show_last_changed": true,
+                  "visibility": [
+                    {
+                      "condition": "state",
+                      "entity": "binary_sensor.internet",
+                      "state_not": "on"
+                    }
+                  ],
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"System functionality limited since \";\n  white-space: pre;\n}\n"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.device_issues",
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#device-issues"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#device-issues"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#device-issues"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#device-issues"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.unavailable_entities",
+                      "show_state": true,
+                      "show_background": false
+                    },
+                    {
+                      "entity": "sensor.frozen_entities",
+                      "show_state": true,
+                      "show_background": false
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.device_issues",
+                      "above": 0
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "default"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "icon_border_progress": []
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.system_issues_in_the_last_hour",
+                  "card_layout": "large-2-rows",
+                  "sub_button": [
+                    {
+                      "entity": "sensor.errors_in_the_last_hour",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:alert-circle"
+                    },
+                    {
+                      "entity": "sensor.warnings_in_the_last_hour",
+                      "show_state": true,
+                      "show_background": false,
+                      "icon": "mdi:help-circle"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "numeric_state",
+                      "entity": "sensor.errors_in_the_last_hour",
+                      "above": 0
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['counter.errors'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['counter.warnings'].state === '1.0' ? '': 's') }\n",
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  }
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.low_batteries",
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#low-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#low-batteries"
+                    }
+                  },
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.low_batteries",
+                        "show_state": true,
+                        "show_background": false
+                      },
+                      {
+                        "entity": "sensor.low_batteries",
+                        "show_state": false,
+                        "show_background": false,
+                        "show_attribute": true,
+                        "attribute": "unavailable",
+                        "icon": "mdi:battery-unknown"
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "visibility": [
+                    {
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.low_batteries",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "rows": 1.125
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "entity": "sensor.charging_batteries",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#charging-batteries"
+                  },
+                  "button_action": {
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "#charging-batteries"
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "charged",
+                      "icon": "mdi:battery"
+                    },
+                    {
+                      "entity": "sensor.charging_batteries",
+                      "show_state": false,
+                      "show_attribute": true,
+                      "show_background": false,
+                      "attribute": "above_50",
+                      "icon": "mdi:battery-50"
+                    }
+                  ],
+                  "visibility": [
+                    {
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.charged_batteries",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
+                  "modules": [
+                    "icon_color_mix_in"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "yellow"
+                  }
+                }
               ]
             },
             {
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "input_select.scene"
+                  "type": "heading",
+                  "heading": "History",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:clock-time-eight"
                 },
                 {
-                  "entity": "group.any_climate_control"
+                  "type": "history-graph",
+                  "entities": [
+                    {
+                      "entity": "input_select.scene"
+                    },
+                    {
+                      "entity": "group.any_aircon"
+                    },
+                    {
+                      "entity": "group.any_fans"
+                    },
+                    {
+                      "entity": "group.any_heaters"
+                    },
+                    {
+                      "entity": "group.any_humidifiers"
+                    },
+                    {
+                      "entity": "group.all_lights",
+                      "name": "Any lights"
+                    }
+                  ],
+                  "title": "Status",
+                  "hours_to_show": 36,
+                  "refresh_interval": 0
                 },
                 {
-                  "entity": "group.any_aircon"
+                  "type": "history-graph",
+                  "title": "Motion",
+                  "entities": [
+                    {
+                      "entity": "binary_sensor.resident_home"
+                    },
+                    {
+                      "entity": "binary_sensor.guest_home"
+                    },
+                    {
+                      "entity": "input_boolean.pets_home_alone"
+                    },
+                    {
+                      "entity": "lock.door_lock",
+                      "name": "Front door lock"
+                    },
+                    {
+                      "entity": "binary_sensor.front_door_motion_detected",
+                      "name": "Front door"
+                    },
+                    {
+                      "entity": "binary_sensor.entryway_multisensor_motion",
+                      "name": "Entryway"
+                    },
+                    {
+                      "entity": "binary_sensor.kitchen_presence_sensor_occupancy",
+                      "name": "Kitchen"
+                    },
+                    {
+                      "entity": "binary_sensor.kitchen_door_motion",
+                      "name": "Kitchen door"
+                    },
+                    {
+                      "entity": "binary_sensor.back_deck_motion_detected",
+                      "name": "Back deck"
+                    },
+                    {
+                      "entity": "binary_sensor.living_room_presence_sensor_occupancy",
+                      "name": "Living room"
+                    },
+                    {
+                      "entity": "binary_sensor.living_room_motion_detected",
+                      "name": "Living room camera"
+                    },
+                    {
+                      "entity": "binary_sensor.dining_room_multisensor_motion",
+                      "name": "Dining room"
+                    },
+                    {
+                      "entity": "binary_sensor.dining_room_balcony_door_motion",
+                      "name": "Dining room balcony door"
+                    },
+                    {
+                      "entity": "binary_sensor.hall_multisensor_motion",
+                      "name": "Hall"
+                    },
+                    {
+                      "entity": "binary_sensor.bathroom_multisensor_motion",
+                      "name": "Bathroom"
+                    },
+                    {
+                      "entity": "binary_sensor.office_presence_sensor_occupancy",
+                      "name": "Office"
+                    },
+                    {
+                      "entity": "binary_sensor.nursery_presence_sensor_occupancy",
+                      "name": "Nursery"
+                    },
+                    {
+                      "entity": "binary_sensor.bedroom_presence_sensor_occupancy",
+                      "name": "Bedroom"
+                    },
+                    {
+                      "entity": "binary_sensor.bedroom_balcony_door_motion",
+                      "name": "Bedroom balcony door"
+                    },
+                    {
+                      "entity": "binary_sensor.back_door_motion_detected",
+                      "name": "Back door"
+                    },
+                    {
+                      "entity": "binary_sensor.garage_motion_detected",
+                      "name": "Garage"
+                    }
+                  ],
+                  "hours_to_show": 24
                 },
                 {
-                  "entity": "group.any_fans"
+                  "type": "history-graph",
+                  "entities": [
+                    {
+                      "entity": "counter.warnings"
+                    },
+                    {
+                      "entity": "counter.errors"
+                    }
+                  ],
+                  "title": "Warnings & errors",
+                  "hours_to_show": 72,
+                  "refresh_interval": 0
                 },
                 {
-                  "entity": "group.any_heaters"
-                },
-                {
-                  "entity": "group.any_humidifiers"
-                },
-                {
-                  "entity": "input_boolean.pets_home_alone"
+                  "type": "custom:auto-entities",
+                  "card": {
+                    "type": "history-graph",
+                    "title": "Battery levels",
+                    "hours_to_show": 240,
+                    "refresh_interval": 0
+                  },
+                  "filter": {
+                    "template": "{{ states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list }}"
+                  },
+                  "sort": {
+                    "numeric": true,
+                    "method": "state"
+                  },
+                  "rename": {
+                    "find": ".attery level"
+                  }
                 }
-              ],
-              "hours_to_show": 36,
-              "refresh_interval": 0,
-              "title": "Control History",
-              "type": "history-graph"
+              ]
             },
             {
-              "entities": [
+              "type": "grid",
+              "cards": [
                 {
-                  "entity": "counter.warnings"
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#device-issues",
+                  "button_type": "state",
+                  "name": "Device issues",
+                  "entity": "group.unavailable_entities",
+                  "icon": "mdi:alert-circle",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
+                          }
+                        }
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected - reconnect to resolve issues",
+                      "show_state": false,
+                      "show_last_changed": true,
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.internet",
+                          "state_not": "on"
+                        }
+                      ],
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
+                      "styles": ".bubble-state::before {\n  content: \"System functionality limited since \";\n  white-space: pre;\n}\n"
+                    },
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "sensor.missing_entities",
+                      "name": "missing entities - check watchman_report.txt",
+                      "show_state": false,
+                      "show_last_changed": true,
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.missing_entities",
+                          "above": 0
+                        }
+                      ],
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
+                      "styles": ".bubble-name::before {\n  content: \"${state} \";\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n"
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "The entities listed below are unavailable or frozen. \nThere are multiple potential causes for such states, and it is recommended to follow this guide to diagnose and fix them.\n\n<details><summary><i>Resolution guide</i></summary>\n\n1. If the internet is disconnected, try and restore it\n\n1. If the system was recently restarted or reconnected, wait up to 10 minutes or so for configuration to complete\n\n1. Check the device is plugged in or has sufficient battery charge\n\n1. Select an entity \n    - if there is a warning that it is no longer being provided by the relevant integration, fix the configuration if possible or consider deleting it\n    - select the cog icon and check the entity_id seems correct - in particular check if '_2' or similar is appended, this can indiciate it is a duplicate and helps direct the next step\n    - select the 3 dots icon and check device and/or related info, look for and resolve duplicate entities, incorrect names, or any other detected issues - reload the relevant integration or adjust configuration if necessary\n    - check the entity history to determine when the issue started and if that correlates with anything that could have been the cause\n\n1. Try reloading home assistant\n\n1. Try restarting home assistant\n\n1. If none of the above resolve the issue, either delete the entity if not required or add it to the ignored unavailable entities list in the system configuration\n\n</details> {%- if states('sensor.device_issues')|int(1) > 15 -%}\n  15 of {{ states('sensor.device_issues')|int }} device issues are shown below. Resolve these to see the remaining issues.\n{%- endif -%}",
+                      "uix": {
+                        "style": {
+                          "ha-markdown$": "summary {\n  background: var(--primary-background-color);\n  margin-left: auto;\n  margin-right: auto;\n  margin-bottom: 12px;\n  width: 150px;\n  border-radius: var(--ha-card-border-radius);\n  border: var(--button-border-info);\n}\nsummary, summary i {\n  padding-left: 10px;\n}"
+                        }
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 240,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{% set unavailable_entities = state_attr('group.unavailable_entities', 'entity_id') %} {% set frozen_entities = state_attr('group.frozen_entities', 'entity_id') %} {{\n  (\n    (unavailable_entities if unavailable_entities is not none else ()) +\n    (frozen_entities if frozen_entities is not none else ())\n  )[:15]\n}}\n"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    }
+                  ]
                 },
                 {
-                  "entity": "counter.errors"
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#low-batteries",
+                  "button_type": "state",
+                  "name": "Low batteries",
+                  "entity": "group.low_batteries",
+                  "icon": "mdi:battery-low",
+                  "card_layout": "large",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
+                          }
+                        }
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "icon_color_mix_in",
+                    "datetime_to_relative_time"
+                  ],
+                  "icon_color_mix_in": {
+                    "color": "red"
+                  },
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "cards": [
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "binary_sensor.internet",
+                      "name": "Internet is disconnected",
+                      "show_state": false,
+                      "show_last_changed": true,
+                      "visibility": [
+                        {
+                          "condition": "state",
+                          "entity": "binary_sensor.internet",
+                          "state_not": "on"
+                        }
+                      ],
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
+                      "styles": ".bubble-state::before {\n  content: \"Batteries may not have updated since \";\n  white-space: pre;\n}\n"
+                    },
+                    {
+                      "type": "markdown",
+                      "content": "Once a battery is too flat for the device to function its battery level may not be reported, and as such appear as \"unavailable\". This can also occur when a battery is ok but the device can't connect. It can be worth checking other device issues first in this case.\n\nBatteries with low levels are still functional, but it is recommended to charge or replace them soon to keep the system functional.",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 240,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('group.low_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:bubble-card",
+                      "card_type": "button",
+                      "button_type": "state",
+                      "entity": "sensor.device_issues",
+                      "show_state": false,
+                      "card_layout": "large-2-rows",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "double_tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "hold_action": {
+                        "action": "navigate",
+                        "navigation_path": "#device-issues"
+                      },
+                      "sub_button": [
+                        {
+                          "entity": "sensor.unavailable_entities",
+                          "show_state": true,
+                          "show_background": false
+                        },
+                        {
+                          "entity": "sensor.frozen_entities",
+                          "show_state": true,
+                          "show_background": false
+                        }
+                      ],
+                      "visibility": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.device_issues",
+                          "above": 0
+                        }
+                      ],
+                      "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
+                      "modules": [
+                        "icon_color_mix_in"
+                      ],
+                      "icon_color_mix_in": {
+                        "color": "red"
+                      },
+                      "grid_options": {
+                        "columns": 12
+                      }
+                    }
+                  ],
+                  "rows": 1
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "pop-up",
+                  "hash": "#charging-batteries",
+                  "button_type": "state",
+                  "name": "Charging batteries",
+                  "entity": "group.charging_batteries",
+                  "icon": "mdi:battery-charging",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "icon": "mdi:refresh",
+                        "show_background": false,
+                        "tap_action": {
+                          "action": "perform-action",
+                          "perform_action": "automation.trigger",
+                          "target": {
+                            "entity_id": "automation.update_device_issue_and_battery_groups"
+                          }
+                        }
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-state::before {\n  content: \"Checked \";\n  white-space: pre;\n}\n",
+                  "modules": [
+                    "datetime_to_relative_time",
+                    "icon_color_mix_in"
+                  ],
+                  "datetime_to_relative_time": {
+                    "entity": "automation.update_device_issue_and_battery_groups",
+                    "attribute": "last_triggered"
+                  },
+                  "icon_color_mix_in": {
+                    "color": "yellow"
+                  },
+                  "cards": [
+                    {
+                      "type": "markdown",
+                      "content": "Devices with integrated batteries that report their charge status are displayed here. You will be notified when a device is fully charged.",
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "entities"
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    },
+                    {
+                      "type": "custom:auto-entities",
+                      "card": {
+                        "type": "history-graph",
+                        "title": "History",
+                        "hours_to_show": 6,
+                        "refresh_interval": 0
+                      },
+                      "filter": {
+                        "template": "{{ state_attr('group.charging_batteries', 'entity_id') }}"
+                      },
+                      "sort": {
+                        "numeric": true,
+                        "method": "state"
+                      },
+                      "rename": {
+                        "find": ".attery level"
+                      },
+                      "grid_options": {
+                        "columns": 12,
+                        "rows": "auto"
+                      }
+                    }
+                  ]
                 }
-              ],
-              "hours_to_show": 72,
-              "refresh_interval": 0,
-              "title": "Warnings & Errors",
-              "type": "history-graph"
-            },
-            {
-              "type": "custom:auto-entities",
-              "card": {
-                "type": "history-graph",
-                "title": "Battery Levels",
-                "hours_to_show": 240,
-                "refresh_interval": 0
-              },
-              "filter": {
-                "template": "{{ states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list }}"
-              },
-              "sort": {
-                "numeric": true,
-                "method": "state"
-              },
-              "rename": {
-                "find": ".attery level"
-              }
+              ]
             }
-          ]
+          ],
+          "max_columns": 2,
+          "dense_section_placement": true,
+          "path": "overview"
         },
         {
           "title": "Statistics",
