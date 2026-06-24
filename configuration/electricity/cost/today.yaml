@@ -295,63 +295,77 @@ template:
         not_to:
           - unknown
           - unavailable
+        for: "00:01:00"
     sensor:
       - name: Daily total energy cost
         unique_id: daily_total_energy_cost
-        state: "{{ state_attr('sensor.total_energy_cost_today', 'last_period')|float|round(2) }}"
+        state: "{{ state_attr('sensor.total_energy_cost_today', 'last_period')|float(this.state)|round(2) }}"
         attributes:
           average: >
-            {%- set cost_incorrect_start_offset = -478.89 -%}
-            {{-
-              ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) /
-              states('sensor.days_since_solar_installation')|float)|round(2)
-            -}}
-          minimum: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float, this.attributes.minimum|default|float(999)]|min|round(2) }}"
-          maximum: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float, this.attributes.maximum|default|float(-999)]|max|round(2) }}"
+            {%- if has_value('sensor.total_energy_cost') and has_value('sensor.days_since_solar_installation') -%}
+              {%- set cost_incorrect_start_offset = -478.89 -%}
+              {{-
+                ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) /
+                states('sensor.days_since_solar_installation')|float)|round(2)
+              -}}
+            {%- else -%}
+              {{- this.attributes.average|default(none) -}}
+            {%- endif -%}
+          minimum: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float(999), this.attributes.minimum|default|float(999)]|min|round(2) }}"
+          maximum: "{{ [state_attr('sensor.total_energy_cost_today', 'last_period')|float(-999), this.attributes.maximum|default|float(-999)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost_today') and has_value('sensor.days_since_solar_installation') }}"
+        icon: mdi:currency-usd"
       - name: Daily total energy cost savings
         unique_id: daily_total_energy_cost_savings
-        state: "{{ state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float|round(2) }}"
+        state: "{{ state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(this.state)|round(2) }}"
         attributes:
           average: >
-            {%- set cost_savings_incorrect_start_offset = 506.89 -%}
-            {{-
-              ((states('sensor.total_energy_cost_savings')|float - cost_savings_incorrect_start_offset) /
-              states('sensor.days_since_solar_installation')|float)|round(2)
-            -}}
-          minimum: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float, this.attributes.minimum|default|float(999)]|min|round(2) }}"
-          maximum: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float, this.attributes.maximum|default|float(-999)]|max|round(2) }}"
+            {%- if has_value('sensor.total_energy_cost_savings') and has_value('sensor.days_since_solar_installation') -%}
+              {%- set cost_savings_incorrect_start_offset = 506.89 -%}
+              {{-
+                ((states('sensor.total_energy_cost_savings')|float - cost_savings_incorrect_start_offset) /
+                states('sensor.days_since_solar_installation')|float)|round(2)
+              -}}
+            {%- else -%}
+              {{- this.attributes.average|default(none) -}}
+            {%- endif -%}
+          minimum: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(999), this.attributes.minimum|default|float(999)]|min|round(2) }}"
+          maximum: "{{ [state_attr('sensor.total_energy_cost_savings_today', 'last_period')|float(-999), this.attributes.maximum|default|float(-999)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost_savings_today') and has_value('sensor.days_since_solar_installation') }}"
       - name: Daily grid cost
         unique_id: daily_grid_cost
-        state: "{{ state_attr('sensor.grid_cost_today', 'last_period')|float|round(2) }}"
-        attributes:
-          average: "{{ ((states('sensor.grid_cost')|float) / states('sensor.days_since_solar_installation')|float)|round(2) }}"
-          minimum: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float, this.attributes.minimum|default|float(999)]|min|round(2) }}"
-          maximum: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float, this.attributes.maximum|default|float(-999)]|max|round(2) }}"
-        unit_of_measurement: $/day
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.grid_cost_today') and has_value('sensor.days_since_solar_installation') }}"
-      - name: Daily energy export earnings
-        unique_id: daily_energy_export_earnings
-        state: "{{ (state_attr('sensor.export_energy_cost_today', 'last_period')|float * -1)|round(2) }}"
+        state: "{{ state_attr('sensor.grid_cost_today', 'last_period')|float(this.state)|round(2) }}"
         attributes:
           average: >
-            {%- set initial_earnings = 231.51 -%}
-            {{-
-              ((initial_earnings - states('sensor.export_energy_cost')|float) /
-              states('sensor.days_since_solar_installation')|float)|round(2)
-            -}}
-          minimum: "{{ [state_attr('sensor.export_energy_cost_today', 'last_period')|float * -1, this.attributes.minimum|default|float(999)]|min|round(2) }}"
-          maximum: "{{ [state_attr('sensor.export_energy_cost_today', 'last_period')|float * -1, this.attributes.maximum|default|float(-999)]|max|round(2) }}"
+            {%- if has_value('sensor.grid_cost') and has_value('sensor.days_since_solar_installation') -%}
+              {{- ((states('sensor.grid_cost')|float) / states('sensor.days_since_solar_installation')|float)|round(2) -}}
+            {%- else -%}
+              {{- this.attributes.average|default(none) -}}
+            {%- endif -%}
+          minimum: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float(999), this.attributes.minimum|default|float(999)]|min|round(2) }}"
+          maximum: "{{ [state_attr('sensor.grid_cost_today', 'last_period')|float(-999), this.attributes.maximum|default|float(-999)]|max|round(2) }}"
         unit_of_measurement: $/day
         state_class: total
         icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.export_energy_cost') and has_value('sensor.days_since_solar_installation') }}"
+      - name: Daily energy export earnings
+        unique_id: daily_energy_export_earnings
+        state: "{{ (state_attr('sensor.export_energy_cost_today', 'last_period')|float(this.state) * -1)|round(2) }}"
+        attributes:
+          average: >
+            {%- if has_value('sensor.export_energy_cost') and has_value('sensor.days_since_solar_installation') -%}
+              {%- set initial_earnings = 231.51 -%}
+              {{-
+                ((initial_earnings - states('sensor.export_energy_cost')|float) /
+                states('sensor.days_since_solar_installation')|float)|round(2)
+              -}}
+            {%- else -%}
+              {{- this.attributes.average|default(none) -}}
+            {%- endif -%}
+          minimum: "{{ [state_attr('sensor.export_energy_cost_today', 'last_period')|float(999) * -1, this.attributes.minimum|default|float(999)]|min|round(2) }}"
+          maximum: "{{ [state_attr('sensor.export_energy_cost_today', 'last_period')|float(-999) * -1, this.attributes.maximum|default|float(-999)]|max|round(2) }}"
+        unit_of_measurement: $/day
+        state_class: total
+        icon: mdi:cash-plus

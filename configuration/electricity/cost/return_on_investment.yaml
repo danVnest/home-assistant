@@ -17,6 +17,7 @@ template:
         not_to:
           - unknown
           - unavailable
+        for: "00:01:00"
     sensor:
       - name: Solar and battery years to break even
         unique_id: solar_and_battery_years_to_break_even
