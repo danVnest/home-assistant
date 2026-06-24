@@ -774,12 +774,12 @@
                       "conditions": [
                         {
                           "condition": "state",
-                          "state": "unknown"
+                          "state": "None"
                         },
                         {
                           "condition": "state",
                           "entity": "select.robovac_clean_room",
-                          "state": "unknown"
+                          "state": "None"
                         }
                       ]
                     }
@@ -813,12 +813,12 @@
                       "conditions": [
                         {
                           "condition": "state",
-                          "state": "unknown"
+                          "state": "None"
                         },
                         {
                           "condition": "state",
                           "entity": "select.robovac_scene",
-                          "state": "unknown"
+                          "state": "None"
                         }
                       ]
                     }
