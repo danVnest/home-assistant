@@ -4055,6 +4055,130 @@
                           "line": {
                             "color": "gold"
                           }
+                        },
+                        {
+                          "entity": "sensor.solar_production_today",
+                          "x": [
+                            "Produced"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.energy_export_today",
+                          "x": [
+                            "Exported"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.solar_storage_today",
+                          "x": [
+                            "Solar stored"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.grid_storage_today",
+                          "x": [
+                            "Grid stored"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.energy_consumption_today",
+                          "x": [
+                            "Total used"
+                          ],
+                          "y": "$ex ys / 1000",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.solar_consumption_today",
+                          "x": [
+                            "Solar used"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.battery_consumption_today",
+                          "x": [
+                            "Battery used"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.grid_consumption_today",
+                          "x": [
+                            "Grid used"
+                          ],
+                          "y": "$ex [ys[0]/1000]",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.total_energy_cost_today",
+                          "yaxis": "y2",
+                          "x": [
+                            "Net cost"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.total_energy_cost_savings_today",
+                          "yaxis": "y2",
+                          "x": [
+                            "Total savings"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.grid_cost_today",
+                          "yaxis": "y2",
+                          "x": [
+                            "Grid cost"
+                          ],
+                          "y": "$ex ys",
+                          "line": {
+                            "color": "red"
+                          }
+                        },
+                        {
+                          "entity": "sensor.export_energy_cost_today",
+                          "yaxis": "y2",
+                          "x": [
+                            "Export earnings"
+                          ],
+                          "y": "$ex [-ys[0]]",
+                          "line": {
+                            "color": "red"
+                          }
                         }
                       ]
                     },
