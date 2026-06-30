@@ -43,8 +43,6 @@ class Control(App):
         self.log_listener = self.listen_log(self.increment_log_issue_counter, "WARNING")
         if self.entities.input_boolean.development_mode.state == "off":
             self.set_production_mode()
-        self.call_service("counter/reset", entity_id="counter.warnings")
-        self.call_service("counter/reset", entity_id="counter.errors")
         for setting in [
             "input_boolean.development_mode",
             "input_boolean.pets_home_alone",

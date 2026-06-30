@@ -1,10 +1,8 @@
 counter:
   errors:
     name: Errors
-    restore: true
   warnings:
     name: Warnings
-    restore: true
 
 sensor:
   - platform: statistics
