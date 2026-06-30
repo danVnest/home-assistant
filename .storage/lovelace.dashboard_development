@@ -274,12 +274,10 @@
                   "sub_button": [
                     {
                       "entity": "sensor.unavailable_entities",
-                      "show_state": true,
                       "show_background": false
                     },
                     {
                       "entity": "sensor.frozen_entities",
-                      "show_state": true,
                       "show_background": false
                     }
                   ],
@@ -290,7 +288,7 @@
                       "above": 0
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
                   "modules": [
                     "icon_color_mix_in",
                     "default"
@@ -306,20 +304,21 @@
                   "button_type": "state",
                   "entity": "sensor.system_issues_in_the_last_hour",
                   "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "sensor.errors_in_the_last_hour",
-                      "show_state": true,
-                      "show_background": false,
-                      "icon": "mdi:alert-circle"
-                    },
-                    {
-                      "entity": "sensor.warnings_in_the_last_hour",
-                      "show_state": true,
-                      "show_background": false,
-                      "icon": "mdi:help-circle"
-                    }
-                  ],
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.errors_in_the_last_hour",
+                        "show_background": false,
+                        "icon": "mdi:alert-circle"
+                      },
+                      {
+                        "entity": "sensor.warnings_in_the_last_hour",
+                        "show_background": false,
+                        "icon": "mdi:help-circle"
+                      }
+                    ],
+                    "bottom": []
+                  },
                   "visibility": [
                     {
                       "condition": "numeric_state",
@@ -327,13 +326,14 @@
                       "above": 0
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['sensor.errors_in_the_last_hour'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['sensor.warnings_in_the_last_hour'].state === '1.0' ? '': 's') }\n",
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['sensor.errors_in_the_last_hour'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['sensor.warnings_in_the_last_hour'].state === '1.0' ? '': 's') }\n",
                   "modules": [
                     "icon_color_mix_in"
                   ],
                   "icon_color_mix_in": {
                     "color": "red"
-                  }
+                  },
+                  "rows": 1.125
                 },
                 {
                   "type": "custom:bubble-card",
@@ -363,15 +363,11 @@
                     "main": [
                       {
                         "entity": "sensor.low_batteries",
-                        "show_state": true,
                         "show_background": false
                       },
                       {
                         "entity": "sensor.low_batteries",
-                        "show_state": false,
                         "show_background": false,
-                        "show_attribute": true,
-                        "attribute": "unavailable",
                         "icon": "mdi:battery-unknown"
                       }
                     ],
@@ -395,7 +391,7 @@
                       ]
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.low_batteries'].state + ' low batter' + (hass.states['sensor.low_batteries'].state === '1' ? 'y': 'ies') }\n${card.querySelector('.bubble-state').innerText = 'Please check, charge, or replace'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].state + ' below 25%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.low_batteries'].attributes['unavailable'] + ' unavailable' }\n",
                   "modules": [
                     "icon_color_mix_in"
                   ],
@@ -432,18 +428,12 @@
                   "sub_button": [
                     {
                       "entity": "sensor.charging_batteries",
-                      "show_state": false,
-                      "show_attribute": true,
                       "show_background": false,
-                      "attribute": "charged",
                       "icon": "mdi:battery"
                     },
                     {
                       "entity": "sensor.charging_batteries",
-                      "show_state": false,
-                      "show_attribute": true,
                       "show_background": false,
-                      "attribute": "above_50",
                       "icon": "mdi:battery-50"
                     }
                   ],
@@ -465,7 +455,7 @@
                       ]
                     }
                   ],
-                  "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText =  hass.states['sensor.charging_batteries'].state + ' batter' + (hass.states['sensor.charging_batteries'].state === '1' ? 'y': 'ies') + ' charging' }\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_90'] + ' above 90%' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.charging_batteries'].attributes['above_50'] + ' above 50%' }\n",
                   "modules": [
                     "icon_color_mix_in"
                   ],
@@ -898,12 +888,10 @@
                       "sub_button": [
                         {
                           "entity": "sensor.unavailable_entities",
-                          "show_state": true,
                           "show_background": false
                         },
                         {
                           "entity": "sensor.frozen_entities",
-                          "show_state": true,
                           "show_background": false
                         }
                       ],
@@ -914,7 +902,7 @@
                           "above": 0
                         }
                       ],
-                      "styles": "${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
+                      "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText =  hass.states['sensor.device_issues'].state + ' possibly related device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
                       "modules": [
                         "icon_color_mix_in"
                       ],
