@@ -52,13 +52,13 @@
     {%- if mode == "fan_only" -%}
         {%- set heat_pump_power_factor = 0 -%}
     {%- else -%}
-        {%- set indoor_temperature = state_attr(entity_id, 'current_temperature')|float(24) -%}
+        {%- set indoor_temperature = states('sensor.' + room + '_temperature')|float(24) -%}
         {%- set target_temperature = state_attr(entity_id, 'temperature')|float(24) -%}
         {%- set outdoor_temperature = states('sensor.outside_apparent_temperature')|float(25) -%}
         {%- set heating_flip = -1 if mode == "heat" or (mode == "heat_cool" and indoor_temperature < target_temperature) else 1 -%}
         {%- set indoor_difference = (indoor_temperature - target_temperature) * heating_flip -%}
         {%- set outdoor_difference = (outdoor_temperature - target_temperature) * heating_flip -%}
-        {%- set temperature_factor = max(indoor_difference, 0) * (1 + max(outdoor_difference, 0) / 8) / 8 -%}
+        {%- set temperature_factor = max(indoor_difference + 0.5, 0) * (1 + max(outdoor_difference, 0) / 8) / 8 -%}
         {%- set heat_pump_power_factor = 0.2 + 0.8 * min(1, temperature_factor) -%}
     {%- endif -%}
     {%- set fan_power = 50 + 100 * states('sensor.' + room + '_aircon_airspeed')|float(0) / max_airspeed -%}
