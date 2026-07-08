@@ -266,21 +266,6 @@ utility_meter:
 
 template:
   - sensor:
-      - name: Grid cost
-        unique_id: grid_cost
-        state: >
-          {% set cost_incorrect_start_offset = -478.89 %}
-          {% set initial_earnings = 231.51 %}
-          {{
-            ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) -
-            states('sensor.battery_energy_cost')|float -
-            states('sensor.export_energy_cost')|float + initial_earnings
-            )|round(2)
-          }}
-        unit_of_measurement: $
-        state_class: total
-        icon: mdi:currency-usd
-        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.battery_energy_cost') and has_value('sensor.export_energy_cost') }}"
       - name: Maximum forecast grid power cost
         unique_id: maximum_forecast_grid_cost
         state: "{{ state_attr('sensor.electricity_general_forecast', 'forecasts')|map(attribute='per_kwh')|max|round(2) }}"

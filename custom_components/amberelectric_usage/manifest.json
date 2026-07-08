@@ -1,0 +1,13 @@
+{
+  "domain": "amberelectric_usage",
+  "name": "Amber Electric - Energy Usage & Costs",
+  "version": "1.1.1",
+  "integration_type": "service",
+  "documentation": "https://github.com/danVnest/amberelectric-usage",
+  "issue_tracker": "https://github.com/danVnest/amberelectric-usage/issues",
+  "codeowners": ["@danVnest"],
+  "config_flow": true,
+  "requirements": ["amberelectric==2.0.12"],
+  "loggers": ["amberelectric"],
+  "iot_class": "cloud_polling"
+}

@@ -320,6 +320,8 @@ powercalc:
     - entity_id: sensor.dummy
       name: Water heater, oven & stove, guest suite, garage, all other
       unique_id: water_heater_oven_stove_guest_suite_garage_all_other
+      # does not include controlled load power (unavailable) or energy (delayed)
+      # energy entity manually renamed to sensor.water_heater_oven_stove_guest_suite_garage_all_other_without_controlled_load_energy
       fixed:
         power: "{{ max(0, states('sensor.power_meter_power_load_consumed')|float(0) - states('sensor.tracked_power')|float(0)) }}"
 

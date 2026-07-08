@@ -8,8 +8,8 @@ sensor:
       minutes: 1
 
   - platform: integration
-    name: Total energy cost
-    unique_id: total_energy_cost
+    name: Total excluding controlled load energy cost
+    unique_id: total_excluding_controlled_load_energy_cost
     source: sensor.total_power_cost
     method: left
     max_sub_interval:
@@ -23,8 +23,8 @@ sensor:
       minutes: 1
 
   - platform: integration
-    name: Total excluding battery and export energy cost
-    unique_id: total_excluding_battery_and_export_energy_cost
+    name: Total excluding battery, export, controlled load energy cost
+    unique_id: total_excluding_battery_export_controlled_load_energy_cost
     source: sensor.total_excluding_battery_and_export_power_cost
     method: left
     max_sub_interval:
@@ -279,8 +279,8 @@ sensor:
       minutes: 1
 
   - platform: integration
-    name: Water heater, oven & stove, guest suite, garage, all other energy cost
-    unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
+    name: Water heater, oven & stove, guest suite, garage, all other energy cost without controlled load
+    unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_without_controlled_load
     source: sensor.water_heater_oven_stove_guest_suite_garage_all_other_power_cost
     method: left
     max_sub_interval:
@@ -382,3 +382,64 @@ sensor:
     method: left
     max_sub_interval:
       minutes: 1
+
+template:
+  - sensor:
+      - name: Total energy cost
+        unique_id: total_energy_cost
+        state: >
+          {% set initial_cost = 1497.08 %}
+          {{
+            (states('sensor.total_excluding_controlled_load_energy_cost')|float +
+            states('sensor.controlled_load_energy_cost')|float + initial_cost
+            )|round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_excluding_controlled_load_energy_cost') and has_value('sensor.controlled_load_energy_cost') }}"
+      - name: Total excluding battery and export energy cost
+        unique_id: total_excluding_battery_and_export_energy_cost
+        state: >
+          {% set initial_cost = 660.31 %}
+          {{
+            (states('sensor.total_excluding_battery_export_controlled_load_energy_cost')|float +
+            states('sensor.controlled_load_energy_cost')|float + initial_cost
+            )|round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_excluding_battery_export_controlled_load_energy_cost') and has_value('sensor.controlled_load_energy_cost') }}"
+      - name: Grid cost
+        unique_id: grid_cost
+        state: >
+          {% set cost_incorrect_start_offset = -478.89 %}
+          {% set initial_earnings = 231.51 %}
+          {{
+            ((states('sensor.total_energy_cost')|float - cost_incorrect_start_offset) -
+            states('sensor.battery_energy_cost')|float -
+            states('sensor.export_energy_cost')|float + initial_earnings
+            )|round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: "{{ has_value('sensor.total_energy_cost') and has_value('sensor.battery_energy_cost') and has_value('sensor.export_energy_cost') }}"
+      - name: Water heater, oven & stove, guest suite, garage, all other energy cost
+        unique_id: water_heater_oven_stove_guest_suite_garage_all_other_energy_cost
+        state: >
+          {% set initial_cost = 719.56 %}
+          {{
+            (states('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_without_controlled_load')|float + 
+            states('sensor.controlled_load_energy_cost')|float + initial_cost
+            )|round(2)
+          }}
+        unit_of_measurement: $
+        state_class: total
+        icon: mdi:currency-usd
+        availability: >
+          {{
+            has_value('sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy_cost_without_controlled_load') and 
+            has_value('sensor.controlled_load_energy_cost')
+          }}
