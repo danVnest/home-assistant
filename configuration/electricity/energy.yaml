@@ -53,8 +53,10 @@ template:
           {{
             [total_produced_before_battery_install + initial_controlled_load +
             states('sensor.solar_energy_produced')|float +
-            states('sensor.controlled_load_energy')|float * 1000 +
-            states('sensor.smart_meter_real_energy_consumed')|float -
+            states('sensor.battery_energy_discharged')|float +
+            states('sensor.smart_meter_real_energy_consumed')|float +
+            states('sensor.controlled_load_energy')|float * 1000 -
+            states('sensor.battery_energy_charged')|float -
             states('sensor.smart_meter_real_energy_produced')|float,
             this.attributes.last_known_state|default|float(0)]|max
           }}
@@ -67,7 +69,39 @@ template:
         availability: >
           {{
             has_value('sensor.solar_energy_produced') and
+            has_value('sensor.battery_energy_discharged') and
+            has_value('sensor.smart_meter_real_energy_consumed') and
             has_value('sensor.controlled_load_energy') and
+            has_value('sensor.battery_energy_charged') and
+            has_value('sensor.smart_meter_real_energy_produced')   
+          }}
+      - name: Total energy consumed comparison
+        # TODO: compare with above and pick a method
+        unique_id: total_energy_consumed_comparison
+        state: >
+          {%- set initial_sync_value = 3719666 -%}
+          {%- set initial_controlled_load = 909650 -%}
+          {{
+            [initial_sync_value + initial_controlled_load +
+            states('sensor.smart_meter_real_energy_consumed')|float +
+            states('sensor.solar_energy_consumed')|float +
+            states('sensor.battery_energy_consumed')|float +
+            states('sensor.controlled_load_energy')|float * 1000,
+            this.attributes.last_known_state|default|float(0)]|max
+          }}
+        unit_of_measurement: Wh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:home-lightning-bolt
+        attributes:
+          last_known_state: "{{ this.state|float(this.attributes.last_known_state|default|float(0)) }}"
+        availability: >
+          {{
+            has_value('sensor.smart_meter_real_energy_consumed') and
+            has_value('sensor.solar_energy_consumed') and
+            has_value('sensor.battery_energy_consumed') and
+            has_value('sensor.controlled_load_energy')
+          }}
             has_value('sensor.smart_meter_real_energy_produced') and
             has_value('sensor.smart_meter_real_energy_consumed')
           }}
