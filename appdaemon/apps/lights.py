@@ -751,7 +751,7 @@ class Light(PresenceDevice):
         self.minimum_brightness = self.controller.constants[
             "min_brightness"
             if device_id.endswith("strip")
-            or self.get_attribute("supported_color_modes")[0] == "brightness"
+            or self.get_attribute("supported_color_modes")[0] == "brightness"  # fans
             else "restricted_min_brightness"
         ]
         self.kelvin_limits = {
@@ -764,7 +764,9 @@ class Light(PresenceDevice):
     @property
     def brightness(self) -> int:
         """Get the brightness of the light from Home Assistant."""
-        return self.get_attribute("brightness", 0)
+        if not self.on:
+            return 0
+        return max(self.get_attribute("brightness"), self.minimum_brightness)
 
     @brightness.setter
     def brightness(self, value: int):
@@ -859,7 +861,7 @@ class Light(PresenceDevice):
 
     def turn_off(self):
         """Turn light off and record previous kelvin level."""
-        if self.control_enabled and self.brightness != 0:
+        if self.control_enabled and self.on:
             self.kelvin_before_off = self.kelvin
             if self.controller.logger.isEnabledFor(logging.DEBUG):
                 self.controller.log(
