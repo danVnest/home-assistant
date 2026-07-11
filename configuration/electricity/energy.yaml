@@ -102,9 +102,20 @@ template:
             has_value('sensor.battery_energy_consumed') and
             has_value('sensor.controlled_load_energy')
           }}
-            has_value('sensor.smart_meter_real_energy_produced') and
-            has_value('sensor.smart_meter_real_energy_consumed')
+      - name: Grid energy consumed
+        unique_id: grid_energy_consumed
+        state: >
+          {{
+            [states('sensor.smart_meter_real_energy_consumed')|float - states('sensor.battery_energy_grid_charged')|float,
+            this.attributes.last_known_state|default|float(0)]|max
           }}
+        unit_of_measurement: Wh
+        device_class: energy
+        state_class: total_increasing
+        icon: mdi:home-import-outline
+        attributes:
+          last_known_state: "{{ this.state|float(this.attributes.last_known_state|default|float(0)) }}"
+        availability: "{{ has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.battery_energy_grid_charged') }}"
       - name: Water heater, oven & stove, guest suite, garage, all other energy
         unique_id: water_heater_oven_stove_guest_suite_garage_all_other_with_controlled_energy
         # manually renamed to sensor.water_heater_oven_stove_guest_suite_garage_all_other_energy
@@ -359,7 +370,7 @@ template:
             {%- if has_value('sensor.smart_meter_real_energy_consumed') and has_value('sensor.controlled_load_energy') and has_value('sensor.days_since_battery_installation') -%}
               {%- set total_grid_consumed_before_battery_install = 4023.583 -%}
               {{-
-                ((states('sensor.smart_meter_real_energy_consumed')|float / 1000 +
+                ((states('sensor.grid_energy_consumed')|float / 1000 +
                 states('sensor.controlled_load_energy')|float +
                 total_grid_consumed_before_battery_install) /
                 states('sensor.days_since_battery_installation')|float)|round(3)
@@ -422,5 +433,5 @@ utility_meter:
   grid_consumption_today:
     name: Grid consumption today
     unique_id: grid_consumption_today
-    source: sensor.smart_meter_real_energy_consumed
+    source: sensor.grid_energy_consumed
     cycle: daily
