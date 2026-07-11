@@ -177,8 +177,9 @@ template:
   - triggers:
       - trigger: state
         entity_id: select.robovac_scene
-        to: unknown
+        to: None
         not_from:
+          - None
           - unknown
           - unavailable
     sensor:
@@ -191,8 +192,9 @@ template:
         entity_id:
           - select.robovac_clean_room
           - select.robovac_scene
-        to: unknown
+        to: None
         not_from:
+          - None
           - unknown
           - unavailable
     sensor:
