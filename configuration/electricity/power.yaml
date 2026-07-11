@@ -326,7 +326,11 @@ powercalc:
         power: "{{ max(0, states('sensor.power_meter_power_load_consumed')|float(0) - states('sensor.tracked_power')|float(0)) }}"
 
 template:
-  - sensor:
+  - triggers:
+    - trigger: state
+      entity_id: sensor.power_meter_power_load_consumed
+      for: "00:00:00.2"
+    sensor:
       - name: Power autonomy
         unique_id: power_autonomy
         state: >
@@ -341,14 +345,6 @@ template:
             has_value('sensor.power_meter_power_battery_discharge') and 
             has_value('sensor.power_meter_power_grid_import')
           }}
-      - name: Battery solar charge power
-        unique_id: battery_solar_charge_power
-        state: "{{ states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_grid_charge_power')|float }}"
-        unit_of_measurement: W
-        device_class: power
-        state_class: measurement
-        icon: mdi:battery-heart-variant
-        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.battery_grid_charge_power') }}"
       - name: Battery grid charge power
         unique_id: battery_grid_charge_power
         state: "{{ [states('sensor.power_meter_power_grid_import')|float - states('sensor.power_meter_power_load_consumed')|float, 0]|max }}"
@@ -357,6 +353,14 @@ template:
         state_class: measurement
         icon: mdi:battery-charging
         availability: "{{ has_value('sensor.power_meter_power_grid_import') and has_value('sensor.power_meter_power_load_consumed') }}"
+      - name: Battery solar charge power
+        unique_id: battery_solar_charge_power
+        state: "{{ [states('sensor.power_meter_power_battery_charge')|float - states('sensor.battery_grid_charge_power')|float, 0]|max }}"
+        unit_of_measurement: W
+        device_class: power
+        state_class: measurement
+        icon: mdi:battery-heart-variant
+        availability: "{{ has_value('sensor.power_meter_power_battery_charge') and has_value('sensor.battery_grid_charge_power') }}"
       - name: Battery consumption power
         unique_id: battery_consumption_power
         state: "{{ [states('sensor.power_meter_power_battery_discharge')|float - states('sensor.power_meter_power_grid_export')|float, 0]|max }}"
@@ -367,7 +371,7 @@ template:
         availability: "{{ has_value('sensor.power_meter_power_battery_discharge') and has_value('sensor.power_meter_power_grid_export') }}"
       - name: Battery export power
         unique_id: battery_export_power
-        state: "{{ states('sensor.power_meter_power_battery_discharge')|float - states('sensor.battery_consumption_power')|float }}"
+        state: "{{ [states('sensor.power_meter_power_battery_discharge')|float - states('sensor.battery_consumption_power')|float, 0]|max }}"
         unit_of_measurement: W
         device_class: power
         state_class: measurement
@@ -375,7 +379,7 @@ template:
         availability: "{{ has_value('sensor.power_meter_power_battery_discharge') and has_value('sensor.battery_consumption_power') }}"
       - name: Solar export power
         unique_id: solar_export_power
-        state: "{{ states('sensor.power_meter_power_grid_export')|float - states('sensor.battery_export_power')|float }}"
+        state: "{{ [states('sensor.power_meter_power_grid_export')|float - states('sensor.battery_export_power')|float, 0]|max }}"
         unit_of_measurement: W
         device_class: power
         state_class: measurement
@@ -385,10 +389,10 @@ template:
         unique_id: solar_consumption_power
         state: >
           {{
-            states('sensor.power_meter_power_photovoltaics')|float - 
+            [states('sensor.power_meter_power_photovoltaics')|float - 
             states('sensor.battery_solar_charge_power')|float -
-            states('sensor.solar_export_power')|float
-          }}
+            states('sensor.solar_export_power')|float, 0]|max
+          }}  
         unit_of_measurement: W
         device_class: power
         state_class: measurement
