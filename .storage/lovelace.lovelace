@@ -4101,7 +4101,7 @@
                           "x": [
                             "Total used"
                           ],
-                          "y": "$ex ys / 1000",
+                          "y": "$ex [ys[0]/1000]",
                           "line": {
                             "color": "red"
                           }
