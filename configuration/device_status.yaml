@@ -279,14 +279,24 @@ automation:
           object_id: low_batteries
           entities: >
             {% set low_battery_threshold = 20 %}
-            {% set entities = states.sensor|selectattr('entity_id', 'search', 'battery_level$')|map(attribute='entity_id')|list|sort %}
+            {% set entities = 
+              states.sensor
+              |selectattr('entity_id', 'search', 'battery_level$')
+              |rejectattr('entity_id', 'search', 'phone|watch|tablet|computer')
+              |map(attribute='entity_id')|list|sort
+            %}
             {% set battery_levels = entities|map('states')|map('float', 0)|list %}
             {{ zip(entities, battery_levels)|selectattr(1, '<=', low_battery_threshold)|map(attribute=0)|list }}
       - action: group.set
         data:
           object_id: charging_batteries
           entities: >
-            {% set entities = states.sensor|selectattr('entity_id', 'search', 'charging_status$|battery_state$')|map(attribute='entity_id')|list|sort %}
+            {% set entities = 
+              states.sensor
+              |selectattr('entity_id', 'search', 'charging_status$|battery_state$')
+              |rejectattr('entity_id', 'search', 'phone|watch|tablet|computer')
+              |map(attribute='entity_id')|list|sort
+            %}
             {% set status = entities|map('states')|list %}
             {% set entities = zip(entities, status)|selectattr(1, 'in', ['charging', 'Charging', 'full', 'Full'])|map(attribute=0)|list %}
             {{ entities|map('replace', 'battery_state', 'battery_level')|map('replace', 'charging_status', 'battery_level')|list }}
