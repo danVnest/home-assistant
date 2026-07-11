@@ -562,10 +562,11 @@ class ClimateDevice(Device):
         """Adjust for new conditions with delay if appropriate."""
         del entity, attribute, old, new, kwargs
         if self.device.state in (None, "unavailable", "unknown"):
-            self.controller.log(
-                f"The '{self.device_id}' is unavailable - ignoring sensor change",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"The '{self.device_id}' is unavailable - ignoring sensor change",
+                    level="DEBUG",
+                )
             return
         if self.adjustment_delay == 0:
             self.adjust_for_conditions()
@@ -917,9 +918,7 @@ class Fan(ClimateDevice, PresenceDevice):
         speed = (self.room_temperature - self.target_temperature) / self.constants[
             "fan"
         ]["cooling_per_speed"]
-        if self.controller.logger.isEnabledFor(
-            logging.DEBUG,
-        ):
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
             self.controller.log(
                 f"Fan speed required to reduce '{self.room}' temperature to the target "
                 f"{self.target_temperature:.1f}C is {speed:.1f}% (currently "

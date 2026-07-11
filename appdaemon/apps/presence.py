@@ -291,11 +291,12 @@ class Room:
                 for sensor in self.sensors
                 if sensor != entity
             ):
-                self.controller.log(
-                    f"Sensor '{entity}' reports no presence "
-                    "but at least one other sensor in the room indicates presence",
-                    level="DEBUG",
-                )
+                if self.controller.logger.isEnabledFor(logging.DEBUG):
+                    self.controller.log(
+                        f"Sensor '{entity}' reports no presence "
+                        "but at least one other sensor in the room indicates presence",
+                        level="DEBUG",
+                    )
                 return
             self.last_vacated = self.controller.datetime()
         else:
@@ -328,10 +329,11 @@ class Room:
                     )
                     self.controller.pets_home_alone = True
         if reentry:
-            self.controller.log(
-                f"The '{self.room_id}' was re-entered - no callbacks called",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"The '{self.room_id}' was re-entered - no callbacks called",
+                    level="DEBUG",
+                )
             return
         if self.controller.logger.isEnabledFor(logging.DEBUG):
             self.controller.log(
@@ -342,20 +344,22 @@ class Room:
             self.controller.cancel_timer(callback["timer_handle"])
             if not vacant or callback["vacating_delay"] == 0:
                 callback["callback"]()
-                self.controller.log(
-                    f"Callback {handle} triggered by '{entity}'",
-                    level="DEBUG",
-                )
+                if self.controller.logger.isEnabledFor(logging.DEBUG):
+                    self.controller.log(
+                        f"Callback {handle} triggered by '{entity}'",
+                        level="DEBUG",
+                    )
             else:
                 self.callbacks[handle]["timer_handle"] = self.controller.run_in(
                     callback["callback"],
                     callback["vacating_delay"],
                     constrain_input_boolean=callback["control_input_boolean"],
                 )
-                self.controller.log(
-                    f"Set vacation timer for callback: {handle}",
-                    level="DEBUG",
-                )
+                if self.controller.logger.isEnabledFor(logging.DEBUG):
+                    self.controller.log(
+                        f"Set vacation timer for callback: {handle}",
+                        level="DEBUG",
+                    )
 
     def add_sensor(self, sensor_id: str):
         """Add additional binary presence sensor to room."""
@@ -383,10 +387,11 @@ class Room:
                 vacating_delay + self.seconds_in_room(),
                 constrain_input_boolean=control_input_boolean,
             )
-        self.controller.log(
-            f"Registered callback for '{self.room_id}' with handle: {handle}",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Registered callback for '{self.room_id}' with handle: {handle}",
+                level="DEBUG",
+            )
         return handle
 
     def cancel_callback(self, handle):
@@ -531,10 +536,11 @@ class PresenceDevice(Device):
             return
         kwargs["steps_remaining"] = kwargs["steps_remaining"] - 1
         if kwargs["steps_remaining"] <= 0:
-            self.controller.log(
-                f"Transition to occupied complete for '{self.device_id}'",
-                level="DEBUG",
-            )
+            if self.controller.logger.isEnabledFor(logging.DEBUG):
+                self.controller.log(
+                    f"Transition to occupied complete for '{self.device_id}'",
+                    level="DEBUG",
+                )
             self.transition_timer = None
             self.adjust_for_conditions()
         else:

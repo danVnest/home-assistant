@@ -361,10 +361,11 @@ class Lights(App):
                 next_start,
                 self.circadian["time_step"].total_seconds(),
             )
-            self.log(
-                f"Set circadian progression to commence at {next_start}",
-                level="DEBUG",
-            )
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.log(
+                    f"Set circadian progression to commence at {next_start}",
+                    level="DEBUG",
+                )
         brightness, kelvin = self.calculate_circadian_brightness_kelvin(
             circadian_progress,
         )
@@ -420,11 +421,12 @@ class Lights(App):
                 occupied=(brightness, kelvin),
                 vacating_delay=self.get_setting("night_vacating_delay"),
             )
-        self.log(
-            "Adjusted lighting based on circadian progression to "
-            f"brightness: {brightness} and kelvin: {kelvin}",
-            level="DEBUG",
-        )
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.log(
+                "Adjusted lighting based on circadian progression to "
+                f"brightness: {brightness} and kelvin: {kelvin}",
+                level="DEBUG",
+            )
 
     @property
     def circadian_progress(self) -> float:
@@ -442,10 +444,11 @@ class Lights(App):
                 )
                 else 1
             )
-        self.log(
-            f"Circadian progress calculated as: {circadian_progress}",
-            level="DEBUG",
-        )
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.log(
+                f"Circadian progress calculated as: {circadian_progress}",
+                level="DEBUG",
+            )
         return circadian_progress
 
     def calculate_circadian_brightness_kelvin(
@@ -932,10 +935,11 @@ class Light(PresenceDevice):
             self.presence_adjustments[presence]["brightness"],
             self.presence_adjustments[presence]["kelvin"],
         )
-        self.controller.log(
-            f"Lighting '{self.device_id}' adjusted now room is '{presence}'",
-            level="DEBUG",
-        )
+        if self.controller.logger.isEnabledFor(logging.DEBUG):
+            self.controller.log(
+                f"Lighting '{self.device_id}' adjusted now room is '{presence}'",
+                level="DEBUG",
+            )
         return True
 
     def start_transition_towards_occupied(self, progress: float = 0):

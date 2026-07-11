@@ -6,6 +6,7 @@ User defined variables are configued in control.yaml
 """
 
 import datetime
+import logging
 import urllib.request
 
 from app import App, IDs
@@ -295,10 +296,12 @@ class Control(App):
         button = entity.removeprefix("event.")
         event = self.get_state(entity, attribute="event_type")
         if old == "unavailable":
-            self.log(
-                f"Button '{button}' was previously 'unavailable', ignoring '{{event}}'",
-                log_level="DEBUG",
-            )
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.log(
+                    f"Button '{button}' was previously 'unavailable'"
+                    f", ignoring '{{event}}'",
+                    level="DEBUG",
+                )
             return
         self.cancel_timer(self.timers[button])
         now = self.get_now_ts()
@@ -309,11 +312,12 @@ class Control(App):
             ):
                 getattr(self, f"handle_{button}_double_press")()
             else:
-                self.log(
-                    f"The '{button}' was pressed once: "
-                    "delaying action to detect double press",
-                    level="DEBUG",
-                )
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.log(
+                        f"The '{button}' was pressed once: "
+                        "delaying action to detect double press",
+                        level="DEBUG",
+                    )
                 self.timers[button] = self.run_in(
                     getattr(self, f"handle_{button}_single_press"),
                     self.constants["button_max_double_press_delay"],
@@ -490,11 +494,12 @@ class Control(App):
         _, setting = self.split_entity(entity)
         user_id = self.get_state(entity, attribute="context")["user_id"]
         is_user = not IDs.is_system(user_id)
-        self.log(
-            f"'{IDs.get_name(user_id)}' changed UI setting '{setting}' "
-            f"to '{new}' from '{old}'",
-            level="DEBUG" if not is_user else "INFO",
-        )
+        if is_user or self.logger.isEnabledFor(logging.DEBUG):
+            self.log(
+                f"'{IDs.get_name(user_id)}' changed UI setting '{setting}' "
+                f"to '{new}' from '{old}'",
+                level="INFO" if is_user else "DEBUG",
+            )
         if not is_user:
             return
         if setting == "scene":
