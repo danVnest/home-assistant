@@ -293,41 +293,67 @@ class Climate(App):
         if self.suggested:
             self.suggested = False
 
-    def validate_target_and_trigger(self, target_or_trigger):
-        """Check if a given target/trigger temperature pair is valid, update if not."""
-        # TODO: https://app.asana.com/0/1207020279479204/1207033183115364/f
-        # what if heating target is below cooling target?
-        # what if aircon high trigger is below aircon low trigger?
-        sleep = "sleep_" if "sleep" in target_or_trigger else ""
-        if "target" in target_or_trigger:
-            other = (
-                f"input_number.{sleep}"
-                f"{'high' if 'cool' in target_or_trigger else 'low'}"
-                "_temperature_aircon_trigger"
-            )
-            modifier = -1 if "cool" in target_or_trigger else 1
+    def validate_temperature_setting(self, setting: str):
+        """Check if a given temperature setting is valid, update if not."""
+        sleep = "sleep_" if "sleep" in setting else ""
+        target = "target" in setting
+        heat = "heat" in setting
+        high = "high" in setting
+        modifier = heat if target else high
+        checks = {
+            f"{sleep}{'low' if modifier else 'high'}_temperature_aircon_trigger": 1
+            if modifier
+            else -1,
+            f"{sleep}{'cool' if modifier else 'heat'}ing_target_temperature": 1
+            if high or (target and not heat)
+            else -1,
+        }
+        self._validate_setting_given_checks(setting, checks)
+
+    def validate_humidity_setting(self, setting: str):
+        """Check if a given humidity setting is valid, update if not."""
+        sleep = "sleep_" if "sleep" in setting else ""
+        checks: dict[str, int] = {}
+        if "target" in setting:
+            checks[f"{sleep}high_humidity_aircon_trigger"] = -1
+            checks[f"{sleep}low_humidity_humidifier_trigger"] = 1
         else:
-            other = (
-                f"input_number.{sleep}"
-                f"{'cool' if 'high' in target_or_trigger else 'heat'}"
-                "ing_target_temperature"
+            checks[f"{sleep}target_humidity"] = 1 if "high" in setting else -1
+        self._validate_setting_given_checks(setting, checks)
+
+    def _validate_setting_given_checks(self, setting: str, checks: dict[str, int]):
+        """Check if a given setting is valid, update if not."""
+        setting_id = f"input_number.{setting}"
+        setting_type = "temperature" if "temperature" in setting else "humidity"
+        adjustments = {}
+        for check, polarity in checks.items():
+            if (
+                float(self.get_state(setting_id))
+                - float(self.get_state(f"input_number.{check}"))
+            ) * polarity < self.constants["setting_buffer"][setting_type]:
+                adjustments[check] = (
+                    self.constants["setting_buffer"][setting_type] * polarity
+                )
+        for other_setting, adjustment in adjustments.items():
+            other_setting_id = f"input_number.{other_setting}"
+            valid_other = max(
+                min(
+                    float(self.get_state(setting_id)) - adjustment,
+                    float(self.get_state(other_setting_id, attribute="max")),
+                ),
+                float(self.get_state(other_setting_id, attribute="min")),
             )
-            modifier = -1 if "low" in target_or_trigger else 1
-        if (
-            float(self.get_state(f"input_number.{target_or_trigger}"))
-            - float(self.get_state(other))
-        ) * modifier < 0:
-            valid_other = float(self.get_state(f"input_number.{target_or_trigger}"))
             self.call_service(
                 "input_number/set_value",
-                entity_id=other,
+                entity_id=other_setting_id,
                 value=valid_other,
             )
             self.log(
-                f"The '{target_or_trigger}' value is not valid, adjusting "
-                f"the corresponding target/trigger to '{valid_other}°'",
+                f"The new '{setting}' value conflicts, adjusting "
+                f"the corresponding setting '{other_setting}' to '{valid_other}°'",
                 level="WARNING",
             )
+            getattr(self, f"validate_{setting_type}_setting")(other_setting)
         self.allow_suggestion()
         self.adjust_for_conditions()
         self.suggest_for_conditions()

@@ -527,7 +527,9 @@ class Control(App):
             else:
                 self.revert_setting(f"input_datetime.{setting}", old)
         elif "temperature" in setting:
-            self.climate.validate_target_and_trigger(setting)
+            self.climate.validate_temperature_setting(setting)
+        elif "humidity" in setting:
+            self.climate.validate_humidity_setting(setting)
         elif "door" in setting:
             self.climate.update_door_check_delay(float(new))
         else:

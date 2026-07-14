@@ -208,7 +208,6 @@ input_number:
     name: Aircon cools once above
     min: 20
     max: 40
-    step: 0.5
     unit_of_measurement: °C
     mode: box
     icon: mdi:thermometer-high
@@ -216,7 +215,6 @@ input_number:
     name: Aircon heats once below
     min: 0
     max: 20
-    step: 0.5
     unit_of_measurement: °C
     mode: box
     icon: mdi:thermometer-low
@@ -224,7 +222,6 @@ input_number:
     name: Aircon cools once above
     min: 20
     max: 40
-    step: 0.5
     unit_of_measurement: °C
     mode: box
     icon: mdi:thermometer-high
@@ -232,7 +229,6 @@ input_number:
     name: Aircon heats once below
     min: 0
     max: 20
-    step: 0.5
     unit_of_measurement: °C
     mode: box
     icon: mdi:thermometer-low
@@ -288,7 +284,6 @@ input_number:
     name: Aircon off if door open
     min: 1
     max: 10
-    step: 1
     unit_of_measurement: min
     mode: box
     icon: mdi:timer
@@ -296,7 +291,6 @@ input_number:
     name: Aircon off if room empty
     min: 1
     max: 60
-    step: 1
     unit_of_measurement: min
     mode: box
     icon: mdi:timer
@@ -304,7 +298,6 @@ input_number:
     name: Fan off if room empty
     min: 1
     max: 60
-    step: 1
     unit_of_measurement: min
     mode: box
     icon: mdi:timer
@@ -312,7 +305,6 @@ input_number:
     name: Heater off if room empty
     min: 1
     max: 60
-    step: 1
     unit_of_measurement: min
     mode: box
     icon: mdi:timer
@@ -320,7 +312,6 @@ input_number:
     name: Humidifier off if room empty
     min: 1
     max: 60
-    step: 1
     unit_of_measurement: min
     mode: box
     icon: mdi:timer

@@ -12,5 +12,8 @@ Climate:
     delay: 15 # number of seconds before the aircon fan reduces after its closest door opens
     temperature_threshold: 2 # minimum temperature off target before fan reduces (when door open)
   adjustment_delay: 300 # minimum number of seconds delay between seqential device adjustments (per device)
+  setting_buffer:
+    temperature: 1 # minimum temperature difference between paired temperature trigger/target settings
+    humidity: 10 # minimum humidity (%) difference between humidity trigger/target settings
   dependencies: Presence
   # log_level: DEBUG
