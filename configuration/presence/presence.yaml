@@ -265,6 +265,7 @@ template:
       - name: Bedroom balcony door motion
         unique_id: bedroom_balcony_door_motion
         state: on
+        auto_off: 0:00:30
         device_class: motion
         icon: mdi:door
   - triggers:
