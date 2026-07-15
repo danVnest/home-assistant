@@ -1,4 +1,7 @@
 powercalc:
+  discovery:
+    enabled: false
+  enable_analytics: true
   energy_sensor_unit_prefix: k
   create_domain_groups:
     - light
@@ -68,7 +71,7 @@ powercalc:
               - 88 -> 23.5
               - 100 -> 26.1
           standby_power: 0.25 # estimate (equal split between fan and light)
-        - entity_id: switch.office_heater
+        - entity_id: switch.office_heater_dumb
           unique_id: office_heater_energy
           power_sensor_id: sensor.office_heater_power
           ignore_unavailable_state: true
@@ -194,6 +197,12 @@ powercalc:
                 # ≈20W subwoofer, ≈10W * 2 rear @ 50% volume
                 # ≈40W subwoofer, ≈20W * 2 rear @ 100% volume
                 # standby from https://www.lg.com/uk/speakers/soundbars/sp11ra/?srsltid=AfmBOopZ7O31FooCpPHhw462bAGGP_GJ9nZR9T5n9rWonUcFKXETGE2i
+        - entity_id: switch.robovac
+          unique_id: robovac_energy
+          name: Robovac
+          power_sensor_id: sensor.robovac_power
+          ignore_unavailable_state: true
+          energy_integration_method: left
         - entity_id: switch.dishwasher
           unique_id: dishwasher_energy
           power_sensor_id: sensor.dishwasher_power
@@ -231,6 +240,12 @@ powercalc:
           energy_sensor_id: sensor.washer_energy
         - power_sensor_id: sensor.dryer_power
           energy_sensor_id: sensor.dryer_energy
+        - entity_id: switch.paludarium_picture_frame_camera
+          unique_id: paludarium_picture_frame_camera_energy
+          name: Paludarium, picture frame, camera
+          power_sensor_id: sensor.paludarium_picture_frame_camera_power
+          ignore_unavailable_state: true
+          energy_integration_method: left
         - create_group: Office desk, computer & monitor, cooler, fish tank
           unique_id: office_desk_computer_monitor_cooler_fish_tank
           entities:
@@ -281,42 +296,62 @@ powercalc:
               unique_id: weather_stations
               daily_fixed_energy:
                 value: 0.072 # estimate
-            - name: Nursery egg temperature light
-              unique_id: nursery_egg_temperature_light
-              daily_fixed_energy:
-                value: 0.048 # estimate
-            - power_sensor_id: sensor.dishwasher_switch_device_power
-              energy_sensor_id: sensor.dishwasher_switch_device_energy
-            - power_sensor_id: sensor.freezer_switch_device_power
-              energy_sensor_id: sensor.freezer_switch_device_energy
-            - power_sensor_id: sensor.fridge_switch_device_power
-              energy_sensor_id: sensor.fridge_switch_device_energy
-            - power_sensor_id: sensor.kettle_milk_frother_switch_device_power
-              energy_sensor_id: sensor.kettle_milk_frother_switch_device_energy
-            - power_sensor_id: sensor.kitchen_switch_device_power
-              energy_sensor_id: sensor.kitchen_switch_device_energy
-            - power_sensor_id: sensor.microwave_switch_device_power
-              energy_sensor_id: sensor.microwave_switch_device_energy
-            - power_sensor_id: sensor.office_desk_switch_device_power
-              energy_sensor_id: sensor.office_desk_switch_device_energy
-            - power_sensor_id: sensor.office_heater_switch_device_power
-              energy_sensor_id: sensor.office_heater_switch_device_energy
-            - power_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_power
-              energy_sensor_id: sensor.paludarium_picture_frame_camera_switch_device_energy
-            - power_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_power
-              energy_sensor_id: sensor.tv_pc_home_assistant_router_relay_security_hub_switch_device_energy
-        - entity_id: switch.paludarium_picture_frame_camera
-          unique_id: paludarium_picture_frame_camera_energy
-          name: Paludarium, picture frame, camera
-          power_sensor_id: sensor.paludarium_picture_frame_camera_power
-          ignore_unavailable_state: true
-          energy_integration_method: left
-        - entity_id: switch.robovac
-          unique_id: robovac_energy
-          name: Robovac
-          power_sensor_id: sensor.robovac_power
-          ignore_unavailable_state: true
-          energy_integration_method: left
+            - name: Washer sensor
+              entity_id: binary_sensor.washer_power
+              unique_id: washer_device
+              fixed:
+                power: 3 # estimate for sensor only (main washer power/energy are separate entities)
+              standby_power: 2 # estimate
+            - name: Dryer sensor
+              entity_id: binary_sensor.dryer_power
+              unique_id: dryer_device
+              fixed:
+                power: 3 # estimate for sensor only (main dryer power/energy are separate entities)
+              standby_power: 2 # estimate
+            - entity_id: switch.dishwasher
+              unique_id: dishwasher_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.freezer
+              unique_id: freezer_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.fridge
+              unique_id: fridge_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.kettle_milk_frother
+              unique_id: kettle_milk_frother_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.kitchen_switch
+              unique_id: kitchen_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.microwave
+              unique_id: microwave_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.office_desk
+              unique_id: office_desk_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.office_heater_dumb
+              unique_id: office_heater_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.paludarium_picture_frame_camera
+              unique_id: paludarium_picture_frame_camera_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.robovac
+              unique_id: robovac_switch_device
+              manufacturer: arlec
+              model: PC191HA
+            - entity_id: switch.tv_pc_home_assistant_router_relay_security_hub
+              unique_id: tv_pc_home_assistant_router_relay_security_hub_switch_device
+              manufacturer: arlec
+              model: PC191HA
     - entity_id: sensor.dummy
       name: Water heater, oven & stove, guest suite, garage, all other
       unique_id: water_heater_oven_stove_guest_suite_garage_all_other
