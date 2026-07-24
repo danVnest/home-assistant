@@ -201,12 +201,13 @@ class Climate(App):
             self.adjust_for_conditions()
             self.suggest_for_conditions()
         if scene in ("Day", "Sleep") or self.presence.pets_home_alone:
-            self.suggest_if_extreme_forecast_and_control_disabled()
+            self.notify_if_extreme_forecast_and_control_disabled()
         self.allow_suggestion()
 
     def suggest_for_conditions(self):
-        """Control aircon or suggest based on changes in inside temperature."""
-        """Handle each case (house open, outside nicer, climate control status)?"""
+        """Suggest climate control actions based on temperature and airflow."""
+        if self.suggested:
+            return
         if (
             self.presence.pets_home_alone
             and not self.any_aircon_on
@@ -234,7 +235,6 @@ class Climate(App):
                 f"It is {self.inside_temperature:.1f}° inside but aircon won't turn on "
                 f"for the pets because {reason} turning aircon on manually",
             )
-            # TODO: above doesn't account for the situation where the bedroom door is closed
 
     def adjust_for_conditions(
         self,
@@ -261,8 +261,8 @@ class Climate(App):
         ):
             device.monitor_presence()
 
-    def suggest_if_extreme_forecast_and_control_disabled(self):
-        """Suggest user enables more control if extreme temperatures are forecast."""
+    def notify_if_extreme_forecast_and_control_disabled(self):
+        """Notify if extreme temperatures are forecast and climate not controlled."""
         extreme_forecast = self.entities.sensor.extreme_forecast.state
         if extreme_forecast not in (None, "unavailable", "unknown") and any(
             not device.control_enabled
@@ -273,29 +273,25 @@ class Climate(App):
                 else [self.aircons, self.heaters]
             )
             for device in device_group.values()
-            if self.control.scene != "Sleep"
-            or device.room not in ("living_room", "office")
+            if self.control.scene != "Sleep" or device.room in ("bedroom", "nursery")
         ):
-            self.allow_suggestion()
-            self.suggest(
+            self.notify(
                 f"It's forecast to reach {float(extreme_forecast):.1f}°, "
                 "consider enabling additional climate control",
-            )
-
-    def suggest(self, message: str):
-        """Make a suggestion to the users, but only if one has not already been sent."""
-        if not self.suggested:
-            self.suggested = True
-            self.notify(
-                message,
                 title="Climate Control",
                 targets="anyone_home_else_all",
             )
 
+    def suggest(self, message: str):
+        """Make a suggestion to the users, but only if one has not already been sent."""
+        if self.suggested:
+            return
+        self.suggested = True
+        self.notify(message, title="Climate Control", targets="anyone_home_else_all")
+
     def allow_suggestion(self):
         """Allow suggestions to be made again. Use after user events & scene changes."""
-        if self.suggested:
-            self.suggested = False
+        self.suggested = False
 
     def validate_temperature_setting(self, setting: str):
         """Check if a given temperature setting is valid, update if not."""
@@ -798,7 +794,16 @@ class Aircon(ClimateDevice, PresenceDevice):
             if check_if_would_adjust_only:
                 return self.would_turn_on_adjust_for_conditions
             self.turn_on_for_conditions()  # already on, this will ensure best settings
-            self.suggest_if_temperature_outside_nicer()
+            if (
+                not self.door_open
+                and self.mode_aided_by_outside_temperature
+                and self.controller.presence.anyone_home
+            ):
+                self.controller.suggest(
+                    f"Outside ({self.controller.outside_temperature:.1f}°) "
+                    f"is a more pleasant temperature than the {self.room} "
+                    f"({self.room_temperature:.1f}°), consider opening up the house",
+                )
         return False
 
     @property
@@ -877,26 +882,9 @@ class Aircon(ClimateDevice, PresenceDevice):
             and not self.controller.presence.anyone_home
         ):
             self.controller.notify(
-                f"It is {self.room_temperature}° in the {self.room}, "
+                f"It is {self.room_temperature:.1f}° in the {self.room}, "
                 "turning aircon on for the pets",
                 title="Climate Control",
-            )
-
-    def suggest_if_temperature_outside_nicer(self):
-        """Suggest opening up the house if outside is nicer."""
-        if (
-            (self.device.state == "heat" and self.hotter_outside)
-            or (self.device.state == "cool" and self.colder_outside)
-            or (
-                self.device.state == "off"
-                and self.too_hot_or_cold
-                and not self.too_hot_or_cold_outside
-            )
-        ) and self.controller.presence.anyone_home:
-            self.controller.suggest(
-                f"Outside ({self.controller.outside_temperature:.1f}°) "
-                f"is a more pleasant temperature than the {self.room} "
-                f"({self.room_temperature:.1f}°), consider opening up the house",
             )
 
 
