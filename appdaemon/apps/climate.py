@@ -12,7 +12,6 @@ User defined variables are configued in climate.yaml
 # TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
-import logging
 from math import floor
 from typing import TYPE_CHECKING
 
@@ -595,11 +594,7 @@ class ClimateDevice(Device):
         """Adjust for new conditions with delay if appropriate."""
         del entity, attribute, old, new, kwargs
         if self.device.state in (None, "unavailable", "unknown"):
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"The '{self.device_id}' is unavailable - ignoring sensor change",
-                    level="DEBUG",
-                )
+            self.log("Device is unavailable - ignoring sensor change", level="DEBUG")
             return
         if self.adjustment_delay == 0:
             self.adjust_for_conditions()
@@ -618,10 +613,10 @@ class ClimateDevice(Device):
                 self.adjust_for_conditions_after_delay,
                 run_in,
             )
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"The '{self.device_id}' is set to adjust for conditions "
-                    f"in {run_in:.1f} seconds as it was already adjusted recently",
+            if self.debugging:
+                self.log(
+                    f"Set to adjust for conditions in {run_in:.1f} seconds "
+                    "as it was already adjusted recently",
                     level="DEBUG",
                 )
         elif self.adjustment_timer is None or not was_recent_adjustment:
@@ -629,10 +624,10 @@ class ClimateDevice(Device):
                 self.controller.cancel_timer(self.adjustment_timer)
                 self.adjustment_timer = None
             self.adjust_for_conditions()
-        elif self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"The '{self.device_id}' is already set to adjust for conditions "
-                "shortly - ignoring latest sensor change",
+        else:
+            self.log(
+                "Already set to adjust for conditions shortly - "
+                "ignoring latest sensor change",
                 level="DEBUG",
             )
 
@@ -857,6 +852,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                     and abs(self.room_temperature - self.target_temperature)
                     > self.constants["aircon_reduce_fan"]["temperature_threshold"]
                 ):
+                    self.log("Reducing aircon fan to low while an outside door is open")
                     self.fan_mode = "low"
         elif not self.door_open:
             if self.on:
@@ -943,9 +939,9 @@ class Fan(ClimateDevice, PresenceDevice):
         speed = (self.room_temperature - self.target_temperature) / self.constants[
             "fan"
         ]["cooling_per_speed"]
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Fan speed required to reduce '{self.room}' temperature to the target "
+        if self.debugging:
+            self.log(
+                f"Speed required to reduce temperature to the target "
                 f"{self.target_temperature:.1f}C is {speed:.1f}% (currently "
                 f"{self.room_temperature_with_wind_chill:.1f}C and {self.speed:.0f}%) ",
                 level="DEBUG",
@@ -1036,7 +1032,6 @@ class Fan(ClimateDevice, PresenceDevice):
             return None
         reverse = self.reverse_desired
         speed = 0
-        # TODO: handle if heating target is higher than cooling target
         if self.companion_device and self.companion_device.on:
             reverse = self.reverse_to_match_companion_device
             speed = max(self.minimum_speed, self.desired_cooling_speed)
@@ -1052,9 +1047,9 @@ class Fan(ClimateDevice, PresenceDevice):
                 reverse = False
                 speed = self.desired_cooling_speed
         if self.could_disturb_sleep_if_adjusted_to(reverse, speed):
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"The desired '{self.room}' fan settings ({speed:.0f}% "
+            if self.debugging:
+                self.log(
+                    f"The desired settings ({speed:.0f}% "
                     f"{'reverse' if reverse else 'forward'}) could disturb sleep - "
                     "turning off instead",
                     level="DEBUG",
@@ -1081,8 +1076,8 @@ class Fan(ClimateDevice, PresenceDevice):
                 speed,
                 reverse,
             )
-            self.controller.log(
-                f"Changing '{self.room}' fan's spin direction to "
+            self.log(
+                f"Changing spin direction to "
                 f"'{'reverse' if self.reverse_desired else 'forward'}' and speed from "
                 f"{self.speed:.0f}% to {speed}%, which will change the apparent "
                 f"temperature by {temperature_change:.1f}C to "
@@ -1112,11 +1107,10 @@ class Fan(ClimateDevice, PresenceDevice):
         temperature_change = self.cooling_effect - self.cooling_effect_for_speed(
             speed,
         )
-        self.controller.log(
-            f"Changing '{self.room}' fan speed from {self.speed:.0f}% to "
-            f"{speed}%, which will change the apparent temperature by "
-            f"{temperature_change:.1f}C to "
-            f"{self.room_temperature + temperature_change:.1f}C",
+        self.log(
+            f"Changing speed from {self.speed:.0f}% to {speed}%, "
+            f"which will change the apparent temperature by {temperature_change:.1f}C "
+            f"to {self.room_temperature + temperature_change:.1f}C",
         )
         if self.on:
             self.call_service("set_percentage", percentage=speed)
@@ -1466,11 +1460,13 @@ class Humidifier(ClimateDevice, PresenceDevice):
         del entity, attribute, old, kwargs
         if not self.on:
             return
-        self.controller.log(
-            f"The {self.room} light is now {new}, syncing humidifier light "
-            f"(currently {self.controller.get_state(f'light.{self.room}_humidifier')})",
-            level="DEBUG",
-        )
+        if self.debugging:
+            self.log(
+                f"Syncing light (currently '"
+                f"{self.controller.get_state(f'light.{self.room}_humidifier')}') "
+                f"with the room lighting (now '{new}')",
+                level="DEBUG",
+            )
         if new != "on":
             new = "off"
         if new != self.controller.get_state(f"light.{self.room}_humidifier"):

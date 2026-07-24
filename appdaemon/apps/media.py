@@ -5,7 +5,6 @@ Loads the TV app launcher on startup, and monitors to change the scene appropria
 User defined variables are configued in media.yaml
 """
 
-import logging
 from typing import TYPE_CHECKING
 
 from app import App
@@ -84,7 +83,7 @@ class Media(App):
     ):
         """Handle TV events to adjust the scene and load appropriately on startup."""
         del kwargs
-        if self.logger.isEnabledFor(logging.DEBUG):
+        if self.debugging:
             self.log(
                 f"TV changed from '{old}' to '{new}' ('{entity}' - '{attribute}')",
                 level="DEBUG",

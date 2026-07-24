@@ -6,7 +6,6 @@ User defined variables are configued in control.yaml
 """
 
 import datetime
-import logging
 import urllib.request
 
 from app import App, IDs
@@ -296,7 +295,7 @@ class Control(App):
         button = entity.removeprefix("event.")
         event = self.get_state(entity, attribute="event_type")
         if old == "unavailable":
-            if self.logger.isEnabledFor(logging.DEBUG):
+            if self.debugging:
                 self.log(
                     f"Button '{button}' was previously 'unavailable'"
                     f", ignoring '{{event}}'",
@@ -312,7 +311,7 @@ class Control(App):
             ):
                 getattr(self, f"handle_{button}_double_press")()
             else:
-                if self.logger.isEnabledFor(logging.DEBUG):
+                if self.debugging:
                     self.log(
                         f"The '{button}' was pressed once: "
                         "delaying action to detect double press",
@@ -494,7 +493,7 @@ class Control(App):
         _, setting = self.split_entity(entity)
         user_id = self.get_state(entity, attribute="context")["user_id"]
         is_user = not IDs.is_system(user_id)
-        if is_user or self.logger.isEnabledFor(logging.DEBUG):
+        if is_user or self.debugging:
             self.log(
                 f"'{IDs.get_name(user_id)}' changed UI setting '{setting}' "
                 f"to '{new}' from '{old}'",

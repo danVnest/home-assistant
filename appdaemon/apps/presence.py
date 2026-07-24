@@ -8,7 +8,6 @@ User defined variables are configued in presence.yaml
 
 from __future__ import annotations
 
-import logging
 import uuid
 from datetime import timedelta
 
@@ -240,10 +239,9 @@ class Room:
         self.last_entered = last_changed - timedelta(hours=2 if vacant else 0)
         self.callbacks = {}
         self.controller.listen_state(self.handle_presence_change, sensor_id)
-        presence_message = "vacated" if vacant else "entered"
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Room '{room_id}' initialised as last '{presence_message}' at "
+        if self.debugging:
+            self.log(
+                f"Initialised as last '{'vacated' if vacant else 'entered'}' at "
                 f"{self.last_vacated if vacant else self.last_entered}",
                 level="DEBUG",
             )
@@ -277,7 +275,7 @@ class Room:
         """If room presence changes, trigger all registered callbacks."""
         del attribute, kwargs
         if "unavailable" in (new, old):
-            self.controller.log(
+            self.log(
                 f"Ignoring '{'current' if new == 'unavailable' else 'previous'}' "
                 f"unavailable '{self.room_id}' sensor state",
                 level="WARNING",
@@ -291,8 +289,8 @@ class Room:
                 for sensor in self.sensors
                 if sensor != entity
             ):
-                if self.controller.logger.isEnabledFor(logging.DEBUG):
-                    self.controller.log(
+                if self.debugging:
+                    self.log(
                         f"Sensor '{entity}' reports no presence "
                         "but at least one other sensor in the room indicates presence",
                         level="DEBUG",
@@ -329,24 +327,18 @@ class Room:
                     )
                     self.controller.pets_home_alone = True
         if reentry:
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"The '{self.room_id}' was re-entered - no callbacks called",
-                    level="DEBUG",
-                )
+            if self.debugging:
+                self.log("Room was re-entered - no callbacks called", level="DEBUG")
             return
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"The '{self.room_id}' is now '{'vacant' if vacant else 'occupied'}'",
-                level="DEBUG",
-            )
+        if self.debugging:
+            self.log(f"Room now '{'vacant' if vacant else 'occupied'}'", level="DEBUG")
         for handle, callback in list(self.callbacks.items()):
             self.controller.cancel_timer(callback["timer_handle"])
             if not vacant or callback["vacating_delay"] == 0:
                 callback["callback"]()
-                if self.controller.logger.isEnabledFor(logging.DEBUG):
-                    self.controller.log(
-                        f"Callback {handle} triggered by '{entity}'",
+                if self.debugging:
+                    self.log(
+                        f"Callback '{handle}' triggered by '{entity}'",
                         level="DEBUG",
                     )
             else:
@@ -355,8 +347,8 @@ class Room:
                     callback["vacating_delay"],
                     constrain_input_boolean=callback["control_input_boolean"],
                 )
-                if self.controller.logger.isEnabledFor(logging.DEBUG):
-                    self.controller.log(
+                if self.debugging:
+                    self.log(
                         f"Set vacation timer for callback: {handle}",
                         level="DEBUG",
                     )
@@ -387,11 +379,8 @@ class Room:
                 vacating_delay + self.seconds_in_room(),
                 constrain_input_boolean=control_input_boolean,
             )
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Registered callback for '{self.room_id}' with handle: {handle}",
-                level="DEBUG",
-            )
+        if self.debugging:
+            self.log(f"Registered callback {self.callbacks[handle] = }", level="DEBUG")
         return handle
 
     def cancel_callback(self, handle):
@@ -399,6 +388,19 @@ class Room:
         if handle in self.callbacks:
             self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
             del self.callbacks[handle]
+
+    def log(self, message: str, level: str = "INFO") -> None:
+        """Log a message to AppDaemon's main logfile with device name prepended."""
+        if level != "DEBUG" or self.debugging:
+            self.controller.log(
+                f"[{self.room_id.replace('_', ' ').capitalize()} monitor] {message}",
+                level=level,
+            )
+
+    @property
+    def debugging(self):
+        """Use to check if debug logging is enabled before evaulating f-strings."""
+        return self.controller.debugging
 
 
 class PresenceDevice(Device):
@@ -522,11 +524,10 @@ class PresenceDevice(Device):
             constrain_input_boolean=self.control_input_boolean,
             **kwargs,
         )
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
+        if self.debugging:
+            self.log(
                 "Starting transition from entered state to occupied state with: "
-                f"step_time = {step_time}, steps_remaining = {steps_remaining}, "
-                f"settings = {kwargs}",
+                f"{step_time = }, {steps_remaining = }, {kwargs = }",
                 level="DEBUG",
             )
 
@@ -536,17 +537,13 @@ class PresenceDevice(Device):
             return
         kwargs["steps_remaining"] = kwargs["steps_remaining"] - 1
         if kwargs["steps_remaining"] <= 0:
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"Transition to occupied complete for '{self.device_id}'",
-                    level="DEBUG",
-                )
+            self.log("Transition to occupied complete", level="DEBUG")
             self.transition_timer = None
             self.adjust_for_conditions()
         else:
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"{kwargs['steps_remaining']} steps until '{self.device_id}' "
+            if self.debugging:
+                self.log(
+                    f"{kwargs['steps_remaining']} steps until "
                     "transition to occupied state is complete",
                     level="DEBUG",
                 )

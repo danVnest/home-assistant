@@ -9,7 +9,6 @@ User defined variables are configued in lights.yaml
 from __future__ import annotations
 
 import datetime
-import logging
 
 from app import App
 from presence import PresenceDevice
@@ -361,7 +360,7 @@ class Lights(App):
                 next_start,
                 self.circadian["time_step"].total_seconds(),
             )
-            if self.logger.isEnabledFor(logging.DEBUG):
+            if self.debugging:
                 self.log(
                     f"Set circadian progression to commence at {next_start}",
                     level="DEBUG",
@@ -421,10 +420,10 @@ class Lights(App):
                 occupied=(brightness, kelvin),
                 vacating_delay=self.get_setting("night_vacating_delay"),
             )
-        if self.logger.isEnabledFor(logging.DEBUG):
+        if self.debugging:
             self.log(
                 "Adjusted lighting based on circadian progression to "
-                f"brightness: {brightness} and kelvin: {kelvin}",
+                f"{brightness = } and {kelvin = }",
                 level="DEBUG",
             )
 
@@ -615,7 +614,7 @@ class Lights(App):
                     self.lights[light_name].ignore_vacancy()
                     self.lights[light_name].turn_off()
                 self.log(
-                    f"The 'kitchen' light level is high ({new}lx), "
+                    f"The 'kitchen' light level is high ({float(new):.0f}lx), "
                     "automatic lighting disabled",
                 )
         else:
@@ -632,7 +631,7 @@ class Lights(App):
                         ),
                     )
                 self.log(
-                    f"The 'kitchen' light level is low ({new}lx), "
+                    f"The 'kitchen' light level is low ({float(new):.0f}lx), "
                     "automatic lighting enabled",
                 )
 
@@ -654,7 +653,7 @@ class Lights(App):
             and float(new) >= self.constants["illuminance"]["bedroom_morning_max"]
         ):
             self.log(
-                f"The 'bedroom' light level is high ({new}lx), "
+                f"The 'bedroom' light level is high ({float(new):.0f}lx), "
                 "transitioning to day scene",
             )
             self.napping_in_bedroom = False
@@ -697,7 +696,7 @@ class Lights(App):
                 self.lights[room].ignore_vacancy()
                 self.lights[room].turn_off()
                 self.log(
-                    f"The '{room}' light level is high ({illuminance}lx), "
+                    f"The '{room}' light level is high ({illuminance:.0f}lx), "
                     "automatic lighting disabled",
                 )
         else:
@@ -713,7 +712,7 @@ class Lights(App):
                     ),
                 )
                 self.log(
-                    f"The '{room}' light level is low ({illuminance}lx), "
+                    f"The '{room}' light level is low ({illuminance:.0f}lx), "
                     "automatic lighting enabled",
                 )
 
@@ -766,7 +765,7 @@ class Light(PresenceDevice):
         """Get the brightness of the light from Home Assistant."""
         if not self.on:
             return 0
-        return max(self.get_attribute("brightness"), self.minimum_brightness)
+        return max(int(self.get_attribute("brightness")), self.minimum_brightness)
 
     @brightness.setter
     def brightness(self, value: int):
@@ -777,10 +776,9 @@ class Light(PresenceDevice):
         if self.brightness == value:
             return
         if value != 0:
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"Setting '{self.device_id}' brightness to {value} "
-                    f"(from {self.brightness})",
+            if self.debugging:
+                self.log(
+                    f"Setting brightness to {value} (from {self.brightness})",
                     level="DEBUG",
                 )
             self.turn_on(brightness=value)
@@ -798,8 +796,8 @@ class Light(PresenceDevice):
     @property
     def kelvin(self) -> int:
         """Get the colour warmth value of the light from Home Assistant."""
-        kelvin = self.get_attribute("color_temp_kelvin")
-        return kelvin if kelvin is not None else self.kelvin_before_off
+        kelvin = self.get_attribute("color_temp_kelvin", self.kelvin_before_off)
+        return int(kelvin) if kelvin else None
 
     @kelvin.setter
     def kelvin(self, value: int):
@@ -809,11 +807,8 @@ class Light(PresenceDevice):
         value = self.validate_kelvin(value)
         if value is None or value == self.kelvin:
             return
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Setting {self.device_id}'s kelvin to {value} (from {self.kelvin})",
-                level="DEBUG",
-            )
+        if self.debugging:
+            self.log(f"Setting kelvin to {value} (from {self.kelvin})", level="DEBUG")
         self.turn_on(color_temp_kelvin=value)
 
     def validate_kelvin(self, value: int) -> int | None:
@@ -834,10 +829,9 @@ class Light(PresenceDevice):
             self.turn_off()
         else:
             kelvin = self.validate_kelvin(kelvin)
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"Adjusting '{self.device_id}' to "
-                    f"brightness {brightness} and kelvin {kelvin} "
+            if self.debugging:
+                self.log(
+                    f"Adjusting to {brightness = } and {kelvin = } "
                     f"(from {self.brightness} and {self.kelvin})",
                     level="DEBUG",
                 )
@@ -863,10 +857,10 @@ class Light(PresenceDevice):
         """Turn light off and record previous kelvin level."""
         if self.control_enabled and self.on:
             self.kelvin_before_off = self.kelvin
-            if self.controller.logger.isEnabledFor(logging.DEBUG):
-                self.controller.log(
-                    f"Turning '{self.device_id}' off (previously at"
-                    f" {self.brightness} brightness and {self.kelvin} kelvin)",
+            if self.debugging:
+                self.log(
+                    f"Turning off (previously at "
+                    f"{self.brightness = } and {self.kelvin = })",
                     level="DEBUG",
                 )
             super().turn_off()
@@ -895,8 +889,8 @@ class Light(PresenceDevice):
         self.transition_period = transition_period
         presence = "vacant" if self.vacant else "occupied"
         if (transition_period != 0) ^ (entered != (0, 0)):
-            self.controller.log(
-                f"'{self.device_id}' set to transition with invalid parameters, "
+            self.log(
+                "Set to transition with invalid parameters, "
                 "setting to occupied state instead",
                 level="WARNING",
             )
@@ -910,10 +904,9 @@ class Light(PresenceDevice):
             )
         self.vacating_delay = vacating_delay
         self.monitor_presence()
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Configured '{self.device_id}' with presence '{presence}' and "
-                f"presence adjustments: {self.presence_adjustments}",
+        if self.debugging:
+            self.log(
+                f"Configured with room '{presence}' and {self.presence_adjustments = }",
                 level="DEBUG",
             )
 
@@ -937,11 +930,8 @@ class Light(PresenceDevice):
             self.presence_adjustments[presence]["brightness"],
             self.presence_adjustments[presence]["kelvin"],
         )
-        if self.controller.logger.isEnabledFor(logging.DEBUG):
-            self.controller.log(
-                f"Lighting '{self.device_id}' adjusted now room is '{presence}'",
-                level="DEBUG",
-            )
+        if self.debugging:
+            self.log(f"Lighting adjusted now room is '{presence}'", level="DEBUG")
         return True
 
     def start_transition_towards_occupied(self, progress: float = 0):

@@ -42,7 +42,7 @@ watchman_report.txt
 
 # Logs
 home-assistant.log*
-appdaemon/logs
+# appdaemon/logs
 *.log
 
 # Visual Studio Code

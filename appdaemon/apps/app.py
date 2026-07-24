@@ -23,6 +23,7 @@ if TYPE_CHECKING:
     from safety import Safety
 
     from appdaemon.apps.appdaemon.entity import Entity
+import logging
 
 
 class IDs:
@@ -137,6 +138,11 @@ class App(hass.Hass):
     def safety(self) -> Safety:
         """Get the Safety app instance."""
         return self.get_app("Safety")
+
+    @property
+    def debugging(self):
+        """Use to check if debug logging is enabled before evaulating f-strings."""
+        return self.logger.isEnabledFor(logging.DEBUG)
 
 
 class Device:
@@ -272,8 +278,8 @@ class Device:
         """Handle manual adjustment of the device via the UI."""
         del attribute, old, kwargs
         user = IDs.get_name(new["user_id"])
-        self.controller.log(
-            f"'{user}' changed {entity} from UI: "
+        self.log(
+            f"'{user}' adjusted device via UI: "
             f"{self.controller.get_state(entity, 'all')}",
         )
         self.handle_user_adjustment(user)
@@ -285,8 +291,7 @@ class Device:
                 return
             self.control_enabled = False
             self.log(
-                "Automatic control is now disabled for the "
-                f"{self.device.friendly_name.lower()} to prevent it from immediately "
+                "Automatic control is now disabled to prevent it from immediately "
                 f"overriding {user}'s manual adjustments",
             )
 
@@ -303,3 +308,13 @@ class Device:
         self.adjust_for_conditions()
         if self.on:
             self.turn_on_for_conditions()
+
+    def log(self, message: str, level: str = "INFO") -> None:
+        """Log a message to AppDaemon's main logfile with device name prepended."""
+        if level != "DEBUG" or self.debugging:
+            self.controller.log(f"[{self.device.friendly_name}] {message}", level=level)
+
+    @property
+    def debugging(self):
+        """Use to check if debug logging is enabled before evaulating f-strings."""
+        return self.controller.debugging
