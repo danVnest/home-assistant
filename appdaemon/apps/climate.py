@@ -579,6 +579,11 @@ class ClimateDevice(Device):
             "high_humidity_aircon_trigger",
         )
 
+    @property
+    def dry_enough(self) -> bool:
+        """Check if room is dry enough based on desired target humidity settings."""
+        return self.room_humidity < self.controller.get_setting("target_humidity")
+
     def handle_sensor_change(
         self,
         entity: str,
@@ -688,7 +693,7 @@ class Aircon(ClimateDevice, PresenceDevice):
     @property
     def best_mode_for_conditions(self) -> str:
         """Determine best climate mode (cool/heat/dry) for current room conditions."""
-        if self.too_humid and not self.too_hot_or_cold:
+        if self.too_humid and self.within_target_temperatures:
             return "dry"
         if self.above_target_temperature or self.closer_to_hot_than_cold:
             return "cool"
@@ -779,7 +784,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.door_open
             or (
                 self.within_target_temperatures
-                and self.room_humidity < self.controller.get_setting("target_humidity")
+                and (self.mode != "dry" or self.dry_enough)
             )
             or (not self.ignoring_vacancy and self.vacant)
         ):
