@@ -41,6 +41,10 @@ class Climate(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
+        for device_class in (Aircon, Fan, Heater):
+            self.constants["target_reduction"][device_class] = self.constants[
+                "target_reduction"
+            ].get(device_class.__name__.lower(), {})
         self.aircons = {
             "bedroom": Aircon(
                 device_id="climate.bedroom_aircon",
@@ -506,6 +510,9 @@ class ClimateDevice(Device):
         """Check if temperature is above the target temperature."""
         return self.room_temperature > float(
             self.controller.get_setting("cooling_target_temperature"),
+        ) + self.controller.constants["target_reduction"][self.__class__].get(
+            self.room,
+            0,
         )
 
     @property
@@ -513,6 +520,9 @@ class ClimateDevice(Device):
         """Check if temperature is below the target temperature."""
         return self.room_temperature < self.controller.get_setting(
             "heating_target_temperature",
+        ) - self.controller.constants["target_reduction"][self.__class__].get(
+            self.room,
+            0,
         )
 
     @property

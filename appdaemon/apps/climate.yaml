@@ -11,6 +11,11 @@ Climate:
   aircon_reduce_fan:
     delay: 15 # number of seconds before the aircon fan reduces after its closest door opens
     temperature_threshold: 2 # minimum temperature off target before fan reduces (when door open)
+  target_reduction: # fine tune when devices decide if their room is above/below target temperature thresholds
+    aircon:
+      dining_room: 2 # on only when particularly hot/cold inside, leaving living room aircon to maintain target temperatures
+    heater:
+      office: 3 # on only when particularly cold
   adjustment_delay: 300 # minimum number of seconds delay between seqential device adjustments (per device)
   setting_buffer:
     temperature: 1 # minimum temperature difference between paired temperature trigger/target settings
