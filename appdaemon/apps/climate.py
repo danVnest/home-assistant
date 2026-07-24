@@ -533,13 +533,9 @@ class ClimateDevice(Device):
     @property
     def closer_to_hot_than_cold(self) -> bool:
         """Return if temperature inside is closer to needing cooling than heating."""
-        return (
-            self.room_temperature
-            > (
-                self.controller.get_setting("cooling_target_temperature")
-                + self.controller.get_setting("heating_target_temperature")
-            )
-            / 2
+        return self.room_temperature + self.controller.outside_temperature > (
+            self.controller.get_setting("cooling_target_temperature")
+            + self.controller.get_setting("heating_target_temperature")
         )
 
     @property
