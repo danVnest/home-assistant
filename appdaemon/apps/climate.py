@@ -85,23 +85,19 @@ class Climate(App):
                 controller=self,
                 room=room,
             )
-            for room in ("bedroom", "office", "nursery")
+            for room in ("bedroom", "nursery", "office")
+        }
+        self.humidifiers = {
+            room: Humidifier(
+                device_id=f"humidifier.{room}",
+                controller=self,
+                room=room,
+            )
+            for room in ("bedroom", "nursery")
         }
         self.fans["bedroom"].companion_device = self.aircons["bedroom"]
-        self.fans["office"].companion_device = self.heaters["office"]
         self.fans["nursery"].companion_device = self.heaters["nursery"]
-        self.humidifiers = {
-            "nursery": Humidifier(
-                device_id="humidifier.nursery",
-                controller=self,
-                room="nursery",
-            ),
-            "bedroom": Humidifier(
-                device_id="humidifier.bedroom",
-                controller=self,
-                room="bedroom",
-            ),
-        }
+        self.fans["office"].companion_device = self.heaters["office"]
         for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
             for device in device_group.values():
                 device.monitor_presence()
