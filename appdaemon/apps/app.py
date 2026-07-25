@@ -97,8 +97,7 @@ class App(hass.Hass):
                             {
                                 "ttl": 0,
                                 "priority": "high",
-                                "media_stream": "alarm_stream_max",
-                                "tts_text": message,
+                                "channel": "alarm_stream",
                             },
                         )
                 super().notify(
