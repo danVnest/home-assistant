@@ -677,7 +677,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                 self.handle_door_change,
                 door_id,
                 new="on",
-                duration=self.constants["aircon_reduce_fan"]["delay"],
+                duration=self.constants["aircon"]["reduce_fan"]["delay"],
             )
         self.__door_open_delay = None
         self.door_open_delay = 60 * float(
@@ -838,7 +838,10 @@ class Aircon(ClimateDevice, PresenceDevice):
         if not self.control_enabled:
             return
         if new == "on" and self.on:
-            if self.vacating_delay - self.constants["aircon_reduce_fan"]["delay"] <= 0:
+            if (
+                self.door_open_delay - self.constants["aircon"]["reduce_fan"]["delay"]
+                <= 0
+            ):
                 self.turn_off()
             else:
                 self.turn_off_timer_handle = self.controller.run_in(
@@ -850,7 +853,7 @@ class Aircon(ClimateDevice, PresenceDevice):
                     entity == self.doors[0].entity_id
                     and self.fan_mode == "auto"
                     and abs(self.room_temperature - self.target_temperature)
-                    > self.constants["aircon_reduce_fan"]["temperature_threshold"]
+                    > self.constants["aircon"]["reduce_fan"]["temperature_threshold"]
                 ):
                     self.log("Reducing aircon fan to low while an outside door is open")
                     self.fan_mode = "low"
@@ -1240,7 +1243,7 @@ class Heater(ClimateDevice, PresenceDevice):
         return (
             self.room_temperature
             > self.desired_target_temperature
-            + self.constants["target_buffer"]["heater_temperature"]
+            + self.constants["heater"]["target_buffer"]
         )
 
     def adjust_for_conditions(

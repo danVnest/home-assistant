@@ -4,6 +4,9 @@ Lights:
   max_brightness: 255 # maximum brightness value that lighting can reach
   min_brightness: 1 # minimum brightness possible for normal lights (0 turns off the light, even though 0 is valid for some light types)
   restricted_min_brightness: 26 # minimum brightness possible for other lights (0 turns off the light, anything higher defaults to minimum)
+  brightness_per_step: 2.55 # minimimum brightness has to change before any light actually adjusts
+  kelvin_per_step: 20 # minimum kelvin has to change before any light actually adjusts
+  max_steps_per_second: 2 # throttle light adjustments per second
   night_to_day_delay: 600 # seconds it has to be light outside before transitioning to day scene
   illuminance:
     bedroom_morning_max: 10 # bedroom illuminance above this triggers transition to day scene

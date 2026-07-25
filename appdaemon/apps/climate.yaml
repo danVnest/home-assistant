@@ -2,15 +2,16 @@ Climate:
   module: climate
   class: Climate
   inside_outside_trigger: 2 # difference between outside and inside temperatures which triggers suggestion
-  target_buffer:
-    heater_temperature: 2 # difference between actual heater target temperature and the temperature which triggers device off
+  aircon:
+    reduce_fan:
+      delay: 15 # number of seconds before the aircon fan reduces after its closest door opens
+      temperature_threshold: 2 # minimum temperature off target before fan reduces (when door open)
   fan:
     cooling_per_speed: 0.1 # degrees reduction in apparent temperature for each percent of fan speed (max fan_airspeed = 0.1*100/0.7)
     cooling_reduction_factor_when_reverse: 3.5 # the factor of which cooling is reduced when a fan is in reverse (also see fan_airspeed macro)
     reversing_delay: 5 # number of seconds to allow between fan reversal steps
-  aircon_reduce_fan:
-    delay: 15 # number of seconds before the aircon fan reduces after its closest door opens
-    temperature_threshold: 2 # minimum temperature off target before fan reduces (when door open)
+  heater:
+    target_buffer: 3 # degrees of apparent temperature above the heater target temperature which triggers device off
   target_reduction: # fine tune when devices decide if their room is above/below target temperature thresholds
     aircon:
       dining_room: 2 # on only when particularly hot/cold inside, leaving living room aircon to maintain target temperatures

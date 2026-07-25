@@ -22,10 +22,6 @@ class Lights(App):
         super().__init__(*args, **kwargs)
         self.circadian = {"timer": None}
         self.__lights: dict[str, Light] = {}
-        self.constants["brightness_per_step"] = 2.55
-        self.constants["kelvin_per_step"] = 20
-        self.constants["max_steps_per_second"] = 2
-        # TODO: these constants should either be in yaml or determined another way (remove in app.py as well)
         self.last_low_illuminance_time = {
             "kitchen": None,
             "bedroom": None,
