@@ -699,6 +699,8 @@ class Aircon(ClimateDevice, PresenceDevice):
     def desired_target_temperature(self) -> float:
         """Get the desired room target temperature based on settings and conditions."""
         mode = self.best_mode_for_conditions
+        if mode not in ("cool", "heat"):
+            mode = "cool"
         return self.controller.get_setting(mode + "ing_target_temperature")
 
     @property
