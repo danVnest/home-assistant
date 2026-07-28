@@ -30,6 +30,10 @@ class Control(App):
             "living_room_button_last_press": 0,
             "nursery_button": None,
             "nursery_button_last_press": 0,
+            "dan_s_bedroom_button": None,
+            "dan_s_bedroom_button_last_press": 0,
+            "rachel_s_bedroom_button": None,
+            "rachel_s_bedroom_button_last_press": 0,
         }
         self.log_listener = None
         self.is_all_initialised = False
@@ -357,7 +361,6 @@ class Control(App):
     def handle_nursery_button_single_press(self, **kwargs: dict):
         """Handle a single press of the nursery button."""
         del kwargs
-        self.timers["nursery_button"] = None
         self.log("Nursery button pressed")
         if self.napping_in_nursery:
             self.log("Nursery already configured for napping - setting again anyway")
@@ -403,17 +406,37 @@ class Control(App):
         """Handle a bedroom Tuya button event."""
         del event_type, kwargs
         name = self.constants["button"]["id"][data["device_id"]]
+        timer_id = f"{name}_s_bedroom_button"
         button = f"{name.capitalize()}'s bedroom button"
+        self.cancel_timer(self.timers[timer_id])
         if data["value"] == "single_click":
-            self.handle_bedroom_button_single_press(button)
+            now = self.get_now_ts()
+            if (
+                now - self.timers[f"{timer_id}_last_press"]
+                < self.constants["button"]["max_double_press_delay"]
+            ):
+                self.handle_bedroom_button_double_press(button)
+            else:
+                if self.debugging:
+                    self.log(
+                        f"{button} was pressed once: "
+                        "delaying action to detect double press",
+                        level="DEBUG",
+                    )
+                self.timers[timer_id] = self.run_in(
+                    self.handle_bedroom_button_single_press,
+                    self.constants["button"]["max_double_press_delay"],
+                    button=button,
+                )
+            self.timers[f"{timer_id}_last_press"] = now
         elif data["value"] == "double_click":
             self.handle_bedroom_button_double_press(button)
         elif data["value"] == "long_press":
             self.handle_bedroom_button_long_press(button)
 
-    def handle_bedroom_button_single_press(self, button: str):
+    def handle_bedroom_button_single_press(self, **kwargs: dict):
         """Handle a single press of a bedroom button."""
-        self.log(f"{button} pressed")
+        self.log(f"{kwargs['button']} pressed")
         if self.napping_in_bedroom:
             self.scene = "Sleep"
         else:
