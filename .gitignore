@@ -10,7 +10,6 @@ secrets.yaml
 *.db-wal
 .cache
 .ha_run.lock
-.ruff_cache
 .storage/*
 !.storage/core.area_registry
 !.storage/core.floor_registry
@@ -34,7 +33,6 @@ zwavejs*
 custom_components/*/*
 !custom_components/*/manifest.json
 !custom_components/apparent_temperature/sensor.py
-!custom_components/tplink_router/device_tracker.py
 cuboai_*
 go2rtc*
 themes/*/*.jpg
