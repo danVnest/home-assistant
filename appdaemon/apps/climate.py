@@ -1158,10 +1158,9 @@ class Fan(ClimateDevice, PresenceDevice):
                     "turning off instead",
                     level="DEBUG",
                 )
-            reverse = self.reverse_desired
             speed = 0
         if check_if_would_adjust_only:
-            return self.reverse_desired != reverse or self.speed != speed
+            return self.speed != speed or (speed and self.reverse_desired != reverse)
         self.adjust(reverse, speed)
         return None
 
