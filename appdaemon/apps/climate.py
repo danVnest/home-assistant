@@ -357,7 +357,7 @@ class Climate(App):
         """Cancel presence callbacks before termination (auto run by Appdaemon)."""
         for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
             for device in device_group.values():
-                device.ignore_vacancy()
+                device.ignore_presence()
 
     # TODO: consider making a TemperatureChecker class with all the following checks
     # devices can use with their own temperature

@@ -116,7 +116,7 @@ class Lights(App):
     def terminate(self):
         """Cancel presence callbacks before termination (auto run by Appdaemon)."""
         for light in self.lights.values():
-            light.ignore_vacancy()
+            light.ignore_presence()
 
     def transition_to_scene(self, scene: str):
         """Change lighting based on the specified scene."""
@@ -158,8 +158,7 @@ class Lights(App):
             "dining_room",
             "hall",
         ):
-            self.lights[light_name].ignore_vacancy()
-            self.lights[light_name].turn_off()
+            self.lights[light_name].turn_off_and_ignore_presence()
 
     def transition_to_bright_scene(self):
         """Configure lighting for the bright scene."""
@@ -197,7 +196,7 @@ class Lights(App):
         )
         light_names = ["tv"]
         if self.control.napping_in_bedroom or self.control.napping_in_nursery:
-            self.lights["hall"].turn_off()
+            self.lights["hall"].turn_off_and_ignore_presence()
         else:
             light_names.extend("hall")
         for light_name in light_names:
@@ -263,8 +262,7 @@ class Lights(App):
             "bedroom",
             "nursery",
         ):
-            self.lights[light_name].ignore_vacancy()
-            self.lights[light_name].turn_off()
+            self.lights[light_name].turn_off_and_ignore_presence()
 
     def transition_to_morning_scene(self):
         """Configure lighting for the morning scene."""
@@ -297,8 +295,7 @@ class Lights(App):
                 vacating_delay=vacating_delay,
             )
         for light_name in ("hall", "bedroom"):
-            self.lights[light_name].ignore_vacancy()
-            self.lights[light_name].turn_off()
+            self.lights[light_name].turn_off_and_ignore_presence()
 
     def transition_to_away_night_scene(self):
         """Configure lighting for the Away (Night) scene."""
@@ -315,11 +312,9 @@ class Lights(App):
         if self.now_is_between("12:00:00", "23:59:59"):
             self.lights["dining_room"].adjust_to_max()
         else:
-            self.lights["dining_room"].ignore_vacancy()
-            self.lights["dining_room"].turn_off()
+            self.lights["dining_room"].turn_off_and_ignore_presence()
         for light_name in ("kitchen_strip", "tv", "hall", "bedroom", "nursery"):
-            self.lights[light_name].ignore_vacancy()
-            self.lights[light_name].turn_off()
+            self.lights[light_name].turn_off_and_ignore_presence()
         if any(
             light.on and not light.control_enabled for light in self.lights.values()
         ):
@@ -395,7 +390,7 @@ class Lights(App):
         )
         self.lights["tv"].adjust(brightness, kelvin)
         if self.control.napping_in_bedroom or self.control.napping_in_nursery:
-            self.lights["hall"].turn_off()
+            self.lights["hall"].turn_off_and_ignore_presence()
         else:
             self.lights["hall"].adjust(brightness, kelvin)
         self.lights["office"].set_presence_adjustments(
@@ -523,8 +518,7 @@ class Lights(App):
         if self.control.scene == "Night":
             self.start_circadian()
         elif self.control.scene == "Away (Night)":
-            self.lights["dining_room"].ignore_vacancy()
-            self.lights["dining_room"].turn_off()
+            self.lights["dining_room"].turn_off_and_ignore_presence()
 
     def is_lighting_sufficient(self, room: str) -> bool:
         """Return if there is enough light to not require further lighting."""
@@ -614,8 +608,7 @@ class Lights(App):
                 > self.last_low_illuminance_time["kitchen"] + self.auto_off_delay
             ):
                 for light_name in ("kitchen", "kitchen_strip"):
-                    self.lights[light_name].ignore_vacancy()
-                    self.lights[light_name].turn_off()
+                    self.lights[light_name].turn_off_and_ignore_presence()
                 self.log(
                     f"The 'kitchen' light level is high ({float(new):.0f}lx), "
                     "automatic lighting disabled",
@@ -696,8 +689,7 @@ class Lights(App):
                 and self.datetime()
                 > self.last_low_illuminance_time[room] + self.auto_off_delay
             ):
-                self.lights[room].ignore_vacancy()
-                self.lights[room].turn_off()
+                self.lights[room].turn_off_and_ignore_presence()
                 self.log(
                     f"The '{room}' light level is high ({illuminance:.0f}lx), "
                     "automatic lighting disabled",
@@ -891,6 +883,11 @@ class Light(PresenceDevice):
                     level="DEBUG",
                 )
             super().turn_off()
+
+    def turn_off_and_ignore_presence(self):
+        """Turn light off and stay off regardless of presence in the room."""
+        self.ignore_presence()
+        self.turn_off()
 
     def set_presence_adjustments(
         self,

@@ -217,7 +217,7 @@ class Control(App):
         )
         if napping:
             for light in (room, "hall"):
-                self.lights.lights[light].ignore_vacancy()
+                self.lights.lights[light].ignore_presence()
                 self.turn_off(f"light.{light}")  # turns off even if control disabled
             self.climate.condition_room_for_sleep(room)
         else:

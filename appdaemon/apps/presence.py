@@ -443,17 +443,18 @@ class PresenceDevice(Device):
         if self.vacating_delay != seconds:
             self.__vacating_delay = seconds
             if not self.ignoring_vacancy:
-                self.ignore_vacancy()
+                self.ignore_presence()
                 self.monitor_presence()
 
-    def ignore_vacancy(self):
+    def ignore_presence(self):
         """Ignore presence changes by cancelling any presence callbacks."""
         if not self.ignoring_vacancy:
             for room in self.rooms:
                 for callback in self.presence_callbacks:
                     room.cancel_callback(callback)
             self.presence_callbacks = []
-        # TODO: just set self.ignore_vacancy to True and check with control_input_boolean
+
+    ignore_vacancy = ignore_presence  # alias to increase readability in some cases
 
     def monitor_presence(self):
         """Set callbacks for when presence changes."""
@@ -467,7 +468,6 @@ class PresenceDevice(Device):
                 for room in self.rooms
             ]
             self.handle_presence_change()
-        # TODO: just set self.ignore_vacancy to False and check with control_input_boolean
 
     def handle_presence_change(self, **kwargs):
         """Set device to adjust (with delay if required) when presence changes."""
