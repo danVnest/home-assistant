@@ -217,9 +217,17 @@ class Control(App):
         """Set nursery napping state, adjusting lights and climate devices."""
         self.__change_napping_state("nursery", napping)
 
-    def napping_in(self, room: str) -> bool:
+    def napping_in(self, room: str, *, sustained: bool = False) -> bool:
         """Get napping state for the given room from Home Assistant."""
-        return self.get_state(f"input_boolean.napping_in_{room}") == "on"
+        input_id = f"input_boolean.napping_in_{room}"
+        napping = self.get_state(input_id) == "on"
+        if not sustained or not napping:
+            return napping
+        return (
+            self.parse_utc_string(self.get_state(input_id, attribute="last_changed"))
+            + self.constants["napping_sustained_delay"]
+            < self.get_now_ts()
+        )
 
     def __change_napping_state(self, room: str, napping: bool):
         """Change device behaviour based on napping state in the specified room."""

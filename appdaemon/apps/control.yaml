@@ -4,6 +4,7 @@ Control:
   init_delay: 60 # seconds after AppDaemon starts for when we assume all apps are initialised
   day_time: "10:00:00" # time for which Morning scene changes to Day if it hasn't already
   settings_change_delay: 2 # seconds delay before handling any settings changes made through the UI
+  napping_sustained_delay: 60 # seconds napping mode has to be active for some logic checks to consider true
   heartbeat: # handles system disconnecting from the internet
     url: !secret heartbeat_url
     timeout: 10 # seconds to wait for heartbeat to complete successfully

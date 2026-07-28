@@ -98,7 +98,7 @@ class Climate(App):
         self.fans["bedroom"].companion_device = self.aircons["bedroom"]
         self.fans["nursery"].companion_device = self.heaters["nursery"]
         self.fans["office"].companion_device = self.heaters["office"]
-        for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
+        for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
             for device in device_group.values():
                 device.monitor_presence()
                 device.adjust_for_conditions()
@@ -235,13 +235,13 @@ class Climate(App):
         self,
     ):
         """Control aircon or suggest based on changes in inside temperature."""
-        for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
+        for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
             for device in device_group.values():
                 device.adjust_for_conditions()
 
     def condition_room_for_sleep(self, room: str):
         """Cool/heat/humidify the given room for nice sleeping conditions."""
-        device_groups = (self.aircons, self.heaters, self.fans, self.humidifiers)
+        device_groups = (self.aircons, self.heaters, self.humidifiers, self.fans)
         for device in (
             device_group[room] for device_group in device_groups if room in device_group
         ):
@@ -250,7 +250,7 @@ class Climate(App):
 
     def condition_room_normally(self, room: str):
         """Restore normal presence-based device functionality in the given room."""
-        device_groups = (self.aircons, self.heaters, self.fans, self.humidifiers)
+        device_groups = (self.aircons, self.heaters, self.humidifiers, self.fans)
         for device in (
             device_group[room] for device_group in device_groups if room in device_group
         ):
@@ -355,7 +355,7 @@ class Climate(App):
 
     def terminate(self):
         """Cancel presence callbacks before termination (auto run by Appdaemon)."""
-        for device_group in (self.aircons, self.fans, self.heaters, self.humidifiers):
+        for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
             for device in device_group.values():
                 device.ignore_presence()
 
@@ -1103,7 +1103,7 @@ class Fan(ClimateDevice, PresenceDevice):
         """Check if the fan could disturb sleep if adjusted."""
         return (
             self.room in ("bedroom", "nursery")
-            and self.controller.control.napping_in(self.room)
+            and self.controller.control.napping_in(self.room, sustained=True)
             and (
                 reverse != self.reverse or (not self.on and speed >= self.minimum_speed)
             )
