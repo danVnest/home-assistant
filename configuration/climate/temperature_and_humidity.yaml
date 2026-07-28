@@ -113,8 +113,8 @@ template:
         unique_id: dining_room_temperature
         state: >
           {%- set value_weight_array = [
-            {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':1},
-            {'value': states('sensor.dining_room_multisensor_temperature'), 'weight':1},
+            {'value': state_attr('climate.dining_room_aircon', 'current_temperature'), 'weight':2},
+            {'value': states('sensor.dining_room_multisensor_temperature'), 'weight':2},
             {'value': states('sensor.dining_room_wall_sensor_temperature'), 'weight':1}]
           -%}
           {%- from 'generic.jinja' import weighted_average -%}
@@ -169,22 +169,12 @@ template:
           }}
       - name: Bedroom humidity
         unique_id: bedroom_humidity
-        state: >
-          {%- set value_weight_array = [
-            {'value': state_attr('climate.bedroom_aircon', 'current_humidity'), 'weight':2},
-            {'value': states('sensor.bedroom_humidifier_humidity'), 'weight':1}]
-          -%}
-          {%- from 'generic.jinja' import weighted_average -%}
-          {{- weighted_average(value_weight_array) -}}
+        state: "{{ state_attr('climate.bedroom_aircon', 'current_humidity') }}"
         unit_of_measurement: "%"
         device_class: humidity
         state_class: measurement
         icon: mdi:water
-        availability: >
-          {{
-            state_attr('climate.bedroom_aircon', 'current_humidity') is not none or
-            has_value('sensor.bedroom_humidifier_humidity')
-          }}
+        availability: "{{ state_attr('climate.bedroom_aircon', 'current_humidity') is not none }}"
 
       - name: Nursery temperature
         unique_id: nursery_temperature
@@ -211,7 +201,7 @@ template:
         state: >
           {%- set value_weight_array = [
             {'value': states('sensor.nursery_sensor_humidity'), 'weight':1},
-            {'value': states('sensor.nursery_humidifier_humidity'), 'weight':1}]
+            {'value': states('sensor.nursery_camera_humidity'), 'weight':1}]
           -%}
           {%- from 'generic.jinja' import weighted_average -%}
           {{- weighted_average(value_weight_array) -}}
@@ -222,5 +212,5 @@ template:
         availability: >
           {{
             has_value('sensor.nursery_sensor_temperature') or
-            has_value('sensor.nursery_humidifier_temperature')
+            has_value('sensor.nursery_camera_temperature')
           }}
