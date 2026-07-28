@@ -627,6 +627,39 @@ class ClimateDevice(Device):
         self.adjustment_timer = None
         self.adjust_for_conditions()
 
+    def adjust_for_conditions_after_initial_checks(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Use in adjust_for_conditions after initial checks."""
+        if not self.available:
+            return False
+        adjuster = (
+            self.adjust_for_conditions_from_on
+            if self.on
+            else self.adjust_for_conditions_from_off
+        )
+        return adjuster(check_if_would_adjust_only=check_if_would_adjust_only)
+
+    def adjust_for_conditions_from_off(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Override this in child class to adjust device settings appropriately."""
+        del check_if_would_adjust_only
+        return False
+
+    def adjust_for_conditions_from_on(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Override this in child class to adjust device settings appropriately."""
+        del check_if_would_adjust_only
+        return False
+
 
 class Aircon(ClimateDevice, PresenceDevice):
     """Control a specific aircon unit."""
@@ -685,6 +718,19 @@ class Aircon(ClimateDevice, PresenceDevice):
         return "heat"
 
     @property
+    def mode_aided_by_outside_temperature(self):
+        """Check if outside temperature is improving inside temperature."""
+        return (
+            (self.device.state == "heat" and self.hotter_outside)
+            or (self.device.state == "cool" and self.colder_outside)
+            or (
+                self.device.state == "off"
+                and self.too_hot_or_cold
+                and not self.too_hot_or_cold_outside
+            )
+        )
+
+    @property
     def target_temperature(self) -> float:
         """Get the aircon's current target temperature, or room temperature if off."""
         return self.get_attribute("temperature") if self.on else self.room_temperature
@@ -741,7 +787,7 @@ class Aircon(ClimateDevice, PresenceDevice):
             or self.swing_mode != self.preferred_swing_mode
         )
 
-    def adjust_for_conditions(  # noqa: PLR0911
+    def adjust_for_conditions(
         self,
         *,
         check_if_would_adjust_only: bool = False,
@@ -752,35 +798,93 @@ class Aircon(ClimateDevice, PresenceDevice):
         if (
             "Away" in self.controller.control.scene
             and not self.controller.presence.pets_home_alone
-        ):
-            if check_if_would_adjust_only:
-                return self.on
-            self.turn_off()
-            return None
-        if not self.on:
-            if (
-                (self.too_hot_or_cold or self.too_humid)
-                and (self.ignoring_vacancy or not self.vacant)
-                and not self.door_open
-            ):
-                if check_if_would_adjust_only:
-                    return True
-                self.turn_on_for_conditions()
-                self.notify_if_turning_on_for_pets()
-        elif (
-            self.door_open
-            or (
-                self.within_target_temperatures
-                and (self.mode != "dry" or self.dry_enough)
-            )
-            or (not self.ignoring_vacancy and self.vacant)
+        ) or (self.room != "bedroom" and self.controller.control.scene == "Sleep"):
+            if not check_if_would_adjust_only and self.on:
+                self.log("Turning off because no one is home or the scene is 'Sleep'")
+                self.turn_off()
+            return self.on
+        return self.adjust_for_conditions_after_initial_checks(
+            check_if_would_adjust_only=check_if_would_adjust_only,
+        )
+
+    def adjust_for_conditions_from_off(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Adjust aircon based on current conditions and target temperatures."""
+        if (
+            (self.too_hot_or_cold or self.too_humid)
+            and (self.ignoring_vacancy or not self.vacant)
+            and (not self.door_open or self.mode_aided_by_outside_temperature)
         ):
             if check_if_would_adjust_only:
                 return True
+            self.log("Turning on because it's too hot/cold/humid")
+            if self.debugging:
+                self.log(
+                    f"({self.too_hot_or_cold = } or {self.too_humid = }) "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = }) "
+                    f"and ({not self.door_open = } or "
+                    f"{self.mode_aided_by_outside_temperature = })",
+                    level="DEBUG",
+                )
+            self.notify_if_turning_on_for_pets()
+            self.turn_on_for_conditions()
+        elif not check_if_would_adjust_only and self.debugging:
+            self.log(
+                f"Staying off because: "
+                f"({not self.too_hot_or_cold = } and {not self.too_humid = }) "
+                f"or ({not self.ignoring_vacancy = } and {self.vacant = }) "
+                f"or ({self.door_open = } and "
+                f"{not self.mode_aided_by_outside_temperature = })",
+                level="DEBUG",
+            )
+        return False
+
+    def adjust_for_conditions_from_on(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Adjust aircon based on current conditions and target temperatures."""
+        if (
+            (
+                self.within_target_temperatures
+                and (self.device.state != "dry" or self.dry_enough)
+            )
+            or (not self.ignoring_vacancy and self.vacant)
+            or (self.door_open and not self.mode_aided_by_outside_temperature)
+        ):
+            if check_if_would_adjust_only:
+                return True
+            self.log(
+                "Turning aircon off because it's within targets "
+                "(or room is vacant, or door is open)",
+            )
+            if self.debugging:
+                self.log(
+                    f"({self.within_target_temperatures = } and "
+                    f"({self.device.state != 'dry'} or {self.dry_enough = })) "
+                    f"or ({not self.ignoring_vacancy = } and {self.vacant = }) "
+                    f"or ({self.door_open = } and "
+                    f"{not self.mode_aided_by_outside_temperature = })",
+                    level="DEBUG",
+                )
             self.turn_off()
         else:
             if check_if_would_adjust_only:
                 return self.would_turn_on_adjust_for_conditions
+            if self.debugging:
+                self.log(
+                    f"Staying on because: "
+                    f"({not self.within_target_temperatures = } or "
+                    f"({self.device.state == 'dry'} and {not self.dry_enough = })) "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = }) "
+                    f"and ({not self.door_open = } or "
+                    f"{self.mode_aided_by_outside_temperature = })",
+                    level="DEBUG",
+                )
             self.turn_on_for_conditions()  # already on, this will ensure best settings
             if (
                 not self.door_open
@@ -1248,28 +1352,81 @@ class Heater(ClimateDevice, PresenceDevice):
             if check_if_would_adjust_only:
                 return True
             self.turn_off()
-        elif self.control_enabled or check_if_would_adjust_only:
-            if not self.on:
-                if (
-                    self.too_cold
-                    and (self.ignoring_vacancy or not self.vacant)
-                    and (self.door and self.door.state == "off")
-                ):
-                    if check_if_would_adjust_only:
-                        return True
-                    self.turn_on_for_conditions()
-            elif (
-                self.room_warm_enough
-                or (not self.ignoring_vacancy and self.vacant)
-                or (self.door and self.door.state != "off")
-            ):
-                if check_if_would_adjust_only:
-                    return True
-                self.turn_off()
-            elif check_if_would_adjust_only:
-                return self.target_temperature != self.desired_target_temperature
-            else:
-                self.target_temperature = self.desired_target_temperature
+        if not self.control_enabled and not check_if_would_adjust_only:
+            return None
+        return self.adjust_for_conditions_after_initial_checks(
+            check_if_would_adjust_only=check_if_would_adjust_only,
+        )
+
+    def adjust_for_conditions_from_off(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Adjust heater based on current conditions and target temperature."""
+        if (
+            self.too_cold
+            and (self.ignoring_vacancy or not self.vacant)
+            and (self.door and self.door.state == "off")
+        ):
+            if check_if_would_adjust_only:
+                return True
+            self.log("Turning on because it's too cold")
+            if self.debugging:
+                self.log(
+                    f"{self.too_cold = } "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = }) "
+                    f"and {(self.door and self.door.state == "off") = }",
+                    level="DEBUG",
+                )
+            self.turn_on_for_conditions()
+        elif self.debugging:
+            self.log(
+                "Staying off because: "
+                f"{not self.too_cold = } "
+                f"or ({not self.ignoring_vacancy = } and {self.vacant = }) "
+                f"or {not (self.door and self.door.state == "off") = }",
+                level="DEBUG",
+            )
+        return False
+
+    def adjust_for_conditions_from_on(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Adjust heater based on current conditions and target temperature."""
+        if (
+            self.room_warm_enough
+            or (not self.ignoring_vacancy and self.vacant)
+            or (self.door and self.door.state != "off")
+        ):
+            if check_if_would_adjust_only:
+                return True
+            self.log(
+                "Turning off because it's warm enough "
+                "(or room is vacant, or door is open)",
+            )
+            if self.debugging:
+                self.log(
+                    f"{self.room_warm_enough = } "
+                    f"or ({not self.ignoring_vacancy = } and {self.vacant = }) "
+                    f"or {(self.door and self.door.state != "off") = }",
+                    level="DEBUG",
+                )
+            self.turn_off()
+        elif check_if_would_adjust_only:
+            return self.target_temperature != self.desired_target_temperature
+        else:
+            if self.debugging:
+                self.log(
+                    f"Staying on because: "
+                    f"{not self.room_warm_enough = } "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = }) "
+                    f"and {not (self.door and self.door.state != "off") = }",
+                    level="DEBUG",
+                )
+            self.target_temperature = self.desired_target_temperature
         return False
 
     def handle_door_change(
@@ -1409,38 +1566,73 @@ class Humidifier(ClimateDevice, PresenceDevice):
         """Turn the humidifier on/off based on current and target humidities."""
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
-        if (
-            self.too_dry
-            and not self.on
-            and (
-                self.ignoring_vacancy
-                or (not self.vacant and self.controller.control.scene == "Sleep")
-            )
-        ):
+        return self.adjust_for_conditions_after_initial_checks(
+            check_if_would_adjust_only=check_if_would_adjust_only,
+        )
+
+    def adjust_for_conditions_from_off(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Turn the humidifier on/off based on current and target humidities."""
+        if self.too_dry and (self.ignoring_vacancy or not self.vacant):
             if self.empty_water_tank:
                 self.notify_of_empty_water_tank()
                 return False
             if check_if_would_adjust_only:
                 return True
+            self.log("Turning on because it's too dry")
+            if self.debugging:
+                self.log(
+                    f"{self.too_dry = } "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = })",
+                    level="DEBUG",
+                )
             self.turn_on_for_conditions()
-        elif self.on and (
-            self.too_humid
-            or (
-                (self.controller.control.scene != "Sleep" or self.vacant)
-                and not self.ignoring_vacancy
+        elif self.debugging:
+            self.log(
+                "Staying off because: "
+                f"{not self.too_dry = } "
+                f"or ({not self.ignoring_vacancy = } and {self.vacant = })",
+                level="DEBUG",
             )
-        ):
+        return False
+
+    def adjust_for_conditions_from_on(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Turn the humidifier on/off based on current and target humidities."""
+        if self.too_humid or (not self.ignoring_vacancy and self.vacant):
             if check_if_would_adjust_only:
                 return True
+            self.log("Turning off because it's too humid (or room is vacant)")
+            if self.debugging:
+                self.log(
+                    f"{self.too_humid = } "
+                    f"or ({not self.ignoring_vacancy = } and {self.vacant = })",
+                    level="DEBUG",
+                )
             self.turn_off()
-        elif self.on and (
-            not self.constant_humidity_mode
-            or self.target_humidity != self.controller.get_setting("target_humidity")
-        ):
-            if check_if_would_adjust_only:
-                return True
-            self.set_constant_humidity_mode()
-            self.target_humidity = self.controller.get_setting("target_humidity")
+        else:
+            if (
+                not self.constant_humidity_mode
+                or self.target_humidity
+                != self.controller.get_setting("target_humidity")
+            ):
+                if check_if_would_adjust_only:
+                    return True
+                self.set_constant_humidity_mode()
+                self.target_humidity = self.controller.get_setting("target_humidity")
+            if self.debugging:
+                self.log(
+                    f"Staying on because: "
+                    f"{not self.too_humid = } "
+                    f"and ({self.ignoring_vacancy = } or {not self.vacant = })",
+                    level="DEBUG",
+                )
         return False
 
     def sync_lighting(
