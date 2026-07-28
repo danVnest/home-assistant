@@ -23,8 +23,8 @@ class Safety(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        for sensor_id in self.fire_sensors:
-            self.fire_sensors[sensor_id] = FireSensor(sensor_id, self)
+        for room in self.fire_sensors:
+            self.fire_sensors[room] = FireSensor(room, self)
         self.listen_state(
             self.handle_dog_water_bowl_empty,
             "binary_sensor.dog_water_bowl",
@@ -61,9 +61,9 @@ class Safety(App):
 class FireSensor:
     """Monitors smoke, carbon monoxide and heat alarms from a fire sensor."""
 
-    def __init__(self, sensor_id: str, controller: Safety):
+    def __init__(self, room: str, controller: Safety):
         """Start listening to smoke, co and heat status."""
-        self.sensor_id = sensor_id
+        self.room = room
         self.sensor_types = ["smoke", "co", "heat"]
         self.sensor_prefix = "binary_sensor.nest_protect_"
         self.sensor_suffix = "_status"
@@ -71,7 +71,7 @@ class FireSensor:
         for sensor_type in self.sensor_types:
             self.controller.listen_state(
                 self.handle_fire,
-                f"{self.sensor_prefix}{sensor_id}_{sensor_type}{self.sensor_suffix}",
+                f"{self.sensor_prefix}{room}_{sensor_type}{self.sensor_suffix}",
             )
 
     def handle_fire(
@@ -84,20 +84,26 @@ class FireSensor:
     ):
         """React when potential fire detected."""
         del attribute, kwargs
+        if new != "on" and not (new == "off" and old == "on"):
+            return
+        alert_type = (
+            entity.removeprefix(f"{self.sensor_prefix}{self.room}_")
+            .removesuffix(self.sensor_suffix)
+            .replace("_", " ")
+            .capitalize()
+        )
         if new == "on":
             self.controller.control.scene = "Bright"
             self.presence.unlock_door(force=True)
             self.controller.media.pause()
-            alert_type = (
-                entity.removeprefix(f"{self.sensor_prefix}{self.sensor_id}_")
-                .removesuffix(self.sensor_suffix)
-                .replace("_", " ")
-                .capitalize()
-            )
             self.controller.notify(
-                f"{alert_type} detected in the {self.sensor_id.replace('_', ' ')}",
+                f"{alert_type} detected in the {self.room.replace('_', ' ')}",
                 title="Fire Alarm",
                 critical=True,
             )
         elif new == "off" and old == "on":
             self.controller.control.reset_scene()
+            self.controller.notify(
+                f"{alert_type} no longer detected in the {self.room.replace('_', ' ')}",
+                title="Fire Alarm",
+            )
