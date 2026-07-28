@@ -775,7 +775,12 @@ class Aircon(ClimateDevice, PresenceDevice):
     def turn_off_after_delay(self, **kwargs: dict):
         """Turn aircon off after the required delay when a door opens."""
         del kwargs
-        self.turn_off()
+        if self.door_open:
+            self.log(
+                "Turning off because a door has been open for "
+                f"{self.door_open_delay / 60} minutes",
+            )
+            self.turn_off()
 
     @property
     def would_turn_on_adjust_for_conditions(self):
@@ -902,11 +907,9 @@ class Aircon(ClimateDevice, PresenceDevice):
     def door_open(self) -> bool:
         """Check if any doors are open (and have been for the required delay)."""
         return any(
-            door.state == "on" and door.last_changed_seconds >= self.door_open_delay
+            door.state != "off" and door.last_changed_seconds >= self.door_open_delay
             for door in self.doors
         )
-        # TODO: maybe change all repeated get_state usages to storing the actual entitiy as a variable and getting state from that
-        # useful device variables: friendly_name, last_changed/_seconds, entity_name, domain, entity_id, attributes (dict)
 
     @property
     def door_open_delay(self) -> float:
@@ -933,16 +936,18 @@ class Aircon(ClimateDevice, PresenceDevice):
         self.controller.cancel_timer(self.turn_off_timer_handle)
         if not self.control_enabled:
             return
-        if new == "on" and self.on:
+        if new == "on" and self.on and not self.mode_aided_by_outside_temperature:
             if (
                 self.door_open_delay - self.constants["aircon"]["reduce_fan"]["delay"]
                 <= 0
             ):
+                self.log("Turning off because an outside door is open")
                 self.turn_off()
             else:
                 self.turn_off_timer_handle = self.controller.run_in(
                     self.turn_off_after_delay,
-                    self.vacating_delay - self.constants["aircon_reduce_fan"]["delay"],
+                    self.door_open_delay
+                    - self.constants["aircon"]["reduce_fan"]["delay"],
                     constrain_input_boolean=self.control_input_boolean,
                 )
                 if (
