@@ -222,7 +222,7 @@ class Room:
             vacant = self.controller.get_state(sensor_id) == "off"
             last_changed = self.controller.convert_utc(
                 self.controller.get_state(sensor_id, attribute="last_changed"),
-            ).replace(tzinfo=None)
+            )
         except (ValueError, TypeError):
             self.controller.notify(
                 f"Sensor in {room_id} is {self.controller.get_state(sensor_id)}",
@@ -251,17 +251,17 @@ class Room:
         return (
             self.last_entered
             < self.last_vacated
-            < self.controller.datetime() - timedelta(seconds=vacating_delay)
+            < self.controller.get_now() - timedelta(seconds=vacating_delay)
         )
 
     def seconds_in_room(self, vacating_delay: float = 0) -> float:
         """Return number of seconds room has been occupied (or vacant if negative)."""
         return (
             self.last_vacated
-            - self.controller.datetime()
+            - self.controller.get_now()
             + timedelta(seconds=vacating_delay)
             if self.is_vacant(vacating_delay)
-            else self.controller.datetime() - self.last_entered
+            else self.controller.get_now() - self.last_entered
         ).total_seconds()
 
     def handle_presence_change(
@@ -296,10 +296,10 @@ class Room:
                         level="DEBUG",
                     )
                 return
-            self.last_vacated = self.controller.datetime()
+            self.last_vacated = self.controller.get_now()
         else:
             reentry = self.last_entered > self.last_vacated
-            self.last_entered = self.controller.datetime()
+            self.last_entered = self.controller.get_now()
             if "Away" in self.controller.control.scene:
                 if "_person_detected" in entity:
                     self.controller.notify(
