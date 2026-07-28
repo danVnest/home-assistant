@@ -79,7 +79,7 @@ class Control(App):
         self.set_timer("bed_time")
         self.timers["heartbeat"] = self.run_every(
             self.heartbeat,
-            "now",
+            "immediate",
             self.constants["heartbeat"]["period"],
         )
         self.listen_state(
