@@ -57,11 +57,11 @@ class Control(App):
                 setting,
                 duration=self.constants["settings_change_delay"],
             )
-        for name in ("rachel", "dan"):
+        for device_id in self.constants["button"]["id"]:
             self.listen_event(
                 self.handle_bedroom_tuya_button,
                 "localtuya_device_dp_triggered",
-                device_id=self.constants["button_ids"][name],
+                device_id=device_id,
             )
         for room in ("nursery", "living_room"):
             self.listen_state(
@@ -307,7 +307,7 @@ class Control(App):
         if event == "KeyPressed":
             if (
                 now - self.timers[f"{button}_last_press"]
-                < self.constants["button_max_double_press_delay"]
+                < self.constants["button"]["max_double_press_delay"]
             ):
                 getattr(self, f"handle_{button}_double_press")()
             else:
@@ -319,7 +319,7 @@ class Control(App):
                     )
                 self.timers[button] = self.run_in(
                     getattr(self, f"handle_{button}_single_press"),
-                    self.constants["button_max_double_press_delay"],
+                    self.constants["button"]["max_double_press_delay"],
                 )
             self.timers[f"{button}_last_press"] = now
         elif event == "KeyHeldDown":
@@ -402,11 +402,8 @@ class Control(App):
     ):
         """Handle a bedroom Tuya button event."""
         del event_type, kwargs
-        button = (
-            "Dan's bedroom button"
-            if data["device_id"] == self.constants["button_ids"]["dan"]
-            else "Rachel's bedroom button"
-        )
+        name = self.constants["button"]["id"][data["device_id"]]
+        button = f"{name.capitalize()}'s bedroom button"
         if data["value"] == "single_click":
             self.handle_bedroom_button_single_press(button)
         elif data["value"] == "double_click":

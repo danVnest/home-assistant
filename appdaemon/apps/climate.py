@@ -501,20 +501,14 @@ class ClimateDevice(Device):
         """Check if temperature is above the target temperature."""
         return self.room_temperature > float(
             self.controller.get_setting("cooling_target_temperature"),
-        ) + self.controller.constants["target_reduction"][self.__class__].get(
-            self.room,
-            0,
-        )
+        ) + self.constants["target_reduction"][self.__class__].get(self.room, 0)
 
     @property
     def below_target_temperature(self) -> bool:
         """Check if temperature is below the target temperature."""
         return self.room_temperature < self.controller.get_setting(
             "heating_target_temperature",
-        ) - self.controller.constants["target_reduction"][self.__class__].get(
-            self.room,
-            0,
-        )
+        ) - self.constants["target_reduction"][self.__class__].get(self.room, 0)
 
     @property
     def too_hot_or_cold(self) -> bool:

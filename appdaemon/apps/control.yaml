@@ -1,25 +1,25 @@
 Control:
   module: control
   class: Control
-  init_delay: 10
-  day_time: "10:00:00"
-  settings_change_delay: 2
-  heartbeat:
+  init_delay: 10 # seconds after AppDaemon starts for when we assume all apps are initialised
+  day_time: "10:00:00" # time for which Morning scene changes to Day if it hasn't already
+  settings_change_delay: 2 # seconds delay before handling any settings changes made through the UI
+  heartbeat: # handles system disconnecting from the internet
     url: !secret heartbeat_url
-    timeout: 10
-    max_fail_count: 10
-    period: 60
-  notify_battery_level: 25
-  mobiles:
+    timeout: 10 # seconds to wait for heartbeat to complete successfully
+    max_fail_count: 10 # if heartbeat fails this many times in a row, Home Assistant will restart AFTER it next connects
+    period: 60 # seconds between heartbeats
+  mobiles: # definitions for device notifiers
     dan:
       name: mobile_app_dans_phone
       type: iOS
     rachel:
       name: mobile_app_rachel_s_phone
       type: Android
-  button_ids:
-    dan: bf9428682b24aed4a9paaa
-    rachel: bf3a40d46b789ec295bdtp
-  button_max_double_press_delay: 2
+  button:
+    id: # device IDs provided by Home Assistant with tuya button events
+      bf9428682b24aed4a9paaa: dan
+      bf3a40d46b789ec295bdtp: rachel
+    max_double_press_delay: 2 # if two button presses are made within this timeframe (seconds) then trigger a double press event instead
   priority: 1
   # log_level: DEBUG

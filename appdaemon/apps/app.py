@@ -162,7 +162,6 @@ class Device:
         self.room = room
         self.linked_rooms = linked_rooms
         self.controller = controller
-        self.constants = controller.constants
         self.control_input_boolean = (
             "input_boolean.control_" + device_name + control_input_boolean_suffix
         )
@@ -246,6 +245,11 @@ class Device:
         """Call one of the device's services in Home Assistant."""
         self.device.call_service(service, **kwargs)
         self.last_adjustment_time = self.controller.get_now_ts()
+
+    @property
+    def constants(self) -> dict:
+        """Use the same constants as defined by the controller."""
+        return self.controller.constants
 
     def get_attribute(
         self,

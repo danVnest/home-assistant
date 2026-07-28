@@ -233,7 +233,7 @@ class Lights(App):
         for light_name in ("entryway", "kitchen"):
             self.lights[light_name].set_presence_adjustments(
                 entered=(
-                    self.lights[light_name].minimum_brightness,
+                    self.lights[light_name].min_brightness,
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 occupied=(
@@ -248,7 +248,7 @@ class Lights(App):
         for light_name in ("office", "bathroom"):
             self.lights[light_name].set_presence_adjustments(
                 occupied=(
-                    self.lights[light_name].minimum_brightness,
+                    self.lights[light_name].min_brightness,
                     self.lights[light_name].kelvin_limits["min"],
                 ),
                 vacating_delay=self.get_setting(
@@ -439,7 +439,7 @@ class Lights(App):
                 )
                 else 1
             )
-        if self.logger.isEnabledFor(logging.DEBUG):
+        if self.debugging:
             self.log(
                 f"Circadian progress calculated as: {circadian_progress}",
                 level="DEBUG",
@@ -454,7 +454,7 @@ class Lights(App):
         if circadian_progress is None:
             circadian_progress = self.circadian_progress
         return (
-            int(
+            round(
                 float(self.entities.input_number.initial_circadian_brightness.state)
                 + (
                     float(self.entities.input_number.final_circadian_brightness.state)
@@ -464,7 +464,7 @@ class Lights(App):
                 )
                 * circadian_progress,
             ),
-            int(
+            round(
                 float(self.entities.input_number.initial_circadian_kelvin.state)
                 + (
                     float(self.entities.input_number.final_circadian_kelvin.state)
@@ -493,12 +493,16 @@ class Lights(App):
                 float(self.entities.input_number.initial_circadian_brightness.state)
                 - float(self.entities.input_number.final_circadian_brightness.state),
             )
-            / self.constants["brightness_per_step"],
+            / min(self.constants["brightness_per_step"].values()),
             abs(
                 float(self.entities.input_number.initial_circadian_kelvin.state)
                 - float(self.entities.input_number.final_circadian_kelvin.state),
             )
-            / self.constants["kelvin_per_step"],
+            / min(
+                value
+                for value in self.constants["kelvin_per_step"].values()
+                if value is not None
+            ),
         )
         if time_step.total_seconds() < 0:
             self.error(
@@ -506,6 +510,9 @@ class Lights(App):
                 f"(by {time_step.total_seconds() / -60} minutes)",
             )
             raise ValueError
+        min_seconds_per_step = 1 / self.constants["max_steps_per_second"]
+        if time_step.total_seconds() < min_seconds_per_step:
+            time_step = datetime.timedelta(seconds=min_seconds_per_step)
         self.circadian["start_time"] = start_time
         self.circadian["end_time"] = end_time
         self.circadian["time_step"] = time_step
@@ -743,16 +750,19 @@ class Light(PresenceDevice):
             room=room,
             linked_rooms=linked_rooms,
         )
-        self.minimum_brightness = self.controller.constants[
-            "min_brightness"
-            if device_id.endswith("strip")
-            or self.get_attribute("supported_color_modes")[0] == "brightness"  # fans
-            else "restricted_min_brightness"
-        ]
+        if device_id.endswith("strip"):
+            light_type = "strip"
+        elif self.get_attribute("supported_color_modes")[0] == "brightness":
+            light_type = "fan"
+        else:
+            light_type = "bulb"
+        self.brightness_per_step = self.constants["brightness_per_step"][light_type]
+        self.min_brightness = max(int(self.constants["min_brightness"][light_type]), 1)
         self.kelvin_limits = {
             "max": self.get_attribute("max_color_temp_kelvin"),
             "min": self.get_attribute("min_color_temp_kelvin"),
         }
+        self.kelvin_per_step = self.constants["kelvin_per_step"][light_type]
         self.kelvin_before_off = self.kelvin_limits["min"]
         self.presence_adjustments: dict[str, int] = {}
 
@@ -761,7 +771,7 @@ class Light(PresenceDevice):
         """Get the brightness of the light from Home Assistant."""
         if not self.on:
             return 0
-        return max(int(self.get_attribute("brightness")), self.minimum_brightness)
+        return max(int(self.get_attribute("brightness")), self.min_brightness)
 
     @brightness.setter
     def brightness(self, value: int):
@@ -783,11 +793,31 @@ class Light(PresenceDevice):
 
     def validate_brightness(self, value: int) -> int:
         """Return closest valid value for brightness."""
-        if value < self.minimum_brightness:
-            return self.minimum_brightness if value > 0 else 0
-        if value > self.controller.args["max_brightness"]:
-            return self.controller.args["max_brightness"]
-        return value
+        current_brightness = self.brightness
+        if value == current_brightness:
+            return value
+        if value <= 0:
+            return 0
+        if value <= self.min_brightness:
+            return self.min_brightness
+        if value >= self.constants["max_brightness"]:
+            return self.constants["max_brightness"]
+        if (
+            value - self.brightness_per_step / 2
+            < current_brightness
+            < value + self.brightness_per_step / 2
+        ):
+            # bulb brightness = floor(26 + 255/100 * step)
+            # measured: 26, 28.0, 31.0, 33.0, 36.0, 38.0, ..., 252.0, 255.0
+            # formula:  26, 28.5, 31.1, 33.6, 36.2, 38.7, ..., 252.9, 255.5
+
+            # strip brightness = 1 + 1 * step
+
+            # fan brightness = round(255/8 * step)
+            # measured: 0, 32.0, 64.0, 96.0, 128.0, 159.0, 191.0, 223.0, 255
+            # formula:  0, 31.9, 63.8, 95.6, 127.5, 159.4, 191.3, 223.1, 255
+            return current_brightness
+        return value  # brightness will change and HA will round to nearest step
 
     @property
     def kelvin(self) -> int:
@@ -809,12 +839,29 @@ class Light(PresenceDevice):
 
     def validate_kelvin(self, value: int) -> int | None:
         """Return closest valid value for kelvin."""
-        if self.kelvin_limits["min"] is None:
+        if self.kelvin_per_step is None:
             return None
-        return self.constants["kelvin_per_step"] * int(
-            min(max(value, self.kelvin_limits["min"]), self.kelvin_limits["max"])
-            / self.constants["kelvin_per_step"],
-        )
+        current_kelvin = self.kelvin
+        if value == current_kelvin:
+            return value
+        if value <= self.kelvin_limits["min"]:
+            return self.kelvin_limits["min"]
+        if value >= self.kelvin_limits["max"]:
+            return self.kelvin_limits["max"]
+        if (
+            value - self.kelvin_per_step / 2
+            < current_kelvin
+            < value + self.kelvin_per_step / 2
+        ):
+            # bulb kelvin = 2000 + 1 * step
+
+            # strip kelvin = round(2700 + (6500-2700)/990 * step)
+            # measured: 2700, 2704.0, 2708.0, 2712.0, 2715.0, ..., 2942.0, 2946.0, 2949.0, 2953.0, ..., 6297.0, 6300.0, 6304.0, 6308.0, ..., 6320.0, 6323.0, ..., 6500
+            # formula:  2700, 2703.8, 2707.7, 2711.5, 2715.4, ..., 2941.8, 2945.7, 2949.5, 2953.3, ..., 6296.6, 6300.4, 6304.2, 6308.1, ..., 6319.6, 6323.4, ..., 6500
+
+            # fan kelvin = None
+            return current_kelvin
+        return value  # kelvin will change and Home Assistant will round to nearest step
 
     def adjust(self, brightness: int, kelvin: int):
         """Adjust light brightness and kelvin at the same time."""
@@ -840,7 +887,7 @@ class Light(PresenceDevice):
 
     def adjust_to_max(self):
         """Adjust light brightness and kelvin at the same time to maximum values."""
-        self.adjust(self.controller.args["max_brightness"], self.kelvin_limits["max"])
+        self.adjust(self.constants["max_brightness"], self.kelvin_limits["max"])
 
     def turn_on_for_conditions(self):
         """Turn the light to with appropriate parameters for the scene."""
@@ -937,26 +984,33 @@ class Light(PresenceDevice):
             - self.presence_adjustments["entered"]["brightness"]
         ) * (1 - progress)
         kelvin_change = (
-            self.presence_adjustments["occupied"]["kelvin"]
-            - self.presence_adjustments["entered"]["kelvin"]
-        ) * (1 - progress)
+            (
+                (
+                    self.presence_adjustments["occupied"]["kelvin"]
+                    - self.presence_adjustments["entered"]["kelvin"]
+                )
+                * (1 - progress)
+            )
+            if self.kelvin_per_step is not None
+            else 0
+        )
         if brightness_change == 0 and kelvin_change == 0:
             return
-        steps = max(
-            abs(brightness_change) / self.constants["brightness_per_step"],
-            abs(kelvin_change) / self.constants["kelvin_per_step"],
-            1,
+        steps = min(
+            max(
+                abs(brightness_change) / self.brightness_per_step,
+                abs(kelvin_change) / self.kelvin_per_step
+                if self.kelvin_per_step is not None
+                else 0,
+                1,
+            ),
+            self.transition_period * self.constants["max_steps_per_second"],
         )
-        max_steps = self.transition_period * self.constants["max_steps_per_second"]
-        steps = min(steps, max_steps)
-        brightness_step = brightness_change / steps
-        kelvin_step = kelvin_change / steps
-        step_time = self.transition_period / steps
         super().start_transition_towards_occupied(
-            step_time,
+            self.transition_period / steps,
             steps,
-            brightness_step=brightness_step,
-            kelvin_step=kelvin_step,
+            brightness_step=brightness_change / steps,
+            kelvin_step=kelvin_change / steps,
         )
 
     def transition_towards_occupied(self, **kwargs: dict):
@@ -966,9 +1020,13 @@ class Light(PresenceDevice):
         steps_remaining = kwargs["steps_remaining"] - 1
         if steps_remaining > 0:
             self.adjust(
-                self.presence_adjustments["occupied"]["brightness"]
-                - kwargs["brightness_step"] * steps_remaining,
-                self.presence_adjustments["occupied"]["kelvin"]
-                - kwargs["kelvin_step"] * steps_remaining,
+                round(
+                    self.presence_adjustments["occupied"]["brightness"]
+                    - kwargs["brightness_step"] * steps_remaining,
+                ),
+                round(
+                    self.presence_adjustments["occupied"]["kelvin"]
+                    - kwargs["kelvin_step"] * steps_remaining,
+                ),
             )
         super().transition_towards_occupied(**kwargs)
