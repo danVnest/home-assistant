@@ -1656,8 +1656,11 @@ class Humidifier(ClimateDevice, PresenceDevice):
             )
         if new != "on":
             new = "off"
-        if new != self.controller.get_state(f"light.{self.room}_humidifier"):
-            self.controller.set_state(f"light.{self.room}_humidifier", state=new)
+        if self.controller.get_state(f"light.{self.room}_humidifier") not in (
+            new,
+            "unavailable",
+        ):
+            getattr(self.controller, f"turn_{new}")(f"light.{self.room}_humidifier")
 
     def disable_beep(
         self,
@@ -1669,4 +1672,4 @@ class Humidifier(ClimateDevice, PresenceDevice):
     ):
         """Ensure the humidifier is set to not beep on status change."""
         del entity, attribute, old, new, kwargs
-        self.controller.set_state(f"switch.{self.room}_humidifier_beeper", state="off")
+        self.controller.turn_off(f"switch.{self.room}_humidifier_beeper")
