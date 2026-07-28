@@ -807,15 +807,6 @@ class Light(PresenceDevice):
             < current_brightness
             < value + self.brightness_per_step / 2
         ):
-            # bulb brightness = floor(26 + 255/100 * step)
-            # measured: 26, 28.0, 31.0, 33.0, 36.0, 38.0, ..., 252.0, 255.0
-            # formula:  26, 28.5, 31.1, 33.6, 36.2, 38.7, ..., 252.9, 255.5
-
-            # strip brightness = 1 + 1 * step
-
-            # fan brightness = round(255/8 * step)
-            # measured: 0, 32.0, 64.0, 96.0, 128.0, 159.0, 191.0, 223.0, 255
-            # formula:  0, 31.9, 63.8, 95.6, 127.5, 159.4, 191.3, 223.1, 255
             return current_brightness
         return value  # brightness will change and HA will round to nearest step
 
@@ -853,13 +844,6 @@ class Light(PresenceDevice):
             < current_kelvin
             < value + self.kelvin_per_step / 2
         ):
-            # bulb kelvin = 2000 + 1 * step
-
-            # strip kelvin = round(2700 + (6500-2700)/990 * step)
-            # measured: 2700, 2704.0, 2708.0, 2712.0, 2715.0, ..., 2942.0, 2946.0, 2949.0, 2953.0, ..., 6297.0, 6300.0, 6304.0, 6308.0, ..., 6320.0, 6323.0, ..., 6500
-            # formula:  2700, 2703.8, 2707.7, 2711.5, 2715.4, ..., 2941.8, 2945.7, 2949.5, 2953.3, ..., 6296.6, 6300.4, 6304.2, 6308.1, ..., 6319.6, 6323.4, ..., 6500
-
-            # fan kelvin = None
             return current_kelvin
         return value  # kelvin will change and Home Assistant will round to nearest step
 
