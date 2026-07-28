@@ -92,8 +92,6 @@ class Control(App):
             self.assume_all_initialised,
             self.constants["init_delay"],
         )
-        # TODO: https://app.asana.com/0/1207020279479204/1203851145721583/f
-        # test self.notify("test message", targets="dan", title="test title", critical=True)
 
     def all_initialized(self, event_name: str, data: dict, **kwargs: dict):
         """Configure all apps with the current scene."""
@@ -114,13 +112,27 @@ class Control(App):
             self.log(
                 "Assuming initialisation complete after "
                 f"{self.constants['init_delay']} seconds",
+                level="WARNING",
             )
             self.all_initialized(None, None)
 
     def handle_app_reloaded(self, event_name: str, data: dict, **kwargs: dict):
-        """Re-link the app and set a timer to initialise it?"""
+        """Set a timer to re-initialise the system."""
         del event_name, kwargs
         self.log(f"App added: '{data['app']}'")
+        self.cancel_timer(self.timers["init_delay"])
+        self.timers["init_delay"] = self.run_in(
+            self.assume_all_reloaded,
+            self.constants["init_delay"],
+        )
+
+    def assume_all_reloaded(self, **kwargs: dict):
+        """Configure all apps if not already done normally."""
+        del kwargs
+        self.log(
+            "Assuming all apps have reloaded after "
+            f"{self.constants['init_delay']} seconds",
+        )
         self.reset_scene(keep_bright=True)
 
     @property
@@ -534,7 +546,10 @@ class Control(App):
     def handle_simple_settings_change(self, setting: str, new: str, old: str):
         """Act on changes to settings that can only be made through the UI."""
         if setting == "development_mode":
-            self.set_production_mode(new == "off")
+            if new == "on":
+                self.set_production_mode(False)
+            else:
+                self.call_service("hassio/app_restart", app="a0d7b954_appdaemon")
         elif setting.startswith("circadian"):
             try:
                 self.lights.redate_circadian()
