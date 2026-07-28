@@ -110,7 +110,7 @@ class Lights(App):
             self.last_low_illuminance_time[room] = init_time
             self.listen_state(
                 getattr(self, f"handle_{room}_illuminance_change"),
-                f"sensor.{room}_presence_sensor_illuminance",
+                f"sensor.{room}_presence_sensor_illuminance_filtered",
             )
 
     def terminate(self):
