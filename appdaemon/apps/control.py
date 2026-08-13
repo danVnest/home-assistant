@@ -35,7 +35,7 @@ class Control(App):
             "rachel_s_bedroom_button": None,
             "rachel_s_bedroom_button_last_press": 0,
         }
-        self.log_listener = None
+        self.log_listeners: list[str] = []
         self.is_all_initialised = False
 
     def initialize(self):
@@ -44,7 +44,15 @@ class Control(App):
         Appdaemon defined init function called once ready after __init__.
         """
         super().initialize()
-        self.log_listener = self.listen_log(self.increment_log_issue_counter, "WARNING")
+        for log_type in ("main_log", "error_log"):
+            self.log_listeners.extend(
+                self.listen_log(
+                    self.increment_log_issue_counter,
+                    "WARNING",
+                    log=log_type,
+                )
+                or [],
+            )
         if self.entities.input_boolean.development_mode.state == "off":
             self.set_production_mode()
         for setting in [
@@ -635,30 +643,34 @@ class Control(App):
                     >= self.constants["heartbeat"]["max_fail_count"]
                 ):
                     self.log("Restarting Home Assistant to fix any broken entities")
-                    self.cancel_listen_log(self.log_listener)
+                    if self.log_listeners is not None:
+                        for listener in self.log_listeners:
+                            self.cancel_listen_log(listener)
                     self.call_service("homeassistant/restart")
             self.timers["heartbeat_fail_count"] = 0
 
     def increment_log_issue_counter(
         self,
         app_name: str,
-        timestamp: datetime.datetime,
+        timestamp: datetime,
         level: str,
         log_type: str,
         message: str,
         **kwargs: dict,
-    ):
-        """Increment counters if logged message is a WARNING or ERROR."""
+    ) -> None:
+        """Increment counters if logged message is a WARNING or ERROR/CRITICAL."""
         del app_name, timestamp, kwargs
-        if log_type == "error_log":
-            level = "ERROR" if message.startswith("Traceback") else None
-        elif log_type == "main_log" and message.endswith("errors.log"):
-            level = None
-        if level in ("WARNING", "ERROR"):
-            self.call_service(
-                "counter/increment",
-                entity_id=f"counter.{level.lower()}s",
-            )
+        if level == "ERROR" and log_type == "error_log":
+            if self.logging_multiline_error:
+                if message.endswith("====="):
+                    self.logging_multiline_error = False
+                return
+            if message.startswith("====="):
+                self.logging_multiline_error = True
+        self.call_service(
+            "counter/increment",
+            entity_id="counter.warnings" if level == "WARNING" else "counter.errors",
+        )
 
     def handle_update_available(
         self,

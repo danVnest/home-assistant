@@ -1,14 +1,4 @@
 secrets: /homeassistant/secrets.yaml
-# logs:
-#   main_log:
-#     filename: /config/logs/main.log
-#     filter_threshold: 5
-#   error_log:
-#     filename: /config/logs/errors.log
-#   diag_log:
-#     filename: /config/logs/diag.log
-#   access_log:
-#     filename: /config/logs/access.log
 appdaemon:
   latitude: !secret location_latitude
   longitude: !secret location_longitude
