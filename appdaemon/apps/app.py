@@ -9,7 +9,6 @@ environmental changes.
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 import appdaemon.plugins.hass.hassapi as hass
@@ -24,29 +23,6 @@ if TYPE_CHECKING:
 
     from appdaemon.apps.appdaemon.entity import Entity
 import logging
-
-
-class IDs:
-    """System and user IDs defined by Home Assistant when referencing state context."""
-
-    _named_ids = MappingProxyType(
-        {
-            None: "System",
-            "57bea01aa68f44eb94ac2031ecb5b7ba": "System",
-            "15ff7a86d4ae4d38a60003ad4064ff78": "Dan",
-            "9a175674be354863afb9634adc4b8980": "Rachel",
-        },
-    )
-
-    @classmethod
-    def get_name(cls, id_value):
-        """Get the user (or system) name for a given ID."""
-        return cls._named_ids.get(id_value, "Unknown")
-
-    @classmethod
-    def is_system(cls, id_value):
-        """Check if an ID refers to the system rather than a user."""
-        return cls.get_name(id_value) == "System"
 
 
 class App(hass.Hass):
@@ -174,7 +150,6 @@ class Device:
                 self.__handle_user_adjustment,
                 entity_id=device,
                 attribute="context",
-                new=lambda new: not IDs.is_system(new["user_id"]),
             )
         self.controller.listen_state(
             self.__handle_control_enabled,
@@ -251,6 +226,12 @@ class Device:
         """Use the same constants as defined by the controller."""
         return self.controller.constants
 
+    def __get_user(self, user_id: str | None) -> str:
+        """Get the name of the user corresponding to a sensor state context ID."""
+        return cast(
+            "dict[str | None, str]",
+            self.controller.control.constants["ids"],
+        ).get(user_id, "Unknown")
     def get_attribute(
         self,
         attribute: str,
@@ -280,7 +261,9 @@ class Device:
     ):
         """Handle manual adjustment of the device via the UI."""
         del attribute, old, kwargs
-        user = IDs.get_name(new["user_id"])
+        user = self.__get_user(new.get("user_id"))
+        if user == "System":
+            return
         self.log(
             f"'{user}' adjusted device via UI: "
             f"{self.controller.get_state(entity, 'all')}",
@@ -308,6 +291,9 @@ class Device:
     ):
         """Adjust device appropriately when automatic control is enabled."""
         del entity, attribute, old, new, kwargs
+        user = self.__get_user(new.get("user_id"))
+        if user == "System":
+            return
         self.adjust_for_conditions()
         if self.on:
             self.turn_on_for_conditions()

@@ -22,5 +22,10 @@ Control:
       bf9428682b24aed4a9paaa: dan
       bf3a40d46b789ec295bdtp: rachel
     max_double_press_delay: 2 # if two button presses are made within this timeframe (seconds) then trigger a double press event instead
+  ids: # system and user IDs defined by Home Assistant when referencing entity state context
+    null: System
+    57bea01aa68f44eb94ac2031ecb5b7ba: System
+    15ff7a86d4ae4d38a60003ad4064ff78: Dan
+    9a175674be354863afb9634adc4b8980: Rachel
   priority: 1
   # log_level: DEBUG
