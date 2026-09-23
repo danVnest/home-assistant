@@ -1,6 +1,6 @@
 datetime_to_relative_time:
   name: Datetime to relative time
-  version: '1.0'
+  version: '1.1'
   creator: danVnest
   description: Converts a datetime state to its relative equivalent from the current time (e.g. 2 hours ago or in 53 minutes).
   supported:
@@ -11,6 +11,8 @@ datetime_to_relative_time:
       const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
       const entity = hass.states[this.config.datetime_to_relative_time?.entity];
       const attribute = entity?.attributes[this.config.datetime_to_relative_time?.attribute];
+      const prepend = this.config.datetime_to_relative_time?.prepend ?? '';
+      const append = this.config.datetime_to_relative_time?.append ?? '';
       const datetime = attribute || entity?.state || state;
       const seconds = Math.round((new Date() - new Date(datetime)) / 1000);
       if (Math.abs(seconds) < 60) return rtf.format(-seconds, 'second');
@@ -18,7 +20,7 @@ datetime_to_relative_time:
       if (Math.abs(minutes) < 60) return rtf.format(-minutes, 'minute');
       const hours = Math.round(minutes / 60);
       if (Math.abs(hours) < 24) return rtf.format(-hours, 'hour');
-      return rtf.format(-Math.round(hours / 24), 'day');
+      return prepend + rtf.format(-Math.round(hours / 24), 'day') + append;
     })()}
   editor:
     - name: entity
@@ -27,3 +29,11 @@ datetime_to_relative_time:
     - name: attribute
       selector:
         attribute: {}
+    - name: prepend
+      label: Prepend text
+      selector:
+        text: {}
+    - name: append
+      label: Append text
+      selector:
+        text: {}
