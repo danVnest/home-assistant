@@ -44,7 +44,7 @@ class App(hass.Hass):
         """Send a notification (title required) to target users (anyone_home or all)."""
         targets = kwargs.get("targets", "all")
         if targets == "anyone_home_else_all":
-            targets = "anyone_home" if self.presence.anyone_home else "all"
+            targets = "anyone_home" if self.presence.resident_home else "all"
         for person in ("dan", "rachel"):
             if any(
                 (

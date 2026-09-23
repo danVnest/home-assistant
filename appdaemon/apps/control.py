@@ -187,8 +187,8 @@ class Control(App):
         self.log("Detecting current appropriate scene")
         if keep_bright and self.scene == "Bright":
             self.scene = "Bright"
-        elif not self.presence.anyone_home and self.presence.manual_guest_mode == "off":
-            self.scene = "Away (Night)" if self.lights.dark_outside else "Away (Day)"
+        elif not self.presence.anyone_home:
+            self.scene = f"Away ({'Night' if self.lights.dark_outside else 'Day'})"
         elif not self.lights.dark_outside:
             self.scene = "Day"
         elif self.media.playing:

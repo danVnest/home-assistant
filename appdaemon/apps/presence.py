@@ -102,8 +102,23 @@ class Presence(App):
 
     @property
     def anyone_home(self) -> bool:
-        """Check if anyone is home, including guests."""
+        """True if any resident or guest is home (includes manual guest mode)."""
         return self.entities.binary_sensor.anyone_home.state == "on"
+
+    @property
+    def resident_home(self) -> bool:
+        """True if a resident is home."""
+        return self.entities.binary_sensor.resident_home.state == "on"
+
+    @property
+    def guest_home(self) -> bool:
+        """True if a guest is detected at home (excludes manual guest mode)."""
+        return self.entities.binary_sensor.guest_home.state == "on"
+
+    @property
+    def manual_guest_mode(self) -> bool:
+        """True if guest mode is set to manual."""
+        return self.get_boolean_setting("manual_guest_mode")
 
     @property
     def pets_home_alone(self) -> bool:
@@ -124,10 +139,6 @@ class Presence(App):
                 self.climate.climate_control_enabled = True
                 # TODO: don't do this, create specific self.climate.handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
 
-    @property
-    def manual_guest_mode(self) -> bool:
-        """Get manual guest mode input from Home Assistant."""
-        return self.entities.input_boolean.manual_guest_mode.state == "on"
 
     @property
     def door_locked(self) -> bool:

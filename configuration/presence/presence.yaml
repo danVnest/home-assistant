@@ -90,10 +90,20 @@ template:
   - binary_sensor:
       - name: Anyone home
         unique_id: anyone_home
-        state: "{{ states('binary_sensor.resident_home') == 'on' or states('binary_sensor.guest_home') == 'on' }}"
+        state: >
+          {{
+            states('binary_sensor.resident_home') == 'on' or
+            states('binary_sensor.guest_home') == 'on' or
+            states('input_boolean.manual_guest_mode') == 'on'
+          }}
         device_class: occupancy
         icon: mdi:account-multiple
-        availability: "{{ has_value('binary_sensor.resident_home') or has_value('binary_sensor.guest_home') }}"
+        availability: >
+          {{
+            has_value('binary_sensor.resident_home') or
+            has_value('binary_sensor.guest_home') or
+            has_value('input_boolean.manual_guest_mode')
+          }}
       - name: Resident home
         unique_id: resident_home
         state: "{{ states('person.dan') == 'home' or states('person.rachel') == 'home' }}"
