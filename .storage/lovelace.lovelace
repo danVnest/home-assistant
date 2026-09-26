@@ -455,12 +455,12 @@
                             {
                               "condition": "numeric_state",
                               "entity": "sensor.power_meter_power_grid_export",
-                              "above": 500
+                              "above": 600
                             },
                             {
                               "condition": "numeric_state",
                               "entity": "sensor.electricity_feed_in_price",
-                              "below": 0.01
+                              "below": 0
                             }
                           ]
                         }

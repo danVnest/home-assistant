@@ -1,3 +1,36 @@
+automation:
+  - alias: Control electricity export curtailment
+    id: control_electricity_export_curtailment
+    description: Curtail electricity export if prices are negative
+    triggers:
+      - trigger: numeric_state
+        entity_id: sensor.electricity_feed_in_price
+        below: 0
+      - trigger: numeric_state
+        entity_id: sensor.electricity_feed_in_price
+        above: 0
+      - trigger: state
+        entity_id: sensor.electricity_feed_in_price
+        to:
+          - unknown
+          - unavailable
+      - trigger: state
+        entity_id: number.electricity_export_limit
+        from:
+          - unknown
+          - unavailable
+      - trigger: event
+        event_type:
+          - homeassistant_started
+    actions:
+      - action: number.set_value
+        target:
+          entity_id: number.electricity_export_limit
+        data:
+          value: "{{ 5000 if states('sensor.electricity_feed_in_price')|float(0) >= 0 else 550 }}"
+          # Green CATCH requires >500W export before diverting to the water heater
+    mode: single
+
 powercalc:
   discovery:
     enabled: false
