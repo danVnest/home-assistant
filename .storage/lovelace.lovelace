@@ -1660,7 +1660,7 @@
                   "type": "custom:bubble-card",
                   "card_type": "button",
                   "button_type": "state",
-                  "entity": "lock.door_lock",
+                  "entity": "lock.front_door",
                   "show_state": false,
                   "show_last_changed": true,
                   "name": "Front door",
@@ -1717,7 +1717,7 @@
                       ]
                     }
                   ],
-                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.door_lock'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
+                  "styles": ".bubble-icon-container {\n  background: ${hass.states['lock.front_door'].state == 'locked' ? 'var(--bubble-accent-color)' : 'var(--bubble-sub-button-background-color)' } !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-main-icon {\n  color: var(--button-color) !important;\n} .bubble-name::after {\n  content: ' ${state}' !important;\n  white-space: pre;\n} .bubble-state::before {\n  content: \"Since \";\n  white-space: pre;\n} .bubble-sub-button-1 .bubble-sub-button-name-container {\n  text-transform: lowercase;\n} .bubble-sub-button-1 .bubble-sub-button-name-container::before {\n  content: 'Monitoring ' !important;\n  white-space: pre;\n  text-transform: none;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
@@ -3149,7 +3149,7 @@
                   "entity": "input_boolean.pets_home_alone"
                 },
                 {
-                  "entity": "lock.door_lock",
+                  "entity": "lock.front_door",
                   "name": "Front door lock"
                 },
                 {

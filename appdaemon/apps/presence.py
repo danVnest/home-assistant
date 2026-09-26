@@ -141,19 +141,19 @@ class Presence(App):
 
 
     @property
-    def door_locked(self) -> bool:
+    def front_door_locked(self) -> bool:
         """True if the front door is locked."""
-        return self.entities.lock.door_lock.state == "locked"
+        return self.entities.lock.front_door.state == "locked"
 
-    def lock_door(self, *, force: bool = False):
+    def lock_front_door(self, *, force: bool = False) -> None:
         """Lock the front door if not already locked."""
-        if not self.door_locked and (force or self.manual_guest_mode != "on"):
-            self.call_service("lock/lock", entity_id="lock.door_lock")
+        if not self.front_door_locked and (force or not self.manual_guest_mode):
+            self.call_service("lock/lock", entity_id="lock.front_door")
 
-    def unlock_door(self, *, force: bool = False):
+    def unlock_front_door(self, *, force: bool = False) -> None:
         """Unlock the front door if not already unlocked."""
-        if self.door_locked and (force or self.manual_guest_mode != "on"):
-            self.call_service("lock/unlock", entity_id="lock.door_lock")
+        if self.front_door_locked and (force or not self.manual_guest_mode):
+            self.call_service("lock/unlock", entity_id="lock.front_door")
 
     def handle_presence_change(
         self,
@@ -177,13 +177,12 @@ class Presence(App):
                 self.log("Manual guest mode is on, ignoring guest presence change")
                 return
         if new == "home":
-            self.unlock_door()
-            if "Away" in self.control.scene:
+            self.unlock_front_door()
                 self.pets_home_alone = False
                 self.control.reset_scene(keep_bright=True)
         else:
             if old == "home":
-                self.lock_door()
+                self.lock_front_door()
             if "Away" not in self.control.scene and not self.anyone_home:
                 self.control.scene = (
                     "Away (Night)" if self.lights.dark_outside else "Away (Day)"
@@ -211,7 +210,8 @@ class Presence(App):
         """Handle doorbell when it rings."""
         del entity, attribute, old, new, kwargs
         self.notify(
-            f"Someone rung the doorbell (door is {self.entities.lock.door_lock.state})",
+            "Someone rung the doorbell "
+            f"(door is {self.entities.lock.front_door.state})",
             title="Doorbell",
         )
         if self.media.playing:
