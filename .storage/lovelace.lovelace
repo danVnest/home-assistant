@@ -648,7 +648,7 @@
                   "button_type": "state",
                   "entity": "select.washer",
                   "icon": "mdi:washing-machine",
-                  "name": "Washing needs to be done",
+                  "name": "Check if washing needs to be done",
                   "modules": [
                     "icon_color_mix_in",
                     "datetime_to_relative_time"
@@ -657,7 +657,8 @@
                     "color": "var(--blue-color)"
                   },
                   "datetime_to_relative_time": {
-                    "entity": "sensor.washer_completion_time"
+                    "entity": "sensor.washer_completion_time",
+                    "prepend": "Last washed "
                   },
                   "visibility": [
                     {
@@ -673,11 +674,15 @@
                           "locations": [
                             "home"
                           ]
+                        },
+                        {
+                          "condition": "time",
+                          "after": "07:00:00",
+                          "before": "15:00:00"
                         }
                       ]
                     }
-                  ],
-                  "styles": ".bubble-state::before {\n  content: 'Last washed ';\n  white-space: pre;\n}\n"
+                  ]
                 },
                 {
                   "type": "custom:bubble-card",
