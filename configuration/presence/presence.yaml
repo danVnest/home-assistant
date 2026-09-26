@@ -231,14 +231,14 @@ template:
         icon: mdi:cellphone-dock
         availability: "{{ has_value('sensor.dan_s_phone_battery_state') }}"
   - triggers:
-    - trigger: state
-      entity_id: binary_sensor.kitchen_door
-      not_from:
-        - unknown
-        - unavailable
-      not_to:
-        - unknown
-        - unavailable
+      - trigger: state
+        entity_id: binary_sensor.kitchen_door
+        not_from:
+          - unknown
+          - unavailable
+        not_to:
+          - unknown
+          - unavailable
     binary_sensor:
       - name: Kitchen door motion
         unique_id: kitchen_door_motion
@@ -247,14 +247,14 @@ template:
         device_class: motion
         icon: mdi:door
   - triggers:
-    - trigger: state
-      entity_id: binary_sensor.dining_room_balcony_door
-      not_from:
-        - unknown
-        - unavailable
-      not_to:
-        - unknown
-        - unavailable
+      - trigger: state
+        entity_id: binary_sensor.dining_room_balcony_door
+        not_from:
+          - unknown
+          - unavailable
+        not_to:
+          - unknown
+          - unavailable
     binary_sensor:
       - name: Dining room balcony door motion
         unique_id: dining_room_balcony_door_motion
@@ -263,14 +263,14 @@ template:
         device_class: motion
         icon: mdi:door
   - triggers:
-    - trigger: state
-      entity_id: binary_sensor.bedroom_balcony_door
-      not_from:
-        - unknown
-        - unavailable
-      not_to:
-        - unknown
-        - unavailable
+      - trigger: state
+        entity_id: binary_sensor.bedroom_balcony_door
+        not_from:
+          - unknown
+          - unavailable
+        not_to:
+          - unknown
+          - unavailable
     binary_sensor:
       - name: Bedroom balcony door motion
         unique_id: bedroom_balcony_door_motion
@@ -279,14 +279,14 @@ template:
         device_class: motion
         icon: mdi:door
   - triggers:
-    - trigger: state
-      entity_id: binary_sensor.nursery_door
-      not_from:
-        - unknown
-        - unavailable
-      not_to:
-        - unknown
-        - unavailable
+      - trigger: state
+        entity_id: binary_sensor.nursery_door
+        not_from:
+          - unknown
+          - unavailable
+        not_to:
+          - unknown
+          - unavailable
     binary_sensor:
       - name: Nursery door motion
         unique_id: nursery_door_motion

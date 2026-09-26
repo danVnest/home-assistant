@@ -222,9 +222,9 @@ template:
           button: "{{ 'Dan''s' if trigger.event.data.device_id == 'bf9428682b24aed4a9paaa' else 'Rachel''s' }}"
 
 automation:
-  - alias: Turn TV on if not already on
-    id: turn_tv_on_if_not_already_on
-    description: "Required to turn the TV on from Home Assistant - sends a wake on lan magic packet"
+  - alias: Turn TV on
+    id: turn_tv_on
+    description: Required to turn the TV on (with a wake on lan magic packet) from Home Assistant
     triggers:
       - trigger: webostv.turn_on
         entity_id: media_player.tv
@@ -237,7 +237,7 @@ automation:
   # https://app.asana.com/0/1207020279479204/1207033183175579/f
   - alias: Renew LG TV developer mode session weekly
     id: renew_lgtv_developer_mode_session_weekly
-    description: "Required to use TV app launcher and media state reporter"
+    description: Required to use TV app launcher and media state reporter
     actions:
       - action: rest_command.renew_lgtv_developer_mode_session
     triggers:

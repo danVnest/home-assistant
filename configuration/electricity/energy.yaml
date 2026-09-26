@@ -232,12 +232,12 @@ template:
         icon: mdi:calendar-start
 
   - triggers:
-    - trigger: state
-      entity_id: sensor.days_since_battery_installation
-      not_to:
-        - unknown
-        - unavailable
-      for: "00:01:00"
+      - trigger: state
+        entity_id: sensor.days_since_battery_installation
+        not_to:
+          - unknown
+          - unavailable
+        for: "00:01:00"
     sensor:
       - name: Daily solar production
         unique_id: daily_solar_production
@@ -353,8 +353,8 @@ template:
         state_class: total
         icon: mdi:home-battery
   - triggers:
-    - trigger: time
-      at: "11:59:00" # 1 minute before midnight so controlled_load_energy_yesterday can be used
+      - trigger: time
+        at: "11:59:00" # 1 minute before midnight so controlled_load_energy_yesterday can be used
     sensor:
       - name: Daily grid consumption
         unique_id: daily_grid_consumption
