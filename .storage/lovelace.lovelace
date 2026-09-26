@@ -944,7 +944,7 @@
                   "icon_color_mix_in": {
                     "color": "purple"
                   },
-                  "styles": ".bubble-state::before {\n  content: '≈${Math.max(0, (hass.states['select.robovac_scene'].state != \"unknown\" ? 75 : 10) - Math.round(parseFloat(hass.states['sensor.robovac_cleaning_time'].state) / 60)) } minutes remaining' !important;\n  white-space: pre;\n}\n"
+                  "styles": ".bubble-state::before {\n  content: '≈${Math.max(0, (hass.states['select.robovac_scene'].state != \"None\" ? 75 : 10) - Math.round(parseFloat(hass.states['sensor.robovac_cleaning_time'].state) / 60)) } minutes remaining' !important;\n  white-space: pre;\n}\n"
                 },
                 {
                   "type": "custom:bubble-card",
