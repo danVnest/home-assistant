@@ -462,6 +462,34 @@
                   "icon_color_mix_in": {
                     "color": "yellow"
                   }
+                },
+                {
+                  "type": "history-graph",
+                  "entities": [
+                    {
+                      "entity": "sensor.power_meter_export_soft_limit"
+                    },
+                    {
+                      "entity": "sensor.electricity_feed_in_price"
+                    }
+                  ],
+                  "hours_to_show": 72
+                },
+                {
+                  "type": "statistics-graph",
+                  "entities": [
+                    "sensor.total_energy_cost_yearly",
+                    "sensor.total_energy_cost_savings_yearly"
+                  ],
+                  "days_to_show": 365,
+                  "period": "month",
+                  "chart_type": "line",
+                  "stat_types": [
+                    "state"
+                  ],
+                  "expand_legend": false,
+                  "logarithmic_scale": false,
+                  "energy_date_selection": false
                 }
               ]
             },
