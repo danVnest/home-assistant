@@ -542,7 +542,8 @@
                     "scene_state_text_and_icon"
                   ]
                 }
-              ]
+              ],
+              "column_span": 1
             },
             {
               "type": "grid",
@@ -2266,302 +2267,120 @@
         },
         {
           "title": "Climate",
-          "path": "climate",
           "icon": "mdi:thermometer",
-          "cards": [
+          "cards": [],
+          "type": "sections",
+          "sections": [
             {
+              "type": "grid",
               "cards": [
                 {
-                  "entities": [
+                  "type": "heading",
+                  "heading": "Conditions",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:thermometer",
+                  "badges": [
                     {
-                      "entity": "sensor.weighted_average_inside_apparent_temperature",
-                      "name": "Inside"
-                    },
-                    {
-                      "entity": "sensor.outside_apparent_temperature",
-                      "name": "Outside"
-                    },
-                    {
-                      "entity": "sensor.extreme_forecast"
+                      "type": "entity",
+                      "entity": "sensor.texts",
+                      "name": "Guide",
+                      "state_content": "name",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/guide"
+                      },
+                      "icon": "mdi:text-box"
                     }
                   ],
-                  "show_name": true,
-                  "type": "glance"
-                },
-                {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": true,
-                  "entities": [
+                  "visibility": [
                     {
-                      "entity": "sensor.entryway_apparent_temperature",
-                      "name": "Entryway"
-                    },
-                    {
-                      "entity": "sensor.kitchen_apparent_temperature",
-                      "name": "Kitchen"
-                    },
-                    {
-                      "entity": "sensor.living_room_apparent_temperature",
-                      "name": "Living room"
-                    },
-                    {
-                      "entity": "sensor.dining_room_apparent_temperature",
-                      "name": "Dining room"
-                    },
-                    {
-                      "entity": "sensor.bathroom_apparent_temperature",
-                      "name": "Bathroom"
-                    },
-                    {
-                      "entity": "sensor.bedroom_apparent_temperature",
-                      "name": "Bedroom"
-                    },
-                    {
-                      "entity": "sensor.nursery_apparent_temperature",
-                      "name": "Nursery"
-                    },
-                    {
-                      "entity": "sensor.office_apparent_temperature",
-                      "name": "Office"
-                    }
-                  ],
-                  "type": "glance",
-                  "columns": 4
-                },
-                {
-                  "type": "glance",
-                  "entities": [
-                    {
-                      "entity": "sensor.weighted_average_inside_humidity",
-                      "name": "Inside"
-                    },
-                    {
-                      "entity": "sensor.outside_humidity",
-                      "name": "Outside"
-                    },
-                    {
-                      "entity": "sensor.bedroom_humidity",
-                      "name": "Bedroom"
-                    },
-                    {
-                      "entity": "sensor.nursery_humidity",
-                      "name": "Nursery"
+                      "condition": "screen",
+                      "media_query": "(min-width: 0px) and (max-width: 767px)"
                     }
                   ]
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "cards": [
+                },
                 {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "entities": [
+                  "type": "heading",
+                  "heading": "Conditions",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:thermometer",
+                  "visibility": [
                     {
-                      "entity": "group.all_aircon",
-                      "name": "All"
-                    },
-                    {
-                      "entity": "climate.living_room_aircon",
-                      "name": "Living room"
-                    },
-                    {
-                      "entity": "climate.dining_room_aircon",
-                      "name": "Dining room"
-                    },
-                    {
-                      "entity": "climate.bedroom_aircon"
+                      "condition": "screen",
+                      "media_query": "(min-width: 768px)"
                     }
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Inside",
+                  "entity": "sensor.weighted_average_inside_apparent_temperature",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "name": "Top",
+                        "group": [
+                          {
+                            "entity": "sensor.kitchen_apparent_temperature",
+                            "icon": "mdi:fridge",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.living_room_apparent_temperature",
+                            "icon": "mdi:sofa",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.dining_room_apparent_temperature",
+                            "icon": "mdi:table-chair",
+                            "show_state": true,
+                            "show_background": false
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Bottom",
+                        "group": [
+                          {
+                            "entity": "sensor.bedroom_apparent_temperature",
+                            "icon": "mdi:bed",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.nursery_apparent_temperature",
+                            "icon": "mdi:cradle",
+                            "show_state": true,
+                            "show_background": false
+                          },
+                          {
+                            "entity": "sensor.office_apparent_temperature",
+                            "icon": "mdi:desktop-classic",
+                            "show_state": true,
+                            "show_background": false
+                          }
+                        ]
+                      }
+                    ],
+                    "main_layout": "rows",
+                    "bottom": []
+                  },
+                  "modules": [
+                    "colorise_entities"
                   ],
-                  "state_color": true,
-                  "title": "Aircon"
+                  "button_action": {},
+                  "slider_fill_orientation": "left",
+                  "slider_value_position": "right",
+                  "card_layout": "large-2-rows",
+                  "rows": 1.125,
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}\n"
                 },
                 {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "entities": [
-                    {
-                      "entity": "group.all_fans",
-                      "name": "All"
-                    },
-                    {
-                      "entity": "fan.nursery",
-                      "name": "Nursery"
-                    },
-                    {
-                      "entity": "fan.office",
-                      "name": "Office"
-                    },
-                    {
-                      "entity": "fan.bedroom",
-                      "name": "Bedroom"
-                    }
-                  ],
-                  "state_color": true,
-                  "title": "Fans"
-                },
-                {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "entities": [
-                    {
-                      "entity": "group.all_heaters",
-                      "name": "All"
-                    },
-                    {
-                      "entity": "switch.nursery_heater",
-                      "name": "Nursery",
-                      "icon": "mdi:radiator"
-                    },
-                    {
-                      "entity": "switch.office_heater",
-                      "name": "Office",
-                      "icon": "mdi:radiator"
-                    }
-                  ],
-                  "title": "Heaters"
-                },
-                {
-                  "show_name": true,
-                  "show_icon": true,
-                  "show_state": false,
-                  "type": "glance",
-                  "entities": [
-                    {
-                      "entity": "group.all_humidifiers",
-                      "name": "All"
-                    },
-                    {
-                      "entity": "humidifier.bedroom",
-                      "name": "Bedroom",
-                      "icon": "mdi:air-humidifier"
-                    },
-                    {
-                      "entity": "humidifier.nursery",
-                      "name": "Nursery",
-                      "icon": "mdi:air-humidifier"
-                    }
-                  ],
-                  "title": "Humidifiers"
-                },
-                {
-                  "content": "Manually controlling aircon, fans, or heaters may disable **automatic control** for those devices. You can toggle **automatic control** of all/individual devices below.",
-                  "type": "markdown"
-                },
-                {
-                  "type": "entities",
-                  "title": "Automatic climate control",
-                  "entities": [
-                    "input_boolean.control_living_room_aircon",
-                    "input_boolean.control_dining_room_aircon",
-                    "input_boolean.control_bedroom_aircon",
-                    "input_boolean.control_nursery_fan",
-                    "input_boolean.control_office_fan",
-                    "input_boolean.control_bedroom_fan",
-                    "input_boolean.control_nursery_heater",
-                    "input_boolean.control_office_heater",
-                    "input_boolean.control_bedroom_humidifier",
-                    "input_boolean.control_nursery_humidifier"
-                  ],
-                  "show_header_toggle": true
-                },
-                {
-                  "type": "markdown",
-                  "content": "**Automatic climate control** will control each aircon, fan, and heater based on room temperature and occupancy.\nIf the **pets are home alone** (or are going to be soon), you can manually specify this or wait for their movement to be detected to trigger **climate control**.\nOnly the bedroom aircon will be controlled when **pets are home alone** (bedroom and office fans will be on as well) or after the specified bed time. **Aircon** can also be manually turned on and off. These settings can be controlled by telling Siri/Google:\n- **\"climate control on\"** or **\"climate control off\"**\n- **\"aircon on\"** or **\"aircon off\"**\n\nNOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC CONTROL DISABLED"
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "entities": [
-                {
-                  "entity": "input_number.cooling_target_temperature"
-                },
-                {
-                  "entity": "input_number.heating_target_temperature"
-                },
-                {
-                  "entity": "input_number.high_temperature_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.low_temperature_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.target_humidity"
-                },
-                {
-                  "entity": "input_number.high_humidity_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.low_humidity_humidifier_trigger"
-                }
-              ],
-              "show_header_toggle": false,
-              "title": "Day",
-              "type": "entities",
-              "state_color": true
-            },
-            {
-              "entities": [
-                {
-                  "entity": "input_number.sleep_cooling_target_temperature"
-                },
-                {
-                  "entity": "input_number.sleep_heating_target_temperature"
-                },
-                {
-                  "entity": "input_number.sleep_high_temperature_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.sleep_low_temperature_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.sleep_target_humidity"
-                },
-                {
-                  "entity": "input_number.sleep_high_humidity_aircon_trigger"
-                },
-                {
-                  "entity": "input_number.sleep_low_humidity_humidifier_trigger"
-                }
-              ],
-              "show_header_toggle": false,
-              "title": "Night",
-              "type": "entities",
-              "state_color": true
-            },
-            {
-              "type": "entities",
-              "entities": [
-                {
-                  "entity": "input_number.aircon_door_check_delay"
-                },
-                {
-                  "entity": "input_number.aircon_vacating_delay"
-                },
-                {
-                  "entity": "input_number.fan_vacating_delay"
-                },
-                {
-                  "entity": "input_number.heater_vacating_delay"
-                },
-                {
-                  "entity": "input_number.humidifier_vacating_delay"
-                }
-              ],
-              "title": "Delays"
-            },
-            {
-              "cards": [
-                {
+                  "type": "history-graph",
                   "entities": [
                     {
                       "entity": "sensor.weighted_average_inside_apparent_temperature",
@@ -2604,13 +2423,20 @@
                       "name": "Office"
                     }
                   ],
-                  "refresh_interval": 0,
                   "title": "Temperatures",
-                  "type": "history-graph",
                   "hours_to_show": 12,
-                  "logarithmic_scale": false
+                  "refresh_interval": 0,
+                  "show_names": false,
+                  "logarithmic_scale": false,
+                  "expand_legend": false,
+                  "uix": {
+                    "style": {
+                      ".": "ha-card {\n  --chart-max-height: 150px;\n}"
+                    }
+                  }
                 },
                 {
+                  "type": "history-graph",
                   "entities": [
                     {
                       "entity": "sensor.weighted_average_inside_humidity",
@@ -2653,129 +2479,782 @@
                       "name": "Office"
                     }
                   ],
-                  "refresh_interval": 0,
                   "title": "Humidities",
-                  "type": "history-graph",
                   "hours_to_show": 12,
-                  "logarithmic_scale": false
+                  "refresh_interval": 0,
+                  "show_names": false,
+                  "logarithmic_scale": false,
+                  "uix": {
+                    "style": {
+                      ".": "ha-card {\n  --chart-max-height: 150px;\n}"
+                    }
+                  }
                 }
-              ],
-              "type": "vertical-stack"
+              ]
             },
             {
-              "type": "vertical-stack",
+              "type": "grid",
               "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Weather",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:weather-partly-cloudy"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "button_type": "state",
+                  "name": "Outside",
+                  "entity": "sensor.outside_apparent_temperature",
+                  "tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "double_tap_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "hold_action": {
+                    "action": "navigate",
+                    "navigation_path": "#weather"
+                  },
+                  "card_layout": "large-2-rows",
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.extreme_forecast",
+                        "icon": "mdi:thermometer",
+                        "show_background": false
+                      },
+                      {
+                        "entity": "sensor.next_rain_forecast",
+                        "show_background": false
+                      }
+                    ],
+                    "bottom": []
+                  },
+                  "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${icon.setAttribute(\"icon\", 'mdi:' + (() => {\n  switch (hass.states['sensor.pirateweather_icon_4h'].state) {\n    case 'clear-day':\n      return 'weather-sunny';\n    case 'clear-night':\n      return 'weather-night';\n    case 'rain':\n      return 'weather-rainy';\n    case 'snow':\n      return 'weather-snowy';\n    case 'sleet':\n      return 'weather-snowy-rainy';\n    case 'wind':\n      return 'weather-windy';\n    case 'fog':\n      return 'weather-fog';\n    case 'cloudy':\n      return 'weather-cloudy';\n    case 'partly-cloudy-day':\n      return 'weather-partly-cloudy';\n    case 'partly-cloudy-night':\n      return 'weather-night-partly-cloudy';\n  }\n})())}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = (() => {\n  const extreme_forecast = hass.states['sensor.extreme_forecast'];\n  if (extreme_forecast.state == 'unavailable') return 'Extreme forecast unavailable';\n  if (extreme_forecast.state == 'unknown') return 'Nice for 10 hours';\n  return `${parseFloat(extreme_forecast.state).toFixed(1)} °C in ${extreme_forecast.attributes.hours_until} hours`\n})()}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = (() => {\n  const next_rain_forecast = hass.states['sensor.next_rain_forecast'];\n  if (next_rain_forecast.state == 'unavailable') return 'Rain forecast unavailable';\n  const hours = parseFloat(next_rain_forecast.state).toFixed(0);\n  if (hours == 0) return 'Raining now';\n  if (hours == 168) return 'No rain for 7 days';\n  return `Rain in ${hours < 24 ? `${hours} hour` : `${Math.round(hours / 24)} day`}${(hours == 1 || hours == 24) ? 's' : ''}`;\n})()}\n",
+                  "modules": [
+                    "colorise_entities"
+                  ],
+                  "rows": 1.125
+                },
+                {
+                  "type": "weather-forecast",
+                  "show_current": false,
+                  "show_forecast": true,
+                  "entity": "weather.pirateweather",
+                  "forecast_type": "daily",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": "auto"
+                  }
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.pirateweather_nearest_storm_distance",
+                  "name": "Nearest storm",
+                  "grid_options": {
+                    "columns": 12,
+                    "rows": "auto"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Devices",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:fan"
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Aircon",
+                  "button_type": "state",
+                  "entity": "group.any_aircon",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "hold_action": {
+                    "action": "call-service",
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_aircon_control"
+                    }
+                  },
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "call-service",
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_aircon_control"
+                      }
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "climate.living_room_aircon",
+                      "icon": "mdi:sofa",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_living_room_aircon"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "climate.dining_room_aircon",
+                      "icon": "mdi:table-chair",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_dining_room_aircon"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "climate.bedroom_aircon",
+                      "icon": "mdi:bed",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_bedroom_aircon"
+                        }
+                      }
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_aircon_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_living_room_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_dining_room_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_bedroom_aircon'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Fans",
+                  "button_type": "state",
+                  "entity": "group.any_fans",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "hold_action": {
+                    "action": "call-service",
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_fan_control"
+                    }
+                  },
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "call-service",
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_fan_control"
+                      }
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "fan.bedroom",
+                      "icon": "mdi:bed",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_bedroom_fan"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "fan.nursery",
+                      "icon": "mdi:cradle",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_nursery_fan"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "fan.office",
+                      "icon": "mdi:desktop-classic",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_office_fan"
+                        }
+                      }
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_fan_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_bedroom_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_nursery_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['input_boolean.control_office_fan'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Heaters",
+                  "button_type": "state",
+                  "entity": "group.any_heaters",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "hold_action": {
+                    "action": "call-service",
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_heater_control"
+                    }
+                  },
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "call-service",
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_heater_control"
+                      }
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "climate.nursery_heater",
+                      "icon": "mdi:cradle",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_nursery_heater"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "switch.office_heater",
+                      "icon": "mdi:desktop-classic",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_office_heater"
+                        }
+                      }
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "styles": ".bubble-icon-container {\n  border: ${hass.states['group.all_heater_control'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['input_boolean.control_nursery_heater'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_office_heater'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
+                  ]
+                },
+                {
+                  "type": "custom:bubble-card",
+                  "card_type": "button",
+                  "name": "Humidifiers",
+                  "button_type": "state",
+                  "entity": "group.any_humidifiers",
+                  "show_state": false,
+                  "card_layout": "large-2-rows",
+                  "hold_action": {
+                    "action": "call-service",
+                    "service": "script.toggle_group",
+                    "data": {
+                      "group": "group.all_humidifier_control"
+                    }
+                  },
+                  "button_action": {
+                    "double_tap_action": {
+                      "action": "toggle"
+                    },
+                    "hold_action": {
+                      "action": "call-service",
+                      "service": "script.toggle_group",
+                      "data": {
+                        "group": "group.all_humidifier_control"
+                      }
+                    }
+                  },
+                  "sub_button": [
+                    {
+                      "entity": "humidifier.bedroom",
+                      "icon": "mdi:bed",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_bedroom_humidifier"
+                        }
+                      }
+                    },
+                    {
+                      "entity": "humidifier.nursery",
+                      "icon": "mdi:cradle",
+                      "double_tap_action": {
+                        "action": "toggle"
+                      },
+                      "hold_action": {
+                        "action": "call-service",
+                        "service": "input_boolean.toggle",
+                        "target": {
+                          "entity_id": "input_boolean.control_nursery_humidifier"
+                        }
+                      }
+                    }
+                  ],
+                  "grid_options": {
+                    "columns": 6
+                  },
+                  "styles": ".bubble-icon-container {\n  border: ${hass.states['sensor.humidifiers_status_text'].state !== 'Functional' ? 'var(--button-border-error)' : (hass.states['group.all_humidifier_control'].state == 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n  box-sizing: border-box !important;\n} .bubble-icon-container::before {\n  background: var(--disabled-color) !important;\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 16px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['sensor.bedroom_humidifier_faults'].state !== 'no faults' ? 'var(--button-border-error)' : (hass.states['input_boolean.control_bedroom_humidifier'].state === 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['sensor.nursery_humidifier_faults'].state !== 'no faults' ? 'var(--button-border-error)' : (hass.states['input_boolean.control_nursery_humidifier'].state === 'on' ? 'var(--button-border-auto)' : 'none')} !important;\n}\n${card.querySelector('.bubble-state').innerText = hass.states['sensor.humidifiers_status_text'].state !== \"Functional\" ? hass.states['sensor.humidifiers_status_text'].state : \"\" }\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
+                  ]
+                },
+                {
+                  "type": "markdown",
+                  "content": "A device that is being controlled automatically will have a <span>green border</span>, in which case it will follow the automation settings below. Turning a device on or off here may disable its automatic control, and as such require your manual input to adjust later. **Press and hold on device/room icons above to toggle their automatic control.**",
+                  "grid_options": {
+                    "columns": "full"
+                  },
+                  "uix": {
+                    "style": {
+                      "ha-markdown$": "span {\n  text-shadow: 0px 0px 2px green;\n}"
+                    }
+                  }
+                }
+              ],
+              "column_span": 2
+            },
+            {
+              "type": "grid",
+              "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Automation",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:cog"
+                },
                 {
                   "entities": [
                     {
-                      "entity": "input_datetime.morning_time"
+                      "entity": "input_number.cooling_target_temperature"
                     },
                     {
-                      "entity": "input_datetime.nursery_time"
+                      "entity": "input_number.heating_target_temperature"
                     },
                     {
-                      "entity": "input_datetime.bed_time"
+                      "entity": "input_number.high_temperature_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.low_temperature_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.target_humidity"
+                    },
+                    {
+                      "entity": "input_number.high_humidity_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.low_humidity_humidifier_trigger"
                     }
                   ],
                   "show_header_toggle": false,
+                  "title": "Day",
                   "type": "entities",
                   "state_color": true
                 },
                 {
-                  "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
-                  "type": "markdown"
+                  "entities": [
+                    {
+                      "entity": "input_number.sleep_cooling_target_temperature"
+                    },
+                    {
+                      "entity": "input_number.sleep_heating_target_temperature"
+                    },
+                    {
+                      "entity": "input_number.sleep_high_temperature_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.sleep_low_temperature_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.sleep_target_humidity"
+                    },
+                    {
+                      "entity": "input_number.sleep_high_humidity_aircon_trigger"
+                    },
+                    {
+                      "entity": "input_number.sleep_low_humidity_humidifier_trigger"
+                    }
+                  ],
+                  "show_header_toggle": false,
+                  "title": "Night",
+                  "type": "entities",
+                  "state_color": true
+                },
+                {
+                  "type": "entities",
+                  "entities": [
+                    {
+                      "entity": "input_number.aircon_door_check_delay"
+                    },
+                    {
+                      "entity": "input_number.aircon_vacating_delay"
+                    },
+                    {
+                      "entity": "input_number.fan_vacating_delay"
+                    },
+                    {
+                      "entity": "input_number.heater_vacating_delay"
+                    },
+                    {
+                      "entity": "input_number.humidifier_vacating_delay"
+                    }
+                  ],
+                  "title": "Delays"
+                },
+                {
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "entities": [
+                        {
+                          "entity": "input_datetime.morning_time"
+                        },
+                        {
+                          "entity": "input_datetime.nursery_time"
+                        },
+                        {
+                          "entity": "input_datetime.bed_time"
+                        }
+                      ],
+                      "show_header_toggle": false,
+                      "type": "entities",
+                      "state_color": true
+                    },
+                    {
+                      "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
+                      "type": "markdown"
+                    }
+                  ]
                 }
-              ]
+              ],
+              "column_span": 2
             }
-          ]
+          ],
+          "max_columns": 2,
+          "path": "climate"
         },
         {
           "path": "lights",
           "title": "Lights",
           "icon": "mdi:lightbulb-variant",
-          "cards": [
+          "cards": [],
+          "type": "sections",
+          "max_columns": 2,
+          "sections": [
             {
+              "type": "grid",
               "cards": [
                 {
-                  "type": "glance",
-                  "entities": [
+                  "type": "heading",
+                  "heading": "Lights",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:lightbulb-variant",
+                  "badges": [
                     {
-                      "entity": "group.all_lights",
-                      "name": "Any / all"
-                    },
-                    {
-                      "entity": "group.entryway_lights",
-                      "name": "Entryway"
-                    },
-                    {
-                      "entity": "group.kitchen_lights",
-                      "name": "Kitchen"
-                    },
-                    {
-                      "entity": "group.tv_lights",
-                      "name": "TV"
-                    },
-                    {
-                      "entity": "group.dining_room_lights",
-                      "name": "Dining"
-                    },
-                    {
-                      "entity": "light.hall",
-                      "name": "Hall"
-                    },
-                    {
-                      "entity": "light.bathroom",
-                      "name": "Bathroom"
-                    },
-                    {
-                      "entity": "light.bedroom",
-                      "name": "Bedroom"
-                    },
-                    {
-                      "entity": "light.nursery",
-                      "name": "Nursery"
-                    },
-                    {
-                      "entity": "light.office",
-                      "name": "Office"
+                      "type": "entity",
+                      "entity": "sensor.texts",
+                      "name": "Guide",
+                      "state_content": "name",
+                      "tap_action": {
+                        "action": "navigate",
+                        "navigation_path": "/lovelace/guide"
+                      },
+                      "icon": "mdi:text-box"
                     }
                   ],
-                  "show_icon": true,
-                  "show_name": true,
-                  "show_state": false,
-                  "title": "Lights",
-                  "state_color": true
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 0px) and (max-width: 767px)"
+                    }
+                  ]
                 },
                 {
-                  "content": "Manually controlling lights may disable **automatic control** for those lights. You can toggle **automatic control** of all/individual lights below.",
-                  "type": "markdown"
+                  "type": "heading",
+                  "heading": "Lights",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:lightbulb-variant",
+                  "visibility": [
+                    {
+                      "condition": "screen",
+                      "media_query": "(min-width: 768px)"
+                    }
+                  ]
                 },
                 {
-                  "type": "entities",
-                  "title": "Automatic light control",
-                  "entities": [
-                    "input_boolean.control_entryway_lights",
-                    "input_boolean.control_kitchen_light",
-                    "input_boolean.control_kitchen_strip_light",
-                    "input_boolean.control_tv_lights",
-                    "input_boolean.control_dining_room_lights",
-                    "input_boolean.control_hall_light",
-                    "input_boolean.control_bathroom_light",
-                    "input_boolean.control_bedroom_light",
-                    "input_boolean.control_nursery_light",
-                    "input_boolean.control_office_light"
+                  "type": "custom:bubble-card",
+                  "card_type": "sub-buttons",
+                  "card_layout": "large-2-rows",
+                  "scrolling_effect": false,
+                  "sub_button": {
+                    "bottom_layout": "rows",
+                    "bottom": [
+                      {
+                        "name": "Top",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "group.all_lights",
+                            "name": "All",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.entryway_lights",
+                            "name": "Entryway",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_entryway_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.kitchen_lights",
+                            "name": "Kitchen",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "script.toggle_group",
+                              "data": {
+                                "group": "group.all_kitchen_light_control"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.tv_lights",
+                            "name": "TV",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_tv_lights"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "group.dining_room_lights",
+                            "name": "Dining",
+                            "show_name": true,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_dining_room_lights"
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Bottom",
+                        "buttons_layout": "inline",
+                        "group": [
+                          {
+                            "entity": "light.hall",
+                            "name": "Hall",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_hall_light"
+                              }
+                            },
+                            "content_layout": "icon-left"
+                          },
+                          {
+                            "entity": "light.bathroom",
+                            "name": "Bathroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bathroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.bedroom",
+                            "name": "Bedroom",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_bedroom_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.nursery",
+                            "name": "Nursery",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_nursery_light"
+                              }
+                            }
+                          },
+                          {
+                            "entity": "light.office",
+                            "name": "Office",
+                            "show_name": true,
+                            "light_background": false,
+                            "double_tap_action": {
+                              "action": "toggle"
+                            },
+                            "hold_action": {
+                              "action": "call-service",
+                              "service": "input_boolean.toggle",
+                              "target": {
+                                "entity_id": "input_boolean.control_office_light"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "styles": ".bubble-sub-button {\n  padding: 0 4px;\n} .bubble-sub-button-group {\n  gap: 4px;\n} .icon-with-state {\n  margin-right: 2px\n} .bubble-sub-button-icon {\n  --mdc-icon-size: 12px !important;\n} .bubble-sub-button-1 {\n  border: ${hass.states['group.all_light_control'].state == 'on' ? 'var(--button-border-auto)' : (hass.states['group.any_light_control'].state == 'on' ? 'var(--button-border-semi)' : 'none')} !important;\n} .bubble-sub-button-2 {\n  border: ${hass.states['input_boolean.control_entryway_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-3 {\n  border: ${hass.states['group.all_kitchen_light_control'].state == 'on' ? 'var(--button-border-auto)' : hass.states['input_boolean.control_kitchen_light'].state == 'on' || hass.states['input_boolean.control_kitchen_strip_light'].state == 'on' ? 'var(--button-border-semi)' : 'none'} !important;\n} .bubble-sub-button-4 {\n  border: ${hass.states['input_boolean.control_tv_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-5 {\n  border: ${hass.states['input_boolean.control_dining_room_lights'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-6 {\n  border: ${control = hass.states['input_boolean.control_hall_light'].state == 'on', control && (hass.states['input_boolean.napping_in_nursery'].state == 'on' || hass.states['input_boolean.napping_in_bedroom'].state == 'on') ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-7 {\n  border: ${hass.states['input_boolean.control_bathroom_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n} .bubble-sub-button-8 {\n  border: ${control = hass.states['input_boolean.control_bedroom_light'].state == 'on', control && hass.states['input_boolean.napping_in_bedroom'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-9 {\n  border: ${control = hass.states['input_boolean.control_nursery_light'].state == 'on', control && hass.states['input_boolean.napping_in_nursery'].state == 'on' ? 'var(--button-border-manual)' : (control ? 'var(--button-border-auto)' : 'none')} !important;\n} .bubble-sub-button-10 {\n  border: ${hass.states['input_boolean.control_office_light'].state == 'on' ? 'var(--button-border-auto)' : 'none'} !important;\n}\n",
+                  "modules": [
+                    "colorise_entities",
+                    "indicate_unavailable_entities"
                   ],
-                  "show_header_toggle": true
+                  "rows": 1.1
                 },
                 {
                   "type": "markdown",
-                  "content": "Lighting in the entryway, kitchen, office and bedroom will automatically brighten when someone enters, and dim shortly after they leave (depending on scene settings). Automatic bedroom lighting is disabled as soon as the ***Sleep*** scene starts, only enabling again when the bedroom **button** is clicked or after illuminance levels peak (i.e. after blinds are first opened in the morning).\n\nNOTE THAT DEVICES WILL ALWAYS TURN OFF WHEN AWAY EVEN IF AUTOMATIC CONTROL DISABLED"
+                  "content": "A light that is being controlled automatically will have a <span>green border</span>, in which case it will follow the automation settings below. Adjusting a light here may disable its automatic control, and as such require your manual input to adjust later. **Press and hold on a light's room icon above to toggle its automatic control.**\n\nLighting in most rooms will automatically brighten when someone enters, and dim shortly after they leave (depending on the settings below). Bedroom lighting will turn off and stay off when ***nap mode*** is enabled with a **single smart button press**. A **double smart button press** will manually end ***nap mode*** and enable automatic lighting again.",
+                  "grid_options": {
+                    "columns": "full"
+                  },
+                  "uix": {
+                    "style": {
+                      "ha-markdown$": "span {\n  text-shadow: 0px 0px 2px green;\n}"
+                    }
+                  }
                 }
               ],
-              "type": "vertical-stack"
+              "column_span": 1
             },
             {
+              "type": "grid",
               "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Circadian",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:moon-waxing-crescent"
+                },
                 {
                   "entities": [
                     {
@@ -2795,21 +3274,29 @@
                     },
                     {
                       "entity": "input_datetime.circadian_end_time"
+                    },
+                    {
+                      "entity": "input_datetime.morning_time"
                     }
                   ],
-                  "title": "Circadian Rhythm",
                   "type": "entities",
                   "state_color": false
                 },
                 {
-                  "content": "Lighting at night will gradually transition between the initial and final brightness and colour values specified here.\n\nInitial circadian settings occur after sunset (specified in hours by *initial sunset offset*) and reaches the final values at *end time*.",
-                  "type": "markdown"
+                  "type": "markdown",
+                  "content": "Lighting at night will gradually transition between the initial and final brightness and colour values specified here.\n\nInitial circadian settings occur after sunset (specified in hours by *initial sunset offset*) and reaches the final values at *end time*.\n\nSchedule the Morning scene to trigger just before anyone should wake up to provide dim kitchen lighting (plus climate control). For more information, see the [**Guide**](/lovelace/guide)."
                 }
-              ],
-              "type": "vertical-stack"
+              ]
             },
             {
+              "type": "grid",
               "cards": [
+                {
+                  "type": "heading",
+                  "heading": "Automation",
+                  "heading_style": "subtitle",
+                  "icon": "mdi:cog"
+                },
                 {
                   "content": "Values here specify the *brightness* and colour temperature of lighting in different scenes. Colour temperature ranges from warm white (2000 *kelvin*) to cold white (4500 *kelvin*).\n\n*Motion* indicates the value is specific to when the room is occupied (otherwise defaulting to the normal values specified, the current circadian value, off, or maximum - depending on the scene).\n\n*Vacating delay* specifies how long the light will wait after someone leaves the room before reverting to its previous state.\n\nIf a *transition period* is available the light will smoothly change over that period to the motion brightness and kelvin specified or implied.",
                   "type": "markdown"
@@ -2885,52 +3372,27 @@
                   ],
                   "title": "Morning",
                   "type": "entities"
-                }
-              ],
-              "type": "vertical-stack"
-            },
-            {
-              "entities": [
-                {
-                  "entity": "input_number.office_vacating_delay"
                 },
-                {
-                  "entity": "input_number.bathroom_vacating_delay"
-                },
-                {
-                  "entity": "input_number.bedroom_vacating_delay"
-                },
-                {
-                  "entity": "input_number.nursery_vacating_delay"
-                }
-              ],
-              "title": "Room Vacating Delays",
-              "type": "entities"
-            },
-            {
-              "type": "vertical-stack",
-              "cards": [
                 {
                   "entities": [
                     {
-                      "entity": "input_datetime.morning_time"
+                      "entity": "input_number.office_vacating_delay"
                     },
                     {
-                      "entity": "input_datetime.nursery_time"
+                      "entity": "input_number.bathroom_vacating_delay"
                     },
                     {
-                      "entity": "input_datetime.bed_time"
+                      "entity": "input_number.bedroom_vacating_delay"
+                    },
+                    {
+                      "entity": "input_number.nursery_vacating_delay"
                     }
                   ],
-                  "show_header_toggle": false,
-                  "type": "entities",
-                  "state_color": true
-                },
-                {
-                  "content": "Specify the time for which the ***Morning*** scene and pre-sleep climate controls will trigger. For more information, see the [**Guide**](/lovelace/guide).",
-                  "type": "markdown"
+                  "title": "Room Vacating Delays",
+                  "type": "entities"
                 }
-              ]
+              ],
+              "column_span": 2
             }
           ]
         },
@@ -2967,12 +3429,35 @@
             },
             {
               "type": "markdown",
-              "content": "{% set alerts = state_attr('sensor.cuboai_last_alert', 'alerts') %}\n{% for alert in alerts %}\n  {% if alert['image'] %}![img]({{ alert['image'] }}){% endif %}\n  **{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}** in nursery at **{{ as_timestamp(alert['created'])|timestamp_custom('%I:%M** %p on %d.%m.%Y ', true) }}\n{% endfor %}",
+              "content": "Use **manual guest mode** to disable *Away* scenes. This will prevent the door from automatically locking/unlocking and is most useful when guests are staying who would rather use a key."
+            },
+            {
+              "type": "markdown",
+              "content": "\nSecurity cameras are only enabled when no-one is home, or in the *Sleep* scene.\n\nThe exceptions are:\n- the front door camera is always enabled\n- the living room camera is only enabled when no-one is home\n- the nursery camera is only enabled when the smart button has been pressed to enable *nap mode*, or no-one is home\n"
+            },
+            {
+              "type": "markdown",
+              "content": "{% set alerts = state_attr('sensor.nursery_camera_last_alert', 'alerts') %}\n{% for alert in alerts %}\n  {% if alert['image'] %}![img]({{ alert['image'] }}){% endif %}\n  **{{ alert['type'].replace('CUBO_ALERT_','').replace('_',' ').title() }}** in nursery at **{{ as_timestamp(alert['created'])|timestamp_custom('%I:%M** %p on %d.%m.%Y ', true) }}\n{% endfor %}",
               "visibility": [
                 {
-                  "condition": "state",
-                  "entity": "sensor.cuboai_last_alert",
-                  "state_not": "No alerts"
+                  "condition": "and",
+                  "conditions": [
+                    {
+                      "condition": "state",
+                      "entity": "sensor.nursery_camera_last_alert",
+                      "state_not": "No alerts"
+                    },
+                    {
+                      "condition": "state",
+                      "entity": "sensor.nursery_camera_last_alert",
+                      "state_not": "unknown"
+                    },
+                    {
+                      "condition": "state",
+                      "entity": "sensor.nursery_camera_last_alert",
+                      "state_not": "unavailable"
+                    }
+                  ]
                 }
               ]
             },
@@ -4607,7 +5092,7 @@
                 },
                 {
                   "type": "markdown",
-                  "content": "This Home Assistant system is designed to operate as autonomously as possible, so you hopefully don't need to use manual controls very often.\n\nCurrently, the main functionality/devices that require manual control are:\n- nap mode (for day naps in the bedroom or nursery)*\n- Sleep scene (for when everyone is in bed)*\n- back deck light\n- bathroom vent fan\n- toilet light/vent fan\n- downstairs lights & aircon (except the entryway lights)\n\n\\* Use the **smart buttons**, **app**, or **voice control** to change the scene and set napping state when required.\n\nFor everything else, the [<ha-icon icon=\"mdi:home-assistant\"></ha-icon>**Main Dashboard**](/lovelace/climate) provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the [<ha-icon icon=\"mdi:thermometer\"></ha-icon>**Climate**](/lovelace/climate), [<ha-icon icon=\"mdi:lightbulb-variant\"></ha-icon>**Lights**](/lovelace/lights), [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence), [<ha-icon icon=\"mdi:lightning-bolt\"></ha-icon>**Electricity**](/lovelace/electricity), and [<ha-icon icon=\"mdi:grass\"></ha-icon>**Plants**](/lovelace/plants) dashboards (navigate to these with the icons at the top of the screen).\n\n<center><h3>For more information, select a topic:</h3></center>\n<details><summary><i>Automatic control</i></summary>\n\n**Climate** and **lighting** settings are automatically adjusted based on time, room occupancy, temperatures, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available in the other dashboards. The system will automatically switch between different scenes. You can also manually select a preferred scene.\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger just before anyone wakes up (at the time specified in the Climate and Lights dashboards), providing dim kitchen lighting plus turning on the living room aircon if appropriate. Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient bedroom light is sufficient (usually when the blinds are opened). House lighting is minimised in this scene, but the kitchen, office, bedroom, and nursery will still automatically turn on the lights if there is not enough ambient light in that particular room (and its nap mode is off).\n- ***Night*** is triggered when outdoor light levels are low, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm. This scene is usually triggered as the sun sets, but dark clouds, total solar eclipses, or large birds sitting on the weather station can also trigger it.\n- ***Sleep*** turns off all lighting in the house - except for some non-sleeping areas which are still lit only when there is motion. This scene has to be manually triggered with the bedroom button, this app, or voice control.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night.\n- ***Bright*** turns all lights on at full brightness - triggered when there is a fire, otherwise has to be manually triggered with the app or living room button.\n- ***Away (Night/Day)*** turns off all lights (except dining room lights at night for security purposes) and disables climate control unless the pets are detected alone at home. Also ensures the house is locked and security cameras are all monitoring. This scene is automatically triggered when everyone (including guests) have left the house. **Manual guest mode** can be enabled from [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence) to prevent **Away** scenes from triggering.\n\nThe bedroom and nursery can each be set to **nap mode** using the corresponding room's **smart button**, the **app**, or **voice control**. During **nap mode** the room's light will not turn on automatically, and climate devices don't turn off when motion isn't detected. This ensures nice conditions are maintained in the room while napping/sleeping.\n\n</details>\n<details><summary><i>Manual control</i></summary>\n\nYou can manually control devices with their physical remotes/switches/buttons, or through this app.\nControls are provided for **lights**, **aircon**, **fans**, **heaters**, **humidifiers**, **door locks**, and the **garden watering system**. \n\nAutomatic controls should provide almost all the functionality you need, but manual control is of course useful when required.\n\nIf you manually adjust a device the system may disable subsequent automatic control if there is a logic conflict. If this happens you will get a notification. You can manually re-enable automatic control in this app, or disable control if you want to ensure the current device state is maintained.\n\nUse **manual guest mode** to disable Away scenes (control from the [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence) dashboard). This will prevent the door from automatically locking/unlocking and is most useful when guests are staying who would rather use a key.\n \n</details>\n<details><summary><i>Smart buttons</i></summary>\n\nAll **buttons** have a similar control pattern:\n- *single press*: turn relevant lights off in preparation for napping/sleeping\n  - *living room button*: change the house scene to **Sleep**\n  - *nursery button*: turn **nap mode on** in the nursery\n  - *bedroom buttons*: turn **nap mode on** in the bedroom - unless already on, then transition the house to the **Sleep** scene instead\n- *double press*: turn relevant lights on\n  - *living room button*: set the house scene appropriately (with lights on in the living room and kitchen area)\n  - *nursery and bedroom buttons*: turn **nap mode off** in the room, and turn the room's light on\n- *long press*: if no climate device (**aircon**, **heater**, **fan**, or **humidifier**) is on in the room, they will turn on with appropriate settings for current conditions; otherwise all will turn off\n</details>\n\n<details><summary><i>App usage</i></summary>\nSingle pressing on icons or text will show relevant history graphs and/or controls. Anything with an <span>orange border</span> will show something different when pressed - usually a collection of other relevant information.\n\nDouble pressing on icons or text will toggle the entity if applicable. For example, you can toggle the door lock, lights, and climate devices such as aircon, fans, heaters, and humidifiers.\n\nPress and hold on icons or text to toggle automatic control for lights and climate devices. A device that is currently being controlled automatically will have a <span>green border</span>.\n</details>\n\n<details><summary><i>Voice control</i></summary>\n\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\n\n, or tell Siri/Google:\n- **\"lights on bright\"** for the *Bright* scene\n- **\"sleep time\"** for the *Sleep* scene\n\nIn order to use Google, you will need to connect your Google Assistant to IFTTT and add applets with webhooks to Home Assistant corresponding to each command.\n\nTODO: CHANGE ABOVE TO LIST OF QUOTES\nTODO: consider inbuilt LLM voice control?\n\n</details>",
+                  "content": "This Home Assistant system is designed to operate as autonomously as possible, so you hopefully don't need to use manual controls very often.\n\nCurrently, the main functionality/devices that require manual control are:\n- nap mode (for day naps in the bedroom or nursery)*\n- Sleep scene (for when everyone is in bed)*\n- back deck light\n- bathroom vent fan\n- toilet light/vent fan\n- downstairs lights & aircon (except the entryway lights)\n\n\\* Use the **smart buttons**, **app**, or **voice control** to change the scene and set napping state when required.\n\nFor everything else, the [<ha-icon icon=\"mdi:home-assistant\"></ha-icon>**Main Dashboard**](/lovelace/climate) provides an overview of Home Assistant and some basic controls. You can also find additional details and controls in the [<ha-icon icon=\"mdi:thermometer\"></ha-icon>**Climate**](/lovelace/climate), [<ha-icon icon=\"mdi:lightbulb-variant\"></ha-icon>**Lights**](/lovelace/lights), [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence), [<ha-icon icon=\"mdi:lightning-bolt\"></ha-icon>**Electricity**](/lovelace/electricity), and [<ha-icon icon=\"mdi:grass\"></ha-icon>**Plants**](/lovelace/plants) dashboards (navigate to these with the icons at the top of the screen).\n\n<center><h3>For more information, select a topic:</h3></center>\n<details><summary><i>Automatic control</i></summary>\n\n**Climate** and **lighting** settings are automatically adjusted based on time, room occupancy, temperatures, humidities, illuminance, and various other factors. The system will transition between **scenes** throughout the day - these scenes are general categories for desired functionality. Settings for each scene are available across these dashboards. The system will automatically switch between different scenes, but you can also manually select a preferred scene.\n\nEach **scene** has a particular purpose:\n- ***Morning*** is designed to trigger just before anyone wakes up (at the time specified in the Climate and Lights dashboards), providing dim kitchen lighting plus turning on the living/dining room aircon if appropriate. Thus when anyone does get up it is to a comfortable temperature and sufficient lighting.\n- ***Day*** is triggered when ambient bedroom light is sufficient (usually when the blinds are opened). House lighting is minimised in this scene, but the kitchen, office, bedroom, and nursery will still automatically turn on the lights if there is not enough ambient light in that particular room (and nap mode is off (bedroom/nursery only)).\n- ***Night*** is triggered when outdoor light levels are low, turning on the main lights in the house. The brightness and colour temperature of all lighting adjusts as the night goes on, getting dimmer and warmer so as to reduce the impact to your circadian rhythm. This scene is usually triggered as the sun sets, but dark clouds, total solar eclipses, or large birds sitting on the weather station can also trigger it.\n- ***Sleep*** turns off all lighting in the house - except for some non-sleeping areas which are still lit only when there is motion. This scene has to be manually triggered with the bedroom button, this app, or voice control.\n- ***TV*** dims the lights for a nice viewing experience, automatically triggered when the TV is playing at Night. If the TV is paused or muted the scene will temporarily reset, then transition back to TV when resumed/unmuted.\n- ***Bright*** turns all lights on at full brightness - triggered in emergencies such as when a fire is detected. In these cases the TV is also paused/muted, and the front door automatically unlocks.\n- ***Away (Night/Day)*** turns off all lights (except some lights at night for security purposes) and disables climate control unless the pets are detected alone at home. Also ensures the house is locked and security cameras are all monitoring. This scene is automatically triggered when everyone (including guests) have left the house. **Manual guest mode** can be enabled from [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence) to prevent **Away** scenes from triggering. Only the front door camera is enabled when the scene is not Away.\n\nThe bedroom and nursery can each be set to **nap mode** using the corresponding room's **smart button**, the **app**, or **voice control**. During **nap mode** the room's light will not turn on automatically, and climate devices don't turn off when motion isn't detected. This ensures nice conditions are maintained in the room while napping/sleeping.\n\n</details>\n<details><summary><i>Manual control</i></summary>\n\nYou can manually control devices with their physical remotes/switches/buttons, or through this app.\nControls are provided for **lights**, **aircon**, **fans**, **heaters**, **humidifiers**, **door locks**, and the **garden watering system**. \n\nAutomatic controls should provide almost all the functionality you need, but manual control is of course useful when required.\n\nIf you manually adjust a device the system may disable subsequent automatic control if there is a logic conflict. If this happens you will get a notification. You can manually re-enable automatic control in this app, or disable control if you want to ensure the current device state is maintained.\n\nUse **manual guest mode** to disable Away scenes (control from the [<ha-icon icon=\"mdi:cctv\"></ha-icon>**Presence**](/lovelace/presence) dashboard). This will prevent the door from automatically locking/unlocking and is most useful when guests are staying who would rather use a key.\n \n</details>\n<details><summary><i>Smart buttons</i></summary>\n\nAll **buttons** have a similar control pattern:\n- *single press*: turn relevant lights off in preparation for napping/sleeping\n  - *living room button*: change the house scene to **Sleep**\n  - *nursery button*: turn **nap mode on** in the nursery\n  - *bedroom buttons*: first press turns **nap mode on** in the bedroom, second press transitions the house to the **Sleep** scene\n- *double press*: turn relevant lights on\n  - *living room button*: set the house scene appropriately (with lights on in the living room and kitchen area)\n  - *nursery and bedroom buttons*: turn **nap mode off** in the room, and turn the room's light on\n- *long press*: if no climate device (**aircon**, **heater**, **fan**, or **humidifier**) is on in the room, they will turn on with appropriate settings for current conditions; otherwise all will turn off\n</details>\n\n<details><summary><i>App usage</i></summary>\nSingle pressing on icons or text will usually show relevant history graphs and/or controls, but some will show something different when pressed - usually a collection of other relevant information.\n\nDouble pressing on icons or text will toggle the entity if applicable. For example, you can toggle the door lock, lights, and climate devices such as aircon, fans, heaters, and humidifiers.\n\nPress and hold on icons or text to toggle automatic control for lights and climate devices. A device that is currently being controlled automatically will have a <span>green border</span>.\n</details>\n\n<details><summary><i>Voice control</i></summary>\n\nIn order to use Siri, you will need to add the following Siri shortcuts to your device: [Sleep Time](https://www.icloud.com/shortcuts/1c19b6e78b3c492d867cb63305bbfaa9), [Lights On Bright](https://www.icloud.com/shortcuts/d4bf116ae08c4d8a8290827f5c126010), [Lights On](https://www.icloud.com/shortcuts/7cb15602d0974ce1a897f422901acafd), [Lights Off](https://www.icloud.com/shortcuts/e424f0052a014954a71452d01a122167), [Aircon On](https://www.icloud.com/shortcuts/dab4081c117e4b8c8c0f3f5bff5b9a34), [Aircon Off](https://www.icloud.com/shortcuts/87e1dda3345f41f391c3030d09621655), [Enable Climate Control](https://www.icloud.com/shortcuts/19419fdeecea43b6914a420701fb7b35), [Disable Climate Control](https://www.icloud.com/shortcuts/f322c4c33abd45f5b2dd82281219b706), [Lock The Door](https://www.icloud.com/shortcuts/0e14667cabbd436aa2704a7fd31359b1), [Unlock The Door](https://www.icloud.com/shortcuts/27f357e7fdbd4293927259d4d4326b0d), [TV On](https://www.icloud.com/shortcuts/72c845af76b24ff28a965e34a07f7b6f).\n\nThen you can say the above phrases to Siri. A few examples:\n- **\"sleep time\"** to transition to the *Sleep* scene\n- **\"unlock the door\"** to unlock the door\n- **\"lights on bright\"** to transition to the *Bright* scene\n\nVoice control options for other devices is currently in development.\n</details>",
                   "layout_options": {
                     "grid_columns": "full"
                   },
