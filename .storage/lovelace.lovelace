@@ -99,21 +99,35 @@
                       "navigation_path": "#device-issues"
                     }
                   },
-                  "sub_button": [
-                    {
-                      "entity": "sensor.unavailable_entities",
-                      "show_background": false
-                    },
-                    {
-                      "entity": "sensor.frozen_entities",
-                      "show_background": false
-                    }
-                  ],
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.unavailable_entities",
+                        "show_background": false
+                      },
+                      {
+                        "entity": "sensor.frozen_entities",
+                        "show_background": false
+                      }
+                    ],
+                    "bottom": []
+                  },
                   "visibility": [
                     {
-                      "condition": "numeric_state",
-                      "entity": "sensor.device_issues",
-                      "above": 0
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.device_issues",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n} ${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.device_issues'].state + ' device issue' + (hass.states['sensor.device_issues'].state === '1' ? '': 's')}}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = hass.states['sensor.unavailable_entities'].state + ' unavailable' }\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = hass.states['sensor.frozen_entities'].state + ' frozen' }\n",
@@ -123,8 +137,7 @@
                   ],
                   "icon_color_mix_in": {
                     "color": "red"
-                  },
-                  "icon_border_progress": []
+                  }
                 },
                 {
                   "type": "custom:bubble-card",
@@ -132,23 +145,37 @@
                   "button_type": "state",
                   "entity": "sensor.system_issues_in_the_last_hour",
                   "card_layout": "large-2-rows",
-                  "sub_button": [
-                    {
-                      "entity": "sensor.errors_in_the_last_hour",
-                      "show_background": false,
-                      "icon": "mdi:alert-circle"
-                    },
-                    {
-                      "entity": "sensor.warnings_in_the_last_hour",
-                      "show_background": false,
-                      "icon": "mdi:help-circle"
-                    }
-                  ],
+                  "sub_button": {
+                    "main": [
+                      {
+                        "entity": "sensor.errors_in_the_last_hour",
+                        "show_background": false,
+                        "icon": "mdi:alert-circle"
+                      },
+                      {
+                        "entity": "sensor.warnings_in_the_last_hour",
+                        "show_background": false,
+                        "icon": "mdi:help-circle"
+                      }
+                    ],
+                    "bottom": []
+                  },
                   "visibility": [
                     {
-                      "condition": "numeric_state",
-                      "entity": "sensor.errors_in_the_last_hour",
-                      "above": 0
+                      "condition": "and",
+                      "conditions": [
+                        {
+                          "condition": "numeric_state",
+                          "entity": "sensor.errors_in_the_last_hour",
+                          "above": 0
+                        },
+                        {
+                          "condition": "user",
+                          "users": [
+                            "15ff7a86d4ae4d38a60003ad4064ff78"
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "styles": ".bubble-sub-button-icon {\n  --mdc-icon-size: 16px;\n  margin-right: 3px;\n}  ${card.querySelector('.bubble-name').innerText = 'WARNING: ' + hass.states['sensor.system_issues_in_the_last_hour'].state + ' system issue' + (hass.states['sensor.system_issues_in_the_last_hour'].state === '1' ? '': 's') + ' this hour'}\n${card.querySelector('.bubble-state').innerText = 'System functionality may be impaired'}\n${card.querySelector('.bubble-sub-button-1 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.errors_in_the_last_hour'].state) + ' error' + (hass.states['sensor.errors_in_the_last_hour'].state === '1.0' ? '': 's')}\n${card.querySelector('.bubble-sub-button-2 .bubble-sub-button-name-container').innerText = parseInt(hass.states['sensor.warnings_in_the_last_hour'].state) + ' warning' + (hass.states['sensor.warnings_in_the_last_hour'].state === '1.0' ? '': 's') }\n",
