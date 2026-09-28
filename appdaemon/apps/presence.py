@@ -32,6 +32,7 @@ class Presence(App):
         """Create rooms with sensors and listen for new devices and people."""
         super().initialize()
         self.__pets_home_alone = self.get_boolean_setting("pets_home_alone")
+        self.pets_home_alone_overridden = False
         for multisensor_room in ["entryway", "dining_room", "bathroom"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
@@ -177,6 +178,7 @@ class Presence(App):
                 self.safety.notify_of_empty_dog_water_bowl()
             if self.control.scene.startswith("Away"):
                 self.pets_home_alone = False
+                self.pets_home_alone_overridden = False
                 self.control.reset_scene(keep_bright=True)
         else:
             if old == "home":
@@ -345,6 +347,7 @@ class Room:
                 )
             elif (
                 not self.controller.pets_home_alone
+                and not self.controller.pets_home_alone_overridden
                 and (
                     sensor.endswith(
                         ("_multisensor_motion", "_presence_sensor_occupancy"),

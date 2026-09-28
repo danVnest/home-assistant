@@ -578,6 +578,7 @@ class Control(App):
             self.scene = new
         elif setting == "pets_home_alone":
             if (new == "on") != self.presence.pets_home_alone:
+                self.presence.pets_home_alone_overridden = True
                 self.presence.pets_home_alone = new == "on"
         elif setting.startswith("napping_in"):
             self.__change_napping_state(setting.split("_")[-1], napping=new == "on")
