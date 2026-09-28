@@ -10,8 +10,3 @@
         {{- states(entity_id) -}}
     {%- endif -%}
 {%- endmacro -%}
-
-{%- macro soil_sensor_battery(location) -%}
-    {%- set entity_id = 'sensor.soil_battery_voltage_' + location -%}
-    {{- max(0, min(100, (100 * (float(states(entity_id)) - 1.0) / (1.6 - 1.0))|round(2))) -}}
-{%- endmacro -%}

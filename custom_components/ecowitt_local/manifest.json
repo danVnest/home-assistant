@@ -1,0 +1,13 @@
+{
+  "domain": "ecowitt_local",
+  "name": "Ecowitt Local",
+  "codeowners": ["@alexlenk"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/alexlenk/ecowitt_local",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/alexlenk/ecowitt_local/issues",
+  "quality_scale": "platinum",
+  "requirements": ["aiohttp>=3.8.0"],
+  "version": "1.7.31"
+}
