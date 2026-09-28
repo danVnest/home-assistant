@@ -36,6 +36,7 @@ class Media(App):
             self.handle_state_change,
             "binary_sensor.tv_playing",
             new="on",
+            duration=self.constants["tv_playing_delay"],
         )
         self.listen_state(
             self.handle_state_change,

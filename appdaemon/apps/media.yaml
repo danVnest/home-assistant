@@ -1,4 +1,5 @@
 Media:
   module: media
   class: Media
+  tv_playing_delay: 15 # seconds delay after play starts to change to TV scene (prevents annoying toggling when browsing previews)
   # log_level: DEBUG
