@@ -774,6 +774,8 @@ class Aircon(ClimateDevice, PresenceDevice):
     @override
     def turn_on_for_conditions(self) -> None:
         """Set the aircon unit to heat or cool at desired settings."""
+        if not self.available:
+            return
         mode = self.best_mode_for_conditions
         if self.device.state != mode:
             self.call_service("set_hvac_mode", hvac_mode=mode)
@@ -1164,6 +1166,8 @@ class Fan(ClimateDevice, PresenceDevice):
         check_if_would_adjust_only: bool = False,
     ) -> bool | None:
         """Calculate the best fan speed for current conditions and set accordingly."""
+        if not self.available:
+            return False
         if not self.control_enabled and not check_if_would_adjust_only:
             return None
         reverse = self.reverse_desired
@@ -1201,6 +1205,8 @@ class Fan(ClimateDevice, PresenceDevice):
         if self.reversing_timer:
             self.controller.cancel_timer(self.reversing_timer)
             self.reversing_timer = None
+        if not self.available:
+            return
         speed = self.validate_speed(speed)
         if speed == 0:
             self.turn_off()
@@ -1253,7 +1259,7 @@ class Fan(ClimateDevice, PresenceDevice):
     def continue_reverse(self, **kwargs: Any) -> None:
         """Continue the remaining fan reversal steps (reverse or change speed)."""
         del kwargs
-        if not self.reversing_steps_remaining:
+        if not self.reversing_steps_remaining or not self.available:
             return
         if self.reversing_steps_remaining[0] == "reverse":
             if self.reverse != self.reverse_desired:

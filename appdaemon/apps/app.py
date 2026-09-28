@@ -193,6 +193,16 @@ class Device:
                 entity_id=device,
                 attribute="context",
             )
+            self.controller.listen_state(
+                self.__handle_availability_change,
+                entity_id=device,
+                new="unavailable",
+            )
+            self.controller.listen_state(
+                self.__handle_availability_change,
+                entity_id=device,
+                old="unavailable",
+            )
         self.controller.listen_state(
             self.__handle_automatic_control_change,
             self.control_input_boolean,
@@ -202,7 +212,12 @@ class Device:
     @property
     def on(self) -> bool:
         """True if the device is on."""
-        return self.device.state != "off"
+        return self.device.state not in ("off", "unavailable")
+
+    @property
+    def available(self) -> bool:
+        """True if the device is available."""
+        return self.device.state != "unavailable"
 
     @property
     def control_enabled(self) -> bool:
@@ -234,7 +249,7 @@ class Device:
 
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the device on if it's off or adjust with provided parameters."""
-        if not self.on or kwargs:
+        if self.available and (not self.on or kwargs):
             if self.device_type != "group":
                 self.device.turn_on(**kwargs)
             else:
@@ -250,7 +265,7 @@ class Device:
 
     def turn_off(self) -> None:
         """Turn the device off if it's on."""
-        if self.on:
+        if self.available and self.on:
             if self.device_type != "group":
                 self.device.turn_off()
             else:
@@ -262,8 +277,9 @@ class Device:
 
     def call_service(self, service: str, **data: Any) -> None:
         """Call one of the device's services."""
-        self.device.call_service(service, timeout=None, callback=None, **data)
-        self.last_adjustment_time = self.controller.get_now_ts()
+        if self.available:
+            self.device.call_service(service, timeout=None, callback=None, **data)
+            self.last_adjustment_time = self.controller.get_now_ts()
 
     @property
     def constants(self) -> dict[str, Any]:
@@ -303,6 +319,21 @@ class Device:
                 "Automatic control is now disabled to prevent it from immediately "
                 f"overriding {user}'s manual adjustments",
             )
+
+    def __handle_availability_change(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: Any,
+    ) -> None:
+        """Log when the device becomes unavailable or available again."""
+        del attribute, old, kwargs
+        if new == "unavailable":
+            self.log(f"'{entity}' is unavailable", level="WARNING")
+        else:
+            self.log(f"'{entity}' is available")
 
     def __handle_automatic_control_change(
         self,
