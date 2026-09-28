@@ -10,31 +10,28 @@ from __future__ import annotations
 
 import uuid
 from datetime import timedelta
+from typing import TYPE_CHECKING, Any, cast, override
 
-from app import App, Device
+from app import App, Controller, Device
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 class Presence(App):
     """Monitor presence in the house."""
 
-    def __init__(self, *args, **kwargs):
+    @override
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         """Extend with attribute definitions."""
         super().__init__(*args, **kwargs)
-        self.rooms = {}
-        self.__pets_home_alone = None
-        self.last_device_date = None
+        self.rooms: dict[str, Room] = {}
 
-    def initialize(self):
-        """Create rooms with sensors and listen for new devices and people.
-
-        Appdaemon defined init function called once ready after __init__.
-        """
+    @override
+    def initialize(self) -> None:
+        """Create rooms with sensors and listen for new devices and people."""
         super().initialize()
-        self.__pets_home_alone = (
-            self.entities.input_boolean.pets_home_alone.state == "on"
-        )
-        # TODO: https://app.asana.com/0/1207020279479204/1207033183175547/f
-        # add overide functionality so that if pets home alone mode is manually turned off it doesn't turn on again until after someone comes home and leaves again
+        self.__pets_home_alone = self.get_boolean_setting("pets_home_alone")
         for multisensor_room in ["entryway", "dining_room", "bathroom"]:
             self.rooms[multisensor_room] = Room(
                 multisensor_room,
@@ -91,14 +88,13 @@ class Presence(App):
         # create floorplan for UI, show lighting and presence (combine person and pet?) - create template sensors for room presence or change UI from here
         # TODO: https://app.asana.com/0/1207020279479204/1165239627642113/f
         # potentially simplify this code by using the above template sensors that combine all motion detectors in a room
+        self.listen_event(self.handle_new_device, "device_tracker_new_device")
+        self.listen_state(self.handle_home_presence_change, "person")
         self.listen_state(
             self.handle_doorbell,
             "binary_sensor.doorbell_ringing",
             new="on",
         )
-        self.listen_state(self.handle_presence_change, "person")
-        self.last_device_date = self.date()
-        self.listen_event(self.handle_new_device, "device_tracker_new_device")
 
     @property
     def anyone_home(self) -> bool:
@@ -122,11 +118,11 @@ class Presence(App):
 
     @property
     def pets_home_alone(self) -> bool:
-        """Get pets home alone setting that has been synced to Home Assistant."""
+        """True if pets are detected at home without people (or manually set via UI)."""
         return self.__pets_home_alone
 
     @pets_home_alone.setter
-    def pets_home_alone(self, state: bool):
+    def pets_home_alone(self, state: bool) -> None:
         """Enable/disable pets home alone mode and reflect state in UI."""
         self.log(f"'{'En' if state else 'Dis'}abling' pets home alone mode")
         if self.__pets_home_alone != state:
@@ -136,9 +132,8 @@ class Presence(App):
                 entity_id="input_boolean.pets_home_alone",
             )
             if state:
-                self.climate.climate_control_enabled = True
-                # TODO: don't do this, create specific self.climate.handle_pets_home_alone() method which uses individual climate control history and only enables necessary devices from that
-
+                self.climate.allow_suggestion()
+                self.climate.suggest_for_conditions()
 
     @property
     def front_door_locked(self) -> bool:
@@ -155,19 +150,19 @@ class Presence(App):
         if self.front_door_locked and (force or not self.manual_guest_mode):
             self.call_service("lock/unlock", entity_id="lock.front_door")
 
-    def handle_presence_change(
+    def handle_home_presence_change(
         self,
         entity: str,
         attribute: str,
         old: str,
         new: str,
-        **kwargs: dict,
-    ):
-        """Change scene if everyone has left home or if someone has come back."""
+        **kwargs: Any,
+    ) -> None:
+        """Lock/unlock the door and adjust scene as appropriate."""
         del attribute, kwargs
         self.log(f"'{entity}' is '{new}'")
-        if self.manual_guest_mode == "on":
-            if self.entities.binary_sensor.resident_home.state == "on":
+        if self.manual_guest_mode:
+            if self.resident_home:
                 self.log("Resident is home, turning off manual guest mode")
                 self.call_service(
                     "input_boolean/turn_off",
@@ -178,6 +173,9 @@ class Presence(App):
                 return
         if new == "home":
             self.unlock_front_door()
+            if self.safety.dog_water_bowl_empty:
+                self.safety.notify_of_empty_dog_water_bowl()
+            if self.control.scene.startswith("Away"):
                 self.pets_home_alone = False
                 self.control.reset_scene(keep_bright=True)
         else:
@@ -188,16 +186,20 @@ class Presence(App):
                     "Away (Night)" if self.lights.dark_outside else "Away (Day)"
                 )
 
-    def handle_new_device(self, event_name: str, data: dict, **kwargs: dict):
-        """If not home and someone adds a device, notify."""
-        del event_name
+    def handle_new_device(
+        self,
+        event_type: str,
+        data: dict[str, Any],
+        **kwargs: Any,
+    ) -> None:
+        """Notify when a new device is added to the network."""
+        del event_type
         self.log(f"New device added: '{data}', '{kwargs}'")
         self.notify(
-            f'A guest has added a device: "{data["host_name"]}"',
-            title="Guest Device",
+            f'A new device has been added to the network: "{data["host_name"]}"',
+            title="Device Added To Network",
             targets="dan",
         )
-        self.last_device_date = self.date()
 
     def handle_doorbell(
         self,
@@ -205,9 +207,9 @@ class Presence(App):
         attribute: str,
         old: str,
         new: str,
-        **kwargs: dict,
-    ):
-        """Handle doorbell when it rings."""
+        **kwargs: Any,
+    ) -> None:
+        """Handle when the doorbell rings."""
         del entity, attribute, old, new, kwargs
         self.notify(
             "Someone rung the doorbell "
@@ -221,34 +223,25 @@ class Presence(App):
 
 
 class Room:
-    """Report on presence for an individual room."""
+    """Monitor presence for an individual room."""
 
-    def __init__(self, room_id: str, sensor_id: str, controller: Presence):
+    def __init__(self, room_id: str, sensor_id: str, controller: Presence) -> None:
         """Initialise room presence and start listening for presence change."""
         self.room_id = room_id
+        self.descriptor = (
+            f"{'at' if 'door' in self.room_id or 'deck' in self.room_id else 'in'}"
+            f" the {self.room_id.replace('_', ' ')}"
+        )
         sensor_id = f"binary_sensor.{sensor_id}"
         self.sensors = [sensor_id]
         self.controller = controller
-        try:
-            vacant = self.controller.get_state(sensor_id) == "off"
-            last_changed = self.controller.convert_utc(
-                self.controller.get_state(sensor_id, attribute="last_changed"),
-            )
-        except (ValueError, TypeError):
-            self.controller.notify(
-                f"Sensor in {room_id} is {self.controller.get_state(sensor_id)}",
-                title="Sensor Error",
-                targets="dan",
-            )
-            self.controller.log(
-                f"Initialising room '{room_id}' with default state",
-                level="WARNING",
-            )
-            vacant = True
-            last_changed = self.controller.datetime()
+        vacant: bool = self.controller.get_state(sensor_id) == "off"
+        last_changed = self.controller.convert_utc(
+            cast("str", self.controller.get_state(sensor_id, attribute="last_changed")),
+        )
         self.last_vacated = last_changed - timedelta(hours=0 if vacant else 2)
         self.last_entered = last_changed - timedelta(hours=2 if vacant else 0)
-        self.callbacks = {}
+        self.callbacks: dict[str, dict[str, Any]] = {}
         self.controller.listen_state(self.handle_presence_change, sensor_id)
         if self.debugging:
             self.log(
@@ -258,7 +251,7 @@ class Room:
             )
 
     def is_vacant(self, vacating_delay: float = 0) -> bool:
-        """Check if vacant based on last time vacated/entered, with optional delay."""
+        """Check if the room is vacant, with an optional delay."""
         return (
             self.last_entered
             < self.last_vacated
@@ -266,7 +259,7 @@ class Room:
         )
 
     def seconds_in_room(self, vacating_delay: float = 0) -> float:
-        """Return number of seconds room has been occupied (or vacant if negative)."""
+        """How many seconds the room has been occupied (or vacant if negative)."""
         return (
             self.last_vacated
             - self.controller.get_now()
@@ -281,62 +274,20 @@ class Room:
         attribute: str,
         old: str,
         new: str,
-        **kwargs: dict,
-    ):
+        **kwargs: Any,
+    ) -> None:
         """If room presence changes, trigger all registered callbacks."""
-        del attribute, kwargs
-        if "unavailable" in (new, old):
-            self.log(
-                f"Ignoring '{'current' if new == 'unavailable' else 'previous'}' "
-                f"unavailable '{self.room_id}' sensor state",
-                level="WARNING",
-            )
+        del attribute, old, kwargs
+        if new == "unavailable":
+            self.log(f"Ignoring unavailable '{entity}' sensor state", level="WARNING")
             return
         vacant = new == "off"
         reentry = False
         if vacant:
-            if any(
-                self.controller.get_state(sensor) == "on"
-                for sensor in self.sensors
-                if sensor != entity
-            ):
-                if self.debugging:
-                    self.log(
-                        f"Sensor '{entity}' reports no presence "
-                        "but at least one other sensor in the room indicates presence",
-                        level="DEBUG",
-                    )
-                return
-            self.last_vacated = self.controller.get_now()
+            self.handle_vacancy(entity)
         else:
             reentry = self.last_entered > self.last_vacated
-            self.last_entered = self.controller.get_now()
-            if "Away" in self.controller.control.scene:
-                if "_person_detected" in entity:
-                    self.controller.notify(
-                        f"Person detected at the {self.room_id} (front door is "
-                        f"{self.controller.entities.lock.door_lock.state})",
-                        title="Person Detected",
-                    )
-                    # TODO: https://app.asana.com/0/1207020279479204/1203851145721574/f
-                    # trigger alarm if not doorbell?
-                    # should I change this message? why would the door not be locked!?
-                # elif (
-                # TODO: https://app.asana.com/0/1207020279479204/1207033183175569/f
-                # when should pets home alone mode not be triggered? Only trigger for living_room, kitchen, entryway
-                # )
-                elif (
-                    not self.controller.pets_home_alone
-                    and "Away" in self.controller.control.scene
-                    and "doorbell" not in entity
-                    # TODO: https://app.asana.com/0/1207020279479204/1207033183175569/f
-                    # this seems hacky, fix?
-                ):
-                    self.controller.notify(
-                        "Pets detected as home alone, enabling climate control",
-                        title="Climate Control",
-                    )
-                    self.controller.pets_home_alone = True
+            self.handle_occupancy(entity)
         if reentry:
             if self.debugging:
                 self.log("Room was re-entered - no callbacks called", level="DEBUG")
@@ -364,18 +315,61 @@ class Room:
                         level="DEBUG",
                     )
 
-    def add_sensor(self, sensor_id: str):
-        """Add additional binary presence sensor to room."""
+    def handle_vacancy(self, sensor: str) -> None:
+        """Handle when a sensor reports no presence in the room."""
+        if any(
+            self.controller.get_state(other_sensor) == "on"
+            for other_sensor in self.sensors
+            if other_sensor != sensor
+        ):
+            if self.debugging:
+                self.log(
+                    f"Sensor '{sensor}' reports no presence "
+                    "but at least one other sensor in the room indicates presence",
+                    level="DEBUG",
+                )
+            return
+        self.last_vacated = self.controller.get_now()
+
+    def handle_occupancy(self, sensor: str) -> None:
+        """Handle when a sensor reports presence in the room."""
+        self.last_entered = self.controller.get_now()
+        if self.controller.control.scene.startswith("Away"):
+            if sensor.endswith(("_person_detected", "_door_motion")):
+                self.controller.notify(
+                    f"Person detected {self.descriptor} "
+                    f"(front door is {self.controller.entities.lock.front_door.state})",
+                    title="Person Detected",
+                    critical="doorbell" not in sensor
+                    or not self.controller.front_door_locked,
+                )
+            elif (
+                not self.controller.pets_home_alone
+                and (
+                    sensor.endswith(
+                        ("_multisensor_motion", "_presence_sensor_occupancy"),
+                    )
+                    or sensor == "entryway_motion_detected"
+                )
+            ):
+                self.controller.notify(
+                    "Pets detected as home alone, enabling climate control",
+                    title="Climate Control",
+                )
+                self.controller.pets_home_alone = True
+
+    def add_sensor(self, sensor_id: str) -> None:
+        """Add additional binary presence sensor to the room."""
         sensor_id = f"binary_sensor.{sensor_id}"
         self.sensors.append(sensor_id)
         self.controller.listen_state(self.handle_presence_change, sensor_id)
 
     def register_callback(
         self,
-        callback,
+        callback: Callable,
         vacating_delay: float,
         control_input_boolean: str,
-    ) -> uuid.UUID:
+    ) -> str:
         """Register a callback for when presence changes, with an optional delay."""
         handle = uuid.uuid4().hex
         self.callbacks[handle] = {
@@ -394,14 +388,14 @@ class Room:
             self.log(f"Registered callback {self.callbacks[handle] = }", level="DEBUG")
         return handle
 
-    def cancel_callback(self, handle):
+    def cancel_callback(self, handle: str) -> None:
         """Cancel a callback (and its timer if it has one) by passing its handle."""
         if handle in self.callbacks:
             self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
             del self.callbacks[handle]
 
     def log(self, message: str, level: str = "INFO") -> None:
-        """Log a message to AppDaemon's main logfile with device name prepended."""
+        """Log a message to the main log with device name prepended."""
         if level != "DEBUG" or self.debugging:
             self.controller.log(
                 f"[{self.room_id.replace('_', ' ').capitalize()} monitor] {message}",
@@ -409,38 +403,49 @@ class Room:
             )
 
     @property
-    def debugging(self):
-        """Use to check if debug logging is enabled before evaulating f-strings."""
+    def debugging(self) -> bool:
+        """True if debug logging is enabled (check before logging with f-strings)."""
         return self.controller.debugging
 
 
 class PresenceDevice(Device):
     """Basic device that can be configured to respond to environmental changes."""
 
+    @override
     def __init__(
         self,
-        **kwargs: dict,
-    ):
+        device_id: str,
+        controller: Controller,
+        room: str,
+        linked_rooms: tuple[str, ...] = (),
+        control_input_boolean_suffix: str = "",
+    ) -> None:
         """Initialise with device parameters and prepare for presence adjustments."""
-        super().__init__(**kwargs)
+        super().__init__(
+            device_id,
+            controller,
+            room,
+            linked_rooms,
+            control_input_boolean_suffix,
+        )
         self.rooms: list[Room] = [
             self.controller.presence.rooms[room]
             for room in (self.room, *self.linked_rooms)
         ]
         self.__vacating_delay = 0
         self.was_vacant_at_last_check = self.vacant
-        self.presence_callbacks = None
+        self.presence_callbacks: list[str] = []
         self.transition_period = 0
         self.transition_timer = None
 
     @property
     def vacant(self) -> bool:
-        """If the room (and any linked rooms) are vacant."""
+        """True if the room (and any linked rooms) are vacant."""
         return all(room.is_vacant(self.vacating_delay) for room in self.rooms)
 
     @property
-    def ignoring_vacancy(self):
-        """Check if the device is ignoring presence changes or not."""
+    def ignoring_vacancy(self) -> bool:
+        """True if the device is ignoring presence changes."""
         return not bool(self.presence_callbacks)
 
     @property
@@ -449,7 +454,7 @@ class PresenceDevice(Device):
         return self.__vacating_delay
 
     @vacating_delay.setter
-    def vacating_delay(self, seconds: float):
+    def vacating_delay(self, seconds: float) -> None:
         """If monitoring presence then update with new vacating delay."""
         if self.vacating_delay != seconds:
             self.__vacating_delay = seconds
@@ -457,17 +462,18 @@ class PresenceDevice(Device):
                 self.ignore_presence()
                 self.monitor_presence()
 
-    def ignore_presence(self):
+    def ignore_presence(self) -> None:
         """Ignore presence changes by cancelling any presence callbacks."""
+        self.transition_timer = None
         if not self.ignoring_vacancy:
             for room in self.rooms:
                 for callback in self.presence_callbacks:
                     room.cancel_callback(callback)
-            self.presence_callbacks = []
+            self.presence_callbacks: list[str] = []
 
     ignore_vacancy = ignore_presence  # alias to increase readability in some cases
 
-    def monitor_presence(self):
+    def monitor_presence(self) -> None:
         """Set callbacks for when presence changes."""
         if self.ignoring_vacancy:
             self.presence_callbacks = [
@@ -480,8 +486,8 @@ class PresenceDevice(Device):
             ]
             self.handle_presence_change()
 
-    def handle_presence_change(self, **kwargs):
-        """Set device to adjust (with delay if required) when presence changes."""
+    def handle_presence_change(self, **kwargs: Any) -> None:
+        """Set the device to adjust (with delay if required) when presence changes."""
         del kwargs
         if self.vacant != self.was_vacant_at_last_check:
             self.was_vacant_at_last_check = self.vacant
@@ -490,18 +496,9 @@ class PresenceDevice(Device):
                 self.start_transition_towards_occupied()
             self.adjust_for_conditions()
 
-    def adjust_for_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
-        """Override this in child class to adjust device settings appropriately."""
-        del check_if_would_adjust_only
-        return False
-
     @property
     def transition_progress(self) -> float:
-        """Progress of transition between presence configurations (from 0 to 1)."""
+        """Progress of the transition between presence configurations (from 0 to 1)."""
         if self.transition_period == 0:
             return 1
         seconds_in_room = max(
@@ -513,16 +510,16 @@ class PresenceDevice(Device):
 
     @property
     def should_transition_towards_occupied(self) -> bool:
-        """Check if the current settings should trigger transition to occupied."""
+        """Check if the current settings should trigger transition to occupied state."""
         return self.transition_progress < 1
 
     def start_transition_towards_occupied(
         self,
         step_time: float = 0,
         steps_remaining: int = 0,
-        **kwargs: dict,
-    ):
-        """Help child class to transition deivce slowly from vacant to occupied."""
+        **kwargs: Any,
+    ) -> None:
+        """Help child class to transition device slowly from vacant to occupied."""
         if step_time == 0 or steps_remaining == 0 or kwargs is None:
             return
         self.transition_timer = uuid.uuid4().hex
@@ -542,8 +539,8 @@ class PresenceDevice(Device):
                 level="DEBUG",
             )
 
-    def transition_towards_occupied(self, **kwargs: dict):
-        """Scheduling for child to step towards occupied device settings."""
+    def transition_towards_occupied(self, **kwargs: Any) -> None:
+        """Scheduling for child class to step towards occupied device settings."""
         if kwargs["timer_id"] != self.transition_timer:
             return
         kwargs["steps_remaining"] = kwargs["steps_remaining"] - 1

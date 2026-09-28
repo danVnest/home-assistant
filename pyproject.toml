@@ -3,7 +3,10 @@ namespace-packages = ["appdaemon/apps"]
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["ANN", "TD", "FBT001"]
+ignore = ["CPY001", "TD002", "TD003"]
 
 [tool.ruff.lint.pylint]
-max-args = 6  # increased to handle many unchangeable appdaemon super methods
+max-args = 6  # increased to handle many unchangeable AppDaemon callbacks
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true  # allow to handle many unchangeable AppDaemon callbacks
