@@ -774,7 +774,7 @@ class Light(PresenceDevice):
             light_type
         ]
         self.min_brightness = max(int(self.constants["min_brightness"][light_type]), 1)
-        device = self.device
+        device = self.sub_device or self.device
         self.kelvin_limits: dict[str, int | None] = {
             "max": device.attributes.get("max_color_temp_kelvin"),
             "min": device.attributes.get("min_color_temp_kelvin"),
@@ -791,7 +791,7 @@ class Light(PresenceDevice):
         """Actual brightness of the light(s), or 0 if off."""
         if not self.on:
             return 0
-        device = self.device
+        device = self.sub_device or self.device
         return max(int(device.attributes.get("brightness") or 0), self.min_brightness)
 
     @brightness.setter
@@ -834,7 +834,7 @@ class Light(PresenceDevice):
     @property
     def kelvin(self) -> int | None:
         """Colour temperature value of the light."""
-        device = self.device
+        device = self.sub_device or self.device
         kelvin = device.attributes.get("color_temp_kelvin", self.kelvin_before_off)
         return int(kelvin) if kelvin else None
 

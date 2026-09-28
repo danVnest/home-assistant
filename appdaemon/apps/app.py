@@ -180,10 +180,14 @@ class Device:
             f"input_boolean.control_{device_name}{control_input_boolean_suffix}"
         )
         self.last_adjustment_time = self.controller.get_now_ts()
+        self.sub_device = None
         device_ids: list[str] = [device_id]
         if self.device_type == "group":
-            devices += self.controller.get_state(self.device_id, "entity_id")
-        for device in devices:
+            device_ids.extend(
+                cast("str", self.controller.get_state(self.device_id, "entity_id")),
+            )
+            self.sub_device = controller.get_entity(device_ids[1])
+        for device in device_ids:
             self.controller.listen_state(
                 self.__handle_user_adjustment,
                 entity_id=device,
