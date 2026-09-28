@@ -409,8 +409,11 @@ class Control(App):
         """Handle a double press of the nursery button."""
         self.log("Nursery button double pressed: turning light on")
         self.napping_in_nursery = False
-        self.lights.lights["nursery"].turn_on_for_conditions()
-        self.lights.lights["nursery"].control_enabled = True
+        light = self.lights.lights["nursery"]
+        if light.control_enabled:
+            light.turn_on_for_conditions()
+        else:
+            light.turn_on()
 
     def handle_nursery_button_long_press(self) -> None:
         """Handle a long press of the nursery button."""
@@ -485,6 +488,11 @@ class Control(App):
         """Handle a double press of bedroom button."""
         self.log(f"{button} double pressed: turning light on")
         self.napping_in_bedroom = False
+        light = self.lights.lights["bedroom"]
+        if light.control_enabled:
+            light.turn_on_for_conditions()
+        else:
+            light.turn_on()
         if self.scene == "Sleep":
             self.reset_scene()
             if self.scene == "Sleep":
