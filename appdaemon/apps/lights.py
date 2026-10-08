@@ -516,16 +516,24 @@ class Lights(App):
 
     def is_lighting_sufficient(self, room: str) -> bool:
         """Return if there is enough light to not require further lighting."""
-        return (
-            float(
-                cast(
-                    "str",
-                    self.get_state(f"sensor.{room}_presence_sensor_illuminance"),
-                ),
+        try:
+            return (
+                float(
+                    cast(
+                        "str",
+                        self.get_state(f"sensor.{room}_presence_sensor_illuminance"),
+                    ),
+                )
+                - self.lighting_illuminance(room)
+                >= self.constants["illuminance"]["auto_threshold"][room]
             )
-            - self.lighting_illuminance(room)
-            >= self.constants["illuminance"]["auto_threshold"][room]
-        )
+        except ValueError:
+            self.log(
+                f"The {room} illuminance sensor is not available, "
+                "assuming ambient lighting is not sufficient",
+                level="WARNING",
+            )
+            return False
 
     def lighting_illuminance(self, room: str) -> float:
         """Return approximate illuminance of powered lights affecting light sensors."""
