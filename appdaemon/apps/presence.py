@@ -97,8 +97,9 @@ class Presence(App):
             new="on",
         )
 
+    @override
     @property
-    def anyone_home(self) -> bool:
+    def anyone_home(self) -> bool:  # ty: ignore[invalid-property-type-override]
         """True if any resident or guest is home (includes manual guest mode)."""
         return self.entities.binary_sensor.anyone_home.state == "on"
 
