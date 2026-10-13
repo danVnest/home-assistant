@@ -985,8 +985,8 @@ class Aircon(ClimateDevice, PresenceDevice):
                 and self.controller.presence.anyone_home
             ):
                 self.controller.suggest(
-                    f"Outside ({self.controller.outside_temperature:.1f}°) "
-                    f"is a more pleasant temperature than the {self.room} "
+                    f"Outside ({self.controller.outside_temperature:.1f}°) is a more "
+                    f"pleasant temperature than the {self.room.replace('_', ' ')} "
                     f"({self.room_temperature:.1f}°), consider opening up the house",
                 )
         return False
@@ -999,8 +999,8 @@ class Aircon(ClimateDevice, PresenceDevice):
             and not self.controller.presence.anyone_home
         ):
             self.controller.notify(
-                f"It is {self.room_temperature:.1f}° in the {self.room}, "
-                "turning aircon on for the pets",
+                f"It is {self.room_temperature:.1f}° in the "
+                f"{self.room.replace('_', ' ')}, turning aircon on for the pets",
                 title="Climate Control",
             )
 
