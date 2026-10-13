@@ -107,4 +107,7 @@ class Media(App):
             if self.control.scene == "Night":
                 self.control.scene = "TV"
         elif self.control.scene == "TV":
-            self.control.scene = "Night" if self.lights.dark_outside else "Day"
+            scene = "Night" if self.lights.dark_outside else "Day"
+            self.control.scene = (
+                scene if self.presence.anyone_home else f"Away ({scene})"
+            )
