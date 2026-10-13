@@ -38,8 +38,38 @@ class App(hass.Hass):
     def initialize(self) -> None:
         """AppDaemon calls when app is ready for initialisation."""
 
+    @property
+    def climate(self) -> Climate:
+        """Climate app instance."""
+        return cast("Climate", self.get_app("Climate"))
+
+    @property
+    def control(self) -> Control:
+        """Control app instance."""
+        return cast("Control", self.get_app("Control"))
+
+    @property
+    def lights(self) -> Lights:
+        """Lights app instance."""
+        return cast("Lights", self.get_app("Lights"))
+
+    @property
+    def media(self) -> Media:
+        """Media app instance."""
+        return cast("Media", self.get_app("Media"))
+
+    @property
+    def presence(self) -> Presence:
+        """Presence app instance."""
+        return cast("Presence", self.get_app("Presence"))
+
+    @property
+    def safety(self) -> Safety:
+        """Safety app instance."""
+        return cast("Safety", self.get_app("Safety"))
+
     def get_setting(self, setting_name: str, setting_type: str) -> str:
-        """Get a UI input_number setting value as a string."""
+        """Get a UI setting value as a string."""
         return cast("str", self.get_state(f"{setting_type}.{setting_name}"))
 
     def get_boolean_setting(self, setting_name: str) -> bool:
@@ -120,35 +150,6 @@ class App(hass.Hass):
                 )
         self.log(f"Notified '{targets}': \"{title}: {message}\"")
 
-    @property
-    def climate(self) -> Climate:
-        """Climate app instance."""
-        return cast("Climate", self.get_app("Climate"))
-
-    @property
-    def control(self) -> Control:
-        """Control app instance."""
-        return cast("Control", self.get_app("Control"))
-
-    @property
-    def lights(self) -> Lights:
-        """Lights app instance."""
-        return cast("Lights", self.get_app("Lights"))
-
-    @property
-    def media(self) -> Media:
-        """Media app instance."""
-        return cast("Media", self.get_app("Media"))
-
-    @property
-    def presence(self) -> Presence:
-        """Presence app instance."""
-        return cast("Presence", self.get_app("Presence"))
-
-    @property
-    def safety(self) -> Safety:
-        """Safety app instance."""
-        return cast("Safety", self.get_app("Safety"))
     @property
     def debugging(self) -> bool:
         """True if debug logging is enabled - check before logging with f-strings."""
@@ -235,18 +236,6 @@ class Device:
         if enabled:
             self.adjust_for_conditions()
 
-    def turn_on_for_conditions(self) -> None:
-        """Override this in a child class to turn device on with best settings."""
-        self.turn_on()
-
-    def adjust_for_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool | None:
-        """Override this in a child class to adjust device settings appropriately."""
-        return False if check_if_would_adjust_only else None
-
     def turn_on(self, **kwargs: Any) -> None:
         """Turn the device on if it's off or adjust with provided parameters."""
         if self.available and (not self.on or kwargs):
@@ -262,6 +251,10 @@ class Device:
                     **kwargs,
                 )
             self.last_adjustment_time = self.controller.get_now_ts()
+
+    def turn_on_for_conditions(self) -> None:
+        """Override this in a child class to turn device on with best settings."""
+        self.turn_on()
 
     def turn_off(self) -> None:
         """Turn the device off if it's on."""
@@ -280,6 +273,14 @@ class Device:
         if self.available:
             self.device.call_service(service, timeout=None, callback=None, **data)
             self.last_adjustment_time = self.controller.get_now_ts()
+
+    def adjust_for_conditions(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool | None:
+        """Override this in a child class to adjust device settings appropriately."""
+        return False if check_if_would_adjust_only else None
 
     @property
     def constants(self) -> dict[str, Any]:

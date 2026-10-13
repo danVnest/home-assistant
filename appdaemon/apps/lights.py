@@ -98,10 +98,11 @@ class Lights(App):
                 f"sensor.{room}_presence_sensor_illuminance_filtered",
             )
 
-    def terminate(self) -> None:
-        """Cancel presence callbacks before termination (auto run by Appdaemon)."""
-        for light in self.lights.values():
-            light.ignore_presence()
+    @override
+    @property
+    def lights(self) -> dict[str, Light]:  # ty: ignore[invalid-property-type-override]
+        """Dictionary of all lights controlled by the Lights app."""
+        return self.__lights
 
     def transition_to_scene(self, scene: str) -> None:
         """Change lighting based on the specified scene."""
@@ -319,6 +320,54 @@ class Lights(App):
                 title="Light Control",
             )
 
+    def configure_circadian(self) -> None:
+        """Configure the start, end, and step times for lighting adjustment today."""
+        start_time = self.sunset(today=True) + timedelta(
+            hours=self.get_number_setting("circadian_initial_sunset_offset"),
+        )
+        end_time = self.get_datetime_setting("circadian_end_time")
+        time_step: timedelta = (end_time - start_time) / max(
+            abs(
+                self.get_integer_setting("initial_circadian_brightness")
+                - self.get_integer_setting("final_circadian_brightness"),
+            )
+            / min(self.constants["brightness_per_step"].values()),
+            abs(
+                self.get_integer_setting("initial_circadian_kelvin")
+                - self.get_integer_setting("final_circadian_kelvin"),
+            )
+            / min(
+                value
+                for value in self.constants["kelvin_per_step"].values()
+                if value is not None
+            ),
+        )
+        if time_step.total_seconds() < 0:
+            self.error(
+                "Circadian end time is before start time "
+                f"(by {time_step.total_seconds() / -60} minutes)",
+            )
+            raise ValueError
+        min_seconds_per_step = 1 / self.constants["max_steps_per_second"]
+        if time_step.total_seconds() < min_seconds_per_step:
+            time_step = timedelta(seconds=min_seconds_per_step)
+        self.circadian_start_time = start_time
+        self.circadian_end_time = end_time
+        self.circadian_time_step = time_step
+        self.log(
+            f"Circadian set to start at {start_time.time()} with "
+            f"time step of {time_step.total_seconds() / 60} minutes",
+        )
+
+    def redate_circadian(self, **kwargs: Any) -> None:
+        """Adjust circadian lighting timing for today."""
+        del kwargs
+        self.configure_circadian()
+        if self.control.scene == "Night":
+            self.start_circadian()
+        elif self.control.scene == "Away (Night)":
+            self.lights["dining_room"].turn_off_and_ignore_presence()
+
     def start_circadian(self) -> None:
         """Schedule a timer to periodically set the lighting appropriately."""
         circadian_progress = self.circadian_progress
@@ -465,54 +514,6 @@ class Lights(App):
                 * circadian_progress,
             ),
         )
-
-    def configure_circadian(self) -> None:
-        """Configure the start, end, and step times for lighting adjustment today."""
-        start_time = self.sunset(today=True) + timedelta(
-            hours=self.get_number_setting("circadian_initial_sunset_offset"),
-        )
-        end_time = self.get_datetime_setting("circadian_end_time")
-        time_step: timedelta = (end_time - start_time) / max(
-            abs(
-                self.get_integer_setting("initial_circadian_brightness")
-                - self.get_integer_setting("final_circadian_brightness"),
-            )
-            / min(self.constants["brightness_per_step"].values()),
-            abs(
-                self.get_integer_setting("initial_circadian_kelvin")
-                - self.get_integer_setting("final_circadian_kelvin"),
-            )
-            / min(
-                value
-                for value in self.constants["kelvin_per_step"].values()
-                if value is not None
-            ),
-        )
-        if time_step.total_seconds() < 0:
-            self.error(
-                "Circadian end time is before start time "
-                f"(by {time_step.total_seconds() / -60} minutes)",
-            )
-            raise ValueError
-        min_seconds_per_step = 1 / self.constants["max_steps_per_second"]
-        if time_step.total_seconds() < min_seconds_per_step:
-            time_step = timedelta(seconds=min_seconds_per_step)
-        self.circadian_start_time = start_time
-        self.circadian_end_time = end_time
-        self.circadian_time_step = time_step
-        self.log(
-            f"Circadian set to start at {start_time.time()} with "
-            f"time step of {time_step.total_seconds() / 60} minutes",
-        )
-
-    def redate_circadian(self, **kwargs: Any) -> None:
-        """Adjust circadian lighting timing for today."""
-        del kwargs
-        self.configure_circadian()
-        if self.control.scene == "Night":
-            self.start_circadian()
-        elif self.control.scene == "Away (Night)":
-            self.lights["dining_room"].turn_off_and_ignore_presence()
 
     def is_lighting_sufficient(self, room: str) -> bool:
         """Return if there is enough light to not require further lighting."""
@@ -720,11 +721,10 @@ class Lights(App):
                     "automatic lighting enabled",
                 )
 
-    @override
-    @property
-    def lights(self) -> dict[str, Light]:
-        """Dictionary of all lights controlled by the Lights app."""
-        return self.__lights
+    def terminate(self) -> None:
+        """Cancel presence callbacks before termination (auto run by Appdaemon)."""
+        for light in self.lights.values():
+            light.ignore_presence()
 
 
 @dataclass
@@ -913,6 +913,28 @@ class Light(PresenceDevice):
         )
 
     @override
+    def adjust_for_conditions(
+        self,
+        *,
+        check_if_would_adjust_only: bool = False,
+    ) -> bool:
+        """Adjust to desired light settings for the current presence state."""
+        if not (self.control_enabled and self.available) or self.ignoring_vacancy:
+            return False
+        if check_if_would_adjust_only:
+            return True
+        if self.transition_timer:
+            presence = "entered"
+        elif self.vacant:
+            presence = "vacant"
+        else:
+            presence = "occupied"
+        self.adjust_state(self.presence_states[presence])
+        if self.debugging:
+            self.log(f"Lighting adjusted now room is '{presence}'", level="DEBUG")
+        return True
+
+    @override
     def turn_on_for_conditions(self) -> None:
         """Turn the light on with appropriate brightness and kelvin for the scene."""
         if not self.ignoring_vacancy:
@@ -975,28 +997,6 @@ class Light(PresenceDevice):
                 f"Configured with room '{presence}' and {self.presence_states = }",
                 level="DEBUG",
             )
-
-    @override
-    def adjust_for_conditions(
-        self,
-        *,
-        check_if_would_adjust_only: bool = False,
-    ) -> bool:
-        """Adjust to desired light settings for the current presence state."""
-        if not (self.control_enabled and self.available) or self.ignoring_vacancy:
-            return False
-        if check_if_would_adjust_only:
-            return True
-        if self.transition_timer:
-            presence = "entered"
-        elif self.vacant:
-            presence = "vacant"
-        else:
-            presence = "occupied"
-        self.adjust_state(self.presence_states[presence])
-        if self.debugging:
-            self.log(f"Lighting adjusted now room is '{presence}'", level="DEBUG")
-        return True
 
     @override
     def start_transition_towards_occupied(

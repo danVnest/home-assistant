@@ -9,7 +9,6 @@ current temperatures.
 User defined variables are configued in climate.yaml
 """
 
-# TODO: rearrange all properties and methods more logically
 from __future__ import annotations
 
 from math import floor
@@ -150,27 +149,70 @@ class Climate(App):
             for aircon in self.aircons.values():
                 aircon.handle_user_adjustment(user)
 
-    @override
-    def get_number_setting(self, setting_name: str) -> float:
-        """Get climate settings (e.g. targets and triggers) for current scene."""
-        if (
-            self.control.scene == "Sleep" or self.control.bed_time
-        ) and self.entity_exists(f"input_number.sleep_{setting_name}"):
-            setting_name = f"sleep_{setting_name}"
-        return super().get_number_setting(setting_name)
+    @property
+    def inside_temperature(self) -> float | None:
+        """Apparent temperature inside the house."""
+        state: str = (
+            self.entities.sensor.weighted_average_inside_apparent_temperature.state
+        )
+        try:
+            return float(state)
+        except ValueError:
+            self.log("Inside temperature sensor unavailable", level="WARNING")
+            return None
 
-    def update_door_check_delay(self, seconds: float) -> None:
-        """Update the delay before registering a door as open for each aircon."""
-        self.allow_suggestion()
-        for aircon in self.aircons.values():
-            aircon.door_open_delay = seconds
+    @property
+    def outside_temperature(self) -> float | None:
+        """Apparent temperature outside the house."""
+        state: str = self.entities.sensor.outside_apparent_temperature.state
+        try:
+            return float(state)
+        except ValueError:
+            self.log("Outside temperature sensor unavailable", level="WARNING")
+            return None
 
-    def update_vacating_delays(self, device_type: str, seconds: float) -> None:
-        """Update room vacating delay for each device of specified type."""
-        self.allow_suggestion()
-        for device in getattr(self, f"{device_type}s").values():
-            if not hasattr(device, "safe_when_vacant") or device.safe_when_vacant:
-                device.vacating_delay = seconds
+    @property
+    def inside_too_hot_or_cold(self) -> bool:
+        """True if the inside temperature is above or below the max/min triggers."""
+        if self.inside_temperature is None:
+            return False
+        return not (
+            self.get_number_setting("low_temperature_aircon_trigger")
+            < self.inside_temperature
+            < self.get_number_setting("high_temperature_aircon_trigger")
+        )
+
+    @property
+    def outside_too_hot_or_cold(self) -> bool:
+        """True if the outside temperature exceeds desired indoor thresholds."""
+        if self.outside_temperature is None:
+            return False
+        return not (
+            self.get_number_setting("low_temperature_aircon_trigger")
+            <= self.outside_temperature
+            <= self.get_number_setting("high_temperature_aircon_trigger")
+        )
+
+    def handle_temperature_change(
+        self,
+        entity: str,
+        attribute: str,
+        old: str,
+        new: str,
+        **kwargs: Any,
+    ) -> None:
+        """Handle a change in inside or outside temperature."""
+        del entity, attribute, old, kwargs
+        if new not in (None, "unavailable", "unknown"):
+            # TODO: https://app.asana.com/0/1207020279479204/1207217352886591/f
+            # be more resilient towards unavailable/unknown temperatures
+            self.suggest_for_conditions()
+
+    def adjust_for_conditions(self) -> None:
+        """Control aircon or suggest based on changes in inside temperature."""
+        for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
+            for device in device_group.values():
+                device.adjust_for_conditions()
 
     def transition_to_scene(self, scene: str) -> None:
         """Adjust aircon & temperature triggers, suggest climate control if suitable."""
@@ -197,6 +239,34 @@ class Climate(App):
             self.notify_if_extreme_forecast_and_control_disabled()
         self.allow_suggestion()
 
+    def condition_room_for_sleep(self, room: str) -> None:
+        """Cool/heat/humidify the given room for nice sleeping conditions."""
+        device_groups = self.aircons, self.heaters, self.humidifiers, self.fans
+        for device in (
+            device_group[room] for device_group in device_groups if room in device_group
+        ):
+            device.ignore_vacancy()
+            device.adjust_for_conditions()
+
+    def condition_room_normally(self, room: str) -> None:
+        """Restore normal presence-based device functionality in the given room."""
+        device_groups = self.aircons, self.heaters, self.humidifiers, self.fans
+        for device in (
+            device_group[room] for device_group in device_groups if room in device_group
+        ):
+            device.monitor_presence()
+
+    def allow_suggestion(self) -> None:
+        """Allow suggestions to be made again. Use after user events & scene changes."""
+        self.suggested = False
+
+    def suggest(self, message: str) -> None:
+        """Make a suggestion to the users, but only if one has not already been sent."""
+        if self.suggested:
+            return
+        self.suggested = True
+        self.notify(message, title="Climate Control", targets="anyone_home_else_all")
+
     def suggest_for_conditions(self) -> None:
         """Suggest climate control actions based on temperature and airflow."""
         if self.suggested:
@@ -204,15 +274,19 @@ class Climate(App):
         if (
             self.presence.pets_home_alone
             and not self.any_aircon_on
-            and self.too_hot_or_cold
+            and self.inside_too_hot_or_cold
         ):
-            if all(aircon.door_open for aircon in self.aircons.values()):
+            if all(
+                aircon.door_open and not aircon.mode_aided_by_outside_temperature
+                for aircon in self.aircons.values()
+            ):
                 reason = "the door(s) are open"
                 if self.outside_too_hot_or_cold:
                     reason += f" (but outside is {self.outside_temperature:.1f}°)"
                 reason += ", consider"
             elif any(
-                not aircon.control_enabled and not aircon.door_open
+                not aircon.control_enabled
+                and (not aircon.door_open or aircon.mode_aided_by_outside_temperature)
                 for aircon in self.aircons.values()
             ):
                 reason = "climate control is disabled for some or all aircon, "
@@ -228,29 +302,6 @@ class Climate(App):
                 f"It is {self.inside_temperature:.1f}° inside but aircon won't turn on "
                 f"for the pets because {reason} turning aircon on manually",
             )
-
-    def adjust_for_conditions(self) -> None:
-        """Control aircon or suggest based on changes in inside temperature."""
-        for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
-            for device in device_group.values():
-                device.adjust_for_conditions()
-
-    def condition_room_for_sleep(self, room: str) -> None:
-        """Cool/heat/humidify the given room for nice sleeping conditions."""
-        device_groups = (self.aircons, self.heaters, self.humidifiers, self.fans)
-        for device in (
-            device_group[room] for device_group in device_groups if room in device_group
-        ):
-            device.ignore_vacancy()
-            device.adjust_for_conditions()
-
-    def condition_room_normally(self, room: str) -> None:
-        """Restore normal presence-based device functionality in the given room."""
-        device_groups = (self.aircons, self.heaters, self.humidifiers, self.fans)
-        for device in (
-            device_group[room] for device_group in device_groups if room in device_group
-        ):
-            device.monitor_presence()
 
     def notify_if_extreme_forecast_and_control_disabled(self) -> None:
         """Notify if extreme temperatures are forecast and climate not controlled."""
@@ -276,16 +327,14 @@ class Climate(App):
                 targets="anyone_home_else_all",
             )
 
-    def suggest(self, message: str) -> None:
-        """Make a suggestion to the users, but only if one has not already been sent."""
-        if self.suggested:
-            return
-        self.suggested = True
-        self.notify(message, title="Climate Control", targets="anyone_home_else_all")
-
-    def allow_suggestion(self) -> None:
-        """Allow suggestions to be made again. Use after user events & scene changes."""
-        self.suggested = False
+    @override
+    def get_number_setting(self, setting_name: str) -> float:
+        """Get climate settings (e.g. targets and triggers) for current scene."""
+        if (
+            self.control.scene == "Sleep" or self.control.bed_time
+        ) and self.entity_exists(f"input_number.sleep_{setting_name}"):
+            setting_name = f"sleep_{setting_name}"
+        return super().get_number_setting(setting_name)
 
     def validate_temperature_setting(self, setting: str) -> None:
         """Check if a given temperature setting is valid, update if not."""
@@ -354,56 +403,24 @@ class Climate(App):
         self.adjust_for_conditions()
         self.suggest_for_conditions()
 
+    def update_door_check_delay(self, seconds: float) -> None:
+        """Update the delay before registering a door as open for each aircon."""
+        self.allow_suggestion()
+        for aircon in self.aircons.values():
+            aircon.door_open_delay = seconds
+
+    def update_vacating_delays(self, device_type: str, seconds: float) -> None:
+        """Update room vacating delay for each device of specified type."""
+        self.allow_suggestion()
+        for device in getattr(self, f"{device_type}s").values():
+            if not hasattr(device, "safe_when_vacant") or device.safe_when_vacant:
+                device.vacating_delay = seconds
+
     def terminate(self) -> None:
         """Cancel presence callbacks before termination (auto run by Appdaemon)."""
         for device_group in (self.aircons, self.heaters, self.humidifiers, self.fans):
             for device in device_group.values():
                 device.ignore_presence()
-
-    @property
-    def inside_temperature(self) -> float:
-        """Apparent temperature inside the house."""
-        return float(
-            self.entities.sensor.weighted_average_inside_apparent_temperature.state,
-        )
-
-    @property
-    def outside_temperature(self) -> float:
-        """Apparent temperature outside the house."""
-        return float(self.entities.sensor.outside_apparent_temperature.state)
-
-    def handle_temperature_change(
-        self,
-        entity: str,
-        attribute: str,
-        old: str,
-        new: str,
-        **kwargs: Any,
-    ) -> None:
-        """Handle a change in inside or outside temperature."""
-        del entity, attribute, old, kwargs
-        if new not in (None, "unavailable", "unknown"):
-            # TODO: https://app.asana.com/0/1207020279479204/1207217352886591/f
-            # be more resilient towards unavailable/unknown temperatures
-            self.suggest_for_conditions()
-
-    @property
-    def inside_too_hot_or_cold(self) -> bool:
-        """True if the inside temperature is above or below the max/min triggers."""
-        return not (
-            self.get_number_setting("low_temperature_aircon_trigger")
-            < self.inside_temperature
-            < self.get_number_setting("high_temperature_aircon_trigger")
-        )
-
-    @property
-    def outside_too_hot_or_cold(self) -> bool:
-        """True if the outside temperature exceeds desired indoor thresholds."""
-        return not (
-            self.get_number_setting("low_temperature_aircon_trigger")
-            <= self.outside_temperature
-            <= self.get_number_setting("high_temperature_aircon_trigger")
-        )
 
 
 class ClimateDevice(Device):
@@ -426,7 +443,7 @@ class ClimateDevice(Device):
             linked_rooms,
             control_input_boolean_suffix,
         )
-        self.controller: Climate = self.controller
+        self.controller: Climate = controller
         self.temperature_sensors: list[Entity] = []
         for _room in (room, *linked_rooms):
             temperature_sensor_id = f"sensor.{_room}_apparent_temperature_ignoring_wind"
@@ -470,42 +487,6 @@ class ClimateDevice(Device):
                 level="DEBUG",
             )
         return sum(temperatures) / len(temperatures)
-
-    @property
-    def room_humidity(self) -> float | None:
-        """Average humidity from all sensors in the room."""
-        humidities = [
-            float(sensor.attributes["humidity_source_value"])
-            for sensor in self.temperature_sensors
-            if sensor.attributes.get("humidity_source_value") is not None
-        ]
-        if len(humidities) == 0:
-            try:
-                humidity = float(
-                    self.controller.entities.sensor.weighted_average_inside_apparent_temperature.attributes[
-                        "humidity_source_value"
-                    ],
-                )
-            except (ValueError, KeyError):
-                self.log(
-                    "Inside humidity temperature sensor unavailable",
-                    level="WARNING",
-                )
-                return None
-            self.log(
-                "No room humidity sensors available, defaulting to "
-                f"average inside humidity {humidity}",
-                level="WARNING",
-            )
-            return humidity
-        if self.debugging and len(humidities) != len(self.temperature_sensors):
-            self.log(
-                f"{len(humidities)} of {len(self.temperature_sensors)} "
-                "humidity sensors available, calculated room humidity of "
-                f"{sum(humidities) / len(humidities)} may be innaccurate",
-                level="DEBUG",
-            )
-        return sum(humidities) / len(humidities)
 
     @property
     def room_above_target_temperature(self) -> bool:
@@ -586,6 +567,42 @@ class ClimateDevice(Device):
     def outside_too_hot_or_cold(self) -> bool:
         """True if outside temperature exceeds desired indoor thresholds."""
         return self.controller.outside_too_hot_or_cold
+
+    @property
+    def room_humidity(self) -> float | None:
+        """Average humidity from all sensors in the room."""
+        humidities = [
+            float(sensor.attributes["humidity_source_value"])
+            for sensor in self.temperature_sensors
+            if sensor.attributes.get("humidity_source_value") is not None
+        ]
+        if len(humidities) == 0:
+            try:
+                humidity = float(
+                    self.controller.entities.sensor.weighted_average_inside_apparent_temperature.attributes[
+                        "humidity_source_value"
+                    ],
+                )
+            except (ValueError, KeyError):
+                self.log(
+                    "Inside humidity temperature sensor unavailable",
+                    level="WARNING",
+                )
+                return None
+            self.log(
+                "No room humidity sensors available, defaulting to "
+                f"average inside humidity {humidity}",
+                level="WARNING",
+            )
+            return humidity
+        if self.debugging and len(humidities) != len(self.temperature_sensors):
+            self.log(
+                f"{len(humidities)} of {len(self.temperature_sensors)} "
+                "humidity sensors available, calculated room humidity of "
+                f"{sum(humidities) / len(humidities)} may be innaccurate",
+                level="DEBUG",
+            )
+        return sum(humidities) / len(humidities)
 
     @property
     def room_too_dry(self) -> bool:
@@ -757,26 +774,12 @@ class Aircon(ClimateDevice, PresenceDevice):
         self.user_adjusted_on_time_threshold = 1
 
     @property
-    def best_mode_for_conditions(self) -> str:
-        """Best climate mode (cool/heat/dry) for current room conditions."""
-        if self.room_too_humid and self.room_within_target_temperatures:
-            return "dry"
-        if self.room_above_target_temperature or self.room_closer_to_hot_than_cold:
-            return "cool"
-        return "heat"
-
-    @property
-    def mode_aided_by_outside_temperature(self) -> bool:
-        """True if the outside temperature is improving the inside temperature."""
-        return (
-            (self.device.state == "heat" and self.outside_hotter)
-            or (self.device.state == "cool" and self.outside_colder)
-            or (
-                self.device.state == "off"
-                and self.room_too_hot_or_cold
-                and not self.outside_too_hot_or_cold
-            )
-        )
+    def desired_target_temperature(self) -> float:
+        """Desired room target temperature based on settings and conditions."""
+        mode = self.best_mode_for_conditions
+        if mode not in ("cool", "heat"):
+            mode = "cool"
+        return self.controller.get_number_setting(mode + "ing_target_temperature")
 
     @property
     def target_temperature(self) -> float | None:
@@ -788,14 +791,6 @@ class Aircon(ClimateDevice, PresenceDevice):
             self.log("Target temperature is not available", level="WARNING")
             return None
         return float(target)
-
-    @property
-    def desired_target_temperature(self) -> float:
-        """Desired room target temperature based on settings and conditions."""
-        mode = self.best_mode_for_conditions
-        if mode not in ("cool", "heat"):
-            mode = "cool"
-        return self.controller.get_number_setting(mode + "ing_target_temperature")
 
     @property
     def fan_mode(self) -> str:
@@ -823,6 +818,28 @@ class Aircon(ClimateDevice, PresenceDevice):
             )
             return "rangefull"
         return swing_mode
+
+    @property
+    def best_mode_for_conditions(self) -> str:
+        """Best climate mode (cool/heat/dry) for current room conditions."""
+        if self.room_too_humid and self.room_within_target_temperatures:
+            return "dry"
+        if self.room_above_target_temperature or self.room_closer_to_hot_than_cold:
+            return "cool"
+        return "heat"
+
+    @property
+    def mode_aided_by_outside_temperature(self) -> bool:
+        """True if the outside temperature is improving the inside temperature."""
+        return (
+            (self.device.state == "heat" and self.outside_hotter)
+            or (self.device.state == "cool" and self.outside_colder)
+            or (
+                self.device.state == "off"
+                and self.room_too_hot_or_cold
+                and not self.outside_too_hot_or_cold
+            )
+        )
 
     @override
     def turn_on_for_conditions(self) -> None:
@@ -974,6 +991,19 @@ class Aircon(ClimateDevice, PresenceDevice):
                 )
         return False
 
+    def notify_if_turning_on_for_pets(self) -> None:
+        """Notify if aircon is turning on for the pets."""
+        if (
+            not self.controller.any_aircon_on
+            and self.controller.presence.pets_home_alone
+            and not self.controller.presence.anyone_home
+        ):
+            self.controller.notify(
+                f"It is {self.room_temperature:.1f}° in the {self.room}, "
+                "turning aircon on for the pets",
+                title="Climate Control",
+            )
+
     @property
     def door_open(self) -> bool:
         """True if any doors are open (and have been for the required delay)."""
@@ -1054,19 +1084,6 @@ class Aircon(ClimateDevice, PresenceDevice):
         super().handle_user_adjustment(user)
         self.controller.allow_suggestion()
 
-    def notify_if_turning_on_for_pets(self) -> None:
-        """Notify if aircon is turning on for the pets."""
-        if (
-            not self.controller.any_aircon_on
-            and self.controller.presence.pets_home_alone
-            and not self.controller.presence.anyone_home
-        ):
-            self.controller.notify(
-                f"It is {self.room_temperature:.1f}° in the {self.room}, "
-                "turning aircon on for the pets",
-                title="Climate Control",
-            )
-
 
 class Fan(ClimateDevice, PresenceDevice):
     """Control a fan and configure responses to environmental changes."""
@@ -1124,6 +1141,11 @@ class Fan(ClimateDevice, PresenceDevice):
         return valid_speed if valid_speed != 99 else 100  # noqa: PLR2004
 
     @property
+    def target_temperature(self) -> float:
+        """Fan's target temperature for the room."""
+        return self.controller.get_number_setting("cooling_target_temperature")
+
+    @property
     def desired_cooling_speed(self) -> float:
         """Fan speed required to lower apparent room temperature to the target."""
         room_temperature = self.room_temperature
@@ -1139,22 +1161,12 @@ class Fan(ClimateDevice, PresenceDevice):
         ]["cooling_per_speed"]
         if self.debugging:
             self.log(
-                f"Speed required to reduce temperature to the target "
-                f"{self.target_temperature:.1f}C is {speed:.1f}% (currently "
-                f"{self.room_temperature_with_wind_chill:.1f}C and {self.speed:.0f}%) ",
+                f"Desired fan speed calculated for the current room temperature "
+                f" of {self.room_temperature:.1f}C is {speed:.1f}%"
+                f"(currently {self.speed:.0f}%) ",
                 level="DEBUG",
             )
         return speed
-
-    @property
-    def reverse(self) -> bool:
-        """True if the fan's spin direction is set to reverse."""
-        return self.device.attributes.get("direction") == "reverse"
-
-    @property
-    def target_temperature(self) -> float:
-        """Fan's target temperature for the room."""
-        return self.controller.get_number_setting("cooling_target_temperature")
 
     @property
     def cooling_effect(self) -> float:
@@ -1181,12 +1193,9 @@ class Fan(ClimateDevice, PresenceDevice):
         )
 
     @property
-    def room_temperature_with_wind_chill(self) -> float | None:
-        """Apparent room temperature if the fan was off."""
-        room_temperature = self.room_temperature
-        if room_temperature is None:
-            return None
-        return room_temperature - self.cooling_effect
+    def reverse(self) -> bool:
+        """True if the fan's spin direction is set to reverse."""
+        return self.device.attributes.get("direction") == "reverse"
 
     @property
     def reverse_to_match_companion_device(self) -> bool:
@@ -1199,21 +1208,6 @@ class Fan(ClimateDevice, PresenceDevice):
                     self.companion_device.device.state == "heat_cool"
                     and not self.room_closer_to_hot_than_cold
                 )
-            )
-        )
-
-    def could_disturb_sleep_if_adjusted_to(
-        self,
-        speed: float,
-        *,
-        reverse: bool,
-    ) -> bool:
-        """Check if the fan could disturb sleep if adjusted."""
-        return (
-            self.room in ("bedroom", "nursery")
-            and self.controller.control.napping_in(self.room, sustained=True)
-            and (
-                reverse != self.reverse or (not self.on and speed >= self.minimum_speed)
             )
         )
 
@@ -1327,6 +1321,21 @@ class Fan(ClimateDevice, PresenceDevice):
         else:
             self.turn_on(percentage=speed)
 
+    def could_disturb_sleep_if_adjusted_to(
+        self,
+        speed: float,
+        *,
+        reverse: bool,
+    ) -> bool:
+        """Check if the fan could disturb sleep if adjusted."""
+        return (
+            self.room in ("bedroom", "nursery")
+            and self.controller.control.napping_in(self.room, sustained=True)
+            and (
+                reverse != self.reverse or (not self.on and speed >= self.minimum_speed)
+            )
+        )
+
     def continue_reverse(self, **kwargs: Any) -> None:
         """Continue the remaining fan reversal steps (reverse or change speed)."""
         del kwargs
@@ -1422,25 +1431,6 @@ class Heater(ClimateDevice, PresenceDevice):
         )
 
     @property
-    def on_when_away_and_not_safe(self) -> bool:
-        """True if the device is on, not safe, and no-one home."""
-        return (
-            not self.safe_when_vacant
-            and self.on
-            and (
-                not self.controller.presence.anyone_home
-                or self.controller.presence.manual_guest_mode
-                or self.controller.control.scene.startswith("Away")
-            )
-        )
-
-    @override
-    def turn_on_for_conditions(self) -> None:
-        """Turn the heater on and adjust the target temperature if appropriate."""
-        self.target_temperature = self.desired_target_temperature
-        self.turn_on()
-
-    @property
     def room_too_cold(self) -> bool:
         """True if the room is too cold based on the desired target temperature."""
         room_temperature = self.room_temperature
@@ -1460,6 +1450,12 @@ class Heater(ClimateDevice, PresenceDevice):
             > self.desired_target_temperature
             + self.constants["heater"]["target_buffer"]
         )
+
+    @override
+    def turn_on_for_conditions(self) -> None:
+        """Turn the heater on and adjust the target temperature if appropriate."""
+        self.target_temperature = self.desired_target_temperature
+        self.turn_on()
 
     @override
     def adjust_for_conditions(
@@ -1550,6 +1546,19 @@ class Heater(ClimateDevice, PresenceDevice):
                 )
             self.target_temperature = self.desired_target_temperature
         return False
+
+    @property
+    def on_when_away_and_not_safe(self) -> bool:
+        """True if the device is on, not safe, and no-one home."""
+        return (
+            not self.safe_when_vacant
+            and self.on
+            and (
+                not self.controller.presence.anyone_home
+                or self.controller.presence.manual_guest_mode
+                or self.controller.control.scene.startswith("Away")
+            )
+        )
 
     def handle_door_change(
         self,
@@ -1652,13 +1661,6 @@ class Humidifier(ClimateDevice, PresenceDevice):
         if self.on and not self.constant_humidity_mode:
             self.call_service("set_mode", mode="Constant Humidity")
 
-    @override
-    def turn_on_for_conditions(self) -> None:
-        """Turn the humidifier on and adjust the target humidity if appropriate."""
-        self.set_constant_humidity_mode()
-        self.target_humidity = self.controller.get_number_setting("target_humidity")
-        self.turn_on()
-
     @property
     def empty_water_tank(self) -> bool:
         """True if the humidifier's water tank is empty."""
@@ -1686,6 +1688,13 @@ class Humidifier(ClimateDevice, PresenceDevice):
                 targets="anyone_home",
             )
             self.already_notified_of_empty_water_tank = True
+
+    @override
+    def turn_on_for_conditions(self) -> None:
+        """Turn the humidifier on and adjust the target humidity if appropriate."""
+        self.set_constant_humidity_mode()
+        self.target_humidity = self.controller.get_number_setting("target_humidity")
+        self.turn_on()
 
     @override
     def adjust_for_conditions(

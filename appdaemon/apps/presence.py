@@ -270,6 +270,42 @@ class Room:
             else self.controller.get_now() - self.last_entered
         ).total_seconds()
 
+    def add_sensor(self, sensor_id: str) -> None:
+        """Add additional binary presence sensor to the room."""
+        sensor_id = f"binary_sensor.{sensor_id}"
+        self.sensors.append(sensor_id)
+        self.controller.listen_state(self.handle_presence_change, sensor_id)
+
+    def register_callback(
+        self,
+        callback: Callable,
+        vacating_delay: float,
+        control_input_boolean: str,
+    ) -> str:
+        """Register a callback for when presence changes, with an optional delay."""
+        handle = uuid.uuid4().hex
+        self.callbacks[handle] = {
+            "callback": callback,
+            "vacating_delay": vacating_delay,
+            "timer_handle": None,
+            "control_input_boolean": control_input_boolean,
+        }
+        if 0 < -1 * self.seconds_in_room() < vacating_delay:
+            self.callbacks[handle]["timer_handle"] = self.controller.run_in(
+                callback,
+                vacating_delay + self.seconds_in_room(),
+                constrain_input_boolean=control_input_boolean,
+            )
+        if self.debugging:
+            self.log(f"Registered callback {self.callbacks[handle] = }", level="DEBUG")
+        return handle
+
+    def cancel_callback(self, handle: str) -> None:
+        """Cancel a callback (and its timer if it has one) by passing its handle."""
+        if handle in self.callbacks:
+            self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
+            del self.callbacks[handle]
+
     def handle_presence_change(
         self,
         entity: str,
@@ -361,44 +397,8 @@ class Room:
                 )
                 self.controller.pets_home_alone = True
 
-    def add_sensor(self, sensor_id: str) -> None:
-        """Add additional binary presence sensor to the room."""
-        sensor_id = f"binary_sensor.{sensor_id}"
-        self.sensors.append(sensor_id)
-        self.controller.listen_state(self.handle_presence_change, sensor_id)
-
-    def register_callback(
-        self,
-        callback: Callable,
-        vacating_delay: float,
-        control_input_boolean: str,
-    ) -> str:
-        """Register a callback for when presence changes, with an optional delay."""
-        handle = uuid.uuid4().hex
-        self.callbacks[handle] = {
-            "callback": callback,
-            "vacating_delay": vacating_delay,
-            "timer_handle": None,
-            "control_input_boolean": control_input_boolean,
-        }
-        if 0 < -1 * self.seconds_in_room() < vacating_delay:
-            self.callbacks[handle]["timer_handle"] = self.controller.run_in(
-                callback,
-                vacating_delay + self.seconds_in_room(),
-                constrain_input_boolean=control_input_boolean,
-            )
-        if self.debugging:
-            self.log(f"Registered callback {self.callbacks[handle] = }", level="DEBUG")
-        return handle
-
-    def cancel_callback(self, handle: str) -> None:
-        """Cancel a callback (and its timer if it has one) by passing its handle."""
-        if handle in self.callbacks:
-            self.controller.cancel_timer(self.callbacks[handle]["timer_handle"])
-            del self.callbacks[handle]
-
     def log(self, message: str, level: str = "INFO") -> None:
-        """Log a message to the main log with device name prepended."""
+        """Log a message to the main log with room name prepended."""
         if level != "DEBUG" or self.debugging:
             self.controller.log(
                 f"[{self.room_id.replace('_', ' ').capitalize()} monitor] {message}",
